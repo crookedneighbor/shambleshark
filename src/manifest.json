@@ -1,9 +1,31 @@
 {
-  "name": "Chrome Extension Webpack",
+  "name": "Scryfall Deckbuilder Helper",
   "options_page": "options.html",
   "background": {
     "page": "background.html"
   },
+  "content_scripts": [{
+    "js":      [ "scryfall.bundle.js" ],
+    "matches": [
+      "*://*.scryfall.com/*"
+    ]
+  }, {
+    "js":      [ "edhrec.bundle.js" ],
+    "matches": [
+      "*://*.edhrec.com/*"
+    ],
+    "all_frames": true
+  }],
+  "externally_connectable": {
+    "matches": [
+      "*://*.scryfall.com/*",
+      "*://*.edhrec.com/*"
+    ]
+  },
+  "web_accessible_resources": [
+    "scryfallEmbed.bundle.js"
+  ],
+  "permissions": ["storage"],
   "browser_action": {
     "default_popup": "popup.html",
     "default_icon": "icon-34.png"
