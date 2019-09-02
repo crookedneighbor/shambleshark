@@ -29,20 +29,21 @@
     "snazzy": "^8.0.0",
     "standard": "^13.1.0",
     "style-loader": "^0.23.1",
-    "webpack": "4.28.4",
-    "webpack-cli": "^3.2.1",
-    "webpack-dev-server": "3.1.14",
-    "write-file-webpack-plugin": "4.5.0"
+    "webpack": "^4.39.3",
+    "webpack-cli": "^3.3.7",
+    "webpack-dev-server": "^3.8.0",
+    "write-file-webpack-plugin": "^4.5.1"
   },
   "dependencies": {
     "framebus": "^3.0.2",
-    "scryfall-client": "^0.10.0"
+    "scryfall-client": "^0.10.1"
   },
   "standard": {
     "globals": [
       "chai",
       "sinon",
       "describe",
+      "context",
       "it",
       "afterEach",
       "beforeEach",
