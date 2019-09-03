@@ -1,7 +1,7 @@
 import {
   reset,
   ready
-} from '../../src/js/lib/dom-node-ready'
+} from '../../src/js/lib/mutation'
 
 describe('domNodeReady', function () {
   beforeEach(function () {

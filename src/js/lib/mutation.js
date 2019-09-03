@@ -44,3 +44,7 @@ function check () {
     })
   })
 }
+
+export default {
+  ready
+}
