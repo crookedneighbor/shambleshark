@@ -21,10 +21,12 @@ beforeEach(function () {
       addEventListener: sandbox.stub(),
       getAttribute: sandbox.stub().returns(''),
       hasAttribute: sandbox.stub(),
+      removeAttribute: sandbox.stub(),
       setAttribute: sandbox.stub(),
       classList: {
         add: sandbox.stub(),
-        remove: sandbox.stub()
+        remove: sandbox.stub(),
+        toggle: sandbox.stub()
       },
       style: {},
       querySelector: sandbox.stub()
