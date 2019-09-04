@@ -24,7 +24,7 @@ var options = {
     popup: path.join(__dirname, 'src', 'js', 'popup.js'),
     options: path.join(__dirname, 'src', 'js', 'options.js'),
     background: path.join(__dirname, 'src', 'js', 'background.js'),
-    scryfallEmbed: path.join(__dirname, 'src', 'js', 'scryfall/embed.js'),
+    scryfallEmbed: path.join(__dirname, 'src', 'js', 'scryfall-embed', 'index.js'),
     scryfall: path.join(__dirname, 'src', 'js', 'scryfall/index.js'),
     edhrec: path.join(__dirname, 'src', 'js', 'edhrec/index.js')
   },

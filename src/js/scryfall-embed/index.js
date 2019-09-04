@@ -25,9 +25,7 @@ bus.on('ADD_CARD_TO_DECK', function ({
   addCard(activeDeckId, cardId).then(function (addedCardInfo) {
     if (isLand) {
       addedCardInfo.section = 'lands'
-      updateEntry(activeDeckId, addedCardInfo).then(function (updateInfo) {
-        // TODO do anything here?
-      })
+      updateEntry(activeDeckId, addedCardInfo)
     }
     pushNotification('Card Added', `Added ${cardName}.`, 'purple', 'deck')
   })
