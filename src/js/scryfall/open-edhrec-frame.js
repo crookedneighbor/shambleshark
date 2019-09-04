@@ -1,9 +1,17 @@
 import scryfall from '../lib/scryfall-client'
 import bus from 'framebus'
 
-export default function (commanders) {
+export default function (deck) {
   const modal = document.getElementById('edhrec-modal')
+  const entries = deck.entries
+  const commanders = entries.commanders
+  const cardsInDeck = Object.keys(entries).reduce((all, type) => {
+    entries[type].forEach(card => all[card.card_digest.name] = true)
 
+    return all
+  }, {})
+
+  // TODO dods his work still?
   document.querySelector('.left-tray').style.zIndex = 9000
 
   // TODO figure out partners
@@ -22,8 +30,7 @@ export default function (commanders) {
 
     bus.on('EDHREC_READY', function (reply) {
       reply({
-        // TODO send along all cards in deck
-        cardsInDeck: {}
+        cardsInDeck
       })
 
       modal.querySelector('.modal-dialog-content').style.display = 'none'

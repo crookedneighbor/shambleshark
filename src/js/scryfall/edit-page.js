@@ -43,11 +43,11 @@ function makeEDHRecButton () {
   button.addEventListener('click', (e) => {
     e.preventDefault()
 
-    bus.emit('REQUEST_COMMANDERS', ({ commanders }) => {
+    bus.emit('REQUEST_DECK', (deck) => {
       document.getElementById('deckbuilder').appendChild(modal)
       modal.removeAttribute('style')
 
-      openEDHRecFrame(commanders)
+      openEDHRecFrame(deck)
     })
   })
 

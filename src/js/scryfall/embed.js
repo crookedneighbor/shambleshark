@@ -9,18 +9,12 @@ import {
 
 let activeDeckId = null
 
-bus.on('REQUEST_COMMANDERS', function (reply) {
+bus.on('REQUEST_DECK', function (reply) {
   getActiveDeck().then(({ id }) => {
     activeDeckId = id
 
     return getDeck(id)
-  }).then((deck) => {
-    const commanders = deck.entries.commanders
-
-    reply({
-      commanders
-    })
-  })
+  }).then(reply)
 })
 
 bus.on('ADD_CARD_TO_DECK', function ({
@@ -28,13 +22,14 @@ bus.on('ADD_CARD_TO_DECK', function ({
   cardId,
   isLand
 }) {
-  addCard(activeDeckId, cardId, function (addedCardInfo) {
+  addCard(activeDeckId, cardId).then(function (addedCardInfo) {
     if (isLand) {
       addedCardInfo.section = 'lands'
-      updateEntry(activeDeckId, addedCardInfo, function (updateInfo) {
+      updateEntry(activeDeckId, addedCardInfo).then(function (updateInfo) {
         // TODO do anything here?
       })
     }
+    // TODO does this work?
     pushNotification('Card Added', `Added ${cardName}.`, 'purple', 'deck')
   })
 })
