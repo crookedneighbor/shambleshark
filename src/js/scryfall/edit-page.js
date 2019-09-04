@@ -23,7 +23,7 @@ function makeEDHRecButton () {
     <img src="https://assets.scryfall.com/assets/spinner-0e5953300e953759359ad94bcff35ac64ff73a403d3a0702e809d6c43e7e5ed5.gif" class="modal-dialog-spinner">
   </div>
   <!---->
-  <div class="modal-dialog-stage" style="display:none">
+  <div class="modal-dialog-stage" style="position:fixed;left:-100%;visibility:hidden">
   </div>
 </div>
 `

@@ -12,11 +12,21 @@ describe('EDHRec Ready', function () {
     expect(bus.emit).to.be.calledWith('EDHREC_READY')
   })
 
-  context('when edhrec iframe reports it it sready', function () {
+  context('when edhrec iframe reports it is ready', function () {
     beforeEach(function () {
       sandbox.stub(mutation, 'ready')
 
-      bus.emit.withArgs('EDHREC_READY').yields()
+      this.btn = this.makeDiv()
+      this.newBtn = this.makeDiv()
+      this.icon = this.makeDiv()
+      this.newBtn.querySelector.withArgs('.toggle-card-in-decklist-button-icon').returns(this.icon)
+      this.btn.getAttribute.withArgs('onclick').returns('toggleCardInDecklistButtonOnClick(event,\'Rashmi, Eternities Crafter\')')
+      this.newBtn.getAttribute.withArgs('data-present-in-scryfall-decklist').returns('false')
+      document.createElement.withArgs('div').returns(this.newBtn)
+
+      bus.emit.withArgs('EDHREC_READY').yields({
+        cardsInDeck: {}
+      })
     })
 
     it('removes non-essential elements', function () {
@@ -52,76 +62,107 @@ describe('EDHRec Ready', function () {
       expect(el.removeAttribute).to.be.calledWith('href')
     })
 
-    it('styles button as purple', function () {
-      const btn = this.makeDiv()
-
-      btn.getAttribute.withArgs('onclick').returns('toggleCardInDecklistButtonOnClick(event,Rashmi, Eternities Crafter')
-
-      mutation.ready.withArgs('.toggle-card-in-decklist-button').yields(btn)
+    it('replaces button with a new button', function () {
+      mutation.ready.withArgs('.toggle-card-in-decklist-button').yields(this.btn)
 
       start()
 
-      expect(btn.style.background).to.equal('#634496')
+      expect(this.btn.parentNode.removeChild).to.be.calledWith(this.btn)
+      expect(this.btn.parentNode.appendChild).to.be.calledWith(this.newBtn)
+    })
+
+    it('styles button as purple', function () {
+      mutation.ready.withArgs('.toggle-card-in-decklist-button').yields(this.btn)
+
+      start()
+
+      expect(this.newBtn.style.background).to.equal('#634496')
+    })
+
+    it('removes default icon styling', function () {
+      mutation.ready.withArgs('.toggle-card-in-decklist-button').yields(this.btn)
+
+      start()
+
+      expect(this.icon.classList.remove).to.be.calledWith('glyphicon-plus')
+      expect(this.icon.classList.remove).to.be.calledWith('glyphicon-ok')
     })
 
     it('sets a click handler on card buttons to toggle the class of the icon', function () {
-      const btn = this.makeDiv()
-      const icon = this.makeDiv()
-
-      btn.querySelector.withArgs('.toggle-card-in-decklist-button-icon').returns(icon)
-
-      btn.getAttribute.withArgs('onclick').returns('toggleCardInDecklistButtonOnClick(event,Rashmi, Eternities Crafter')
-      btn.addEventListener.yields({ preventDefault: sandbox.stub() })
-
-      mutation.ready.withArgs('.toggle-card-in-decklist-button').yields(btn)
+      mutation.ready.withArgs('.toggle-card-in-decklist-button').yields(this.btn)
 
       start()
 
-      expect(icon.classList.toggle).to.be.calledWith('glyphicon-plus')
-      expect(icon.classList.toggle).to.be.calledWith('glyphicon-ok')
+      const clickHandler = this.newBtn.addEventListener.args[0][1]
+
+      this.icon.classList.remove.resetHistory()
+      this.icon.classList.add.resetHistory()
+
+      clickHandler({
+        preventDefault: sandbox.stub()
+      })
+
+      expect(this.icon.classList.remove).to.be.calledWith('glyphicon-plus')
+      expect(this.icon.classList.remove).to.be.calledWith('glyphicon-ok')
+      expect(this.icon.classList.add).to.be.calledWith('glyphicon-ok')
+      expect(this.icon.classList.add).to.not.be.calledWith('glyphicon-plus')
     })
 
     it('sets a click handler on card buttons to add card', function () {
-      const btn = this.makeDiv()
-      const icon = this.makeDiv()
+      this.newBtn.addEventListener.yields({ preventDefault: sandbox.stub() })
 
-      btn.querySelector.withArgs('.toggle-card-in-decklist-button-icon').returns(icon)
-
-      btn.getAttribute.withArgs('onclick').returns(`toggleCardInDecklistButtonOnClick(event,'Rashmi, Eternities Crafter')`)
-      btn.addEventListener.yields({ preventDefault: sandbox.stub() })
-
-      mutation.ready.withArgs('.toggle-card-in-decklist-button').yields(btn)
+      mutation.ready.withArgs('.toggle-card-in-decklist-button').yields(this.btn)
 
       start()
 
-      expect(btn.setAttribute).to.be.calledWith('data-present-in-scryfall-decklist', true)
+      expect(this.newBtn.setAttribute).to.be.calledWith('data-present-in-scryfall-decklist', 'true')
       expect(bus.emit).to.be.calledWith('ADD_CARD_FROM_EDHREC', {
         cardName: 'Rashmi, Eternities Crafter'
       })
     })
 
     it('sets a click handler on card buttons to remove card if card is already marked as being in the deck', function () {
-      const btn = this.makeDiv()
-      const icon = this.makeDiv()
+      this.newBtn.getAttribute.withArgs('data-present-in-scryfall-decklist').returns('true')
+      this.newBtn.addEventListener.yields({ preventDefault: sandbox.stub() })
 
-      btn.querySelector.withArgs('.toggle-card-in-decklist-button-icon').returns(icon)
-
-      btn.hasAttribute.withArgs('data-present-in-scryfall-decklist').returns(true)
-      btn.getAttribute.withArgs('onclick').returns(`toggleCardInDecklistButtonOnClick(event,'Rashmi, Eternities Crafter')`)
-      btn.addEventListener.yields({ preventDefault: sandbox.stub() })
-
-      mutation.ready.withArgs('.toggle-card-in-decklist-button').yields(btn)
+      mutation.ready.withArgs('.toggle-card-in-decklist-button').yields(this.btn)
 
       start()
 
-      expect(btn.removeAttribute).to.be.calledWith('data-present-in-scryfall-decklist')
+      expect(this.newBtn.setAttribute).to.be.calledWith('data-present-in-scryfall-decklist', 'false')
       expect(bus.emit).to.be.calledWith('REMOVE_CARD_FROM_EDHREC', {
         cardName: 'Rashmi, Eternities Crafter'
       })
     })
 
-    it.skip('sets btn state depending on if the deck has the card already', function () {
-      // not implemented
+    it('configures button to show that cared is already in deck if card is in deck', function () {
+      bus.emit.withArgs('EDHREC_READY').yields({
+        cardsInDeck: {
+          'Rashmi, Eternities Crafter': true
+        }
+      })
+
+      mutation.ready.withArgs('.toggle-card-in-decklist-button').yields(this.btn)
+
+      start()
+
+      expect(this.newBtn.setAttribute).to.be.calledWith('data-present-in-scryfall-decklist', 'true')
+      expect(this.icon.classList.add).to.be.calledWith('glyphicon-ok')
+    })
+
+    it('configures button to show that cared is not already in deck if card is not in deck', function () {
+      bus.emit.withArgs('EDHREC_READY').yields({
+        cardsInDeck: {
+          'some other card': true
+        }
+      })
+
+      mutation.ready.withArgs('.toggle-card-in-decklist-button').yields(this.btn)
+
+      start()
+
+      expect(this.newBtn.setAttribute).to.be.calledWith('data-present-in-scryfall-decklist', 'false')
+      expect(this.icon.classList.add).to.be.calledWith('glyphicon-plus')
     })
   })
 })

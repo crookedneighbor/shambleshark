@@ -5,35 +5,57 @@ function removeElement (element) {
   element.parentNode.removeChild(element)
 }
 
+function setCardInDeckState (btn, cardInDeck) {
+  const icon = btn.querySelector('.toggle-card-in-decklist-button-icon')
+  const iconClass = `glyphicon-${cardInDeck ? 'ok' : 'plus'}`
+
+  icon.classList.remove('glyphicon-plus')
+  icon.classList.remove('glyphicon-ok')
+
+  btn.setAttribute('data-present-in-scryfall-decklist', String(cardInDeck))
+  icon.classList.add(iconClass)
+}
+
 export default function start () {
-  bus.emit('EDHREC_READY', function () {
+  // TODO move to constant
+  bus.emit('EDHREC_READY', function ({ cardsInDeck }) {
     mutation.ready('.toggle-card-in-decklist-button', (btn) => {
       const onclick = btn.getAttribute('onclick')
+
+      if (!onclick) {
+        return
+      }
+
+      const newButton = document.createElement('div')
+
+      newButton.classList.add('toggle-card-in-decklist-button')
+      // TODO move to constant
+      newButton.style.background = '#634496'
+
       const cardName = onclick.replace('toggleCardInDecklistButtonOnClick(event,\'', '').replace('\')', '').replace(/\\/g, '')
-      btn.style.background = '#634496'
-      const icon = btn.querySelector('.toggle-card-in-decklist-button-icon')
+      const cardInDeck = cardsInDeck[cardName] === true
 
-      // TODO set data-present-in-scryafll-decklist and gylphicon class
-      // on initialization
+      newButton.innerHTML = btn.innerHTML
 
-      btn.addEventListener('click', (e) => {
+      setCardInDeckState(newButton, cardInDeck)
+
+      newButton.addEventListener('click', (e) => {
         e.preventDefault()
 
-        icon.classList.toggle('glyphicon-plus')
-        icon.classList.toggle('glyphicon-ok')
+        const inDeckAlready = newButton.getAttribute('data-present-in-scryfall-decklist') === 'true'
+        const eventToEmit = inDeckAlready ? 'REMOVE_CARD_FROM_EDHREC' : 'ADD_CARD_FROM_EDHREC'
 
-        if (!btn.hasAttribute('data-present-in-scryfall-decklist')) {
-          btn.setAttribute('data-present-in-scryfall-decklist', true)
-          bus.emit('ADD_CARD_FROM_EDHREC', {
-            cardName
-          })
-        } else {
-          bus.emit('REMOVE_CARD_FROM_EDHREC', {
-            cardName
-          })
-          btn.removeAttribute('data-present-in-scryfall-decklist')
-        }
+        setCardInDeckState(newButton, !inDeckAlready)
+
+        bus.emit(eventToEmit, {
+          cardName
+        })
       })
+
+      const parentNode = btn.parentNode
+
+      parentNode.appendChild(newButton)
+      parentNode.removeChild(btn)
     })
 
     mutation.ready('.cards a', (element) => {

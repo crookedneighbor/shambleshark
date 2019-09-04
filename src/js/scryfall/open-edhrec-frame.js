@@ -21,14 +21,13 @@ export default function (commanders) {
     const content = modal.querySelector('.modal-dialog-stage')
 
     bus.on('EDHREC_READY', function (reply) {
-      // TODO setup a mutation observer to know when the buttons are ready
-      // instead of a timeout
-      setTimeout(function () {
-        reply()
+      reply({
+        // TODO send along all cards in deck
+        cardsInDeck: {}
+      })
 
-        modal.querySelector('.modal-dialog-content').style.display = 'none'
-        content.removeAttribute('style')
-      }, 1000)
+      modal.querySelector('.modal-dialog-content').style.display = 'none'
+      content.removeAttribute('style')
     })
 
     bus.on('ADD_CARD_FROM_EDHREC', function (payload) {
@@ -45,6 +44,7 @@ export default function (commanders) {
         console.log(err)
       })
     })
+    // TODO add REMOVE_CARD_FROM_EDHREC event
 
     content.appendChild(iframe)
   })
