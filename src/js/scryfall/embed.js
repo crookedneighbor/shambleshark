@@ -29,7 +29,6 @@ bus.on('ADD_CARD_TO_DECK', function ({
         // TODO do anything here?
       })
     }
-    // TODO does this work?
     pushNotification('Card Added', `Added ${cardName}.`, 'purple', 'deck')
   })
 })
