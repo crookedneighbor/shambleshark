@@ -14,6 +14,7 @@ beforeEach(function () {
   this.makeDiv = function (attributes = {}) {
     const defaultConfig = {
       innerHTML: '',
+      appendChild: sandbox.stub(),
       parentNode: {
         appendChild: sandbox.stub(),
         removeChild: sandbox.stub()
@@ -43,6 +44,8 @@ beforeEach(function () {
   }
   global.MutationObserver.prototype.observe = sandbox.stub()
   global.document = {
+    head: this.makeDiv(),
+    querySelector: sandbox.stub(),
     querySelectorAll: sandbox.stub().returns([]),
     createElement: createElement,
     getElementById: sandbox.stub()
