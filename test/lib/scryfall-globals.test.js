@@ -10,12 +10,13 @@ describe('Scryfall Globals', function () {
   beforeEach(function () {
     global.ScryfallAPI = {
       decks: {
-        active: sandbox.stub(),
+        active: sandbox.stub().yields({ id: 'deck-id' }),
         addCard: sandbox.stub(),
         get: sandbox.stub(),
         updateEntry: sandbox.stub()
       }
     }
+
     global.Scryfall = {
       pushNotification: sandbox.stub()
     }
@@ -23,8 +24,6 @@ describe('Scryfall Globals', function () {
 
   describe('getActiveDeck', function () {
     it('resolves with the active deck', function () {
-      global.ScryfallAPI.decks.active.yields({ id: 'deck-id' })
-
       return getActiveDeck().then((deck) => {
         expect(deck.id).to.equal('deck-id')
       })
@@ -32,12 +31,12 @@ describe('Scryfall Globals', function () {
   })
 
   describe('getDeck', function () {
-    it('resolves with the deck', function () {
+    it('gets the active deck', function () {
       const deck = { id: 'deck-id' }
 
       global.ScryfallAPI.decks.get.yields(deck)
 
-      return getDeck('deck-id').then((resolvedDeck) => {
+      return getDeck().then((resolvedDeck) => {
         expect(global.ScryfallAPI.decks.get).to.be.calledWith('deck-id')
 
         expect(deck).to.equal(resolvedDeck)
@@ -51,7 +50,7 @@ describe('Scryfall Globals', function () {
 
       global.ScryfallAPI.decks.addCard.yields(card)
 
-      return addCard('deck-id', 'card-id').then((resolvedCard) => {
+      return addCard('card-id').then((resolvedCard) => {
         expect(global.ScryfallAPI.decks.addCard).to.be.calledWith('deck-id', 'card-id')
 
         expect(card).to.equal(resolvedCard)
@@ -66,7 +65,7 @@ describe('Scryfall Globals', function () {
 
       global.ScryfallAPI.decks.updateEntry.yields(card)
 
-      return updateEntry('deck-id', cardToUpdate).then((resolvedCard) => {
+      return updateEntry(cardToUpdate).then((resolvedCard) => {
         expect(global.ScryfallAPI.decks.updateEntry).to.be.calledWith('deck-id', cardToUpdate)
 
         expect(card).to.equal(resolvedCard)

@@ -6,7 +6,9 @@ export default function (deck) {
   const entries = deck.entries
   const commanders = entries.commanders
   const cardsInDeck = Object.keys(entries).reduce((all, type) => {
-    entries[type].forEach(card => all[card.card_digest.name] = true)
+    entries[type].forEach((card) => {
+      all[card.card_digest.name] = true
+    })
 
     return all
   }, {})
