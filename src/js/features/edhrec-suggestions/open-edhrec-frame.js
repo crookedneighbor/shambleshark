@@ -1,4 +1,4 @@
-import scryfall from '../lib/scryfall-client'
+import scryfall from '../../lib/scryfall-client'
 import bus from 'framebus'
 
 export default function (deck) {
