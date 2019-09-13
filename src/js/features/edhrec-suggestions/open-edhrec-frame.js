@@ -1,8 +1,7 @@
 import scryfall from '../../lib/scryfall-client'
 import bus from 'framebus'
 
-export default function (deck) {
-  const modal = document.getElementById('edhrec-modal')
+export default function (deck, modal) {
   const entries = deck.entries
   const commanders = entries.commanders
   const cardsInDeck = Object.keys(entries).reduce((all, type) => {
@@ -27,15 +26,11 @@ export default function (deck) {
     iframe.src = edhrecUrl
     iframe.style.width = '100%'
     iframe.style.minHeight = '500px'
-    const content = modal.querySelector('.modal-dialog-stage')
 
     bus.on('EDHREC_READY', function (reply) {
       reply({
         cardsInDeck
       })
-
-      modal.querySelector('.modal-dialog-content').style.display = 'none'
-      content.removeAttribute('style')
     })
 
     bus.on('ADD_CARD_FROM_EDHREC', function (payload) {
@@ -54,6 +49,7 @@ export default function (deck) {
     })
     // TODO add REMOVE_CARD_FROM_EDHREC event
 
-    content.appendChild(iframe)
+    modal.setContent(iframe)
+    modal.open()
   })
 }
