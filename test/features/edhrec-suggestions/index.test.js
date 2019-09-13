@@ -1,4 +1,3 @@
-import bus from 'framebus'
 import EDHRecSuggestions from '../../../src/js/features/edhrec-suggestions'
 
 describe('EDHRec Suggestions', function () {
@@ -6,8 +5,6 @@ describe('EDHRec Suggestions', function () {
     let toolbar, deckbuilderElement
 
     beforeEach(function () {
-      jest.spyOn(bus, 'emit').mockImplementation()
-
       deckbuilderElement = document.createElement('div')
       deckbuilderElement.id = 'deckbuilder'
       document.body.appendChild(deckbuilderElement)
@@ -25,27 +22,12 @@ describe('EDHRec Suggestions', function () {
       expect(toolbar.querySelector('#edhrec-suggestions')).not.toBeFalsy()
     })
 
-    it.skip('opens an EDHRec modal when button is clicked', function () {
-      // TODO
-      // const fakeModal = document.createElement('div')
-      //
-      // document.body.appendChild(btn)
-      //
-      // bus.emit.mockImplementation((event, cb) => {
-      //   const response = {
-      //     entries: {},
-      //     commanders: []
-      //   }
-      //
-      //   if (event === 'REQUEST_DECK') {
-      //     cb(response)
-      //   }
-      // })
-      //
-      // btn.click()
-      //
-      // expect(openEDHRecFrame).toBeCalledTimes(1)
-      // expect(openEDHRecFrame).toBeCalledWith(fakeModal)
+    it('adds an edhrec modal to page', function () {
+      const feature = new EDHRecSuggestions()
+
+      feature.run()
+
+      expect(deckbuilderElement.querySelector('#edhrec-modal')).not.toBeFalsy()
     })
   })
 })
