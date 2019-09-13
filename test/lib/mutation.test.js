@@ -4,106 +4,96 @@ import {
 } from '../../src/js/lib/mutation'
 
 describe('domNodeReady', function () {
-  beforeEach(function () {
-    sandbox.spy(global, 'MutationObserver')
-  })
-
   afterEach(function () {
     reset()
   })
 
   it('applies transformation to specified dom nodes right away', function () {
-    const div = this.makeDiv()
-    const div2 = this.makeDiv()
-    const spy = sandbox.stub()
+    const spy = jest.fn()
 
-    document.querySelectorAll.withArgs('.class-name').returns([
-      div,
-      div2
-    ])
+    const div = document.createElement('div')
+    const div2 = document.createElement('div')
 
-    ready('.class-name', spy)
+    div.classList.add('class-name')
+    div2.classList.add('class-name')
 
-    expect(spy.callCount).to.equal(2)
-    expect(spy).to.be.calledWith(div)
-    expect(spy).to.be.calledWith(div2)
-  })
-
-  it('adds check to mutation observer', function () {
-    const spy = sandbox.stub()
+    document.body.appendChild(div)
+    document.body.appendChild(div2)
 
     ready('.class-name', spy)
 
-    expect(global.MutationObserver.calledWithNew()).to.equal(true)
-    expect(global.MutationObserver).to.be.calledWith(sandbox.match.func)
+    expect(spy).toBeCalledTimes(2)
+    expect(spy).toBeCalledWith(div)
+    expect(spy).toBeCalledWith(div2)
   })
 
   it('only creates observer once', function () {
-    const spy = sandbox.stub()
+    const spy = jest.fn()
 
+    jest.spyOn(global.MutationObserver.prototype, 'observe')
     ready('.class-name', spy)
 
-    expect(global.MutationObserver.callCount).to.equal(1)
-    expect(global.MutationObserver.calledWithNew()).to.equal(true)
-    expect(global.MutationObserver).to.be.calledWith(sandbox.match.func)
+    expect(global.MutationObserver.prototype.observe).toBeCalledTimes(1)
+    expect(global.MutationObserver.prototype.observe).toBeCalledWith(document.documentElement, {
+      childList: true,
+      subtree: true
+    })
 
     ready('.another-class-name', spy)
 
-    expect(global.MutationObserver.callCount).to.equal(1)
+    expect(global.MutationObserver.prototype.observe).toBeCalledTimes(1)
   })
 
   it('applies transformation to specified dom nodes only once', function () {
-    const div = this.makeDiv()
-    const div2 = this.makeDiv()
-    const spy = sandbox.stub()
+    const spy = jest.fn()
 
-    document.querySelectorAll.withArgs('.class-name').returns([
-      div,
-      div2
-    ])
+    const div = document.createElement('div')
+    const div2 = document.createElement('div')
 
-    ready('.class-name', spy)
+    div.classList.add('class-name')
+    div2.classList.add('class-name')
 
-    expect(spy.callCount).to.equal(2)
-    expect(spy).to.be.calledWith(div)
-    expect(spy).to.be.calledWith(div2)
+    document.body.appendChild(div)
+    document.body.appendChild(div2)
 
     ready('.class-name', spy)
 
-    expect(spy.callCount).to.equal(2)
+    expect(spy).toBeCalledTimes(2)
+    expect(spy).toBeCalledWith(div)
+    expect(spy).toBeCalledWith(div2)
+
+    ready('.class-name', spy)
+
+    expect(spy).toBeCalledTimes(2)
   })
 
   it('applies transformation only to new dom nodes', function () {
-    const div = this.makeDiv()
-    const div2 = this.makeDiv()
-    const spy = sandbox.stub()
+    const spy = jest.fn()
 
-    document.querySelectorAll.withArgs('.class-name').returns([
-      div,
-      div2
-    ])
+    const div = document.createElement('div')
+    const div2 = document.createElement('div')
+
+    div.classList.add('class-name')
+    div2.classList.add('class-name')
+
+    document.body.appendChild(div)
+    document.body.appendChild(div2)
 
     ready('.class-name', spy)
 
-    const handler = global.MutationObserver.args[0][0]
+    expect(spy).toBeCalledTimes(2)
+    expect(spy).toBeCalledWith(div)
+    expect(spy).toBeCalledWith(div2)
 
-    expect(spy.callCount).to.equal(2)
-    expect(spy).to.be.calledWith(div)
-    expect(spy).to.be.calledWith(div2)
+    const div3 = document.createElement('div')
+    div3.classList.add('class-name')
+    document.body.appendChild(div3)
 
-    spy.resetHistory()
+    spy.mockReset()
 
-    const div3 = this.makeDiv()
+    ready('.class-name', spy)
 
-    document.querySelectorAll.withArgs('.class-name').returns([
-      div,
-      div3,
-      div2
-    ])
-
-    handler()
-
-    expect(spy.callCount).to.equal(1)
-    expect(spy).to.be.calledWith(div3)
+    expect(spy).toBeCalledTimes(1)
+    expect(spy).toBeCalledWith(div3)
   })
 })

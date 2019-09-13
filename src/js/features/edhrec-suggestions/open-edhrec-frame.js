@@ -13,7 +13,6 @@ export default function (deck) {
     return all
   }, {})
 
-  // TODO dods his work still?
   document.querySelector('.left-tray').style.zIndex = 9000
 
   // TODO figure out partners

@@ -11,7 +11,7 @@ export default class EDHRecSuggestions extends Feature {
   }
 
   isEnabled () {
-  // TODO only put edhrec button on when configured in options
+    // TODO only put edhrec button on when configured in options
     return true
   }
 }

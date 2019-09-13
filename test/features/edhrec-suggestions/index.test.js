@@ -3,51 +3,49 @@ import EDHRecSuggestions from '../../../src/js/features/edhrec-suggestions'
 
 describe('EDHRec Suggestions', function () {
   describe('addToDeckEditPage', function () {
-    beforeEach(function () {
-      this.feature = new EDHRecSuggestions()
+    let toolbar, deckbuilderElement
 
-      this.toolbar = this.makeDiv()
-      this.script = this.makeDiv()
-      this.button = this.makeDiv()
-      this.modal = this.makeDiv()
-      this.modal.querySelector.returns(this.makeDiv())
-      document.querySelector.withArgs('.deckbuilder-toolbar-items-right').returns(this.toolbar)
-      document.createElement.withArgs('button').returns(this.button)
-      document.createElement.withArgs('div').returns(this.modal)
-      document.createElement.withArgs('script').returns(this.script)
+    beforeEach(function () {
+      jest.spyOn(bus, 'emit').mockImplementation()
+
+      deckbuilderElement = document.createElement('div')
+      deckbuilderElement.id = 'deckbuilder'
+      document.body.appendChild(deckbuilderElement)
+
+      toolbar = document.createElement('div')
+      toolbar.classList.add('deckbuilder-toolbar-items-right')
+      document.body.appendChild(toolbar)
     })
 
     it('adds an edhrec button to the toolbar items on the page', function () {
-      this.feature.addToDeckEditPage()
+      const feature = new EDHRecSuggestions()
 
-      expect(document.querySelector).to.be.calledWith('.deckbuilder-toolbar-items-right')
-      expect(this.toolbar.appendChild.callCount).to.equal(1)
-      expect(this.toolbar.appendChild).to.be.calledWith()
+      feature.addToDeckEditPage()
+
+      expect(toolbar.querySelector('#edhrec-suggestions')).not.toBeFalsy()
     })
 
     it.skip('opens an EDHRec modal when button is clicked', function () {
-      this.feature.addToDeckEditPage()
-
-      const clickHandler = this.button.addEventListener.args[0][1]
-      const fakeDeckbuilderElement = this.makeDiv()
-
-      bus.emit.withArgs('REQUEST_DECK').yields({
-        entries: {},
-        commanders: []
-      })
-      document.getElementById.withArgs('deckbuilder').returns(fakeDeckbuilderElement)
-
-      clickHandler({
-        preventDefault: sandbox.stub()
-      })
-
-      expect(bus.emit).to.be.calledWith('REQUEST_DECK')
-      expect(fakeDeckbuilderElement.apprendChild).to.be.calledWith(this.modal)
-      expect(this.modal.removeAttribute).to.be.calledWith('style')
-    })
-
-    it('closes modal when close button is clicked', function () {
       // TODO
+      // const fakeModal = document.createElement('div')
+      //
+      // document.body.appendChild(btn)
+      //
+      // bus.emit.mockImplementation((event, cb) => {
+      //   const response = {
+      //     entries: {},
+      //     commanders: []
+      //   }
+      //
+      //   if (event === 'REQUEST_DECK') {
+      //     cb(response)
+      //   }
+      // })
+      //
+      // btn.click()
+      //
+      // expect(openEDHRecFrame).toBeCalledTimes(1)
+      // expect(openEDHRecFrame).toBeCalledWith(fakeModal)
     })
   })
 

@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "standard --verbose | snazzy",
     "posttest": "npm run lint",
-    "test": "mocha --recursive --require @babel/register test/ ",
+    "test": "jest",
     "build": "node utils/build.js",
     "start": "node utils/webserver.js"
   },
@@ -14,7 +14,6 @@
     "@babel/core": "^7.5.5",
     "@babel/preset-env": "^7.5.5",
     "@babel/register": "^7.5.5",
-    "chai": "^4.2.0",
     "clean-webpack-plugin": "^1.0.0",
     "copy-webpack-plugin": "^4.6.0",
     "css-loader": "2.1.0",
@@ -22,10 +21,7 @@
     "fs-extra": "7.0.1",
     "html-loader": "0.5.5",
     "html-webpack-plugin": "3.2.0",
-    "mocha": "^6.2.0",
-    "sinon": "^7.4.1",
-    "sinon-chai": "^3.3.0",
-    "sinon-chrome": "^3.0.1",
+    "jest": "^24.9.0",
     "snazzy": "^8.0.0",
     "standard": "^13.1.0",
     "style-loader": "^0.23.1",
@@ -40,18 +36,16 @@
   },
   "standard": {
     "globals": [
-      "chai",
-      "sinon",
-      "describe",
-      "context",
-      "it",
+      "Scryfall",
+      "ScryfallAPI",
       "afterEach",
       "beforeEach",
       "chrome",
-      "sandbox",
+      "describe",
       "expect",
-      "Scryfall",
-      "ScryfallAPI"
+      "it",
+      "jest",
+      "test"
     ]
   }
 }

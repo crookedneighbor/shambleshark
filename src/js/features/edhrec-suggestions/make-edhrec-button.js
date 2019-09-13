@@ -6,6 +6,7 @@ export default function makeEDHRecButton () {
   const button = document.createElement('button')
   const modal = makeEDHRecModal()
 
+  button.id = 'edhrec-suggestions'
   button.classList.add('button-n', 'tiny')
   button.innerText = 'EDHRec Suggestions'
 

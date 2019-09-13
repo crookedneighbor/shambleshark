@@ -3,166 +3,248 @@ import mutation from '../../src/js/lib/mutation'
 import bus from 'framebus'
 
 describe('EDHRec Ready', function () {
+  beforeEach(function () {
+    jest.spyOn(bus, 'emit').mockImplementation()
+  })
+
   it('sets up a listener for EDHREC_READY event', function () {
-    expect(bus.emit.callCount).to.equal(0)
+    expect(bus.emit).toBeCalledTimes(0)
 
     start()
 
-    expect(bus.emit.callCount).to.equal(1)
-    expect(bus.emit).to.be.calledWith('EDHREC_READY')
+    expect(bus.emit).toBeCalledTimes(1)
+    expect(bus.emit).toBeCalledWith('EDHREC_READY', expect.any(Function))
   })
 
-  context('when edhrec iframe reports it is ready', function () {
+  describe('when edhrec iframe reports it is ready', function () {
+    let btn
+
     beforeEach(function () {
-      sandbox.stub(mutation, 'ready')
+      jest.spyOn(mutation, 'ready').mockImplementation()
 
-      this.btn = this.makeDiv()
-      this.newBtn = this.makeDiv()
-      this.icon = this.makeDiv()
-      this.newBtn.querySelector.withArgs('.toggle-card-in-decklist-button-icon').returns(this.icon)
-      this.btn.getAttribute.withArgs('onclick').returns('toggleCardInDecklistButtonOnClick(event,\'Rashmi, Eternities Crafter\')')
-      this.newBtn.getAttribute.withArgs('data-present-in-scryfall-decklist').returns('false')
-      document.createElement.withArgs('div').returns(this.newBtn)
+      btn = document.createElement('div')
+      const icon = document.createElement('div')
 
-      bus.emit.withArgs('EDHREC_READY').yields({
-        cardsInDeck: {}
+      icon.classList.add('toggle-card-in-decklist-button-icon')
+      btn.setAttribute('onclick', 'toggleCardInDecklistButtonOnClick(event,\'Rashmi, Eternities Crafter\')')
+      btn.appendChild(icon)
+
+      bus.emit.mockImplementation((event, cb) => {
+        const response = {
+          cardsInDeck: {}
+        }
+
+        if (event === 'EDHREC_READY') {
+          cb(response)
+        }
       })
+
+      document.body.appendChild(btn)
     })
 
     it('removes non-essential elements', function () {
-      const el = this.makeDiv()
-      const el2 = this.makeDiv()
-      const el3 = this.makeDiv()
-      const el4 = this.makeDiv()
-      const el5 = this.makeDiv()
+      const elements = {
+        '#leaderboard': document.createElement('div'),
+        '.edhrec2__panels-outer': document.createElement('div'),
+        '.decklist': document.createElement('div'),
+        '.footer': document.createElement('div'),
+        '.navbar-header .navbar-toggle': document.createElement('div')
+      }
 
-      mutation.ready.withArgs('#leaderboard').yields(el)
-      mutation.ready.withArgs('.edhrec2__panels-outer').yields(el2)
-      mutation.ready.withArgs('.decklist').yields(el3)
-      mutation.ready.withArgs('.footer').yields(el4)
-      mutation.ready.withArgs('.navbar-header .navbar-toggle').yields(el5)
+      Object.keys(elements).forEach((selector) => {
+        document.body.appendChild(elements[selector])
+      })
+
+      jest.spyOn(mutation, 'ready').mockImplementation((selector, cb) => {
+        if (selector in elements) {
+          cb(elements[selector])
+        }
+      })
 
       start()
 
-      expect(el.parentNode.removeChild).to.be.calledWith(el)
-      expect(el2.parentNode.removeChild).to.be.calledWith(el2)
-      expect(el3.parentNode.removeChild).to.be.calledWith(el3)
-      expect(el4.parentNode.removeChild).to.be.calledWith(el4)
-      expect(el5.parentNode.removeChild).to.be.calledWith(el5)
+      expect(document.querySelector('#leaderbaord')).toBeNull()
+      expect(document.querySelector('.edhrec2__panels-outer')).toBeNull()
+      expect(document.querySelector('.decklist')).toBeNull()
+      expect(document.querySelector('.footer')).toBeNull()
+      expect(document.querySelector('.navbar-header .navbar-toggle')).toBeNull()
     })
 
     it('removes href attributes from links', function () {
-      const el = this.makeDiv()
+      const el = document.createElement('a')
+      el.href = 'https://example.com'
 
-      mutation.ready.withArgs('.cards a').yields(el)
+      jest.spyOn(mutation, 'ready').mockImplementation((selector, cb) => {
+        if (selector === '.cards a') {
+          cb(el)
+        }
+      })
 
       start()
 
-      expect(el.removeAttribute.callCount).to.equal(1)
-      expect(el.removeAttribute).to.be.calledWith('href')
+      expect(el.href).toBeFalsy()
     })
 
     it('replaces button with a new button', function () {
-      mutation.ready.withArgs('.toggle-card-in-decklist-button').yields(this.btn)
+      jest.spyOn(mutation, 'ready').mockImplementation((selector, cb) => {
+        if (selector === '.toggle-card-in-decklist-button') {
+          cb(btn)
+        }
+      })
+
+      expect(document.body.children).toContain(btn)
 
       start()
 
-      expect(this.btn.parentNode.removeChild).to.be.calledWith(this.btn)
-      expect(this.btn.parentNode.appendChild).to.be.calledWith(this.newBtn)
+      expect(document.body.children).not.toContain(btn)
+      expect(document.querySelector('.toggle-card-in-decklist-button')).not.toBeFalsy()
     })
 
     it('styles button as purple', function () {
-      mutation.ready.withArgs('.toggle-card-in-decklist-button').yields(this.btn)
+      jest.spyOn(mutation, 'ready').mockImplementation((selector, cb) => {
+        if (selector === '.toggle-card-in-decklist-button') {
+          cb(btn)
+        }
+      })
 
       start()
 
-      expect(this.newBtn.style.background).to.equal('#634496')
+      const newBtn = document.querySelector('.toggle-card-in-decklist-button')
+
+      expect(newBtn.style.background).toBe('rgb(99, 68, 150)')
     })
 
-    it('removes default icon styling', function () {
-      mutation.ready.withArgs('.toggle-card-in-decklist-button').yields(this.btn)
+    it('defaults glyphicon icon to plus state', function () {
+      jest.spyOn(mutation, 'ready').mockImplementation((selector, cb) => {
+        if (selector === '.toggle-card-in-decklist-button') {
+          cb(btn)
+        }
+      })
 
       start()
 
-      expect(this.icon.classList.remove).to.be.calledWith('glyphicon-plus')
-      expect(this.icon.classList.remove).to.be.calledWith('glyphicon-ok')
+      const newBtn = document.querySelector('.toggle-card-in-decklist-button')
+
+      expect(newBtn.querySelector('.toggle-card-in-decklist-button-icon').className).toContain('glyphicon-plus')
     })
 
     it('sets a click handler on card buttons to toggle the class of the icon', function () {
-      mutation.ready.withArgs('.toggle-card-in-decklist-button').yields(this.btn)
+      jest.spyOn(mutation, 'ready').mockImplementation((selector, cb) => {
+        if (selector === '.toggle-card-in-decklist-button') {
+          cb(btn)
+        }
+      })
 
       start()
 
-      const clickHandler = this.newBtn.addEventListener.args[0][1]
+      const newBtn = document.querySelector('.toggle-card-in-decklist-button')
 
-      this.icon.classList.remove.resetHistory()
-      this.icon.classList.add.resetHistory()
+      expect(newBtn.querySelector('.toggle-card-in-decklist-button-icon').className).toContain('glyphicon-plus')
+      expect(newBtn.querySelector('.toggle-card-in-decklist-button-icon').className).not.toContain('glyphicon-ok')
 
-      clickHandler({
-        preventDefault: sandbox.stub()
-      })
+      newBtn.click()
 
-      expect(this.icon.classList.remove).to.be.calledWith('glyphicon-plus')
-      expect(this.icon.classList.remove).to.be.calledWith('glyphicon-ok')
-      expect(this.icon.classList.add).to.be.calledWith('glyphicon-ok')
-      expect(this.icon.classList.add).to.not.be.calledWith('glyphicon-plus')
+      expect(newBtn.querySelector('.toggle-card-in-decklist-button-icon').className).not.toContain('glyphicon-plus')
+      expect(newBtn.querySelector('.toggle-card-in-decklist-button-icon').className).toContain('glyphicon-ok')
     })
 
     it('sets a click handler on card buttons to add card', function () {
-      this.newBtn.addEventListener.yields({ preventDefault: sandbox.stub() })
-
-      mutation.ready.withArgs('.toggle-card-in-decklist-button').yields(this.btn)
+      jest.spyOn(mutation, 'ready').mockImplementation((selector, cb) => {
+        if (selector === '.toggle-card-in-decklist-button') {
+          cb(btn)
+        }
+      })
 
       start()
 
-      expect(this.newBtn.setAttribute).to.be.calledWith('data-present-in-scryfall-decklist', 'true')
-      expect(bus.emit).to.be.calledWith('ADD_CARD_FROM_EDHREC', {
+      const newBtn = document.querySelector('.toggle-card-in-decklist-button')
+
+      expect(newBtn.getAttribute('data-present-in-scryfall-decklist')).toBe('false')
+
+      newBtn.click()
+
+      expect(newBtn.getAttribute('data-present-in-scryfall-decklist')).toBe('true')
+
+      expect(bus.emit).toBeCalledWith('ADD_CARD_FROM_EDHREC', {
         cardName: 'Rashmi, Eternities Crafter'
       })
     })
 
     it('sets a click handler on card buttons to remove card if card is already marked as being in the deck', function () {
-      this.newBtn.getAttribute.withArgs('data-present-in-scryfall-decklist').returns('true')
-      this.newBtn.addEventListener.yields({ preventDefault: sandbox.stub() })
-
-      mutation.ready.withArgs('.toggle-card-in-decklist-button').yields(this.btn)
+      jest.spyOn(mutation, 'ready').mockImplementation((selector, cb) => {
+        if (selector === '.toggle-card-in-decklist-button') {
+          cb(btn)
+        }
+      })
 
       start()
 
-      expect(this.newBtn.setAttribute).to.be.calledWith('data-present-in-scryfall-decklist', 'false')
-      expect(bus.emit).to.be.calledWith('REMOVE_CARD_FROM_EDHREC', {
+      const newBtn = document.querySelector('.toggle-card-in-decklist-button')
+
+      newBtn.setAttribute('data-present-in-scryfall-decklist', 'true')
+
+      newBtn.click()
+
+      expect(newBtn.getAttribute('data-present-in-scryfall-decklist')).toBe('false')
+      expect(bus.emit).toBeCalledWith('REMOVE_CARD_FROM_EDHREC', {
         cardName: 'Rashmi, Eternities Crafter'
       })
     })
 
-    it('configures button to show that cared is already in deck if card is in deck', function () {
-      bus.emit.withArgs('EDHREC_READY').yields({
-        cardsInDeck: {
-          'Rashmi, Eternities Crafter': true
+    it('configures button to show that card is already in deck if card is in deck', function () {
+      bus.emit.mockImplementation((event, cb) => {
+        const response = {
+          cardsInDeck: {
+            'Rashmi, Eternities Crafter': true
+          }
+        }
+
+        if (event === 'EDHREC_READY') {
+          cb(response)
         }
       })
 
-      mutation.ready.withArgs('.toggle-card-in-decklist-button').yields(this.btn)
+      jest.spyOn(mutation, 'ready').mockImplementation((selector, cb) => {
+        if (selector === '.toggle-card-in-decklist-button') {
+          cb(btn)
+        }
+      })
 
       start()
 
-      expect(this.newBtn.setAttribute).to.be.calledWith('data-present-in-scryfall-decklist', 'true')
-      expect(this.icon.classList.add).to.be.calledWith('glyphicon-ok')
+      const newBtn = document.querySelector('.toggle-card-in-decklist-button')
+
+      expect(newBtn.getAttribute('data-present-in-scryfall-decklist')).toBe('true')
+      expect(newBtn.querySelector('.toggle-card-in-decklist-button-icon').className).toContain('glyphicon-ok')
+      expect(newBtn.querySelector('.toggle-card-in-decklist-button-icon').className).not.toContain('glyphicon-plus')
     })
 
     it('configures button to show that cared is not already in deck if card is not in deck', function () {
-      bus.emit.withArgs('EDHREC_READY').yields({
-        cardsInDeck: {
-          'some other card': true
+      bus.emit.mockImplementation((event, cb) => {
+        const response = {
+          cardsInDeck: {
+            'some other card': true
+          }
+        }
+
+        if (event === 'EDHREC_READY') {
+          cb(response)
         }
       })
 
-      mutation.ready.withArgs('.toggle-card-in-decklist-button').yields(this.btn)
+      jest.spyOn(mutation, 'ready').mockImplementation((selector, cb) => {
+        if (selector === '.toggle-card-in-decklist-button') {
+          cb(btn)
+        }
+      })
 
       start()
 
-      expect(this.newBtn.setAttribute).to.be.calledWith('data-present-in-scryfall-decklist', 'false')
-      expect(this.icon.classList.add).to.be.calledWith('glyphicon-plus')
+      const newBtn = document.querySelector('.toggle-card-in-decklist-button')
+
+      expect(newBtn.getAttribute('data-present-in-scryfall-decklist')).toBe('false')
+      expect(newBtn.querySelector('.toggle-card-in-decklist-button-icon').className).not.toContain('glyphicon-ok')
+      expect(newBtn.querySelector('.toggle-card-in-decklist-button-icon').className).toContain('glyphicon-plus')
     })
   })
 })
