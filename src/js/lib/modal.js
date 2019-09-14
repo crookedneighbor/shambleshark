@@ -20,13 +20,15 @@ export default class Modal {
       this._contentNode.innerHTML = ''
       this._contentNode.appendChild(content)
     }
+  }
 
-    if (content) {
-      this.element.querySelector('.modal-dialog-stage').removeAttribute('style')
-      this.element.querySelector('.modal-dialog-content').style.display = 'none'
-    } else {
+  setLoading (state) {
+    if (state) {
       this.element.querySelector('.modal-dialog-stage').style.display = 'none'
       this.element.querySelector('.modal-dialog-content').removeAttribute('style')
+    } else {
+      this.element.querySelector('.modal-dialog-stage').removeAttribute('style')
+      this.element.querySelector('.modal-dialog-content').style.display = 'none'
     }
   }
 

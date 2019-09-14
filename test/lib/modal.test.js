@@ -100,13 +100,15 @@ describe('makeModal', function () {
 
       expect(modal.element.querySelector('.modal-dialog-stage #some-id').innerHTML).toBe('foo')
     })
+  })
 
-    it('hides the spinner when content is given', function () {
+  describe('setLoading', function () {
+    it('hides the spinner', function () {
       const modal = new Modal({
         content: 'Some content'
       })
 
-      modal.setContent('new content')
+      modal.setLoading(false)
 
       expect(modal.element.querySelector('.modal-dialog-stage').style.display).toBeFalsy()
       expect(modal.element.querySelector('.modal-dialog-content').style.display).toBe('none')
@@ -117,7 +119,7 @@ describe('makeModal', function () {
         content: 'Some content'
       })
 
-      modal.setContent('')
+      modal.setLoading(true)
 
       expect(modal.element.querySelector('.modal-dialog-stage').style.display).toBe('none')
       expect(modal.element.querySelector('.modal-dialog-content').style.display).toBeFalsy()

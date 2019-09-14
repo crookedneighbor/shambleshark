@@ -1,10 +1,13 @@
 import EDHRecSuggestions from '../features/edhrec-suggestions'
 
 export default function () {
-  [
+  // to allow push notifications to appear above modals
+  document.querySelector('.left-tray').style.zIndex = 9000
+
+  return Promise.all([
     EDHRecSuggestions
-  ].forEach(function (Feature) {
+  ].map(function (Feature) {
     const feature = new Feature()
-    feature.run()
-  })
+    return feature.run()
+  }))
 }

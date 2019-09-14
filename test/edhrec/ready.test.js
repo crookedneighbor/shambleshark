@@ -3,11 +3,62 @@ import mutation from '../../src/js/lib/mutation'
 import bus from 'framebus'
 
 describe('EDHRec Ready', function () {
+  let elementsToDelete
+
   beforeEach(function () {
     jest.spyOn(bus, 'emit').mockImplementation()
+
+    elementsToDelete = {
+      '#leaderboard': document.createElement('div'),
+      '.edhrec2__panels-outer': document.createElement('div'),
+      '.decklist': document.createElement('div'),
+      '.footer': document.createElement('div'),
+      '.navbar-header .navbar-toggle': document.createElement('div')
+    }
+
+    Object.keys(elementsToDelete).forEach((selector) => {
+      document.body.appendChild(elementsToDelete[selector])
+    })
   })
 
-  it('sets up a listener for EDHREC_READY event', function () {
+  it('removes non-essential elements', function () {
+    jest.spyOn(mutation, 'ready').mockImplementation((selector, cb) => {
+      if (selector in elementsToDelete) {
+        cb(elementsToDelete[selector])
+      }
+    })
+
+    start()
+
+    expect(document.querySelector('#leaderbaord')).toBeNull()
+    expect(document.querySelector('.edhrec2__panels-outer')).toBeNull()
+    expect(document.querySelector('.decklist')).toBeNull()
+    expect(document.querySelector('.footer')).toBeNull()
+    expect(document.querySelector('.navbar-header .navbar-toggle')).toBeNull()
+  })
+
+  it('removes href attributes from links', function () {
+    const el = document.createElement('a')
+    el.href = 'https://example.com'
+
+    jest.spyOn(mutation, 'ready').mockImplementation((selector, cb) => {
+      if (selector === '.cards a') {
+        cb(el)
+      }
+    })
+
+    start()
+
+    expect(el.href).toBeFalsy()
+  })
+
+  it('emits the ready event after all the non-essential elements have been removed', function () {
+    jest.spyOn(mutation, 'ready').mockImplementation((selector, cb) => {
+      if (selector in elementsToDelete) {
+        cb(elementsToDelete[selector])
+      }
+    })
+
     expect(bus.emit).toBeCalledTimes(0)
 
     start()
@@ -20,7 +71,14 @@ describe('EDHRec Ready', function () {
     let btn
 
     beforeEach(function () {
-      jest.spyOn(mutation, 'ready').mockImplementation()
+      jest.spyOn(mutation, 'ready').mockImplementation((selector, cb) => {
+        if (selector in elementsToDelete) {
+          cb(elementsToDelete[selector])
+        }
+        if (selector === '.toggle-card-in-decklist-button') {
+          cb(btn)
+        }
+      })
 
       btn = document.createElement('div')
       const icon = document.createElement('div')
@@ -42,56 +100,7 @@ describe('EDHRec Ready', function () {
       document.body.appendChild(btn)
     })
 
-    it('removes non-essential elements', function () {
-      const elements = {
-        '#leaderboard': document.createElement('div'),
-        '.edhrec2__panels-outer': document.createElement('div'),
-        '.decklist': document.createElement('div'),
-        '.footer': document.createElement('div'),
-        '.navbar-header .navbar-toggle': document.createElement('div')
-      }
-
-      Object.keys(elements).forEach((selector) => {
-        document.body.appendChild(elements[selector])
-      })
-
-      jest.spyOn(mutation, 'ready').mockImplementation((selector, cb) => {
-        if (selector in elements) {
-          cb(elements[selector])
-        }
-      })
-
-      start()
-
-      expect(document.querySelector('#leaderbaord')).toBeNull()
-      expect(document.querySelector('.edhrec2__panels-outer')).toBeNull()
-      expect(document.querySelector('.decklist')).toBeNull()
-      expect(document.querySelector('.footer')).toBeNull()
-      expect(document.querySelector('.navbar-header .navbar-toggle')).toBeNull()
-    })
-
-    it('removes href attributes from links', function () {
-      const el = document.createElement('a')
-      el.href = 'https://example.com'
-
-      jest.spyOn(mutation, 'ready').mockImplementation((selector, cb) => {
-        if (selector === '.cards a') {
-          cb(el)
-        }
-      })
-
-      start()
-
-      expect(el.href).toBeFalsy()
-    })
-
     it('replaces button with a new button', function () {
-      jest.spyOn(mutation, 'ready').mockImplementation((selector, cb) => {
-        if (selector === '.toggle-card-in-decklist-button') {
-          cb(btn)
-        }
-      })
-
       expect(document.body.children).toContain(btn)
 
       start()
@@ -101,12 +110,6 @@ describe('EDHRec Ready', function () {
     })
 
     it('styles button as purple', function () {
-      jest.spyOn(mutation, 'ready').mockImplementation((selector, cb) => {
-        if (selector === '.toggle-card-in-decklist-button') {
-          cb(btn)
-        }
-      })
-
       start()
 
       const newBtn = document.querySelector('.toggle-card-in-decklist-button')
@@ -115,12 +118,6 @@ describe('EDHRec Ready', function () {
     })
 
     it('defaults glyphicon icon to plus state', function () {
-      jest.spyOn(mutation, 'ready').mockImplementation((selector, cb) => {
-        if (selector === '.toggle-card-in-decklist-button') {
-          cb(btn)
-        }
-      })
-
       start()
 
       const newBtn = document.querySelector('.toggle-card-in-decklist-button')
@@ -129,12 +126,6 @@ describe('EDHRec Ready', function () {
     })
 
     it('sets a click handler on card buttons to toggle the class of the icon', function () {
-      jest.spyOn(mutation, 'ready').mockImplementation((selector, cb) => {
-        if (selector === '.toggle-card-in-decklist-button') {
-          cb(btn)
-        }
-      })
-
       start()
 
       const newBtn = document.querySelector('.toggle-card-in-decklist-button')
@@ -149,12 +140,6 @@ describe('EDHRec Ready', function () {
     })
 
     it('sets a click handler on card buttons to add card', function () {
-      jest.spyOn(mutation, 'ready').mockImplementation((selector, cb) => {
-        if (selector === '.toggle-card-in-decklist-button') {
-          cb(btn)
-        }
-      })
-
       start()
 
       const newBtn = document.querySelector('.toggle-card-in-decklist-button')
@@ -171,12 +156,6 @@ describe('EDHRec Ready', function () {
     })
 
     it('sets a click handler on card buttons to remove card if card is already marked as being in the deck', function () {
-      jest.spyOn(mutation, 'ready').mockImplementation((selector, cb) => {
-        if (selector === '.toggle-card-in-decklist-button') {
-          cb(btn)
-        }
-      })
-
       start()
 
       const newBtn = document.querySelector('.toggle-card-in-decklist-button')
@@ -204,12 +183,6 @@ describe('EDHRec Ready', function () {
         }
       })
 
-      jest.spyOn(mutation, 'ready').mockImplementation((selector, cb) => {
-        if (selector === '.toggle-card-in-decklist-button') {
-          cb(btn)
-        }
-      })
-
       start()
 
       const newBtn = document.querySelector('.toggle-card-in-decklist-button')
@@ -229,12 +202,6 @@ describe('EDHRec Ready', function () {
 
         if (event === 'EDHREC_READY') {
           cb(response)
-        }
-      })
-
-      jest.spyOn(mutation, 'ready').mockImplementation((selector, cb) => {
-        if (selector === '.toggle-card-in-decklist-button') {
-          cb(btn)
         }
       })
 

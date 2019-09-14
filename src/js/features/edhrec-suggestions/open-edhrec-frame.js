@@ -50,6 +50,5 @@ export default function (deck, modal) {
     // TODO add REMOVE_CARD_FROM_EDHREC event
 
     modal.setContent(iframe)
-    modal.open()
   })
 }

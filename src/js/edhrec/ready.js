@@ -1,9 +1,13 @@
 import bus from 'framebus'
 import mutation from '../lib/mutation'
 
-function removeElement (element) {
-  element.parentNode.removeChild(element)
-}
+const ELEMENTS_TO_REMOVE = [
+  '#leaderboard',
+  '.navbar-header .navbar-toggle',
+  '.edhrec2__panels-outer',
+  '.decklist',
+  '.footer'
+]
 
 function setCardInDeckState (btn, cardInDeck) {
   const icon = btn.querySelector('.toggle-card-in-decklist-button-icon')
@@ -16,7 +20,11 @@ function setCardInDeckState (btn, cardInDeck) {
   icon.classList.add(iconClass)
 }
 
-export default function start () {
+function removeElement (element) {
+  element.parentNode.removeChild(element)
+}
+
+function emitReady () {
   // TODO move to constant
   bus.emit('EDHREC_READY', function ({ cardsInDeck }) {
     mutation.ready('.toggle-card-in-decklist-button', (btn) => {
@@ -57,15 +65,25 @@ export default function start () {
       parentNode.appendChild(newButton)
       parentNode.removeChild(btn)
     })
+  })
+}
 
-    mutation.ready('.cards a', (element) => {
-      element.removeAttribute('href')
+export default function start () {
+  let numberOfElementsRemoved = 0
+
+  mutation.ready('.cards a', (element) => {
+    element.removeAttribute('href')
+  })
+
+  ELEMENTS_TO_REMOVE.forEach((selector) => {
+    mutation.ready(selector, function (el) {
+      numberOfElementsRemoved++
+
+      removeElement(el)
+
+      if (numberOfElementsRemoved === ELEMENTS_TO_REMOVE.length) {
+        emitReady()
+      }
     })
-
-    mutation.ready('#leaderboard', removeElement)
-    mutation.ready('.navbar-header .navbar-toggle', removeElement)
-    mutation.ready('.edhrec2__panels-outer', removeElement)
-    mutation.ready('.decklist', removeElement)
-    mutation.ready('.footer', removeElement)
   })
 }
