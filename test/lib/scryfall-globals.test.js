@@ -3,6 +3,7 @@ import {
   cleanUp,
   getActiveDeck,
   getDeck,
+  removeEntry,
   updateEntry,
   pushNotification
 } from '../../src/js/lib/scryfall-globals'
@@ -18,6 +19,7 @@ describe('Scryfall Globals', function () {
           cb(fakeDeck)
         }),
         addCard: jest.fn(),
+        destroyEntry: jest.fn(),
         get: jest.fn(),
         updateEntry: jest.fn()
       }
@@ -84,6 +86,21 @@ describe('Scryfall Globals', function () {
         expect(global.ScryfallAPI.decks.updateEntry).toBeCalledWith('deck-id', cardToUpdate, expect.any(Function))
 
         expect(card).toBe(resolvedCard)
+      })
+    })
+  })
+
+  describe('removeEntry', function () {
+    it('calls destroy API', function () {
+      const data = {}
+
+      global.ScryfallAPI.decks.destroyEntry.mockImplementation((deckId, cardId, cb) => {
+        cb(data)
+      })
+
+      return removeEntry('card-id').then((result) => {
+        expect(global.ScryfallAPI.decks.destroyEntry).toBeCalledWith('deck-id', 'card-id', expect.any(Function))
+        expect(result).toBeFalsy()
       })
     })
   })

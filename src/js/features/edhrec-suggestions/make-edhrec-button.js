@@ -73,7 +73,11 @@ export default function makeEDHRecButton () {
     })
   })
 
-  // TODO add REMOVE_CARD_FROM_EDHREC event
+  bus.on('REMOVE_CARD_FROM_EDHREC', function (payload) {
+    bus.emit('REMOVE_CARD_FROM_DECK', {
+      cardName: payload.cardName
+    })
+  })
 
   return button
 }

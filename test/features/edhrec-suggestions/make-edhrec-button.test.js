@@ -96,6 +96,30 @@ describe('makeEDHRecButton', function () {
     })
   })
 
+  it('listens for the REMOVE_CARD_FROM_EDHREC event and emits a REMOVE_CARD_TO_DECK event', async function () {
+    const payload = {
+      cardName: 'Name'
+    }
+    bus.on.mockImplementation((event, reply) => {
+      if (event === 'REMOVE_CARD_FROM_EDHREC') {
+        reply(payload)
+      }
+    })
+    scryfall.get.mockResolvedValue({
+      name: 'Name',
+      id: 'some-id',
+      type_line: 'Creature'
+    })
+
+    makeEDHRecButton()
+
+    await wait()
+
+    expect(bus.emit).toBeCalledWith('REMOVE_CARD_FROM_DECK', {
+      cardName: 'Name'
+    })
+  })
+
   describe('when clicked', function () {
     let fakeDeck
 

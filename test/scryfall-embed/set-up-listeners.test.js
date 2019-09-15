@@ -9,6 +9,7 @@ describe('set up listeners on Scryfall page', function () {
     jest.spyOn(Scryfall, 'getDeck')
     jest.spyOn(Scryfall, 'addCard')
     jest.spyOn(Scryfall, 'updateEntry')
+    jest.spyOn(Scryfall, 'removeEntry')
     jest.spyOn(Scryfall, 'pushNotification').mockImplementation()
     jest.spyOn(Scryfall, 'cleanUp').mockImplementation()
   })
@@ -18,6 +19,7 @@ describe('set up listeners on Scryfall page', function () {
 
     expect(bus.on).toBeCalledWith('REQUEST_DECK', expect.any(Function))
     expect(bus.on).toBeCalledWith('ADD_CARD_TO_DECK', expect.any(Function))
+    expect(bus.on).toBeCalledWith('REMOVE_CARD_FROM_DECK', expect.any(Function))
     expect(bus.on).toBeCalledWith('CLEAN_UP_DECK', expect.any(Function))
   })
 
@@ -43,7 +45,7 @@ describe('set up listeners on Scryfall page', function () {
     })
   })
 
-  describe('ADD_CARD_FROM_EDHREC', function () {
+  describe('ADD_CARD_TO_DECK', function () {
     let cardData, scryfallCard
 
     beforeEach(function () {
@@ -60,7 +62,6 @@ describe('set up listeners on Scryfall page', function () {
       })
       Scryfall.addCard.mockResolvedValue(scryfallCard)
       Scryfall.updateEntry.mockReturnValue()
-      Scryfall.pushNotification.mockReturnValue()
     })
 
     it('adds card to active deck', function () {
@@ -97,6 +98,56 @@ describe('set up listeners on Scryfall page', function () {
         expect(Scryfall.pushNotification.mock.calls.length).toBe(1)
         expect(Scryfall.pushNotification.mock.calls[0]).toEqual(['Card Added', 'Added Rashmi, Etrnities Crafter.', 'purple', 'deck'])
       })
+    })
+  })
+
+  describe('REMOVE_CARD_FROM_DECK', function () {
+    beforeEach(function () {
+      const cardData = {
+        cardName: 'Rashmi, Etrnities Crafter'
+      }
+      bus.on.mockImplementation((event, cb) => {
+        if (event === 'REMOVE_CARD_FROM_DECK') {
+          cb(cardData)
+        }
+      })
+      Scryfall.getDeck.mockResolvedValue({
+        entries: {
+          commanders: [{
+            id: 'rashmi-id',
+            card_digest: {
+              name: 'Rashmi, Etrnities Crafter'
+            }
+          }, {
+            // empty object, no card info
+          }],
+          nonlands: [{
+            id: 'birds-id',
+            card_digest: {
+              name: 'Birds of Paradise'
+            }
+          }]
+        }
+      })
+      Scryfall.removeEntry.mockResolvedValue()
+    })
+
+    it('removes card from deck', async function () {
+      setUpListeners('active-deck-id')
+
+      await wait(5)
+
+      expect(Scryfall.removeEntry).toBeCalledTimes(1)
+      expect(Scryfall.removeEntry).toBeCalledWith('rashmi-id')
+    })
+
+    it('sends a push notification', async function () {
+      setUpListeners('active-deck-id')
+
+      await wait(5)
+
+      expect(Scryfall.pushNotification).toBeCalledTimes(1)
+      expect(Scryfall.pushNotification).toBeCalledWith('Card Removed', 'Removed Rashmi, Etrnities Crafter.', 'purple', 'deck')
     })
   })
 

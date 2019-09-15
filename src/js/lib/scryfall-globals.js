@@ -46,6 +46,16 @@ export function updateEntry (cardToUpdate) {
   })
 }
 
+export function removeEntry (cardId) {
+  return getActiveDeck().then(({ id }) => {
+    return new Promise((resolve) => {
+      ScryfallAPI.decks.destroyEntry(id, cardId, (card) => {
+        resolve()
+      })
+    })
+  })
+}
+
 export function cleanUp () {
   Scryfall.deckbuilder.cleanUp()
 
@@ -62,6 +72,7 @@ export default {
   addCard,
   cleanUp,
   getDeck,
+  removeEntry,
   updateEntry,
   pushNotification
 }
