@@ -1,5 +1,6 @@
 import {
   addCard,
+  cleanUp,
   getActiveDeck,
   getDeck,
   updateEntry,
@@ -23,6 +24,9 @@ describe('Scryfall Globals', function () {
     }
 
     global.Scryfall = {
+      deckbuilder: {
+        cleanUp: jest.fn()
+      },
       pushNotification: jest.fn()
     }
   })
@@ -80,6 +84,14 @@ describe('Scryfall Globals', function () {
         expect(global.ScryfallAPI.decks.updateEntry).toBeCalledWith('deck-id', cardToUpdate, expect.any(Function))
 
         expect(card).toBe(resolvedCard)
+      })
+    })
+  })
+
+  describe('cleanUp', function () {
+    it('resolves after cleaning up', function () {
+      return cleanUp().then(() => {
+        expect(global.Scryfall.deckbuilder.cleanUp).toBeCalledTimes(1)
       })
     })
   })

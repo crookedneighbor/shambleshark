@@ -9,14 +9,16 @@ describe('set up listeners on Scryfall page', function () {
     jest.spyOn(Scryfall, 'getDeck')
     jest.spyOn(Scryfall, 'addCard')
     jest.spyOn(Scryfall, 'updateEntry')
-    jest.spyOn(Scryfall, 'pushNotification')
+    jest.spyOn(Scryfall, 'pushNotification').mockImplementation()
+    jest.spyOn(Scryfall, 'cleanUp').mockImplementation()
   })
 
   it('listens for events', function () {
     setUpListeners()
 
-    expect(bus.on.mock.calls[0][0]).toBe('REQUEST_DECK')
-    expect(bus.on.mock.calls[1][0]).toBe('ADD_CARD_TO_DECK')
+    expect(bus.on).toBeCalledWith('REQUEST_DECK', expect.any(Function))
+    expect(bus.on).toBeCalledWith('ADD_CARD_TO_DECK', expect.any(Function))
+    expect(bus.on).toBeCalledWith('CLEAN_UP_DECK', expect.any(Function))
   })
 
   describe('REQUEST_DECK', function () {
@@ -95,6 +97,22 @@ describe('set up listeners on Scryfall page', function () {
         expect(Scryfall.pushNotification.mock.calls.length).toBe(1)
         expect(Scryfall.pushNotification.mock.calls[0]).toEqual(['Card Added', 'Added Rashmi, Etrnities Crafter.', 'purple', 'deck'])
       })
+    })
+  })
+
+  describe('CLEAN_UP_DECK', function () {
+    beforeEach(function () {
+      bus.on.mockImplementation((event, cb) => {
+        if (event === 'CLEAN_UP_DECK') {
+          cb()
+        }
+      })
+    })
+
+    it('calls cleanup', function () {
+      setUpListeners('active-deck-id')
+
+      expect(Scryfall.cleanUp).toBeCalledTimes(1)
     })
   })
 })

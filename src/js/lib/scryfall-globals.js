@@ -46,6 +46,12 @@ export function updateEntry (cardToUpdate) {
   })
 }
 
+export function cleanUp () {
+  Scryfall.deckbuilder.cleanUp()
+
+  return Promise.resolve()
+}
+
 export function pushNotification (title, message, color, type) {
   Scryfall.pushNotification(title, message, color, type)
 
@@ -54,6 +60,7 @@ export function pushNotification (title, message, color, type) {
 
 export default {
   addCard,
+  cleanUp,
   getDeck,
   updateEntry,
   pushNotification

@@ -27,6 +27,17 @@ describe('makeEDHRecButton', function () {
     expect(document.querySelector('#edhrec-modal')).not.toBeFalsy()
   })
 
+  it('cleans up deck after modal is closed', function () {
+    makeEDHRecButton()
+
+    const modal = document.querySelector('#edhrec-modal')
+    const closeButton = modal.querySelector('.modal-dialog-close')
+
+    closeButton.click()
+
+    expect(bus.emit).toBeCalledWith('CLEAN_UP_DECK')
+  })
+
   it('listens for the EDHREC_READY event', function () {
     makeEDHRecButton()
 

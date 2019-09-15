@@ -19,4 +19,8 @@ export default function setUpListeners () {
       Scryfall.pushNotification('Card Added', `Added ${cardName}.`, 'purple', 'deck')
     })
   })
+
+  bus.on('CLEAN_UP_DECK', function () {
+    Scryfall.cleanUp()
+  })
 }

@@ -8,7 +8,7 @@ export default function makeEDHRecButton () {
     id: 'edhrec-modal',
     header: 'EDHRec Suggestions',
     onClose () {
-      // TODO call cleanup on close
+      bus.emit('CLEAN_UP_DECK')
     }
   })
   document.getElementById('deckbuilder').appendChild(modal.element)
@@ -86,7 +86,6 @@ function openEDHRecFrame (deck, modal) {
   scryfall.get(`/cards/${id}`).then((card) => {
     const edhrecUrl = card.related_uris.edhrec
 
-    // TODO this can be called multiple times and it duplcates the code, so many button listeners get added
     const iframe = document.createElement('iframe')
     iframe.src = edhrecUrl
     iframe.style.width = '100%'
