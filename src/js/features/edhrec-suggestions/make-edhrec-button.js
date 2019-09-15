@@ -39,6 +39,9 @@ export default function makeEDHRecButton () {
     deckPromise.then((deck) => {
       const cardsInDeck = Object.keys(deck.entries).reduce((all, type) => {
         deck.entries[type].forEach((card) => {
+          if (!card.card_digest) {
+            return
+          }
           all[card.card_digest.name] = true
         })
 

@@ -199,5 +199,45 @@ describe('makeEDHRecButton', function () {
         }
       })
     })
+
+    it('does not error when cards in deck are missing the card_digest', async function () {
+      const spy = jest.fn()
+
+      fakeDeck.entries.lands.push({
+        card_digest: {
+          name: 'Reliquary Tower'
+        }
+      }, {
+        foo: 'bar'
+      })
+      fakeDeck.entries.nonlands.push({
+        card_digest: {
+          name: 'Rhystic Study'
+        }
+      })
+
+      bus.on.mockImplementation((event, reply) => {
+        if (event === 'EDHREC_READY') {
+          wait(5).then(() => {
+            reply(spy)
+          })
+        }
+      })
+
+      const btn = makeEDHRecButton()
+
+      btn.click()
+
+      await wait(5)
+
+      expect(spy).toBeCalledTimes(1)
+      expect(spy).toBeCalledWith({
+        cardsInDeck: {
+          'Arjun, the Shifting Flame': true,
+          'Reliquary Tower': true,
+          'Rhystic Study': true
+        }
+      })
+    })
   })
 })
