@@ -7,8 +7,9 @@ export default function makeEDHRecButton () {
   const modal = new Modal({
     id: 'edhrec-modal',
     header: 'EDHRec Suggestions',
-    onClose () {
+    onClose (modalInstance) {
       bus.emit('CLEAN_UP_DECK')
+      modalInstance.setLoading(true)
     }
   })
   document.getElementById('deckbuilder').appendChild(modal.element)
@@ -35,6 +36,7 @@ export default function makeEDHRecButton () {
     })
   })
 
+  // TODO tiemout for EDHREC frame taking too long to load
   bus.on('EDHREC_READY', function (reply) {
     deckPromise.then((deck) => {
       const cardsInDeck = Object.keys(deck.entries).reduce((all, type) => {
@@ -84,16 +86,18 @@ function findEDHRecUrl (commanders) {
 
   return scryfall.get(`/cards/${id}`).then((card) => {
     let edhrecUrl = card.related_uris.edhrec
-    const otherCommanders = remainderCommanders.map((card) => {
+    const otherCommanders = remainderCommanders.reduce((string, card) => {
       if (!card.card_digest) {
-        return ''
+        return string
       }
 
-      return card.card_digest.name.toLowerCase().replace(/\s/g, '-')
-    }).join('-')
+      string += '-' + card.card_digest.name.toLowerCase().replace(/\s/g, '-')
+
+      return string
+    }, '')
 
     if (otherCommanders) {
-      edhrecUrl += `-${otherCommanders}`
+      edhrecUrl += otherCommanders
     }
 
     return edhrecUrl
