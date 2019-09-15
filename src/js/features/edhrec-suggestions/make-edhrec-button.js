@@ -76,16 +76,34 @@ export default function makeEDHRecButton () {
   return button
 }
 
+function findEDHRecUrl (commanders) {
+  // TODO oathbreaker support
+  const firstCommander = commanders[0]
+  const id = firstCommander.card_digest.id
+  const remainderCommanders = commanders.slice(1, commanders.length)
+
+  return scryfall.get(`/cards/${id}`).then((card) => {
+    let edhrecUrl = card.related_uris.edhrec
+    const otherCommanders = remainderCommanders.map((card) => {
+      if (!card.card_digest) {
+        return ''
+      }
+
+      return card.card_digest.name.toLowerCase().replace(/\s/g, '-')
+    }).join('-')
+
+    if (otherCommanders) {
+      edhrecUrl += `-${otherCommanders}`
+    }
+
+    return edhrecUrl
+  })
+}
+
 function openEDHRecFrame (deck, modal) {
   const commanders = deck.entries.commanders
 
-  // TODO figure out partners
-  const cmdr = commanders[0]
-  const id = cmdr.card_digest.id
-
-  scryfall.get(`/cards/${id}`).then((card) => {
-    const edhrecUrl = card.related_uris.edhrec
-
+  return findEDHRecUrl(commanders).then((edhrecUrl) => {
     const iframe = document.createElement('iframe')
     iframe.src = edhrecUrl
     iframe.style.width = '100%'

@@ -123,7 +123,7 @@ describe('makeEDHRecButton', function () {
 
       scryfall.get.mockResolvedValue({
         related_uris: {
-          edhrec: 'https://example.com/edhrec'
+          edhrec: 'https://example.com/edhrec/arjun-the-shifting-flame'
         }
       })
     })
@@ -148,7 +148,77 @@ describe('makeEDHRecButton', function () {
 
       const iframe = document.querySelector('#edhrec-modal iframe')
 
-      expect(iframe.src).toBe('https://example.com/edhrec')
+      expect(iframe.src).toBe('https://example.com/edhrec/arjun-the-shifting-flame')
+    })
+
+    it('can handle partner commanders', async function () {
+      const btn = makeEDHRecButton()
+
+      fakeDeck.entries.commanders = [
+        {
+          card_digest: {
+            id: 'sidar-id',
+            name: 'Sidar Kondo of Jamura'
+          }
+        },
+        {
+          card_digest: {
+            id: 'tana-id',
+            name: 'Tana the Bloodsower'
+          }
+        }
+      ]
+      scryfall.get.mockResolvedValue({
+        related_uris: {
+          edhrec: 'https://example.com/edhrec/sidar-kondo-of-jamura'
+        }
+      })
+
+      btn.click()
+
+      await wait(5)
+
+      const iframe = document.querySelector('#edhrec-modal iframe')
+
+      expect(iframe.src).toBe('https://example.com/edhrec/sidar-kondo-of-jamura-tana-the-bloodsower')
+    })
+
+    it('attempts any number of cards in command zone', async function () {
+      const btn = makeEDHRecButton()
+
+      fakeDeck.entries.commanders = [
+        {
+          card_digest: {
+            id: 'sidar-id',
+            name: 'Sidar Kondo of Jamura'
+          }
+        },
+        {
+          card_digest: {
+            id: 'tana-id',
+            name: 'Tana the Bloodsower'
+          }
+        },
+        {
+          card_digest: {
+            id: 'reyhan-id',
+            name: 'Reyhan, Last of the Abzan'
+          }
+        }
+      ]
+      scryfall.get.mockResolvedValue({
+        related_uris: {
+          edhrec: 'https://example.com/edhrec/sidar-kondo-of-jamura'
+        }
+      })
+
+      btn.click()
+
+      await wait(5)
+
+      const iframe = document.querySelector('#edhrec-modal iframe')
+
+      expect(iframe.src).toBe('https://example.com/edhrec/sidar-kondo-of-jamura-tana-the-bloodsower-reyhan,-last-of-the-abzan')
     })
 
     it('unhides the modal content when EDHREC_READY event fires', async function () {
