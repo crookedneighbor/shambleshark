@@ -6,7 +6,7 @@ import {
   removeEntry,
   updateEntry,
   pushNotification
-} from '../../src/js/lib/scryfall-globals'
+} from '../../src/js/scryfall-embed/scryfall-globals'
 
 describe('Scryfall Globals', function () {
   beforeEach(function () {

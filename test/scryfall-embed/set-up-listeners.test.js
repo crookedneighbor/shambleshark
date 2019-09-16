@@ -1,5 +1,5 @@
 import wait from '../../src/js/lib/wait'
-import Scryfall from '../../src/js/lib/scryfall-globals'
+import Scryfall from '../../src/js/scryfall-embed/scryfall-globals'
 import setUpListeners from '../../src/js/scryfall-embed/set-up-listeners'
 import bus from 'framebus'
 

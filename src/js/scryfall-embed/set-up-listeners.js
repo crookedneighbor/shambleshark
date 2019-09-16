@@ -1,5 +1,5 @@
 import bus from 'framebus'
-import Scryfall from '../lib/scryfall-globals'
+import Scryfall from './scryfall-globals'
 
 export default function setUpListeners () {
   bus.on('REQUEST_DECK', function (reply) {
