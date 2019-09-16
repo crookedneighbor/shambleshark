@@ -2,7 +2,9 @@ import {
   hasLegalCommanders,
   isCommanderLikeDeck
 } from '../../src/js/lib/deck-parser'
-import scryfall from '../../src/js/lib/scryfall-client'
+import {
+  api as scryfall
+} from '../../lib/scryfall'
 
 describe('Deck Parser', function () {
   describe('isCommanderLikeDeck', function () {

@@ -1,7 +1,7 @@
 import bus from 'framebus'
 import makePromisePlus from '../../lib/promise-plus'
 import Modal from '../../lib/modal'
-import scryfall from '../../lib/scryfall-client'
+import scryfall from '../../lib/scryfall'
 
 export default function makeEDHRecButton () {
   const modal = new Modal({
@@ -19,6 +19,7 @@ export default function makeEDHRecButton () {
   button.id = 'edhrec-suggestions'
   button.classList.add('button-n', 'tiny')
   button.innerText = 'EDHRec Suggestions'
+  button.setAttribute('disabled', true)
 
   let deckPromise
 
@@ -59,7 +60,7 @@ export default function makeEDHRecButton () {
   })
 
   bus.on('ADD_CARD_FROM_EDHREC', function (payload) {
-    scryfall.get('/cards/named', {
+    scryfall.api.get('/cards/named', {
       exact: payload.cardName
     }).then((card) => {
       bus.emit('ADD_CARD_TO_DECK', {
@@ -88,7 +89,7 @@ function findEDHRecUrl (commanders) {
   const id = firstCommander.card_digest.id
   const remainderCommanders = commanders.slice(1, commanders.length)
 
-  return scryfall.get(`/cards/${id}`).then((card) => {
+  return scryfall.api.get(`/cards/${id}`).then((card) => {
     let edhrecUrl = card.related_uris.edhrec
     const otherCommanders = remainderCommanders.reduce((string, card) => {
       if (!card.card_digest) {

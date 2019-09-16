@@ -2,7 +2,9 @@ import bus from 'framebus'
 import makeEDHRecButton from '../../../src/js/features/edhrec-suggestions/make-edhrec-button'
 import wait from '../../../src/js/lib/wait'
 import Modal from '../../../src/js/lib/modal'
-import scryfall from '../../../src/js/lib/scryfall-client'
+import {
+  api as scryfall
+} from '../../../src/js/lib/scryfall'
 
 describe('makeEDHRecButton', function () {
   beforeEach(function () {

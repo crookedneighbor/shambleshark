@@ -1,4 +1,6 @@
-import scryfall from './scryfall-client'
+import {
+  api as scryfall
+} from './scryfall'
 
 export function isCommanderLikeDeck (deck) {
   return Promise.resolve(Boolean(deck.entries.commanders))
