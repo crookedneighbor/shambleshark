@@ -2,6 +2,7 @@ import bus from 'framebus'
 import mutation from '../lib/mutation'
 
 const ELEMENTS_TO_REMOVE = [
+  // TODO leave in ads to support EDHRec
   '#leaderboard',
   '.navbar-header .navbar-toggle',
   '.edhrec2__panels-outer',
@@ -71,6 +72,7 @@ function emitReady () {
 export default function start () {
   let numberOfElementsRemoved = 0
 
+  // TODO only run this when opened as an iframe
   mutation.ready('.cards a', (element) => {
     element.removeAttribute('href')
   })
