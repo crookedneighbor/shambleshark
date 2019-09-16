@@ -49,4 +49,6 @@ export default function setUpListeners () {
   bus.on('CLEAN_UP_DECK', function () {
     Scryfall.cleanUp()
   })
+
+  bus.emit('SCRYFALL_LISTENERS_READY')
 }

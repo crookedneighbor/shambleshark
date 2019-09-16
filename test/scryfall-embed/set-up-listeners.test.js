@@ -6,6 +6,7 @@ import bus from 'framebus'
 describe('set up listeners on Scryfall page', function () {
   beforeEach(function () {
     jest.spyOn(bus, 'on')
+    jest.spyOn(bus, 'emit')
     jest.spyOn(Scryfall, 'getDeck')
     jest.spyOn(Scryfall, 'addCard')
     jest.spyOn(Scryfall, 'updateEntry')
@@ -21,6 +22,12 @@ describe('set up listeners on Scryfall page', function () {
     expect(bus.on).toBeCalledWith('ADD_CARD_TO_DECK', expect.any(Function))
     expect(bus.on).toBeCalledWith('REMOVE_CARD_FROM_DECK', expect.any(Function))
     expect(bus.on).toBeCalledWith('CLEAN_UP_DECK', expect.any(Function))
+  })
+
+  it('reports that listeners are ready', function () {
+    setUpListeners()
+
+    expect(bus.emit).toBeCalledWith('SCRYFALL_LISTENERS_READY')
   })
 
   describe('REQUEST_DECK', function () {
