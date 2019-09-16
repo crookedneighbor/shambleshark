@@ -1,13 +1,22 @@
+import bus from 'framebus'
 import Feature from '../feature'
 import makeEDHRecButton from './make-edhrec-button'
+import deckParser from '../../lib/deck-parser'
 
 export default class EDHRecSuggestions extends Feature {
   run () {
-    // TODO only put edhrec button on commander decks
-    const buttonsContainer = document.querySelector('.deckbuilder-toolbar-items-right')
-    const edhRecButton = makeEDHRecButton()
+    return new Promise((resolve) => {
+      bus.emit('REQUEST_DECK', resolve)
+    }).then(deckParser.isCommanderLikeDeck).then((deckCouldBeCommanderDeck) => {
+      if (!deckCouldBeCommanderDeck) {
+        return
+      }
 
-    buttonsContainer.appendChild(edhRecButton)
+      const buttonsContainer = document.querySelector('.deckbuilder-toolbar-items-right')
+      const edhRecButton = makeEDHRecButton()
+
+      buttonsContainer.appendChild(edhRecButton)
+    })
   }
 
   isEnabled () {

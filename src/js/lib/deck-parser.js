@@ -33,3 +33,8 @@ export function hasLegalCommanders (commanders) {
     return false
   })
 }
+
+export default {
+  isCommanderLikeDeck,
+  hasLegalCommanders
+}
