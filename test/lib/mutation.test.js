@@ -3,97 +3,99 @@ import {
   ready
 } from '../../src/js/lib/mutation'
 
-describe('domNodeReady', function () {
-  afterEach(function () {
-    reset()
-  })
-
-  it('applies transformation to specified dom nodes right away', function () {
-    const spy = jest.fn()
-
-    const div = document.createElement('div')
-    const div2 = document.createElement('div')
-
-    div.classList.add('class-name')
-    div2.classList.add('class-name')
-
-    document.body.appendChild(div)
-    document.body.appendChild(div2)
-
-    ready('.class-name', spy)
-
-    expect(spy).toBeCalledTimes(2)
-    expect(spy).toBeCalledWith(div)
-    expect(spy).toBeCalledWith(div2)
-  })
-
-  it('only creates observer once', function () {
-    const spy = jest.fn()
-
-    jest.spyOn(global.MutationObserver.prototype, 'observe')
-    ready('.class-name', spy)
-
-    expect(global.MutationObserver.prototype.observe).toBeCalledTimes(1)
-    expect(global.MutationObserver.prototype.observe).toBeCalledWith(document.documentElement, {
-      childList: true,
-      subtree: true
+describe('mutation', function () {
+  describe('ready', function () {
+    afterEach(function () {
+      reset()
     })
 
-    ready('.another-class-name', spy)
+    it('applies transformation to specified dom nodes right away', function () {
+      const spy = jest.fn()
 
-    expect(global.MutationObserver.prototype.observe).toBeCalledTimes(1)
-  })
+      const div = document.createElement('div')
+      const div2 = document.createElement('div')
 
-  it('applies transformation to specified dom nodes only once', function () {
-    const spy = jest.fn()
+      div.classList.add('class-name')
+      div2.classList.add('class-name')
 
-    const div = document.createElement('div')
-    const div2 = document.createElement('div')
+      document.body.appendChild(div)
+      document.body.appendChild(div2)
 
-    div.classList.add('class-name')
-    div2.classList.add('class-name')
+      ready('.class-name', spy)
 
-    document.body.appendChild(div)
-    document.body.appendChild(div2)
+      expect(spy).toBeCalledTimes(2)
+      expect(spy).toBeCalledWith(div)
+      expect(spy).toBeCalledWith(div2)
+    })
 
-    ready('.class-name', spy)
+    it('only creates observer once', function () {
+      const spy = jest.fn()
 
-    expect(spy).toBeCalledTimes(2)
-    expect(spy).toBeCalledWith(div)
-    expect(spy).toBeCalledWith(div2)
+      jest.spyOn(global.MutationObserver.prototype, 'observe')
+      ready('.class-name', spy)
 
-    ready('.class-name', spy)
+      expect(global.MutationObserver.prototype.observe).toBeCalledTimes(1)
+      expect(global.MutationObserver.prototype.observe).toBeCalledWith(document.documentElement, {
+        childList: true,
+        subtree: true
+      })
 
-    expect(spy).toBeCalledTimes(2)
-  })
+      ready('.another-class-name', spy)
 
-  it('applies transformation only to new dom nodes', function () {
-    const spy = jest.fn()
+      expect(global.MutationObserver.prototype.observe).toBeCalledTimes(1)
+    })
 
-    const div = document.createElement('div')
-    const div2 = document.createElement('div')
+    it('applies transformation to specified dom nodes only once', function () {
+      const spy = jest.fn()
 
-    div.classList.add('class-name')
-    div2.classList.add('class-name')
+      const div = document.createElement('div')
+      const div2 = document.createElement('div')
 
-    document.body.appendChild(div)
-    document.body.appendChild(div2)
+      div.classList.add('class-name')
+      div2.classList.add('class-name')
 
-    ready('.class-name', spy)
+      document.body.appendChild(div)
+      document.body.appendChild(div2)
 
-    expect(spy).toBeCalledTimes(2)
-    expect(spy).toBeCalledWith(div)
-    expect(spy).toBeCalledWith(div2)
+      ready('.class-name', spy)
 
-    const div3 = document.createElement('div')
-    div3.classList.add('class-name')
-    document.body.appendChild(div3)
+      expect(spy).toBeCalledTimes(2)
+      expect(spy).toBeCalledWith(div)
+      expect(spy).toBeCalledWith(div2)
 
-    spy.mockReset()
+      ready('.class-name', spy)
 
-    ready('.class-name', spy)
+      expect(spy).toBeCalledTimes(2)
+    })
 
-    expect(spy).toBeCalledTimes(1)
-    expect(spy).toBeCalledWith(div3)
+    it('applies transformation only to new dom nodes', function () {
+      const spy = jest.fn()
+
+      const div = document.createElement('div')
+      const div2 = document.createElement('div')
+
+      div.classList.add('class-name')
+      div2.classList.add('class-name')
+
+      document.body.appendChild(div)
+      document.body.appendChild(div2)
+
+      ready('.class-name', spy)
+
+      expect(spy).toBeCalledTimes(2)
+      expect(spy).toBeCalledWith(div)
+      expect(spy).toBeCalledWith(div2)
+
+      const div3 = document.createElement('div')
+      div3.classList.add('class-name')
+      document.body.appendChild(div3)
+
+      spy.mockReset()
+
+      ready('.class-name', spy)
+
+      expect(spy).toBeCalledTimes(1)
+      expect(spy).toBeCalledWith(div3)
+    })
   })
 })
