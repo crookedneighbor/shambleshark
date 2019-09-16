@@ -4,7 +4,7 @@ import {
 } from '../../src/js/lib/deck-parser'
 import {
   api as scryfall
-} from '../../lib/scryfall'
+} from '../../src/js/lib/scryfall'
 
 describe('Deck Parser', function () {
   describe('isCommanderLikeDeck', function () {

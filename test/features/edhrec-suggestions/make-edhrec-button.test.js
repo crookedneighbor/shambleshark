@@ -1,36 +1,57 @@
 import bus from 'framebus'
 import makeEDHRecButton from '../../../src/js/features/edhrec-suggestions/make-edhrec-button'
+import deckParser from '../../../src/js/lib/deck-parser'
 import wait from '../../../src/js/lib/wait'
 import Modal from '../../../src/js/lib/modal'
-import {
-  api as scryfall
-} from '../../../src/js/lib/scryfall'
+import scryfall from '../../../src/js/lib/scryfall'
 
 describe('makeEDHRecButton', function () {
   beforeEach(function () {
     jest.spyOn(bus, 'on')
     jest.spyOn(bus, 'emit')
-    jest.spyOn(scryfall, 'get')
+    jest.spyOn(scryfall.api, 'get')
+    jest.spyOn(scryfall, 'getDeck').mockResolvedValue({
+      entries: {
+        commanders: []
+      }
+    })
+    jest.spyOn(deckParser, 'hasLegalCommanders').mockResolvedValue(true)
 
     const deckbuilderElement = document.createElement('div')
     deckbuilderElement.id = 'deckbuilder'
     document.body.appendChild(deckbuilderElement)
   })
 
-  it('makes a button', function () {
-    const btn = makeEDHRecButton()
+  it('makes a button', async function () {
+    const btn = await makeEDHRecButton()
 
     expect(btn.tagName).toBe('BUTTON')
   })
 
-  it('adds an edhrec modal to page', function () {
-    makeEDHRecButton()
+  it('sets button to disabled when requested deck does not have legal commanders', async function () {
+    deckParser.hasLegalCommanders.mockResolvedValue(false)
+
+    const btn = await makeEDHRecButton()
+
+    expect(btn.getAttribute('disabled')).toBe('true')
+  })
+
+  it('sets button to not disabled when requested has legal commanders', async function () {
+    deckParser.hasLegalCommanders.mockResolvedValue(true)
+
+    const btn = await makeEDHRecButton()
+
+    expect(btn.getAttribute('disabled')).toBeFalsy()
+  })
+
+  it('adds an edhrec modal to page', async function () {
+    await makeEDHRecButton()
 
     expect(document.querySelector('#edhrec-modal')).not.toBeFalsy()
   })
 
-  it('cleans up deck after modal is closed', function () {
-    makeEDHRecButton()
+  it('cleans up deck after modal is closed', async function () {
+    await makeEDHRecButton()
 
     const modal = document.querySelector('#edhrec-modal')
     const closeButton = modal.querySelector('.modal-dialog-close')
@@ -40,8 +61,8 @@ describe('makeEDHRecButton', function () {
     expect(bus.emit).toBeCalledWith('CLEAN_UP_DECK')
   })
 
-  it('listens for the EDHREC_READY event', function () {
-    makeEDHRecButton()
+  it('listens for the EDHREC_READY event', async function () {
+    await makeEDHRecButton()
 
     expect(bus.on).toBeCalledWith('EDHREC_READY', expect.any(Function))
   })
@@ -55,13 +76,13 @@ describe('makeEDHRecButton', function () {
         reply(payload)
       }
     })
-    scryfall.get.mockResolvedValue({
+    scryfall.api.get.mockResolvedValue({
       name: 'Name',
       id: 'some-id',
       type_line: 'Creature'
     })
 
-    makeEDHRecButton()
+    await makeEDHRecButton()
 
     await wait()
 
@@ -81,13 +102,13 @@ describe('makeEDHRecButton', function () {
         reply(payload)
       }
     })
-    jest.spyOn(scryfall, 'get').mockResolvedValue({
+    jest.spyOn(scryfall.api, 'get').mockResolvedValue({
       name: 'Name',
       id: 'some-id',
       type_line: 'Artifact Land'
     })
 
-    makeEDHRecButton()
+    await makeEDHRecButton()
 
     await wait()
 
@@ -107,13 +128,13 @@ describe('makeEDHRecButton', function () {
         reply(payload)
       }
     })
-    scryfall.get.mockResolvedValue({
+    scryfall.api.get.mockResolvedValue({
       name: 'Name',
       id: 'some-id',
       type_line: 'Creature'
     })
 
-    makeEDHRecButton()
+    await makeEDHRecButton()
 
     await wait()
 
@@ -125,7 +146,7 @@ describe('makeEDHRecButton', function () {
   describe('when clicked', function () {
     let fakeDeck
 
-    beforeEach(function () {
+    beforeEach(async function () {
       fakeDeck = {
         entries: {
           commanders: [
@@ -141,24 +162,20 @@ describe('makeEDHRecButton', function () {
         }
       }
 
-      bus.emit.mockImplementation((event, reply) => {
-        if (event === 'REQUEST_DECK') {
-          reply(fakeDeck)
-        }
-      })
+      scryfall.getDeck.mockResolvedValue(fakeDeck)
 
-      scryfall.get.mockResolvedValue({
+      scryfall.api.get.mockResolvedValue({
         related_uris: {
           edhrec: 'https://example.com/edhrec/arjun-the-shifting-flame'
         }
       })
     })
 
-    it('opens the modal', function () {
+    it('opens the modal', async function () {
+      const btn = await makeEDHRecButton()
+
       jest.spyOn(Modal.prototype, 'open')
       bus.emit.mockImplementation()
-
-      const btn = makeEDHRecButton()
 
       btn.click()
 
@@ -166,8 +183,7 @@ describe('makeEDHRecButton', function () {
     })
 
     it('uses scryfall to populate the iframe src', async function () {
-      const btn = makeEDHRecButton()
-
+      const btn = await makeEDHRecButton()
       btn.click()
 
       await wait(5)
@@ -178,8 +194,6 @@ describe('makeEDHRecButton', function () {
     })
 
     it('can handle partner commanders', async function () {
-      const btn = makeEDHRecButton()
-
       fakeDeck.entries.commanders = [
         {
           card_digest: {
@@ -194,12 +208,13 @@ describe('makeEDHRecButton', function () {
           }
         }
       ]
-      scryfall.get.mockResolvedValue({
+      scryfall.api.get.mockResolvedValue({
         related_uris: {
           edhrec: 'https://example.com/edhrec/sidar-kondo-of-jamura'
         }
       })
 
+      const btn = await makeEDHRecButton()
       btn.click()
 
       await wait(5)
@@ -210,8 +225,6 @@ describe('makeEDHRecButton', function () {
     })
 
     it('attempts any number of cards in command zone', async function () {
-      const btn = makeEDHRecButton()
-
       fakeDeck.entries.commanders = [
         {
           card_digest: {
@@ -232,12 +245,13 @@ describe('makeEDHRecButton', function () {
           }
         }
       ]
-      scryfall.get.mockResolvedValue({
+      scryfall.api.get.mockResolvedValue({
         related_uris: {
           edhrec: 'https://example.com/edhrec/sidar-kondo-of-jamura'
         }
       })
 
+      const btn = await makeEDHRecButton()
       btn.click()
 
       await wait(5)
@@ -253,14 +267,13 @@ describe('makeEDHRecButton', function () {
       jest.spyOn(Modal.prototype, 'setLoading')
       bus.on.mockImplementation((event, reply) => {
         if (event === 'EDHREC_READY') {
-          wait(5).then(() => {
+          wait(2).then(() => {
             reply(spy)
           })
         }
       })
 
-      const btn = makeEDHRecButton()
-
+      const btn = await makeEDHRecButton()
       btn.click()
 
       await wait(5)
@@ -285,14 +298,13 @@ describe('makeEDHRecButton', function () {
 
       bus.on.mockImplementation((event, reply) => {
         if (event === 'EDHREC_READY') {
-          wait(5).then(() => {
+          wait(2).then(() => {
             reply(spy)
           })
         }
       })
 
-      const btn = makeEDHRecButton()
-
+      const btn = await makeEDHRecButton()
       btn.click()
 
       await wait(5)
@@ -325,14 +337,13 @@ describe('makeEDHRecButton', function () {
 
       bus.on.mockImplementation((event, reply) => {
         if (event === 'EDHREC_READY') {
-          wait(5).then(() => {
+          wait(2).then(() => {
             reply(spy)
           })
         }
       })
 
-      const btn = makeEDHRecButton()
-
+      const btn = await makeEDHRecButton()
       btn.click()
 
       await wait(5)

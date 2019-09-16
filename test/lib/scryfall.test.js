@@ -18,7 +18,7 @@ describe('scryfall', function () {
     })
 
     it('requests deck from Scryfall page', async function () {
-      let deck = {}
+      const deck = {}
 
       bus.emit.mockImplementation((event, cb) => {
         cb(deck)

@@ -1,9 +1,9 @@
 import bus from 'framebus'
-import makePromisePlus from '../../lib/promise-plus'
 import Modal from '../../lib/modal'
 import scryfall from '../../lib/scryfall'
+import deckParser from '../../lib/deck-parser'
 
-export default function makeEDHRecButton () {
+export default async function makeEDHRecButton () {
   const modal = new Modal({
     id: 'edhrec-modal',
     header: 'EDHRec Suggestions',
@@ -21,25 +21,19 @@ export default function makeEDHRecButton () {
   button.innerText = 'EDHRec Suggestions'
   button.setAttribute('disabled', true)
 
-  let deckPromise
-
   button.addEventListener('click', (e) => {
     e.preventDefault()
 
-    deckPromise = makePromisePlus()
-
     modal.open()
 
-    bus.emit('REQUEST_DECK', (deck) => {
-      deckPromise.resolve(deck)
-
+    scryfall.getDeck().then((deck) => {
       openEDHRecFrame(deck, modal)
     })
   })
 
   // TODO tiemout for EDHREC frame taking too long to load
   bus.on('EDHREC_READY', function (reply) {
-    deckPromise.then((deck) => {
+    scryfall.getDeck().then((deck) => {
       const cardsInDeck = Object.keys(deck.entries).reduce((all, type) => {
         deck.entries[type].forEach((card) => {
           if (!card.card_digest) {
@@ -80,7 +74,25 @@ export default function makeEDHRecButton () {
     })
   })
 
+  const commandersAreLegal = await hasLegalCommanders()
+
+  setDisabledState(button, !commandersAreLegal)
+
   return button
+}
+
+async function hasLegalCommanders () {
+  const deck = await scryfall.getDeck()
+
+  return deckParser.hasLegalCommanders(deck.entries.commanders)
+}
+
+function setDisabledState (button, isDisabled) {
+  if (isDisabled) {
+    button.setAttribute('disabled', isDisabled)
+  } else {
+    button.removeAttribute('disabled')
+  }
 }
 
 function findEDHRecUrl (commanders) {

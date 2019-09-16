@@ -1,5 +1,5 @@
 import EDHRecSuggestions from '../../../src/js/features/edhrec-suggestions'
-import bus from 'framebus'
+import scryfall from '../../../src/js/lib/scryfall'
 import deckParser from '../../../src/js/lib/deck-parser'
 
 describe('EDHRec Suggestions', function () {
@@ -17,8 +17,10 @@ describe('EDHRec Suggestions', function () {
       document.body.appendChild(deckbuilderElement)
 
       jest.spyOn(deckParser, 'isCommanderLikeDeck').mockResolvedValue(true)
-      jest.spyOn(bus, 'emit').mockImplementationOnce((event, reply) => {
-        reply({})
+      jest.spyOn(scryfall, 'getDeck').mockResolvedValue({
+        entries: {
+          commanders: []
+        }
       })
     })
 

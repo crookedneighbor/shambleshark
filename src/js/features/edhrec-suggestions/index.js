@@ -1,22 +1,21 @@
-import bus from 'framebus'
 import Feature from '../feature'
 import makeEDHRecButton from './make-edhrec-button'
 import deckParser from '../../lib/deck-parser'
+import scryfall from '../../lib/scryfall'
 
 export default class EDHRecSuggestions extends Feature {
-  run () {
-    return new Promise((resolve) => {
-      bus.emit('REQUEST_DECK', resolve)
-    }).then(deckParser.isCommanderLikeDeck).then((deckCouldBeCommanderDeck) => {
-      if (!deckCouldBeCommanderDeck) {
-        return
-      }
+  async run () {
+    const deck = await scryfall.getDeck()
+    const deckCouldBeCommanderDeck = await deckParser.isCommanderLikeDeck(deck)
 
-      const buttonsContainer = document.querySelector('.deckbuilder-toolbar-items-right')
-      const edhRecButton = makeEDHRecButton()
+    if (!deckCouldBeCommanderDeck) {
+      return
+    }
 
-      buttonsContainer.appendChild(edhRecButton)
-    })
+    const edhRecButton = await makeEDHRecButton()
+    const buttonsContainer = document.querySelector('.deckbuilder-toolbar-items-right')
+
+    buttonsContainer.appendChild(edhRecButton)
   }
 
   isEnabled () {
