@@ -1,10 +1,10 @@
 // adapted from http://ryanmorr.com/using-mutation-observers-to-watch-for-element-availability/
 
-let observer
+let readyObserver
 const listeners = []
 
 export function reset () {
-  observer = null
+  readyObserver = null
   listeners.splice(0, listeners.length)
 }
 
@@ -14,10 +14,10 @@ export function ready (selector, fn) {
     selector: selector,
     fn: fn
   })
-  if (!observer) {
+  if (!readyObserver) {
     // Watch for changes in the document
-    observer = new global.MutationObserver(check)
-    observer.observe(document.documentElement, {
+    readyObserver = new global.MutationObserver(check)
+    readyObserver.observe(document.documentElement, {
       childList: true,
       subtree: true
     })
@@ -25,6 +25,22 @@ export function ready (selector, fn) {
 
   // Check if the element is currently in the DOM
   check()
+}
+
+export function change (parentSelector, fn) {
+  const parentNode = document.querySelector(parentSelector)
+
+  if (!parentNode) {
+    throw new Error(`${parentSelector} could not be found in DOM`)
+  }
+
+  const observer = new global.MutationObserver(function () {
+    fn(parentNode)
+  })
+  observer.observe(parentNode, {
+    childList: true,
+    subtree: true
+  })
 }
 
 function check () {
@@ -46,5 +62,6 @@ function check () {
 }
 
 export default {
-  ready
+  ready,
+  change
 }
