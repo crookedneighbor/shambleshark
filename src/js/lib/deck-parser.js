@@ -12,20 +12,9 @@ export function hasLegalCommanders (commanders) {
     return Promise.resolve(false)
   }
 
-  if (!commanders.find(c => c.card_digest)) {
-    // has entries in commander section of deck, but none of them
-    // have a card digest yet, so we can't calculate commanders
-    return Promise.resolve(false)
-  }
-
-  return Promise.all(commanders.map((card) => {
-    if (!card.card_digest) {
-      // ignore blank lines
-      return true
-    }
-
+  return Promise.all(commanders.map((cardName) => {
     return scryfall.get('/cards/search', {
-      q: `!"${card.card_digest.name}" is:commander`
+      q: `!"${cardName}" is:commander`
     })
   })).then(() => {
     // if all promises resolve, all were commanders
