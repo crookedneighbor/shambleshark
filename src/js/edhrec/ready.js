@@ -2,7 +2,6 @@ import bus from 'framebus'
 import mutation from '../lib/mutation'
 
 const ELEMENTS_TO_REMOVE = [
-  // TODO leave in ads to support EDHRec
   '#leaderboard',
   '.navbar-header .navbar-toggle',
   '.edhrec2__panels-outer',
@@ -28,6 +27,7 @@ function removeElement (element) {
 export default function start () {
   // TODO move to constant
   bus.emit('EDHREC_READY', function ({ cardsInDeck }) {
+    // TODO send back list of suggested cards instead
     mutation.ready('.cards a', (element) => {
       element.removeAttribute('href')
     })
