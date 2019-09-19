@@ -108,7 +108,6 @@ describe('mutation', function () {
     })
 
     it('observes DOM node for selector', function () {
-      const spy = jest.fn()
       const node = document.createElement('div')
 
       node.id = 'parent'

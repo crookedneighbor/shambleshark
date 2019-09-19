@@ -1,4 +1,5 @@
 import bus from 'framebus'
+import mutation from '../../lib/mutation'
 import Modal from '../../lib/modal'
 import scryfall from '../../lib/scryfall'
 import deckParser from '../../lib/deck-parser'
@@ -74,24 +75,61 @@ export default async function makeEDHRecButton () {
     })
   })
 
-  const commandersAreLegal = await hasLegalCommanders()
+  const initialDeck = await scryfall.getDeck()
 
-  setDisabledState(button, !commandersAreLegal)
+  let commanders = initialDeck.entries.commanders.reduce((all, card) => {
+    if (!card.card_digest) {
+      return all
+    }
+
+    all.push(card.card_digest.name)
+
+    return all
+  }, []).sort()
+
+  await setDisabledState(button, commanders)
+
+  mutation.change('.deckbuilder-editor-inner .deckbuilder-column .deckbuilder-section ul', async (el) => {
+    const commanderList = Array.from(el.querySelectorAll('.deckbuilder-entry')).reduce((all, entry) => {
+      // if the select options have more than 2 disabled, this
+      // indicates that the card lookup has not completed, so
+      // we ignore this value
+      const cardLookupNotComplete = entry.querySelectorAll('.deckbuilder-entry-menu-select option[disabled]').length > 2
+
+      if (cardLookupNotComplete) {
+        return all
+      }
+
+      const input = entry.querySelector('.deckbuilder-entry-input')
+      const parts = input.value.trim().match(/^(\d+ )(.*)/)
+      if (!parts) {
+        return all
+      }
+      const name = parts[2]
+
+      all.push(name)
+
+      return all
+    }, [])
+    commanderList.sort()
+
+    // hack to determine if the arrays are equal
+    if (commanderList.join('|') !== commanders.join('|')) {
+      commanders = commanderList
+      await setDisabledState(button, commanders)
+    }
+  })
 
   return button
 }
 
-async function hasLegalCommanders () {
-  const deck = await scryfall.getDeck()
+async function setDisabledState (button, commanders) {
+  const allLegal = await deckParser.hasLegalCommanders(commanders)
 
-  return deckParser.hasLegalCommanders(deck.entries.commanders)
-}
-
-function setDisabledState (button, isDisabled) {
-  if (isDisabled) {
-    button.setAttribute('disabled', isDisabled)
-  } else {
+  if (allLegal) {
     button.removeAttribute('disabled')
+  } else {
+    button.setAttribute('disabled', 'disabled')
   }
 }
 
