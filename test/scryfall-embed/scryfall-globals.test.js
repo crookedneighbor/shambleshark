@@ -2,6 +2,7 @@ import {
   addCard,
   cleanUp,
   getActiveDeck,
+  getActiveDeckId,
   getDeck,
   removeEntry,
   updateEntry,
@@ -31,6 +32,23 @@ describe('Scryfall Globals', function () {
       },
       pushNotification: jest.fn()
     }
+  })
+
+  describe('getActiveDeckId', function () {
+    it('calls getActiveDeck to get the active deck', function () {
+      return getActiveDeckId().then((id) => {
+        expect(id).toBe('deck-id')
+      })
+    })
+
+    it('skips api call if the deck id is available on the window', function () {
+      global.Scryfall.deckbuilder.deckId = 'deck-id-from-window'
+
+      return getActiveDeckId().then((id) => {
+        expect(id).toBe('deck-id-from-window')
+        expect(global.ScryfallAPI.decks.active).not.toBeCalled()
+      })
+    })
   })
 
   describe('getActiveDeck', function () {

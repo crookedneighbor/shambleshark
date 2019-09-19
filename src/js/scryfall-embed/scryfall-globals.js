@@ -1,5 +1,13 @@
 let getActiveDeckPromise = null
 
+export function getActiveDeckId () {
+  if (Scryfall.deckbuilder && Scryfall.deckbuilder.deckId) {
+    return Promise.resolve(Scryfall.deckbuilder.deckId)
+  }
+
+  return getActiveDeck().then(({ id }) => id)
+}
+
 export function getActiveDeck () {
   if (!getActiveDeckPromise) {
     getActiveDeckPromise = new Promise((resolve) => {
@@ -17,7 +25,7 @@ export function resetActiveDeck () {
 }
 
 export function getDeck () {
-  return getActiveDeck().then(({ id }) => {
+  return getActiveDeckId().then((id) => {
     return new Promise((resolve) => {
       ScryfallAPI.decks.get(id, (deck) => {
         resolve(deck)
@@ -27,7 +35,7 @@ export function getDeck () {
 }
 
 export function addCard (cardId) {
-  return getActiveDeck().then(({ id }) => {
+  return getActiveDeckId().then((id) => {
     return new Promise((resolve) => {
       ScryfallAPI.decks.addCard(id, cardId, (card) => {
         resolve(card)
@@ -37,7 +45,7 @@ export function addCard (cardId) {
 }
 
 export function updateEntry (cardToUpdate) {
-  return getActiveDeck().then(({ id }) => {
+  return getActiveDeckId().then((id) => {
     return new Promise((resolve) => {
       ScryfallAPI.decks.updateEntry(id, cardToUpdate, (card) => {
         resolve(card)
@@ -47,7 +55,7 @@ export function updateEntry (cardToUpdate) {
 }
 
 export function removeEntry (cardId) {
-  return getActiveDeck().then(({ id }) => {
+  return getActiveDeckId().then((id) => {
     return new Promise((resolve) => {
       ScryfallAPI.decks.destroyEntry(id, cardId, (card) => {
         resolve()
