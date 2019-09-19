@@ -5,6 +5,7 @@ import scryfall from '../../lib/scryfall'
 
 export default class EDHRecSuggestions extends Feature {
   async run () {
+    // TODO: sometimes we get a 401 response when deck initialization happens :(
     const deck = await scryfall.getDeck()
     const deckCouldBeCommanderDeck = await deckParser.isCommanderLikeDeck(deck)
 

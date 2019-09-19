@@ -25,9 +25,17 @@ function removeElement (element) {
   element.parentNode.removeChild(element)
 }
 
-function emitReady () {
+export default function start () {
   // TODO move to constant
   bus.emit('EDHREC_READY', function ({ cardsInDeck }) {
+    mutation.ready('.cards a', (element) => {
+      element.removeAttribute('href')
+    })
+
+    ELEMENTS_TO_REMOVE.forEach((selector) => {
+      mutation.ready(selector, removeElement)
+    })
+
     mutation.ready('.toggle-card-in-decklist-button', (btn) => {
       const onclick = btn.getAttribute('onclick')
 
@@ -65,27 +73,6 @@ function emitReady () {
 
       parentNode.appendChild(newButton)
       parentNode.removeChild(btn)
-    })
-  })
-}
-
-export default function start () {
-  let numberOfElementsRemoved = 0
-
-  // TODO only run this when opened as an iframe
-  mutation.ready('.cards a', (element) => {
-    element.removeAttribute('href')
-  })
-
-  ELEMENTS_TO_REMOVE.forEach((selector) => {
-    mutation.ready(selector, function (el) {
-      numberOfElementsRemoved++
-
-      removeElement(el)
-
-      if (numberOfElementsRemoved === ELEMENTS_TO_REMOVE.length) {
-        emitReady()
-      }
     })
   })
 }

@@ -6,7 +6,15 @@ describe('EDHRec Ready', function () {
   let elementsToDelete
 
   beforeEach(function () {
-    jest.spyOn(bus, 'emit').mockImplementation()
+    jest.spyOn(bus, 'emit').mockImplementation((event, reply) => {
+      const response = {
+        cardsInDeck: {}
+      }
+
+      if (event === 'EDHREC_READY') {
+        reply(response)
+      }
+    })
 
     elementsToDelete = {
       '#leaderboard': document.createElement('div'),
@@ -52,22 +60,7 @@ describe('EDHRec Ready', function () {
     expect(el.href).toBeFalsy()
   })
 
-  it('emits the ready event after all the non-essential elements have been removed', function () {
-    jest.spyOn(mutation, 'ready').mockImplementation((selector, cb) => {
-      if (selector in elementsToDelete) {
-        cb(elementsToDelete[selector])
-      }
-    })
-
-    expect(bus.emit).toBeCalledTimes(0)
-
-    start()
-
-    expect(bus.emit).toBeCalledTimes(1)
-    expect(bus.emit).toBeCalledWith('EDHREC_READY', expect.any(Function))
-  })
-
-  describe('when edhrec iframe reports it is ready', function () {
+  describe('button handlers', function () {
     let btn
 
     beforeEach(function () {
@@ -86,16 +79,6 @@ describe('EDHRec Ready', function () {
       icon.classList.add('toggle-card-in-decklist-button-icon')
       btn.setAttribute('onclick', 'toggleCardInDecklistButtonOnClick(event,\'Rashmi, Eternities Crafter\')')
       btn.appendChild(icon)
-
-      bus.emit.mockImplementation((event, cb) => {
-        const response = {
-          cardsInDeck: {}
-        }
-
-        if (event === 'EDHREC_READY') {
-          cb(response)
-        }
-      })
 
       document.body.appendChild(btn)
     })
