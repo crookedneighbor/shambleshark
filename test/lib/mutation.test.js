@@ -101,13 +101,7 @@ describe('mutation', function () {
   })
 
   describe('change', function () {
-    it('throws an error if node cannot be found from selector', function () {
-      expect(() => {
-        change('.foo', jest.fn())
-      }).toThrow('.foo could not be found in DOM')
-    })
-
-    it('observes DOM node for selector', function () {
+    it('observes DOM node for selector when ready', function () {
       const node = document.createElement('div')
 
       node.id = 'parent'
@@ -117,6 +111,7 @@ describe('mutation', function () {
 
       change('#parent', jest.fn())
 
+      expect(global.MutationObserver.prototype.observe).toBeCalledTimes(2)
       expect(global.MutationObserver.prototype.observe).toBeCalledWith(node, {
         childList: true,
         subtree: true

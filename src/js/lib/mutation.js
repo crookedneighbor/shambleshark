@@ -28,18 +28,14 @@ export function ready (selector, fn) {
 }
 
 export function change (parentSelector, fn) {
-  const parentNode = document.querySelector(parentSelector)
-
-  if (!parentNode) {
-    throw new Error(`${parentSelector} could not be found in DOM`)
-  }
-
-  const observer = new global.MutationObserver(function () {
-    fn(parentNode)
-  })
-  observer.observe(parentNode, {
-    childList: true,
-    subtree: true
+  ready(parentSelector, (parentNode) => {
+    const observer = new global.MutationObserver(function () {
+      fn(parentNode)
+    })
+    observer.observe(parentNode, {
+      childList: true,
+      subtree: true
+    })
   })
 }
 
