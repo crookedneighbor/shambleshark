@@ -3,7 +3,7 @@ import makeEDHRecButton from './make-edhrec-button'
 import deckParser from '../../lib/deck-parser'
 import scryfall from '../../lib/scryfall'
 
-export default class EDHRecSuggestions extends Feature {
+class EDHRecSuggestions extends Feature {
   async run () {
     // TODO: sometimes we get a 401 response when deck initialization happens :(
     const deck = await scryfall.getDeck()
@@ -18,9 +18,12 @@ export default class EDHRecSuggestions extends Feature {
 
     buttonsContainer.appendChild(edhRecButton)
   }
-
-  isEnabled () {
-    // TODO only put edhrec button on when configured in options
-    return true
-  }
 }
+
+EDHRecSuggestions.settingsKey = 'edhrec-suggestions-button'
+
+EDHRecSuggestions.settingsDefaults = {
+  enabled: true
+}
+
+export default EDHRecSuggestions
