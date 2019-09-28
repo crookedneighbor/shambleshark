@@ -2,6 +2,7 @@ import Feature from '../feature'
 import makeEDHRecButton from './make-edhrec-button'
 import deckParser from '../../lib/deck-parser'
 import scryfall from '../../lib/scryfall'
+import { sections } from '../constants'
 
 class EDHRecSuggestions extends Feature {
   async run () {
@@ -20,8 +21,12 @@ class EDHRecSuggestions extends Feature {
   }
 }
 
-EDHRecSuggestions.settingsKey = 'edhrec-suggestions-button'
-
+EDHRecSuggestions.metadata = {
+  id: 'edhrec-suggestions-button',
+  title: 'EDHRec Suggestions',
+  section: sections.DECK_BUILDER,
+  description: 'Inserts an EDHRec button on commander decks. When accessed, will display a list of card suggestions from EDHRec.'
+}
 EDHRecSuggestions.settingsDefaults = {
   enabled: true
 }

@@ -26,7 +26,9 @@ describe('Base Feature', function () {
   describe('enable', function () {
     class FeatureThatEnables extends Feature {
     }
-    FeatureThatEnables.settingsKey = 'feature-that-enables'
+    FeatureThatEnables.metadata = {
+      id: 'feature-that-enables'
+    }
 
     it('sets enabled property for feature on storage', async function () {
       jest.spyOn(FeatureThatEnables, 'saveSetting').mockResolvedValue()
@@ -40,7 +42,9 @@ describe('Base Feature', function () {
   describe('disable', function () {
     class FeatureThatDisables extends Feature {
     }
-    FeatureThatDisables.settingsKey = 'feature-that-disables'
+    FeatureThatDisables.metadata = {
+      id: 'feature-that-disables'
+    }
 
     it('saves feature on storage', async function () {
       jest.spyOn(FeatureThatDisables, 'saveSetting').mockResolvedValue()
@@ -54,7 +58,9 @@ describe('Base Feature', function () {
   describe('isEnabled', function () {
     class FeatureThatReportsIfItsEnabled extends Feature {
     }
-    FeatureThatReportsIfItsEnabled.settingsKey = 'feature-that-reports'
+    FeatureThatReportsIfItsEnabled.metadata = {
+      id: 'feature-that-reports'
+    }
 
     it('resolves to true if feature is enabled', async function () {
       const feature = new FeatureThatReportsIfItsEnabled()
@@ -84,7 +90,9 @@ describe('Base Feature', function () {
   describe('getSettings', function () {
     class FeatureWithSavedSettings extends Feature {
     }
-    FeatureWithSavedSettings.settingsKey = 'feature-with-saved'
+    FeatureWithSavedSettings.metadata = {
+      id: 'feature-with-saved'
+    }
     FeatureWithSavedSettings.settingsDefaults = {
       foo: 'bar',
       baz: 'buz'
@@ -123,7 +131,9 @@ describe('Base Feature', function () {
   describe('saveSetting', function () {
     class FeatureThatSavesSettings extends Feature {
     }
-    FeatureThatSavesSettings.settingsKey = 'feature-that-saves'
+    FeatureThatSavesSettings.metadata = {
+      id: 'feature-that-saves'
+    }
 
     beforeEach(function () {
       jest.spyOn(storage, 'set').mockResolvedValue()

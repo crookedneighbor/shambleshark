@@ -39,12 +39,12 @@ class Feature {
     settings[property] = value
 
     return storage.set({
-      [this.settingsKey]: settings
+      [this.metadata.id]: settings
     })
   }
 
   static async getSettings () {
-    let settings = await storage.get(this.settingsKey)
+    let settings = await storage.get(this.metadata.id)
 
     settings = Object.assign({}, this.settingsDefaults, settings)
 
@@ -52,7 +52,7 @@ class Feature {
   }
 }
 
-createStaticProperty('settingsKey')
+createStaticProperty('metadata')
 createStaticProperty('settingsDefaults')
 
 export default Feature
