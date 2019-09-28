@@ -89,8 +89,15 @@ export default async function makeEDHRecButton () {
 
   await setDisabledState(button, commanders)
 
-  mutation.change('.deckbuilder-editor-inner .deckbuilder-column .deckbuilder-section ul', async (el) => {
-    const commanderList = Array.from(el.querySelectorAll('.deckbuilder-entry')).reduce((all, entry) => {
+  mutation.change('.deckbuilder-editor-inner .deckbuilder-column .deckbuilder-section', async (el) => {
+    const title = el.querySelector('.deckbuilder-section-title')
+
+    if (title.innerHTML.toLowerCase().indexOf('commander') === -1) {
+      // only run mutation on commander column
+      return
+    }
+
+    const commanderList = Array.from(el.querySelectorAll('ul .deckbuilder-entry')).reduce((all, entry) => {
       // if the select options have more than 2 disabled, this
       // indicates that the card lookup has not completed, so
       // we ignore this value

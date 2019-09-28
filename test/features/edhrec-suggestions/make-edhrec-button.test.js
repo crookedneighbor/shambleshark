@@ -384,7 +384,7 @@ describe('makeEDHRecButton', function () {
         Array.from(li.querySelectorAll('select option'))
           .forEach(el => el.setAttribute('disabled', 'disabled'))
       }
-      commanderSection.appendChild(li)
+      commanderSection.querySelector('ul').appendChild(li)
     }
 
     beforeEach(async function () {
@@ -399,7 +399,11 @@ describe('makeEDHRecButton', function () {
           nonlands: []
         }
       }
-      commanderSection = document.createElement('ul')
+      commanderSection = document.createElement('div')
+      commanderSection.innerHTML = `
+        <div class="deckbuilder-section-title">Commander(s)</div>
+        <ul></ul>
+      `
 
       scryfall.getDeck.mockResolvedValue(fakeDeck)
       document.body.appendChild(commanderSection)
@@ -566,6 +570,22 @@ describe('makeEDHRecButton', function () {
       await changeHandler(commanderSection)
 
       expect(deckParser.hasLegalCommanders).not.toBeCalled()
+    })
+
+    it('does not check commanders when section is not the commander section', async function () {
+      const title = document.createElement('div')
+      title.innerHTML = 'Lands'
+      const fakeEl = {
+        querySelector: jest.fn().mockReturnValue(title),
+        querySelectorAll: jest.fn()
+      }
+
+      await makeEDHRecButton()
+      const changeHandler = mutation.change.mock.calls[0][1]
+
+      await changeHandler(fakeEl)
+
+      expect(fakeEl.querySelectorAll).not.toBeCalled()
     })
   })
 })
