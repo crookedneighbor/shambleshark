@@ -1,6 +1,5 @@
 import EDHRecSuggestions from '../../../src/js/features/edhrec-suggestions'
 import scryfall from '../../../src/js/lib/scryfall'
-import deckParser from '../../../src/js/lib/deck-parser'
 import mutation from '../../../src/js/lib/mutation'
 
 describe('EDHRec Suggestions', function () {
@@ -17,16 +16,21 @@ describe('EDHRec Suggestions', function () {
       deckbuilderElement.id = 'deckbuilder'
       document.body.appendChild(deckbuilderElement)
 
-      jest.spyOn(deckParser, 'isCommanderLikeDeck').mockResolvedValue(true)
       jest.spyOn(scryfall, 'getDeck').mockResolvedValue({
         entries: {
           commanders: []
         }
       })
       jest.spyOn(mutation, 'change').mockImplementation()
+      jest.spyOn(mutation, 'ready').mockImplementation((selector, cb) => {
+        const el = document.createElement('div')
+        el.innerHTML = 'Commander(s)'
+
+        cb(el)
+      })
     })
 
-    it('adds an edhrec button to the toolbar items on the page for a commander-like deck', async function () {
+    it('adds an edhrec button to the toolbar items on the page for a commander deck', async function () {
       const feature = new EDHRecSuggestions()
 
       await feature.run()
@@ -37,7 +41,12 @@ describe('EDHRec Suggestions', function () {
     it('does not add an edhrec button to the toolbar items on the page for a non-commander deck', async function () {
       const feature = new EDHRecSuggestions()
 
-      deckParser.isCommanderLikeDeck.mockResolvedValue(false)
+      mutation.ready.mockImplementation((selector, cb) => {
+        const el = document.createElement('div')
+        el.innerHTML = 'Lands'
+
+        cb(el)
+      })
 
       await feature.run()
 

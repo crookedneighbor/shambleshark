@@ -1,23 +1,37 @@
 import Feature from '../feature'
 import makeEDHRecButton from './make-edhrec-button'
-import deckParser from '../../lib/deck-parser'
-import scryfall from '../../lib/scryfall'
+import mutation from '../../lib/mutation'
 import { sections } from '../constants'
+
+const TIMEOUT_TO_CONTINUE = 1000
 
 class EDHRecSuggestions extends Feature {
   async run () {
-    // TODO: sometimes we get a 401 response when deck initialization happens :(
-    const deck = await scryfall.getDeck()
-    const deckCouldBeCommanderDeck = await deckParser.isCommanderLikeDeck(deck)
+    return new Promise(function (resolve, reject) {
+      const timeout = setTimeout(reject, TIMEOUT_TO_CONTINUE)
 
-    if (!deckCouldBeCommanderDeck) {
-      return
-    }
+      mutation.ready('.deckbuilder-section-title', async function (title) {
+        // TODO support oathbreaker as well
+        if (title.innerHTML.toLowerCase().indexOf('commander') === -1) {
+          // only run this code once deck has loaded and we are reasonably
+          // certain it is a commander deck
+          return
+        }
 
-    const edhRecButton = await makeEDHRecButton()
-    const buttonsContainer = document.querySelector('.deckbuilder-toolbar-items-right')
+        const edhRecButton = await makeEDHRecButton()
+        const buttonsContainer = document.querySelector('.deckbuilder-toolbar-items-right')
 
-    buttonsContainer.appendChild(edhRecButton)
+        buttonsContainer.appendChild(edhRecButton)
+
+        clearTimeout(timeout)
+        resolve()
+      })
+    }).catch(function () {
+      // Took more than 1 secon to find the commander list
+      // will continue looking for it in the case of a slow
+      // connection, but no need to hang up the resolution
+      // of the other features
+    })
   }
 }
 

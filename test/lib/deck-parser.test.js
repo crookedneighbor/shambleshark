@@ -1,37 +1,11 @@
 import {
-  hasLegalCommanders,
-  isCommanderLikeDeck
+  hasLegalCommanders
 } from '../../src/js/lib/deck-parser'
 import {
   api as scryfall
 } from '../../src/js/lib/scryfall'
 
 describe('Deck Parser', function () {
-  describe('isCommanderLikeDeck', function () {
-    it('returns false if deck has no commanders section', async function () {
-      const deck = {
-        entries: {
-          lands: [],
-          nonlands: []
-        }
-      }
-
-      expect(isCommanderLikeDeck(deck)).resolves.toBe(false)
-    })
-
-    it('returns true if deck has a commanders section', async function () {
-      const deck = {
-        entries: {
-          commanders: [],
-          lands: [],
-          nonlands: []
-        }
-      }
-
-      expect(isCommanderLikeDeck(deck)).resolves.toBe(true)
-    })
-  })
-
   describe('hasLegalCommanders', function () {
     beforeEach(function () {
       jest.spyOn(scryfall, 'get')

@@ -2,10 +2,6 @@ import {
   api as scryfall
 } from './scryfall'
 
-export function isCommanderLikeDeck (deck) {
-  return Promise.resolve(Boolean(deck.entries.commanders))
-}
-
 export function hasLegalCommanders (commanders) {
   if (commanders.length === 0) {
     // no commanders in commander section
@@ -26,6 +22,5 @@ export function hasLegalCommanders (commanders) {
 }
 
 export default {
-  isCommanderLikeDeck,
   hasLegalCommanders
 }
