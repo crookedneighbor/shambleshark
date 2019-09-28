@@ -1,0 +1,22 @@
+.hero.is-primary {
+  background: linear-gradient(to bottom, #1d1c25, #431e3f);
+}
+
+#settings-container {
+  max-width: 800px;
+}
+
+fieldset.field[disabled] {
+  position: relative;
+}
+
+fieldset.field[disabled] .disabled-overlay {
+  opacity: .5;
+  cursor: not-allowed;
+  position: absolute;
+  top: -5px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+}

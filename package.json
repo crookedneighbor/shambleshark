@@ -1,8 +1,8 @@
 {
-  "name": "scryfall-deckbuilder-helper",
+  "name": "scryfall-extend-extension",
   "private": true,
   "version": "0.0.1",
-  "description": "A chrome extension for adding features to the Scryfall deckbuilder",
+  "description": "A browser extension for adding features to the Scryfall site.",
   "scripts": {
     "lint": "standard --verbose | snazzy",
     "posttest": "npm run lint",
@@ -31,6 +31,8 @@
     "write-file-webpack-plugin": "^4.5.1"
   },
   "dependencies": {
+    "bulma": "^0.7.5",
+    "bulma-switch": "^2.0.0",
     "framebus": "^3.0.2",
     "scryfall-client": "^0.10.1"
   },
