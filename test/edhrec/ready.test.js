@@ -4,7 +4,7 @@ import wait from '../../src/js/lib/wait'
 import bus from 'framebus'
 
 describe('EDHRec Ready', function () {
-  let replySpy
+  let replySpy, fetchSpy
 
   beforeEach(function () {
     jest.spyOn(locationCheck, 'isIframe').mockReturnValue(true)
@@ -20,9 +20,10 @@ describe('EDHRec Ready', function () {
         reply(response, replySpy)
       }
     })
+    fetchSpy = jest.fn().mockResolvedValue('result')
     // jest doesn't have fetch on the window
     global.fetch = jest.fn().mockResolvedValue({
-      json: jest.fn().mockResolvedValue('result')
+      json: fetchSpy
     })
   })
 
@@ -76,7 +77,23 @@ describe('EDHRec Ready', function () {
     ])
   })
 
-  it('sends back error if request to edhrec errors', async function () {
+  it('sends back errors if request to edhrec resolves with errors', async function () {
+    fetchSpy.mockResolvedValue({
+      errors: ['1 error', '2 error']
+    })
+
+    start()
+
+    // let request promise resolve
+    await wait()
+
+    expect(replySpy).toBeCalledTimes(1)
+    expect(replySpy).toBeCalledWith([{
+      errors: ['1 error', '2 error']
+    }])
+  })
+
+  it('sends back error in array if request to edhrec fails', async function () {
     const err = new Error('fetch error')
 
     global.fetch.mockRejectedValue(err)

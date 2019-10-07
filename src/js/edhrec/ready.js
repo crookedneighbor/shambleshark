@@ -9,6 +9,11 @@ export default function start () {
   // TODO move event name to constant
   bus.on('REQUEST_EDHREC_RECOMENDATIONS', function (payload, reply) {
     getRecs(payload).then(result => {
+      if (result.errors) {
+        reply([result])
+        return
+      }
+
       reply([null, result])
     }).catch(err => reply([err]))
   })
