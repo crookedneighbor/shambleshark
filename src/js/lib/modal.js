@@ -11,6 +11,8 @@ export default class Modal {
 
     this.element = this._constructModalElement(options)
     this._contentNode = this.element.querySelector('.modal-dialog-stage')
+    this._loaderNode = this.element.querySelector('.modal-dialog-content')
+    this._titleNode = this.element.querySelector('.modal-dialog-title-content')
   }
 
   setContent (content) {
@@ -22,13 +24,17 @@ export default class Modal {
     }
   }
 
+  setTitle (value) {
+    this._titleNode.innerHTML = value
+  }
+
   setLoading (state) {
     if (state) {
-      this.element.querySelector('.modal-dialog-stage').style.display = 'none'
-      this.element.querySelector('.modal-dialog-content').removeAttribute('style')
+      this._contentNode.style.display = 'none'
+      this._loaderNode.removeAttribute('style')
     } else {
-      this.element.querySelector('.modal-dialog-stage').removeAttribute('style')
-      this.element.querySelector('.modal-dialog-content').style.display = 'none'
+      this._contentNode.removeAttribute('style')
+      this._loaderNode.style.display = 'none'
     }
   }
 

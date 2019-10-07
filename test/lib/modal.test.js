@@ -77,6 +77,18 @@ describe('makeModal', function () {
     })
   })
 
+  describe('setTitle', function () {
+    it('can write over content', function () {
+      const modal = new Modal({
+        title: 'Some title'
+      })
+
+      modal.setTitle('new title')
+
+      expect(modal.element.querySelector('.modal-dialog-title-content').innerHTML).toBe('new title')
+    })
+  })
+
   describe('setContent', function () {
     it('can write over content', function () {
       const modal = new Modal({
