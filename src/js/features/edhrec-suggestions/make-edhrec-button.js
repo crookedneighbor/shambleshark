@@ -22,10 +22,13 @@ const TYPES_WITH_IRREGULAR_PLURALS = {
 export default async function makeEDHRecButton () {
   addEDHRecIframe()
 
+  const modalTitle = 'EDHRec Suggestions'
   const modal = new Modal({
     id: 'edhrec-modal',
-    header: 'EDHRec Suggestions',
+    header: modalTitle,
     onClose (modalInstance) {
+      // reset this in case the error state changes it
+      modalInstance.setTitle(modalTitle)
       bus.emit('CLEAN_UP_DECK')
       modalInstance.setLoading(true)
     }
@@ -75,7 +78,7 @@ export default async function makeEDHRecButton () {
         cards: cardsInDeck
       }, function ([err, result]) {
         if (err) {
-          // TODO what?
+          createErrorModalState(modal, err)
           return
         }
 
@@ -134,13 +137,10 @@ export default async function makeEDHRecButton () {
                   cardId: cardFromScryfall.id,
                   isLand: cardFromScryfall.type_line.toLowerCase().indexOf('land') > -1
                 })
-              }).catch((err) => {
-                // TODO scryfall message an error
-                console.log(err)
-              })
 
-              cardElement.classList.add('in-deck')
-              overlay.innerHTML = CHECK_SYMBOL
+                cardElement.classList.add('in-deck')
+                overlay.innerHTML = CHECK_SYMBOL
+              }).catch(err => createErrorModalState(modal, err))
             } else {
               bus.emit('REMOVE_CARD_FROM_DECK', {
                 cardName: card.name
@@ -272,4 +272,29 @@ function formatEDHRecSuggestions (list) {
 
     return all
   }, {})
+}
+
+function createErrorModalState (modal, err) {
+  modal.setTitle('Something went wrong')
+
+  const container = document.createElement('div')
+
+  if (err.errors) {
+    const errorList = document.createElement('ul')
+    err.errors.forEach(errorMessage => {
+      const errorElement = document.createElement('li')
+      errorElement.innerHTML = errorMessage
+      errorList.appendChild(errorElement)
+    })
+
+    container.appendChild(errorList)
+  } else {
+    container.innerHTML = `
+      <p>An unknown error occurred:</p>
+      <pre><code>${err.toString()}</code></pre>
+    `
+  }
+
+  modal.setContent(container)
+  modal.setLoading(false)
 }

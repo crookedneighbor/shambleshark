@@ -399,8 +399,7 @@ describe('makeEDHRecButton', function () {
       }, expect.any(Function))
     })
 
-    it('does not setup modal when edhrec request errors', async function () {
-      // TODO the actual implementation should be show an error message
+    it('displays generic error when edhrec request errors', async function () {
       bus.emit.mockImplementation(function (eventName, payload, reply) {
         const err = new Error('network error')
 
@@ -414,7 +413,30 @@ describe('makeEDHRecButton', function () {
 
       await wait()
 
-      expect(Modal.prototype.setContent).not.toBeCalled()
+      const body = document.querySelector('#edhrec-modal').innerHTML
+      expect(body).toContain('An unknown error occurred:')
+      expect(body).toContain('network error')
+    })
+
+    it('displays specific error when edhrec request errors with specific errors', async function () {
+      bus.emit.mockImplementation(function (eventName, payload, reply) {
+        const err = {
+          errors: ['1 error', '2 error']
+        }
+
+        reply([err])
+      })
+      jest.spyOn(Modal.prototype, 'setContent')
+
+      const btn = await makeEDHRecButton()
+
+      btn.click()
+
+      await wait()
+
+      const errors = document.querySelectorAll('#edhrec-modal li')
+      expect(errors[0].innerHTML).toContain('1 error')
+      expect(errors[1].innerHTML).toContain('2 error')
     })
 
     it('populates modal with list of recomendations organized by type', async function () {
@@ -519,8 +541,11 @@ describe('makeEDHRecButton', function () {
 
       await wait()
 
-      // TODO figure out error handling
       expect(bus.emit).not.toBeCalledWith('ADD_CARD_TO_DECK', expect.any(Object))
+
+      const body = document.querySelector('#edhrec-modal').innerHTML
+      expect(body).toContain('An unknown error occurred:')
+      expect(body).toContain('Error from scryfall')
     })
 
     it('removes card from deck when chosen a second time', async function () {
