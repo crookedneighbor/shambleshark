@@ -1,78 +1,29 @@
 import bus from 'framebus'
-import mutation from '../lib/mutation'
-
-const ELEMENTS_TO_REMOVE = [
-  '#leaderboard',
-  '.navbar-header .navbar-toggle',
-  '.edhrec2__panels-outer',
-  '.decklist',
-  '.footer'
-]
-
-function setCardInDeckState (btn, cardInDeck) {
-  const icon = btn.querySelector('.toggle-card-in-decklist-button-icon')
-  const iconClass = `glyphicon-${cardInDeck ? 'ok' : 'plus'}`
-
-  icon.classList.remove('glyphicon-plus')
-  icon.classList.remove('glyphicon-ok')
-
-  btn.setAttribute('data-present-in-scryfall-decklist', String(cardInDeck))
-  icon.classList.add(iconClass)
-}
-
-function removeElement (element) {
-  element.parentNode.removeChild(element)
-}
+import locationCheck from '../lib/location'
 
 export default function start () {
-  // TODO move to constant
-  bus.emit('EDHREC_READY', function ({ cardsInDeck }) {
-    // TODO send back list of suggested cards instead
-    mutation.ready('.cards a', (element) => {
-      element.removeAttribute('href')
-    })
+  if (!locationCheck.isIframe()) {
+    return
+  }
 
-    ELEMENTS_TO_REMOVE.forEach((selector) => {
-      mutation.ready(selector, removeElement)
-    })
-
-    mutation.ready('.toggle-card-in-decklist-button', (btn) => {
-      const onclick = btn.getAttribute('onclick')
-
-      if (!onclick) {
-        return
-      }
-
-      const newButton = document.createElement('div')
-
-      newButton.classList.add('toggle-card-in-decklist-button')
-      // TODO move to constant
-      newButton.style.background = '#634496'
-
-      const cardName = onclick.replace('toggleCardInDecklistButtonOnClick(event,\'', '').replace('\')', '').replace(/\\/g, '')
-      const cardInDeck = cardsInDeck[cardName] === true
-
-      newButton.innerHTML = btn.innerHTML
-
-      setCardInDeckState(newButton, cardInDeck)
-
-      newButton.addEventListener('click', (e) => {
-        e.preventDefault()
-
-        const inDeckAlready = newButton.getAttribute('data-present-in-scryfall-decklist') === 'true'
-        const eventToEmit = inDeckAlready ? 'REMOVE_CARD_FROM_EDHREC' : 'ADD_CARD_FROM_EDHREC'
-
-        setCardInDeckState(newButton, !inDeckAlready)
-
-        bus.emit(eventToEmit, {
-          cardName
-        })
-      })
-
-      const parentNode = btn.parentNode
-
-      parentNode.appendChild(newButton)
-      parentNode.removeChild(btn)
-    })
+  // TODO move event name to constant
+  bus.on('REQUEST_EDHREC_RECOMENDATIONS', function (payload, reply) {
+    getRecs(payload).then(result => {
+      reply([null, result])
+    }).catch(err => reply([err]))
   })
+}
+
+function getRecs ({ commanders, cards }) {
+  return global.fetch('https://edhrec.com/api/recs/', {
+    method: 'POST',
+    body: JSON.stringify({
+      commanders,
+      cards,
+      name: ''
+    }),
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  }).then(res => res.json())
 }

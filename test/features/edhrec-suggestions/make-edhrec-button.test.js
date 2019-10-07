@@ -52,6 +52,12 @@ describe('makeEDHRecButton', function () {
     expect(document.querySelector('#edhrec-modal')).not.toBeFalsy()
   })
 
+  it('adds an edhrec iframe to page', async function () {
+    await makeEDHRecButton()
+
+    expect(document.querySelector('#edhrec-suggestions-iframe')).not.toBeFalsy()
+  })
+
   it('cleans up deck after modal is closed', async function () {
     await makeEDHRecButton()
 
@@ -63,90 +69,84 @@ describe('makeEDHRecButton', function () {
     expect(bus.emit).toBeCalledWith('CLEAN_UP_DECK')
   })
 
-  it('listens for the EDHREC_READY event', async function () {
-    await makeEDHRecButton()
-
-    expect(bus.on).toBeCalledWith('EDHREC_READY', expect.any(Function))
-  })
-
-  it('listens for the ADD_CARD_FROM_EDHREC event for nonland card and emits an ADD_CARD_TO_DECK event', async function () {
-    const payload = {
-      cardName: 'Name'
-    }
-    bus.on.mockImplementation((event, reply) => {
-      if (event === 'ADD_CARD_FROM_EDHREC') {
-        reply(payload)
-      }
-    })
-    scryfall.api.get.mockResolvedValue({
-      name: 'Name',
-      id: 'some-id',
-      type_line: 'Creature'
-    })
-
-    await makeEDHRecButton()
-
-    await wait()
-
-    expect(bus.emit).toBeCalledWith('ADD_CARD_TO_DECK', {
-      cardName: 'Name',
-      cardId: 'some-id',
-      isLand: false
-    })
-  })
-
-  it('listens for the ADD_CARD_FROM_EDHREC event for land card and emits an ADD_CARD_TO_DECK event', async function () {
-    const payload = {
-      cardName: 'Name'
-    }
-    bus.on.mockImplementation((event, reply) => {
-      if (event === 'ADD_CARD_FROM_EDHREC') {
-        reply(payload)
-      }
-    })
-    jest.spyOn(scryfall.api, 'get').mockResolvedValue({
-      name: 'Name',
-      id: 'some-id',
-      type_line: 'Artifact Land'
-    })
-
-    await makeEDHRecButton()
-
-    await wait()
-
-    expect(bus.emit).toBeCalledWith('ADD_CARD_TO_DECK', {
-      cardName: 'Name',
-      cardId: 'some-id',
-      isLand: true
-    })
-  })
-
-  it('listens for the REMOVE_CARD_FROM_EDHREC event and emits a REMOVE_CARD_TO_DECK event', async function () {
-    const payload = {
-      cardName: 'Name'
-    }
-    bus.on.mockImplementation((event, reply) => {
-      if (event === 'REMOVE_CARD_FROM_EDHREC') {
-        reply(payload)
-      }
-    })
-    scryfall.api.get.mockResolvedValue({
-      name: 'Name',
-      id: 'some-id',
-      type_line: 'Creature'
-    })
-
-    await makeEDHRecButton()
-
-    await wait()
-
-    expect(bus.emit).toBeCalledWith('REMOVE_CARD_FROM_DECK', {
-      cardName: 'Name'
-    })
-  })
+  // it('listens for the ADD_CARD_FROM_EDHREC event for nonland card and emits an ADD_CARD_TO_DECK event', async function () {
+  //   const payload = {
+  //     cardName: 'Name'
+  //   }
+  //   bus.on.mockImplementation((event, reply) => {
+  //     if (event === 'ADD_CARD_FROM_EDHREC') {
+  //       reply(payload)
+  //     }
+  //   })
+  //   scryfall.api.get.mockResolvedValue({
+  //     name: 'Name',
+  //     id: 'some-id',
+  //     type_line: 'Creature'
+  //   })
+  //
+  //   await makeEDHRecButton()
+  //
+  //   await wait()
+  //
+  //   expect(bus.emit).toBeCalledWith('ADD_CARD_TO_DECK', {
+  //     cardName: 'Name',
+  //     cardId: 'some-id',
+  //     isLand: false
+  //   })
+  // })
+  //
+  // it('listens for the ADD_CARD_FROM_EDHREC event for land card and emits an ADD_CARD_TO_DECK event', async function () {
+  //   const payload = {
+  //     cardName: 'Name'
+  //   }
+  //   bus.on.mockImplementation((event, reply) => {
+  //     if (event === 'ADD_CARD_FROM_EDHREC') {
+  //       reply(payload)
+  //     }
+  //   })
+  //   jest.spyOn(scryfall.api, 'get').mockResolvedValue({
+  //     name: 'Name',
+  //     id: 'some-id',
+  //     type_line: 'Artifact Land'
+  //   })
+  //
+  //   await makeEDHRecButton()
+  //
+  //   await wait()
+  //
+  //   expect(bus.emit).toBeCalledWith('ADD_CARD_TO_DECK', {
+  //     cardName: 'Name',
+  //     cardId: 'some-id',
+  //     isLand: true
+  //   })
+  // })
+  //
+  // it('listens for the REMOVE_CARD_FROM_EDHREC event and emits a REMOVE_CARD_TO_DECK event', async function () {
+  //   const payload = {
+  //     cardName: 'Name'
+  //   }
+  //   bus.on.mockImplementation((event, reply) => {
+  //     if (event === 'REMOVE_CARD_FROM_EDHREC') {
+  //       reply(payload)
+  //     }
+  //   })
+  //   scryfall.api.get.mockResolvedValue({
+  //     name: 'Name',
+  //     id: 'some-id',
+  //     type_line: 'Creature'
+  //   })
+  //
+  //   await makeEDHRecButton()
+  //
+  //   await wait()
+  //
+  //   expect(bus.emit).toBeCalledWith('REMOVE_CARD_FROM_DECK', {
+  //     cardName: 'Name'
+  //   })
+  // })
 
   describe('when clicked', function () {
-    let fakeDeck
+    let fakeDeck, fakeEDHRecResponse
 
     beforeEach(async function () {
       fakeDeck = {
@@ -159,85 +159,179 @@ describe('makeEDHRecButton', function () {
               }
             }
           ],
-          lands: [],
-          nonlands: []
+          lands: [
+            {
+              count: 1,
+              card_digest: {
+                id: 'reliquary-tower',
+                name: 'Reliquary Tower'
+              }
+            }
+          ],
+          nonlands: [
+            {
+              count: 1,
+              card_digest: {
+                id: 'obstinate-familiar',
+                name: 'Obstinate Familiar'
+              }
+            }
+          ]
         }
       }
-
-      scryfall.getDeck.mockResolvedValue(fakeDeck)
-
-      scryfall.api.get.mockResolvedValue({
-        related_uris: {
-          edhrec: 'https://example.com/edhrec/arjun-the-shifting-flame'
+      fakeEDHRecResponse = {
+        commanders: [
+          // irrelevant
+        ],
+        outRecs: [
+          // TODO future improvement
+        ],
+        inRecs: [
+          {
+            sanitized: 'arcane-signet',
+            scryfall_uri: 'https://scryfall.com/card/eld/331/arcane-signet?utm_source=api',
+            cmc: 2,
+            names: [
+              'Arcane Signet'
+            ],
+            primary_types: [
+              'Artifact'
+            ],
+            price: 19.99,
+            color_identity: [],
+            salt: 0,
+            tcgplayer: {
+              url: 'https://store.tcgplayer.com/magic/throne-of-eldraine/arcane-signet?partner=EDHREC&utm_campaign=affiliate&utm_medium=EDHREC&utm_source=EDHREC',
+              name: 'arcane signet',
+              price: 11.4
+            },
+            images: [
+              'https://img.scryfall.com/cards/normal/front/8/4/84128e98-87d6-4c2f-909b-9435a7833e63.jpg?1567631723'
+            ],
+            name: 'Arcane Signet',
+            cmcs: [
+              2
+            ],
+            color_id: [],
+            score: 73
+          },
+          {
+            sanitized: 'shivan-reef',
+            scryfall_uri: 'https://scryfall.com/card/ori/251/shivan-reef?utm_source=api',
+            cmc: 0,
+            names: [
+              'Shivan Reef'
+            ],
+            primary_types: [
+              'Land'
+            ],
+            price: 1.99,
+            color_identity: [
+              'R',
+              'U'
+            ],
+            salt: 0.13793103448275862,
+            images: [
+              'https://img.scryfall.com/cards/normal/front/f/1/f1d33afd-6f2a-43c8-ae5d-17a0674fcdd3.jpg?1562049659'
+            ],
+            name: 'Shivan Reef',
+            cmcs: [
+              0
+            ],
+            color_id: [
+              'R',
+              'U'
+            ],
+            score: 59,
+            image: 'https://img.scryfall.com/cards/normal/front/f/1/f1d33afd-6f2a-43c8-ae5d-17a0674fcdd3.jpg?1562049659'
+          },
+          {
+            sanitized: 'arcane-denial',
+            scryfall_uri: 'https://scryfall.com/card/a25/41/arcane-denial?utm_source=api',
+            cmc: 2,
+            names: [
+              'Arcane Denial'
+            ],
+            primary_types: [
+              'Instant'
+            ],
+            price: 0.79,
+            color_identity: [
+              'U'
+            ],
+            salt: 0.7719298245614035,
+            images: [
+              'https://img.scryfall.com/cards/normal/front/9/d/9d1ffeb1-6c31-45f7-8140-913c397022a3.jpg?1562439019'
+            ],
+            url: '/cards/arcane-denial',
+            name: 'Arcane Denial',
+            cmcs: [
+              2
+            ],
+            color_id: [
+              'U'
+            ],
+            score: 52,
+            image: 'https://img.scryfall.com/cards/normal/front/9/d/9d1ffeb1-6c31-45f7-8140-913c397022a3.jpg?1562439019'
+          }
+        ]
+      }
+      bus.emit.mockImplementation(function (eventName, payload, reply) {
+        if (eventName === 'REQUEST_EDHREC_RECOMENDATIONS') {
+          reply([null, fakeEDHRecResponse])
         }
       })
+
+      scryfall.getDeck.mockResolvedValue(fakeDeck)
+    })
+
+    afterEach(async function () {
+      // allow mocked promises to resolve
+      await wait()
     })
 
     it('opens the modal', async function () {
+      bus.emit.mockImplementation()
       const btn = await makeEDHRecButton()
 
       jest.spyOn(Modal.prototype, 'open')
-      bus.emit.mockImplementation()
 
       btn.click()
 
       expect(Modal.prototype.open).toBeCalledTimes(1)
     })
 
-    it('uses scryfall to populate the iframe src', async function () {
+    it('emits a request for EDHRec recomendations with deck data', async function () {
+      bus.emit.mockImplementation()
       const btn = await makeEDHRecButton()
+
       btn.click()
 
-      await wait(5)
+      await wait()
 
-      const iframe = document.querySelector('#edhrec-modal iframe')
-
-      expect(iframe.src).toBe('https://example.com/edhrec/arjun-the-shifting-flame')
-    })
-
-    it('can handle partner commanders', async function () {
-      fakeDeck.entries.commanders = [
-        {
-          card_digest: {
-            id: 'sidar-id',
-            name: 'Sidar Kondo of Jamura'
-          }
-        },
-        {
-          card_digest: {
-            id: 'tana-id',
-            name: 'Tana the Bloodsower'
-          }
-        }
-      ]
-      scryfall.api.get.mockResolvedValue({
-        related_uris: {
-          edhrec: 'https://example.com/edhrec/sidar-kondo-of-jamura'
-        }
-      })
-
-      const btn = await makeEDHRecButton()
-      btn.click()
-
-      await wait(5)
-
-      const iframe = document.querySelector('#edhrec-modal iframe')
-
-      expect(iframe.src).toBe('https://example.com/edhrec/sidar-kondo-of-jamura-tana-the-bloodsower')
+      expect(bus.emit).toBeCalledTimes(1)
+      expect(bus.emit).toBeCalledWith('REQUEST_EDHREC_RECOMENDATIONS', {
+        commanders: ['Arjun, the Shifting Flame'],
+        cards: [
+          '1 Reliquary Tower',
+          '1 Obstinate Familiar'
+        ]
+      }, expect.any(Function))
     })
 
     it('attempts any number of cards in command zone', async function () {
+      bus.emit.mockImplementation()
       fakeDeck.entries.commanders = [
         {
           card_digest: {
             id: 'sidar-id',
-            name: 'Sidar Kondo of Jamura'
+            name: 'Sidar Kondo of Jamuraa'
           }
         },
         {
           card_digest: {
             id: 'tana-id',
-            name: 'Tana the Bloodsower'
+            name: 'Tana, the Bloodsower'
           }
         },
         {
@@ -247,117 +341,359 @@ describe('makeEDHRecButton', function () {
           }
         }
       ]
-      scryfall.api.get.mockResolvedValue({
-        related_uris: {
-          edhrec: 'https://example.com/edhrec/sidar-kondo-of-jamura'
-        }
-      })
 
       const btn = await makeEDHRecButton()
+
       btn.click()
 
-      await wait(5)
+      await wait()
 
-      const iframe = document.querySelector('#edhrec-modal iframe')
-
-      expect(iframe.src).toBe('https://example.com/edhrec/sidar-kondo-of-jamura-tana-the-bloodsower-reyhan,-last-of-the-abzan')
-    })
-
-    it('unhides the modal content when EDHREC_READY event fires', async function () {
-      const spy = jest.fn()
-
-      jest.spyOn(Modal.prototype, 'setLoading')
-      bus.on.mockImplementation((event, reply) => {
-        if (event === 'EDHREC_READY') {
-          wait(2).then(() => {
-            reply(spy)
-          })
-        }
-      })
-
-      const btn = await makeEDHRecButton()
-      btn.click()
-
-      await wait(5)
-
-      expect(Modal.prototype.setLoading).toBeCalledTimes(1)
-      expect(Modal.prototype.setLoading).toBeCalledWith(false)
-    })
-
-    it('replies to EDHREC_READY event with cards in deck', async function () {
-      const spy = jest.fn()
-
-      fakeDeck.entries.lands.push({
-        card_digest: {
-          name: 'Reliquary Tower'
-        }
-      })
-      fakeDeck.entries.nonlands.push({
-        card_digest: {
-          name: 'Rhystic Study'
-        }
-      })
-
-      bus.on.mockImplementation((event, reply) => {
-        if (event === 'EDHREC_READY') {
-          wait(2).then(() => {
-            reply(spy)
-          })
-        }
-      })
-
-      const btn = await makeEDHRecButton()
-      btn.click()
-
-      await wait(5)
-
-      expect(spy).toBeCalledTimes(1)
-      expect(spy).toBeCalledWith({
-        cardsInDeck: {
-          'Arjun, the Shifting Flame': true,
-          'Reliquary Tower': true,
-          'Rhystic Study': true
-        }
-      })
+      expect(bus.emit).toBeCalledTimes(1)
+      expect(bus.emit).toBeCalledWith('REQUEST_EDHREC_RECOMENDATIONS', {
+        commanders: [
+          'Sidar Kondo of Jamuraa',
+          'Tana, the Bloodsower',
+          'Reyhan, Last of the Abzan'
+        ],
+        cards: [
+          '1 Reliquary Tower',
+          '1 Obstinate Familiar'
+        ]
+      }, expect.any(Function))
     })
 
     it('does not error when cards in deck are missing the card_digest', async function () {
-      const spy = jest.fn()
-
+      bus.emit.mockImplementation()
       fakeDeck.entries.lands.push({
-        card_digest: {
-          name: 'Reliquary Tower'
-        }
-      }, {
         foo: 'bar'
+      }, {
+        count: 5,
+        card_digest: {
+          name: 'Island'
+        }
       })
       fakeDeck.entries.nonlands.push({
+        count: 1,
         card_digest: {
           name: 'Rhystic Study'
         }
       })
 
-      bus.on.mockImplementation((event, reply) => {
-        if (event === 'EDHREC_READY') {
-          wait(2).then(() => {
-            reply(spy)
-          })
-        }
+      const btn = await makeEDHRecButton()
+
+      btn.click()
+
+      await wait()
+
+      expect(bus.emit).toBeCalledTimes(1)
+      expect(bus.emit).toBeCalledWith('REQUEST_EDHREC_RECOMENDATIONS', {
+        commanders: [
+          'Arjun, the Shifting Flame'
+        ],
+        cards: [
+          '1 Reliquary Tower',
+          '5 Island',
+          '1 Obstinate Familiar',
+          '1 Rhystic Study'
+        ]
+      }, expect.any(Function))
+    })
+
+    it('does not setup modal when edhrec request errors', async function () {
+      // TODO the actual implementation should be show an error message
+      bus.emit.mockImplementation(function (eventName, payload, reply) {
+        const err = new Error('network error')
+
+        reply([err])
+      })
+      jest.spyOn(Modal.prototype, 'setContent')
+
+      const btn = await makeEDHRecButton()
+
+      btn.click()
+
+      await wait()
+
+      expect(Modal.prototype.setContent).not.toBeCalled()
+    })
+
+    it('populates modal with list of recomendations organized by type', async function () {
+      jest.spyOn(Modal.prototype, 'setContent')
+      jest.spyOn(Modal.prototype, 'setLoading')
+
+      const btn = await makeEDHRecButton()
+
+      btn.click()
+
+      await wait()
+
+      expect(Modal.prototype.setContent).toBeCalledTimes(1)
+      expect(Modal.prototype.setLoading).toBeCalledWith(false)
+
+      const sections = document.querySelectorAll('#edhrec-modal .edhrec-suggestions-container')
+
+      expect(sections.length).toBe(3)
+      expect(sections[0].querySelector('h3').innerHTML).toBe('Instants')
+      expect(sections[0].querySelector('.edhrec-suggestions img').src).toBe('https://img.scryfall.com/cards/normal/front/9/d/9d1ffeb1-6c31-45f7-8140-913c397022a3.jpg?1562439019')
+      expect(sections[0].querySelector('.edhrec-suggestions img').alt).toBe('Arcane Denial')
+      expect(sections[1].querySelector('h3').innerHTML).toBe('Artifacts')
+      expect(sections[1].querySelector('.edhrec-suggestions img').src).toBe('https://img.scryfall.com/cards/normal/front/8/4/84128e98-87d6-4c2f-909b-9435a7833e63.jpg?1567631723')
+      expect(sections[1].querySelector('.edhrec-suggestions img').alt).toBe('Arcane Signet')
+      expect(sections[2].querySelector('h3').innerHTML).toBe('Lands')
+      expect(sections[2].querySelector('.edhrec-suggestions img').src).toBe('https://img.scryfall.com/cards/normal/front/f/1/f1d33afd-6f2a-43c8-ae5d-17a0674fcdd3.jpg?1562049659')
+      expect(sections[2].querySelector('.edhrec-suggestions img').alt).toBe('Shivan Reef')
+    })
+
+    it('looks up nonland card in scryfall and adds it to deck when chosen', async function () {
+      const btn = await makeEDHRecButton()
+      jest.spyOn(scryfall.api, 'get').mockResolvedValue({
+        name: 'Arcane Denial',
+        id: 'arcane-denial-id',
+        type_line: 'Instant'
+      })
+
+      btn.click()
+
+      await wait()
+
+      const cardElement = document.querySelectorAll('#edhrec-modal .edhrec-suggestion-card-container')[0]
+
+      cardElement.click()
+
+      expect(scryfall.api.get).toBeCalledTimes(1)
+      expect(scryfall.api.get).toBeCalledWith('/cards/a25/41')
+
+      await wait()
+
+      expect(bus.emit).toBeCalledWith('ADD_CARD_TO_DECK', {
+        cardName: 'Arcane Denial',
+        cardId: 'arcane-denial-id',
+        isLand: false
+      })
+    })
+
+    it('looks up land card in scryfall and adds it to deck when chosen', async function () {
+      const btn = await makeEDHRecButton()
+      jest.spyOn(scryfall.api, 'get').mockResolvedValue({
+        name: 'Island',
+        id: 'island-id',
+        type_line: 'Basic Land'
+      })
+
+      btn.click()
+
+      await wait()
+
+      const cardElement = document.querySelectorAll('#edhrec-modal .edhrec-suggestion-card-container')[0]
+
+      cardElement.click()
+
+      expect(scryfall.api.get).toBeCalledTimes(1)
+      expect(scryfall.api.get).toBeCalledWith('/cards/a25/41')
+
+      await wait()
+
+      expect(bus.emit).toBeCalledWith('ADD_CARD_TO_DECK', {
+        cardName: 'Island',
+        cardId: 'island-id',
+        isLand: true
+      })
+    })
+
+    it('handles error from scryfall lookup when card is chosen', async function () {
+      const errFromScryfall = new Error('Error from scryfall')
+      const btn = await makeEDHRecButton()
+
+      jest.spyOn(scryfall.api, 'get').mockRejectedValue(errFromScryfall)
+
+      btn.click()
+
+      await wait()
+
+      const cardElement = document.querySelectorAll('#edhrec-modal .edhrec-suggestion-card-container')[0]
+
+      cardElement.click()
+
+      expect(scryfall.api.get).toBeCalledTimes(1)
+      expect(scryfall.api.get).toBeCalledWith('/cards/a25/41')
+
+      await wait()
+
+      // TODO figure out error handling
+      expect(bus.emit).not.toBeCalledWith('ADD_CARD_TO_DECK', expect.any(Object))
+    })
+
+    it('removes card from deck when chosen a second time', async function () {
+      const btn = await makeEDHRecButton()
+      jest.spyOn(scryfall.api, 'get').mockResolvedValue({
+        name: 'Arcane Denial',
+        id: 'arcane-denial-id',
+        type_line: 'Instant'
+      })
+
+      btn.click()
+
+      await wait()
+
+      const cardElement = document.querySelectorAll('#edhrec-modal .edhrec-suggestion-card-container')[0]
+
+      cardElement.click()
+
+      await wait()
+
+      cardElement.click()
+
+      expect(bus.emit).toBeCalledWith('REMOVE_CARD_FROM_DECK', {
+        cardName: 'Arcane Denial'
+      })
+    })
+
+    it('organizes sections in particular order', async function () {
+      fakeEDHRecResponse.inRecs.push({
+        sanitized: 'fake-creature',
+        scryfall_uri: 'https://scyrfall.com/card/set/id/fake-creature',
+        cmc: 2,
+        names: [
+          'Fake Creature'
+        ],
+        primary_types: [
+          'Creature'
+        ],
+        price: 19.99,
+        color_identity: [],
+        salt: 0,
+        images: [
+          'fake-creature.png'
+        ],
+        name: 'Fake Creature',
+        cmcs: [
+          2
+        ],
+        color_id: [],
+        score: 73
+      }, {
+        sanitized: 'fake-sorcery',
+        scryfall_uri: 'https://scryfall.com/card/set/id/fake-sorcery',
+        cmc: 2,
+        names: [
+          'Fake Sorcery'
+        ],
+        primary_types: [
+          'Sorcery'
+        ],
+        price: 19.99,
+        color_identity: [],
+        salt: 0,
+        images: [
+          'fake-sorcery.png'
+        ],
+        name: 'Fake Sorcery',
+        cmcs: [
+          2
+        ],
+        color_id: [],
+        score: 73
+      }, {
+        sanitized: 'fake-enchantment',
+        scryfall_uri: 'https://scryfall.com/card/set/id/fake-enchantment',
+        cmc: 2,
+        names: [
+          'Fake Enchantment'
+        ],
+        primary_types: [
+          'Enchantment'
+        ],
+        price: 19.99,
+        color_identity: [],
+        salt: 0,
+        images: [
+          'fake-enchantment.png'
+        ],
+        name: 'Fake Enchantment',
+        cmcs: [
+          2
+        ],
+        color_id: [],
+        score: 73
+      }, {
+        sanitized: 'fake-planeswalker',
+        scryfall_uri: 'https://scryfall.com/card/set/id/fake-planeswalker',
+        cmc: 2,
+        names: [
+          'Fake Planeswalker'
+        ],
+        primary_types: [
+          'Planeswalker'
+        ],
+        price: 19.99,
+        color_identity: [],
+        salt: 0,
+        images: [
+          'fake-planeswalker.png'
+        ],
+        name: 'Fake Planeswalker',
+        cmcs: [
+          2
+        ],
+        color_id: [],
+        score: 73
       })
 
       const btn = await makeEDHRecButton()
+
       btn.click()
 
-      await wait(5)
+      await wait()
 
-      expect(spy).toBeCalledTimes(1)
-      expect(spy).toBeCalledWith({
-        cardsInDeck: {
-          'Arjun, the Shifting Flame': true,
-          'Reliquary Tower': true,
-          'Rhystic Study': true
-        }
+      const sections = document.querySelectorAll('#edhrec-modal .edhrec-suggestions-container')
+
+      expect(sections.length).toBe(7)
+      expect(sections[0].querySelector('h3').innerHTML).toBe('Creatures')
+      expect(sections[1].querySelector('h3').innerHTML).toBe('Instants')
+      expect(sections[2].querySelector('h3').innerHTML).toBe('Sorceries')
+      expect(sections[3].querySelector('h3').innerHTML).toBe('Artifacts')
+      expect(sections[4].querySelector('h3').innerHTML).toBe('Enchantments')
+      expect(sections[5].querySelector('h3').innerHTML).toBe('Planeswalkers')
+      expect(sections[6].querySelector('h3').innerHTML).toBe('Lands')
+    })
+
+    it('ignores unknown sections', async function () {
+      fakeEDHRecResponse.inRecs.push({
+        sanitized: 'fake-unknown-type',
+        scryfall_uri: 'https://scryfall.com/card/set/id/fake-unknown-type',
+        cmc: 2,
+        names: [
+          'Fake Unknown Type'
+        ],
+        primary_types: [
+          'Unknown Type'
+        ],
+        price: 19.99,
+        color_identity: [],
+        salt: 0,
+        images: [
+          'fake-unknown-type.png'
+        ],
+        name: 'Fake Unknown Type',
+        cmcs: [
+          2
+        ],
+        color_id: [],
+        score: 73
       })
+
+      const btn = await makeEDHRecButton()
+
+      btn.click()
+
+      await wait()
+
+      const sections = document.querySelectorAll('#edhrec-modal .edhrec-suggestions-container')
+
+      expect(sections.length).toBe(3)
+      expect(sections[0].querySelector('h3').innerHTML).toBe('Instants')
+      expect(sections[1].querySelector('h3').innerHTML).toBe('Artifacts')
+      expect(sections[2].querySelector('h3').innerHTML).toBe('Lands')
     })
   })
 
