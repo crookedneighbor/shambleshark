@@ -18,6 +18,7 @@ As with many extensions, it relies on the DOM structure and JavaScript of Scryfa
 
     ```sh
     $ npm start
+    $ # use `BROWSER=FIREFOX npm start` if you prefer to develop in Firefox
     ```
 
 1. Add the unpacked extension to Chrome. See [steps 1-3 here](https://developer.chrome.com/extensions/getstarted#manifest).
@@ -32,4 +33,6 @@ When a version is ready for release run:
 $ NODE_ENV=production npm run build
 ```
 
-Now, the content of `build` folder will be the extension in a state ready to be submitted to the Chrome Web Store. Just take a look at the [official guide](https://developer.chrome.com/webstore/publish) to more infos about publishing.
+Now, the content of `build/google_chrome` and `build/firefox` folders will be the extension in a state ready to be submitted to the Chrome Web Store and Mozilla Add-ons.
+
+Just take a look at the [official guide](https://developer.chrome.com/webstore/publish) to more infos about publishing in the Chrome Web Store.
