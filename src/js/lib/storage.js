@@ -1,3 +1,8 @@
+import {
+  getStorage,
+  setStorage
+} from 'BrowserStorage'
+
 export function get (keys) {
   let key
   const singleKey = !Array.isArray(keys)
@@ -7,21 +12,17 @@ export function get (keys) {
     keys = [keys]
   }
 
-  return new Promise(function (resolve) {
-    chrome.storage.sync.get(keys, function (result) {
-      if (singleKey) {
-        result = result[key]
-      }
+  return getStorage(keys).then(function (result) {
+    if (singleKey) {
+      return result[key]
+    }
 
-      resolve(result)
-    })
+    return result
   })
 }
 
 export function set (obj) {
-  return new Promise(function (resolve) {
-    chrome.storage.sync.set(obj, resolve)
-  })
+  return setStorage(obj)
 }
 
 export default {

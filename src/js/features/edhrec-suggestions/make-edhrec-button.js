@@ -16,7 +16,7 @@ const TYPE_ORDER = [
   'land'
 ]
 const TYPES_WITH_IRREGULAR_PLURALS = {
-  'Sorcery': 'Sorceries'
+  Sorcery: 'Sorceries'
 }
 
 export default async function makeEDHRecButton () {

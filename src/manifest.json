@@ -1,5 +1,5 @@
 {
-  "name": "Scryfall Deckbuilder Helper",
+  "name": "Scryfall Extend",
   "options_ui": {
     "page": "options.html",
     "open_in_tab": true
@@ -19,16 +19,13 @@
     ],
     "all_frames": true
   }],
-  "externally_connectable": {
-    "matches": [
-      "*://*.scryfall.com/*",
-      "*://*.edhrec.com/*"
-    ]
-  },
   "web_accessible_resources": [
     "scryfallEmbed.bundle.js"
   ],
-  "permissions": ["storage"],
+  "permissions": [
+    "storage",
+    "*://api.scryfall.com/*"
+  ],
   "browser_action": {
     "default_popup": "popup.html",
     "default_icon": "icon-34.png"

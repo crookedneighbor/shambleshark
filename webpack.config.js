@@ -7,8 +7,16 @@ var CopyWebpackPlugin = require('copy-webpack-plugin')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
 var WriteFilePlugin = require('write-file-webpack-plugin')
 
-// load the secrets
-var alias = {}
+const BROWSER = process.env.BROWSER || 'GOOGLE_CHROME'
+
+const alias = {
+}
+
+if (BROWSER === 'GOOGLE_CHROME') {
+  alias.BrowserStorage = path.resolve(__dirname, 'src/js/lib/chrome-storage/')
+} else if (BROWSER === 'FIREFOX') {
+  alias.BrowserStorage = path.resolve(__dirname, 'src/js/lib/firefox-storage/')
+}
 
 var secretsPath = path.join(__dirname, ('secrets.' + env.NODE_ENV + '.js'))
 
@@ -29,7 +37,7 @@ var options = {
     edhrec: path.join(__dirname, 'src', 'js', 'edhrec/index.js')
   },
   output: {
-    path: path.join(__dirname, 'build'),
+    path: path.join(__dirname, 'build', BROWSER.toLowerCase()),
     filename: '[name].bundle.js'
   },
   module: {
@@ -55,18 +63,28 @@ var options = {
   },
   plugins: [
     // clean the build folder
-    new CleanWebpackPlugin(['build']),
+    new CleanWebpackPlugin([`build/${BROWSER.toLowerCase()}`]),
     // expose and write the allowed env vars on the compiled bundle
     new webpack.EnvironmentPlugin(['NODE_ENV']),
     new CopyWebpackPlugin([{
       from: 'src/manifest.json',
       transform: function (content, path) {
-        // generates the manifest file using the package.json informations
-        return Buffer.from(JSON.stringify({
+        const json = {
+          // generates the manifest file using the package.json informations
           description: process.env.npm_package_description,
           version: process.env.npm_package_version,
           ...JSON.parse(content.toString())
-        }))
+        }
+        if (BROWSER === 'FIREFOX') {
+          json.browser_specific_settings = {
+            gecko: {
+              id: 'blade@crookedneighbor.com',
+              strict_min_version: '69.0'
+            }
+          }
+        }
+
+        return Buffer.from(JSON.stringify(json))
       }
     }]),
     new HtmlWebpackPlugin({

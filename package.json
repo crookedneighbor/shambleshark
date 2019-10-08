@@ -7,7 +7,9 @@
     "lint": "standard --verbose | snazzy",
     "posttest": "npm run lint",
     "test": "jest",
-    "build": "node utils/build.js",
+    "build": "npm run build:chrome && npm run build:firefox",
+    "build:firefox": "BROWSER=FIREFOX node utils/build.js",
+    "build:chrome": "BROWSER=GOOGLE_CHROME node utils/build.js",
     "start": "node utils/webserver.js"
   },
   "devDependencies": {
@@ -38,6 +40,7 @@
   },
   "standard": {
     "globals": [
+      "browser",
       "Scryfall",
       "ScryfallAPI",
       "afterEach",
