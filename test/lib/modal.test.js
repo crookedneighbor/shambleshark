@@ -40,6 +40,20 @@ describe('makeModal', function () {
       expect(modal.element.querySelector('.modal-dialog-title-content').innerHTML).toBe('Title')
     })
 
+    it('has default loading label', function () {
+      const modal = new Modal()
+
+      expect(modal.element.querySelector('.modal-dialog-content').getAttribute('aria-label')).toBe('Loading')
+    })
+
+    it('can provide a loading label', function () {
+      const modal = new Modal({
+        loadingMessage: 'Custom Loading Message'
+      })
+
+      expect(modal.element.querySelector('.modal-dialog-content').getAttribute('aria-label')).toBe('Custom Loading Message')
+    })
+
     it('can provide content', function () {
       const modal = new Modal({
         content: 'Some content'

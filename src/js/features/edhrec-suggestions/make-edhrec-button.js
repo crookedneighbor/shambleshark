@@ -26,6 +26,7 @@ export default async function makeEDHRecButton () {
   const modal = new Modal({
     id: 'edhrec-modal',
     header: modalTitle,
+    loadingMessage: 'Loading EDHRec Suggestions',
     onClose (modalInstance) {
       // reset this in case the error state changes it
       modalInstance.setTitle(modalTitle)

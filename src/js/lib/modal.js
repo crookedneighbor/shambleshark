@@ -88,7 +88,7 @@ export default class Modal {
       </button>
       </h6>
 
-      <div class="modal-dialog-content">
+      <div class="modal-dialog-content" aria-label="${options.loadingMessage || 'Loading'}">
       <img src="https://assets.scryfall.com/assets/spinner-0e5953300e953759359ad94bcff35ac64ff73a403d3a0702e809d6c43e7e5ed5.gif" class="modal-dialog-spinner">
       </div>
       <!---->
