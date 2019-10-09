@@ -4,6 +4,7 @@ function noop () {
 
 export default class Modal {
   constructor (options = {}) {
+    this._isOpen = false
     this._originalContent = options.content || ''
     this._resetContentOnClose = Boolean(options.resetContentOnClose)
     this._onClose = options.onClose || noop
@@ -40,12 +41,14 @@ export default class Modal {
 
   open () {
     this.element.style.display = ''
+    this._isOpen = true
 
     this._onOpen(this)
   }
 
   close () {
     this.element.style.display = 'none'
+    this._isOpen = false
 
     if (this._resetContentOnClose) {
       this.setContent(this._originalContent)
@@ -53,8 +56,21 @@ export default class Modal {
     this._onClose(this)
   }
 
+  _onEscKey (event) {
+    if (!this._isOpen) {
+      return
+    }
+
+    if (event.key === 'Escape') {
+      event.stopPropagation()
+
+      this.close()
+    }
+  }
+
   _constructModalElement (options) {
     const modal = document.createElement('div')
+    document.addEventListener('keyup', this._onEscKey.bind(this))
 
     modal.id = options.id
     modal.classList.add('modal-dialog-overlay')

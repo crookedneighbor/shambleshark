@@ -65,15 +65,36 @@ describe('makeModal', function () {
       expect(modal.close).toBeCalledTimes(1)
     })
 
-    it('closes when the close button is clicked', function () {
+    it('closes when the esc key is typed', function () {
       const modal = new Modal()
-      const close = modal.element.querySelector('.modal-dialog-close')
 
       jest.spyOn(modal, 'close').mockImplementation()
 
-      close.click()
+      modal.open()
+
+      const evt = new KeyboardEvent('keyup', {
+        key: 'Escape',
+        keyCode: 27,
+        which: 27
+      })
+      document.dispatchEvent(evt)
 
       expect(modal.close).toBeCalledTimes(1)
+    })
+
+    it('does not close when the esc key is typed if modal is not opened', function () {
+      const modal = new Modal()
+
+      jest.spyOn(modal, 'close').mockImplementation()
+
+      const evt = new KeyboardEvent('keyup', {
+        key: 'Escape',
+        keyCode: 27,
+        which: 27
+      })
+      document.dispatchEvent(evt)
+
+      expect(modal.close).not.toBeCalled()
     })
   })
 
