@@ -43,7 +43,9 @@ export default function () {
       display: none;
     }
 
-    .edhrec-suggestion-card-container:hover .edhrec-suggestion-overlay, .edhrec-suggestion-card-container.in-deck .edhrec-suggestion-overlay {
+    .edhrec-suggestion-card-container:hover .edhrec-suggestion-overlay,
+    .edhrec-suggestion-card-container:focus .edhrec-suggestion-overlay,
+    .edhrec-suggestion-card-container.in-deck .edhrec-suggestion-overlay {
       display: block;
     }
   `
