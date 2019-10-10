@@ -59,13 +59,13 @@ describe('makeModal', function () {
         content: 'Some content'
       })
 
-      expect(modal.element.querySelector('.modal-dialog-stage').innerHTML).toBe('Some content')
+      expect(modal.element.querySelector('.modal-dialog-stage-content').innerHTML).toBe('Some content')
     })
 
     it('does not require content', function () {
       const modal = new Modal()
 
-      expect(modal.element.querySelector('.modal-dialog-stage').innerHTML).toBe('')
+      expect(modal.element.querySelector('.modal-dialog-stage-content').innerHTML).toBe('')
     })
 
     it('closes when the close button is clicked', function () {
@@ -86,7 +86,7 @@ describe('makeModal', function () {
 
       modal.open()
 
-      const evt = new KeyboardEvent('keyup', {
+      const evt = new global.KeyboardEvent('keyup', {
         key: 'Escape',
         keyCode: 27,
         which: 27
@@ -101,7 +101,7 @@ describe('makeModal', function () {
 
       jest.spyOn(modal, 'close').mockImplementation()
 
-      const evt = new KeyboardEvent('keyup', {
+      const evt = new global.KeyboardEvent('keyup', {
         key: 'Escape',
         keyCode: 27,
         which: 27
@@ -132,7 +132,7 @@ describe('makeModal', function () {
 
       modal.setContent('new content')
 
-      expect(modal.element.querySelector('.modal-dialog-stage').innerHTML).toBe('new content')
+      expect(modal.element.querySelector('.modal-dialog-stage-content').innerHTML).toBe('new content')
     })
 
     it('replaces content with DOM node when DOM node is provided', function () {
@@ -145,7 +145,7 @@ describe('makeModal', function () {
 
       modal.setContent(node)
 
-      expect(modal.element.querySelector('.modal-dialog-stage #some-id').innerHTML).toBe('foo')
+      expect(modal.element.querySelector('.modal-dialog-stage-content #some-id').innerHTML).toBe('foo')
     })
   })
 

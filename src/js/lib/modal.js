@@ -1,3 +1,5 @@
+const CLOSE_BUTTON_LOADING_MESSAGE = 'Dialog is loading. You may cancel this dialog by using this button.'
+
 function noop () {
   // do nothing!
 }
@@ -11,7 +13,8 @@ export default class Modal {
     this._onOpen = options.onOpen || noop
 
     this.element = this._constructModalElement(options)
-    this._contentNode = this.element.querySelector('.modal-dialog-stage')
+    this._contentNodeContainer = this.element.querySelector('.modal-dialog-stage')
+    this._contentNode = this._contentNodeContainer.querySelector('.modal-dialog-stage-content')
     this._loaderNode = this.element.querySelector('.modal-dialog-content')
     this._titleNode = this.element.querySelector('.modal-dialog-title-content')
   }
@@ -30,12 +33,16 @@ export default class Modal {
   }
 
   setLoading (state) {
+    const closeBtn = this.element.querySelector('.modal-dialog-close')
+
     if (state) {
-      this._contentNode.style.display = 'none'
+      this._contentNodeContainer.style.display = 'none'
       this._loaderNode.removeAttribute('style')
+      closeBtn.title = CLOSE_BUTTON_LOADING_MESSAGE
     } else {
-      this._contentNode.removeAttribute('style')
+      this._contentNodeContainer.removeAttribute('style')
       this._loaderNode.style.display = 'none'
+      closeBtn.title = 'Close this dialog.'
     }
   }
 
@@ -44,6 +51,8 @@ export default class Modal {
     this._isOpen = true
 
     this._onOpen(this)
+
+    this.element.querySelector('.modal-dialog-close').focus()
   }
 
   close () {
@@ -70,10 +79,15 @@ export default class Modal {
 
   _constructModalElement (options) {
     const modal = document.createElement('div')
+    const titleId = `modal-title-${options.id}`
+
     document.addEventListener('keyup', this._onEscKey.bind(this))
 
     modal.id = options.id
     modal.classList.add('modal-dialog-overlay')
+    modal.setAttribute('aria-modal', 'true')
+    modal.setAttribute('role', 'dialog')
+    modal.setAttribute('aria-labelledby', titleId)
 
     if (!options.open) {
       modal.style.display = 'none'
@@ -81,18 +95,21 @@ export default class Modal {
 
     modal.innerHTML = `
       <div class="modal-dialog">
-      <h6 class="modal-dialog-title">
-      <span class='modal-dialog-title-content'>${options.header}</span>
-      <button type="button" title="Close this dialog" class="modal-dialog-close">
-      <span class="vh">Close this dialog</span> <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path d="M217.5 256l137.2-137.2c4.7-4.7 4.7-12.3 0-17l-8.5-8.5c-4.7-4.7-12.3-4.7-17 0L192 230.5 54.8 93.4c-4.7-4.7-12.3-4.7-17 0l-8.5 8.5c-4.7 4.7-4.7 12.3 0 17L166.5 256 29.4 393.2c-4.7 4.7-4.7 12.3 0 17l8.5 8.5c4.7 4.7 12.3 4.7 17 0L192 281.5l137.2 137.2c4.7 4.7 12.3 4.7 17 0l8.5-8.5c4.7-4.7 4.7-12.3 0-17L217.5 256z"></path></svg>
-      </button>
-      </h6>
+        <h6 class="modal-dialog-title">
+          <span class='modal-dialog-title-content' id="${titleId}">${options.header}</span>
+          <button type="button" title="${CLOSE_BUTTON_LOADING_MESSAGE}" class="modal-dialog-close">
+            <span class="vh">Close this dialog</span> <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path d="M217.5 256l137.2-137.2c4.7-4.7 4.7-12.3 0-17l-8.5-8.5c-4.7-4.7-12.3-4.7-17 0L192 230.5 54.8 93.4c-4.7-4.7-12.3-4.7-17 0l-8.5 8.5c-4.7 4.7-4.7 12.3 0 17L166.5 256 29.4 393.2c-4.7 4.7-4.7 12.3 0 17l8.5 8.5c4.7 4.7 12.3 4.7 17 0L192 281.5l137.2 137.2c4.7 4.7 12.3 4.7 17 0l8.5-8.5c4.7-4.7 4.7-12.3 0-17L217.5 256z"></path></svg>
+          </button>
+        </h6>
 
-      <div class="modal-dialog-content" aria-label="${options.loadingMessage || 'Loading'}">
-      <img src="https://assets.scryfall.com/assets/spinner-0e5953300e953759359ad94bcff35ac64ff73a403d3a0702e809d6c43e7e5ed5.gif" class="modal-dialog-spinner">
-      </div>
+        <div class="modal-dialog-content" role="alert" aria-label="${options.loadingMessage || 'Loading'}">
+          <img src="https://assets.scryfall.com/assets/spinner-0e5953300e953759359ad94bcff35ac64ff73a403d3a0702e809d6c43e7e5ed5.gif" class="modal-dialog-spinner" aria-hidden="true">
+        </div>
       <!---->
-      <div class="modal-dialog-stage" style="position:fixed;left:-100%;visibility:hidden">${this._originalContent}</div>
+        <div class="modal-dialog-stage" style="position:fixed;left:-100%;visibility:hidden">
+          <div role="alert" aria-label="${options.contentMessage || 'Modal Loaded'}"></div>
+          <div class="modal-dialog-stage-content">${this._originalContent}</div>
+        </div>
       </div>
       `
     modal.querySelector('.modal-dialog-close').addEventListener('click', () => {
