@@ -1,1 +1,5 @@
-chrome.runtime.openOptionsPage()
+import {
+  openOptionsPage
+} from 'Browser/runtime'
+
+openOptionsPage()
