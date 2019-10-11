@@ -3,6 +3,7 @@ import mutation from '../../lib/mutation'
 import Modal from '../../lib/modal'
 import scryfall from '../../lib/scryfall'
 import deckParser from '../../lib/deck-parser'
+import iframe from '../../lib/iframe'
 import {
   CHECK_SYMBOL,
   EDHREC_SYMBOL,
@@ -23,7 +24,13 @@ const TYPES_WITH_IRREGULAR_PLURALS = {
 }
 
 export default async function makeEDHRecButton () {
-  addEDHRecIframe()
+  await iframe.create({
+    // does not matter where on edhrec we open the page
+    // just need to be on the edhrec domain to access
+    // the recs JSON endpoint
+    src: 'https://edhrec.com/404',
+    id: 'edhrec-suggestions-iframe'
+  })
 
   const button = document.createElement('button')
   const modal = createModal(button)
@@ -72,20 +79,6 @@ function createModal (button) {
   document.getElementById('deckbuilder').appendChild(modal.element)
 
   return modal
-}
-
-function addEDHRecIframe () {
-  const iframe = document.createElement('iframe')
-  // does not matter where on edhrec we open the page
-  // just need to be on the edhrec domain to access
-  // the recs JSON endpoint
-  iframe.src = 'https://edhrec.com/404'
-  iframe.id = 'edhrec-suggestions-iframe'
-  iframe.style.width = '0px'
-  iframe.style.height = '0px'
-  iframe.style.opacity = 0
-
-  document.body.appendChild(iframe)
 }
 
 function configureButton (button, modal) {

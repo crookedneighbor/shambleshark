@@ -5,6 +5,7 @@ import wait from '../../../src/js/lib/wait'
 import Modal from '../../../src/js/lib/modal'
 import mutation from '../../../src/js/lib/mutation'
 import scryfall from '../../../src/js/lib/scryfall'
+import iframe from '../../../src/js/lib/iframe'
 
 describe('makeEDHRecButton', function () {
   beforeEach(function () {
@@ -22,6 +23,8 @@ describe('makeEDHRecButton', function () {
     const deckbuilderElement = document.createElement('div')
     deckbuilderElement.id = 'deckbuilder'
     document.body.appendChild(deckbuilderElement)
+
+    jest.spyOn(iframe, 'create').mockResolvedValue()
   })
 
   it('makes a button', async function () {
@@ -55,7 +58,11 @@ describe('makeEDHRecButton', function () {
   it('adds an edhrec iframe to page', async function () {
     await makeEDHRecButton()
 
-    expect(document.querySelector('#edhrec-suggestions-iframe')).not.toBeFalsy()
+    expect(iframe.create).toBeCalledTimes(1)
+    expect(iframe.create).toBeCalledWith({
+      src: 'https://edhrec.com/404',
+      id: 'edhrec-suggestions-iframe'
+    })
   })
 
   it('cleans up deck after modal is closed', async function () {

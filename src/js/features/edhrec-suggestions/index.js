@@ -27,7 +27,7 @@ class EDHRecSuggestions extends Feature {
         resolve()
       })
     }).catch(function () {
-      // Took more than 1 secon to find the commander list
+      // Took more than 1 second to find the commander list
       // will continue looking for it in the case of a slow
       // connection, but no need to hang up the resolution
       // of the other features

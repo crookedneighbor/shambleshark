@@ -1,6 +1,7 @@
 import EDHRecSuggestions from '../../../src/js/features/edhrec-suggestions'
 import scryfall from '../../../src/js/lib/scryfall'
 import mutation from '../../../src/js/lib/mutation'
+import iframe from '../../../src/js/lib/iframe'
 
 describe('EDHRec Suggestions', function () {
   describe('run', function () {
@@ -28,6 +29,8 @@ describe('EDHRec Suggestions', function () {
 
         cb(el)
       })
+
+      jest.spyOn(iframe, 'create').mockResolvedValue()
     })
 
     it('adds an edhrec button to the toolbar items on the page for a commander deck', async function () {
