@@ -22,6 +22,7 @@ const TYPES_WITH_IRREGULAR_PLURALS = {
 export default async function makeEDHRecButton () {
   addEDHRecIframe()
 
+  const button = document.createElement('button')
   const modalTitle = 'EDHRec Suggestions'
   const modal = new Modal({
     id: 'edhrec-modal',
@@ -32,13 +33,13 @@ export default async function makeEDHRecButton () {
       modalInstance.setTitle(modalTitle)
       bus.emit('CLEAN_UP_DECK')
       modalInstance.setLoading(true)
+      button.focus()
     }
   })
   document.getElementById('deckbuilder').appendChild(modal.element)
 
-  const button = document.createElement('button')
-
   button.id = 'edhrec-suggestions'
+  button.setAttribute('aria-label', 'EDHRec Suggestions')
   button.classList.add('button-n', 'tiny')
   button.innerText = 'EDHRec Suggestions'
   button.setAttribute('disabled', true)
@@ -117,39 +118,76 @@ export default async function makeEDHRecButton () {
           const cardElement = card.element = document.createElement('div')
 
           cardElement.classList.add('edhrec-suggestion-card-container')
+          cardElement.setAttribute('role', 'button')
+          cardElement.setAttribute('tabindex', '0')
+          cardElement.setAttribute('aria-pressed', 'false')
           let cardAlreadyInDeck = false
 
           cardElement.innerHTML = `
-            <img src="${card.img}" alt="${card.name}" />
+            <img src="${card.img}" alt="Add ${card.name} to deck" />
             <div class="edhrec-suggestion-overlay">
             ${PLUS_SYMBOL}
             </div>
             `
+          const img = cardElement.querySelector('img')
+          cardElement.addEventListener('blur', function () {
+            if (cardAlreadyInDeck) {
+              img.alt = `Remove ${card.name} from deck`
+            } else {
+              img.alt = `Add ${card.name} to deck`
+            }
+          })
 
           const overlay = cardElement.querySelector('.edhrec-suggestion-overlay')
 
-          cardElement.addEventListener('click', function () {
+          function toggleCardState () {
             cardAlreadyInDeck = !cardAlreadyInDeck
 
             if (cardAlreadyInDeck) {
+              cardElement.setAttribute('aria-pressed', 'true')
+
+              cardElement.classList.add('in-deck')
+              img.alt = `${card.name} added to deck.`
+              overlay.innerHTML = CHECK_SYMBOL
+
               scryfall.api.get(`/cards/${card.set}/${card.collectorNumber}`).then((cardFromScryfall) => {
                 bus.emit('ADD_CARD_TO_DECK', {
                   cardName: cardFromScryfall.name,
                   cardId: cardFromScryfall.id,
                   isLand: cardFromScryfall.type_line.toLowerCase().indexOf('land') > -1
                 })
+              }).catch(err => {
+                console.error(err)
 
-                cardElement.classList.add('in-deck')
-                overlay.innerHTML = CHECK_SYMBOL
-              }).catch(err => createErrorModalState(modal, err))
+                bus.emit('SCRYFALL_PUSH_NOTIFICATION', {
+                  header: 'Card could not be added',
+                  message: `There was an error adding ${card.name} to the deck. See console for more details.`,
+                  color: 'red'
+                })
+
+                img.alt = `Error adding ${card.name} to deck.`
+                cardElement.classList.remove('in-deck')
+                overlay.innerHTML = PLUS_SYMBOL
+              })
             } else {
+              img.alt = `${card.name} removed from deck.`
+              cardElement.classList.remove('in-deck')
+              overlay.innerHTML = PLUS_SYMBOL
+
+              cardElement.setAttribute('aria-pressed', 'false')
               bus.emit('REMOVE_CARD_FROM_DECK', {
                 cardName: card.name
               })
-              cardElement.classList.remove('in-deck')
-              overlay.innerHTML = PLUS_SYMBOL
+            }
+          }
+
+          cardElement.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+              toggleCardState()
             }
           })
+
+          cardElement.addEventListener('click', toggleCardState)
 
           section.cards.push(card)
         })

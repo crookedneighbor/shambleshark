@@ -59,7 +59,9 @@ describe('makeEDHRecButton', function () {
   })
 
   it('cleans up deck after modal is closed', async function () {
-    await makeEDHRecButton()
+    const button = await makeEDHRecButton()
+
+    button.click()
 
     const modal = document.querySelector('#edhrec-modal')
     const closeButton = modal.querySelector('.modal-dialog-close')
@@ -69,6 +71,18 @@ describe('makeEDHRecButton', function () {
     expect(bus.emit).toBeCalledWith('CLEAN_UP_DECK')
   })
 
+  it('focuses back on the button when closed', async function () {
+    const button = await makeEDHRecButton()
+
+    button.click()
+
+    const modal = document.querySelector('#edhrec-modal')
+    const closeButton = modal.querySelector('.modal-dialog-close')
+
+    closeButton.click()
+
+    expect(document.activeElement).toBe(button)
+  })
 
   describe('when clicked', function () {
     let fakeDeck, fakeEDHRecResponse
@@ -382,13 +396,13 @@ describe('makeEDHRecButton', function () {
       expect(sections.length).toBe(3)
       expect(sections[0].querySelector('h3').innerHTML).toBe('Instants')
       expect(sections[0].querySelector('.edhrec-suggestions img').src).toBe('https://img.scryfall.com/cards/normal/front/9/d/9d1ffeb1-6c31-45f7-8140-913c397022a3.jpg?1562439019')
-      expect(sections[0].querySelector('.edhrec-suggestions img').alt).toBe('Arcane Denial')
+      expect(sections[0].querySelector('.edhrec-suggestions img').alt).toBe('Add Arcane Denial to deck')
       expect(sections[1].querySelector('h3').innerHTML).toBe('Artifacts')
       expect(sections[1].querySelector('.edhrec-suggestions img').src).toBe('https://img.scryfall.com/cards/normal/front/8/4/84128e98-87d6-4c2f-909b-9435a7833e63.jpg?1567631723')
-      expect(sections[1].querySelector('.edhrec-suggestions img').alt).toBe('Arcane Signet')
+      expect(sections[1].querySelector('.edhrec-suggestions img').alt).toBe('Add Arcane Signet to deck')
       expect(sections[2].querySelector('h3').innerHTML).toBe('Lands')
       expect(sections[2].querySelector('.edhrec-suggestions img').src).toBe('https://img.scryfall.com/cards/normal/front/f/1/f1d33afd-6f2a-43c8-ae5d-17a0674fcdd3.jpg?1562049659')
-      expect(sections[2].querySelector('.edhrec-suggestions img').alt).toBe('Shivan Reef')
+      expect(sections[2].querySelector('.edhrec-suggestions img').alt).toBe('Add Shivan Reef to deck')
     })
 
     it('looks up nonland card in scryfall and adds it to deck when chosen', async function () {
@@ -447,11 +461,52 @@ describe('makeEDHRecButton', function () {
       })
     })
 
+    it('can handle add/remove with enter key when focused', async function () {
+      const btn = await makeEDHRecButton()
+      jest.spyOn(scryfall.api, 'get').mockResolvedValue({
+        name: 'Arcane Denial',
+        id: 'arcane-denial-id',
+        type_line: 'Instant'
+      })
+
+      btn.click()
+
+      await wait()
+
+      const cardElement = document.querySelectorAll('#edhrec-modal .edhrec-suggestion-card-container')[0]
+
+      cardElement.focus()
+      const evt = new global.KeyboardEvent('keydown', {
+        key: 'Enter',
+        keyCode: 13,
+        which: 13
+      })
+      cardElement.dispatchEvent(evt)
+
+      expect(scryfall.api.get).toBeCalledTimes(1)
+      expect(scryfall.api.get).toBeCalledWith('/cards/a25/41')
+
+      await wait()
+
+      expect(bus.emit).toBeCalledWith('ADD_CARD_TO_DECK', {
+        cardName: 'Arcane Denial',
+        cardId: 'arcane-denial-id',
+        isLand: false
+      })
+
+      cardElement.dispatchEvent(evt)
+
+      expect(bus.emit).toBeCalledWith('REMOVE_CARD_FROM_DECK', {
+        cardName: 'Arcane Denial'
+      })
+    })
+
     it('handles error from scryfall lookup when card is chosen', async function () {
       const errFromScryfall = new Error('Error from scryfall')
       const btn = await makeEDHRecButton()
 
       jest.spyOn(scryfall.api, 'get').mockRejectedValue(errFromScryfall)
+      jest.spyOn(console, 'error').mockImplementation()
 
       btn.click()
 
@@ -467,10 +522,14 @@ describe('makeEDHRecButton', function () {
       await wait()
 
       expect(bus.emit).not.toBeCalledWith('ADD_CARD_TO_DECK', expect.any(Object))
+      expect(bus.emit).toBeCalledWith('SCRYFALL_PUSH_NOTIFICATION', {
+        header: 'Card could not be added',
+        message: 'There was an error adding Arcane Denial to the deck. See console for more details.',
+        color: 'red'
+      })
 
-      const body = document.querySelector('#edhrec-modal').innerHTML
-      expect(body).toContain('An unknown error occurred:')
-      expect(body).toContain('Error from scryfall')
+      expect(cardElement.querySelector('img').alt).toBe('Error adding Arcane Denial to deck.')
+      expect(console.error).toBeCalledWith(errFromScryfall)
     })
 
     it('removes card from deck when chosen a second time', async function () {
