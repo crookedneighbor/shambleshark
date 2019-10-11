@@ -104,166 +104,13 @@ function configureButton (button, modal) {
     modal.open()
 
     scryfall.getDeck().then((deck) => {
-      const commanders = deck.entries.commanders.reduce((all, card) => {
-        if (!card.card_digest) {
-          return all
-        }
-
-        all.push(card.card_digest.name)
-
-        return all
-      }, [])
-
-      const cardsInDeck = Object.keys(deck.entries).reduce((all, type) => {
-        if (type === 'commanders') {
-          return all
-        }
-
-        deck.entries[type].forEach((card) => {
-          if (!card.card_digest) {
-            return all
-          }
-          all.push(`${card.count} ${card.card_digest.name}`)
-        })
-
-        return all
-      }, [])
+      const commanders = deck.entries.commanders.filter(filterOutInvalidCards).map(getCardName)
+      const cardsInDeck = getCardsInDeck(deck.entries)
 
       bus.emit('REQUEST_EDHREC_RECOMENDATIONS', {
         commanders,
         cards: cardsInDeck
-      }, function ([err, result]) {
-        if (err) {
-          createErrorModalState(modal, err)
-          return
-        }
-
-        const recomendations = formatEDHRecSuggestions(result.inRecs)
-        // TODO ENHANCEMENT: handle cuts
-        // const cuts = formatEDHRecSuggestions(result.outRecs)
-
-        const container = document.createElement('div')
-        const sections = {}
-        container.id = 'edhrec-card-suggestions'
-        container.style.textAlign = 'center'
-        container.style.overflowY = 'scroll'
-        container.style.height = '500px'
-        container.style.width = '100%'
-
-        Object.values(recomendations).forEach(card => {
-          const sectionId = card.type.toLowerCase()
-          let section = sections[sectionId]
-          if (!section) {
-            section = sections[sectionId] = {}
-            section.name = card.type
-            section.element = document.createElement('div')
-            section.element.id = `edhrec-suggestion-${sectionId}`
-            section.element.classList.add('edhrec-suggestions-container')
-
-            const sectionTitle = TYPES_WITH_IRREGULAR_PLURALS[section.name] || `${section.name}s`
-
-            section.element.innerHTML = `
-              <h3 style="font-size:20px;border-bottom: 1px solid #E0DEE3;padding:15px 0 5px;">${sectionTitle}</h3>
-              <div class="edhrec-suggestions"></div>
-              `
-            section.cards = []
-          }
-
-          const cardElement = card.element = document.createElement('div')
-
-          cardElement.classList.add('edhrec-suggestion-card-container')
-          cardElement.setAttribute('role', 'button')
-          cardElement.setAttribute('tabindex', '0')
-          cardElement.setAttribute('aria-pressed', 'false')
-          let cardAlreadyInDeck = false
-
-          cardElement.innerHTML = `
-            <img src="${card.img}" alt="Add ${card.name} to deck" />
-            <div class="edhrec-suggestion-overlay">
-            ${PLUS_SYMBOL}
-            </div>
-            `
-          const img = cardElement.querySelector('img')
-          cardElement.addEventListener('blur', function () {
-            if (cardAlreadyInDeck) {
-              img.alt = `Remove ${card.name} from deck`
-            } else {
-              img.alt = `Add ${card.name} to deck`
-            }
-          })
-
-          const overlay = cardElement.querySelector('.edhrec-suggestion-overlay')
-
-          function toggleCardState () {
-            cardAlreadyInDeck = !cardAlreadyInDeck
-
-            if (cardAlreadyInDeck) {
-              cardElement.setAttribute('aria-pressed', 'true')
-
-              cardElement.classList.add('in-deck')
-              img.alt = `${card.name} added to deck.`
-              overlay.innerHTML = CHECK_SYMBOL
-
-              scryfall.api.get(`/cards/${card.set}/${card.collectorNumber}`).then((cardFromScryfall) => {
-                bus.emit('ADD_CARD_TO_DECK', {
-                  cardName: cardFromScryfall.name,
-                  cardId: cardFromScryfall.id,
-                  isLand: cardFromScryfall.type_line.toLowerCase().indexOf('land') > -1
-                })
-              }).catch(err => {
-                console.error(err)
-
-                bus.emit('SCRYFALL_PUSH_NOTIFICATION', {
-                  header: 'Card could not be added',
-                  message: `There was an error adding ${card.name} to the deck. See console for more details.`,
-                  color: 'red'
-                })
-
-                img.alt = `Error adding ${card.name} to deck.`
-                cardElement.classList.remove('in-deck')
-                overlay.innerHTML = PLUS_SYMBOL
-              })
-            } else {
-              img.alt = `${card.name} removed from deck.`
-              cardElement.classList.remove('in-deck')
-              overlay.innerHTML = PLUS_SYMBOL
-
-              cardElement.setAttribute('aria-pressed', 'false')
-              bus.emit('REMOVE_CARD_FROM_DECK', {
-                cardName: card.name
-              })
-            }
-          }
-
-          cardElement.addEventListener('keydown', function (event) {
-            if (event.key === 'Enter') {
-              toggleCardState()
-            }
-          })
-
-          cardElement.addEventListener('click', toggleCardState)
-
-          section.cards.push(card)
-        })
-
-        TYPE_ORDER.forEach(function (type) {
-          const section = sections[type]
-
-          if (!section) {
-            return
-          }
-
-          const suggestions = section.element.querySelector('.edhrec-suggestions')
-
-          section.cards.forEach(card => {
-            suggestions.appendChild(card.element)
-          })
-          container.appendChild(section.element)
-        })
-
-        modal.setContent(container)
-        modal.setLoading(false)
-      })
+      }, createEDHRecResponseHandler(modal))
     })
   })
 }
@@ -271,15 +118,10 @@ function configureButton (button, modal) {
 async function getInitialCommanderList () {
   const initialDeck = await scryfall.getDeck()
 
-  return initialDeck.entries.commanders.reduce((all, card) => {
-    if (!card.card_digest) {
-      return all
-    }
-
-    all.push(card.card_digest.name)
-
-    return all
-  }, []).sort()
+  return initialDeck.entries.commanders
+    .filter(filterOutInvalidCards)
+    .map(getCardName)
+    .sort()
 }
 
 function updateButtonStateOnCommanderChange (button, commanders) {
@@ -321,6 +163,181 @@ function updateButtonStateOnCommanderChange (button, commanders) {
       await setDisabledState(button, commanders)
     }
   })
+}
+
+function getCardsInDeck (entries) {
+  return Object.keys(entries).reduce((all, type) => {
+    // don't add commanders to decklist
+    if (type === 'commanders') {
+      return all
+    }
+
+    entries[type].filter(filterOutInvalidCards).forEach((card) => {
+      all.push(`${card.count} ${card.card_digest.name}`)
+    })
+
+    return all
+  }, [])
+}
+
+function constructEDHRecSection (sectionId, cardType) {
+  const section = {}
+
+  section.name = cardType
+  section.element = document.createElement('div')
+  section.element.id = `edhrec-suggestion-${sectionId}`
+  section.element.classList.add('edhrec-suggestions-container')
+
+  const sectionTitle = TYPES_WITH_IRREGULAR_PLURALS[section.name] || `${section.name}s`
+
+  section.element.innerHTML = `
+    <h3 style="font-size:20px;border-bottom: 1px solid #E0DEE3;padding:15px 0 5px;">${sectionTitle}</h3>
+    <div class="edhrec-suggestions"></div>
+    `
+  section.cards = []
+
+  return section
+}
+
+function createCardElement (card) {
+  const cardElement = document.createElement('div')
+  let cardInDeck = false
+
+  cardElement.classList.add('edhrec-suggestion-card-container')
+  cardElement.setAttribute('role', 'button')
+  cardElement.setAttribute('tabindex', '0')
+  cardElement.setAttribute('aria-pressed', 'false')
+
+  cardElement.innerHTML = `
+    <img src="${card.img}" alt="Add ${card.name} to deck" />
+    <div class="edhrec-suggestion-overlay">
+    ${PLUS_SYMBOL}
+    </div>
+    `
+  const img = cardElement.querySelector('img')
+
+  cardElement.addEventListener('blur', function () {
+    if (cardInDeck) {
+      img.alt = `Remove ${card.name} from deck`
+    } else {
+      img.alt = `Add ${card.name} to deck`
+    }
+  })
+
+  const overlay = cardElement.querySelector('.edhrec-suggestion-overlay')
+
+  function addCardToDeck () {
+    cardElement.setAttribute('aria-pressed', 'true')
+
+    cardElement.classList.add('in-deck')
+    img.alt = `${card.name} added to deck.`
+    overlay.innerHTML = CHECK_SYMBOL
+
+    scryfall.api.get(`/cards/${card.set}/${card.collectorNumber}`).then((cardFromScryfall) => {
+      bus.emit('ADD_CARD_TO_DECK', {
+        cardName: cardFromScryfall.name,
+        cardId: cardFromScryfall.id,
+        isLand: cardFromScryfall.type_line.toLowerCase().indexOf('land') > -1
+      })
+    }).catch(err => {
+      console.error(err)
+
+      bus.emit('SCRYFALL_PUSH_NOTIFICATION', {
+        header: 'Card could not be added',
+        message: `There was an error adding ${card.name} to the deck. See console for more details.`,
+        color: 'red'
+      })
+
+      img.alt = `Error adding ${card.name} to deck.`
+      cardElement.classList.remove('in-deck')
+      overlay.innerHTML = PLUS_SYMBOL
+      cardInDeck = false
+    })
+  }
+
+  function removeCardFromDeck () {
+    img.alt = `${card.name} removed from deck.`
+    cardElement.classList.remove('in-deck')
+    overlay.innerHTML = PLUS_SYMBOL
+
+    cardElement.setAttribute('aria-pressed', 'false')
+    bus.emit('REMOVE_CARD_FROM_DECK', {
+      cardName: card.name
+    })
+  }
+
+  // TODO: disable while update in progress?
+  function toggleCardState () {
+    cardInDeck = !cardInDeck
+
+    if (cardInDeck) {
+      addCardToDeck()
+    } else {
+      removeCardFromDeck()
+    }
+  }
+
+  cardElement.addEventListener('keydown', function (event) {
+    if (event.key === 'Enter') {
+      toggleCardState()
+    }
+  })
+
+  cardElement.addEventListener('click', toggleCardState)
+
+  return cardElement
+}
+
+function createEDHRecResponseHandler (modal) {
+  return function ([err, result]) {
+    if (err) {
+      createErrorModalState(modal, err)
+      return
+    }
+
+    const recomendations = formatEDHRecSuggestions(result.inRecs)
+    // TODO ENHANCEMENT: handle cuts
+    // const cuts = formatEDHRecSuggestions(result.outRecs)
+
+    const container = document.createElement('div')
+    const sections = {}
+    container.id = 'edhrec-card-suggestions'
+    container.style.textAlign = 'center'
+    container.style.overflowY = 'scroll'
+    container.style.height = '500px'
+    container.style.width = '100%'
+
+    Object.values(recomendations).forEach(card => {
+      const sectionId = card.type.toLowerCase()
+      let section = sections[sectionId]
+
+      if (!section) {
+        section = sections[sectionId] = constructEDHRecSection(sectionId, card.type)
+      }
+
+      card.element = createCardElement(card)
+
+      section.cards.push(card)
+    })
+
+    TYPE_ORDER.forEach(function (type) {
+      const section = sections[type]
+
+      if (!section) {
+        return
+      }
+
+      const suggestions = section.element.querySelector('.edhrec-suggestions')
+
+      section.cards.forEach(card => {
+        suggestions.appendChild(card.element)
+      })
+      container.appendChild(section.element)
+    })
+
+    modal.setContent(container)
+    modal.setLoading(false)
+  }
 }
 
 function formatEDHRecSuggestions (list) {
@@ -367,4 +384,12 @@ function createErrorModalState (modal, err) {
 
   modal.setContent(container)
   modal.setLoading(false)
+}
+
+function filterOutInvalidCards (card) {
+  return card.card_digest
+}
+
+function getCardName (card) {
+  return card.card_digest.name
 }
