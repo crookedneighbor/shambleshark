@@ -13,9 +13,9 @@ const alias = {
 }
 
 if (BROWSER === 'GOOGLE_CHROME') {
-  alias.BrowserStorage = path.resolve(__dirname, 'src/js/lib/chrome-storage/')
+  alias.Browser = path.resolve(__dirname, 'src/js/lib/chrome/')
 } else if (BROWSER === 'FIREFOX') {
-  alias.BrowserStorage = path.resolve(__dirname, 'src/js/lib/firefox-storage/')
+  alias.Browser = path.resolve(__dirname, 'src/js/lib/firefox/')
 }
 
 var secretsPath = path.join(__dirname, ('secrets.' + env.NODE_ENV + '.js'))

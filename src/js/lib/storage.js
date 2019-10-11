@@ -1,7 +1,7 @@
 import {
   getStorage,
   setStorage
-} from 'BrowserStorage'
+} from 'Browser/storage'
 
 export function get (keys) {
   let key
