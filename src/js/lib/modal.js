@@ -28,7 +28,7 @@ export default class Modal {
     }
   }
 
-  setTitle (value) {
+  setHeader (value) {
     this._titleNode.innerHTML = value
   }
 

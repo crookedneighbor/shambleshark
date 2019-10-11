@@ -122,13 +122,13 @@ describe('makeModal', function () {
     })
   })
 
-  describe('setTitle', function () {
+  describe('setHeader', function () {
     it('can write over content', function () {
       const modal = new Modal({
         title: 'Some title'
       })
 
-      modal.setTitle('new title')
+      modal.setHeader('new title')
 
       expect(modal.element.querySelector('.modal-dialog-title-content').innerHTML).toBe('new title')
     })

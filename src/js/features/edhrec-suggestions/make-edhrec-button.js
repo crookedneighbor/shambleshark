@@ -37,7 +37,7 @@ export default async function makeEDHRecButton () {
     loadingMessage: 'Loading EDHRec Suggestions',
     onClose (modalInstance) {
       // reset this in case the error state changes it
-      modalInstance.setTitle(modalTitle)
+      modalInstance.setHeader(modalTitle)
       bus.emit('CLEAN_UP_DECK')
       modalInstance.setLoading(true)
       button.focus()
@@ -324,7 +324,7 @@ function formatEDHRecSuggestions (list) {
 }
 
 function createErrorModalState (modal, err) {
-  modal.setTitle('Something went wrong')
+  modal.setHeader('Something went wrong')
 
   const container = document.createElement('div')
 
