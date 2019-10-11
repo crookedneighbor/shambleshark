@@ -37,7 +37,7 @@ export default async function makeEDHRecButton () {
     loadingMessage: 'Loading EDHRec Suggestions',
     onClose (modalInstance) {
       // reset this in case the error state changes it
-      modalInstance.setHeader(modalTitle)
+      modalInstance.resetHeader()
       bus.emit('CLEAN_UP_DECK')
       modalInstance.setLoading(true)
       button.focus()

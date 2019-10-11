@@ -12,11 +12,21 @@ export default class Modal {
     this._onClose = options.onClose || noop
     this._onOpen = options.onOpen || noop
 
+    this._originalHeader = options.header
+
+    if (options.headerSymbol) {
+      this._originalHeader = `
+        <span class="modal-dialog-title-symbol">${options.headerSymbol || ''}</span>
+
+        ${this._originalHeader}
+      `
+    }
+
     this.element = this._constructModalElement(options)
     this._contentNodeContainer = this.element.querySelector('.modal-dialog-stage')
     this._contentNode = this._contentNodeContainer.querySelector('.modal-dialog-stage-content')
     this._loaderNode = this.element.querySelector('.modal-dialog-content')
-    this._titleNode = this.element.querySelector('.modal-dialog-title-content')
+    this._headerNode = this.element.querySelector('.modal-dialog-title-content')
   }
 
   setContent (content) {
@@ -28,8 +38,12 @@ export default class Modal {
     }
   }
 
+  resetHeader () {
+    this.setHeader(this._originalHeader)
+  }
+
   setHeader (value) {
-    this._titleNode.innerHTML = value
+    this._headerNode.innerHTML = value
   }
 
   setLoading (state) {
@@ -80,16 +94,8 @@ export default class Modal {
   _constructModalElement (options) {
     const modal = document.createElement('div')
     const titleId = `modal-title-${options.id}`
+    const header = this._originalHeader
 
-    let header = options.header
-
-    if (options.headerSymbol) {
-      header = `
-        <span class="modal-dialog-title-symbol">${options.headerSymbol || ''}</span>
-
-        ${header}
-      `
-    }
     document.addEventListener('keyup', this._onEscKey.bind(this))
 
     modal.id = options.id

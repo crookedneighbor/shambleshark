@@ -122,10 +122,23 @@ describe('makeModal', function () {
     })
   })
 
+  describe('resetHeader', function () {
+    it('resets header after it has been changed', function () {
+      const modal = new Modal({
+        header: 'Some title'
+      })
+
+      modal.setHeader('new title')
+      modal.resetHeader()
+
+      expect(modal.element.querySelector('.modal-dialog-title-content').innerHTML).toBe('Some title')
+    })
+  })
+
   describe('setHeader', function () {
     it('can write over content', function () {
       const modal = new Modal({
-        title: 'Some title'
+        header: 'Some title'
       })
 
       modal.setHeader('new title')
