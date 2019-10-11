@@ -57,6 +57,9 @@ export default class Modal {
       this._contentNodeContainer.removeAttribute('style')
       this._loaderNode.style.display = 'none'
       closeBtn.title = 'Close this dialog.'
+      // Firefox often scrolls down content is
+      // loading. This puts us back to the top
+      this.scrollTo(0, 0)
     }
   }
 
@@ -132,5 +135,9 @@ export default class Modal {
     })
 
     return modal
+  }
+
+  scrollTo (x, y) {
+    this.element.scrollTo(x, y)
   }
 }

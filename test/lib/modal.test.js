@@ -173,7 +173,12 @@ describe('makeModal', function () {
   })
 
   describe('setLoading', function () {
-    it('hides the spinner', function () {
+    beforeEach(function () {
+      // jest doesn't know about the scrollTo method on elements
+      jest.spyOn(Modal.prototype, 'scrollTo').mockImplementation()
+    })
+
+    it('hides the spinner when setting loading to false', function () {
       const modal = new Modal({
         content: 'Some content'
       })
@@ -182,6 +187,17 @@ describe('makeModal', function () {
 
       expect(modal.element.querySelector('.modal-dialog-stage').style.display).toBeFalsy()
       expect(modal.element.querySelector('.modal-dialog-content').style.display).toBe('none')
+    })
+
+    it('scrolls up to the top when setting loading to false', function () {
+      const modal = new Modal({
+        content: 'Some content'
+      })
+
+      modal.setLoading(false)
+
+      expect(modal.scrollTo).toBeCalledTimes(1)
+      expect(modal.scrollTo).toBeCalledWith(0, 0)
     })
 
     it('shows the spinner when empty content is given', function () {
@@ -260,6 +276,20 @@ describe('makeModal', function () {
 
       expect(spy).toBeCalledTimes(1)
       expect(spy).toBeCalledWith(modal)
+    })
+  })
+
+  describe('scollTo', function () {
+    it('calls scrollTo on the element', function () {
+      const modal = new Modal()
+
+      // jest doesn't know about scrollTo method on elements
+      modal.element.scrollTo = jest.fn()
+
+      modal.scrollTo(4, 10)
+
+      expect(modal.element.scrollTo).toBeCalledTimes(1)
+      expect(modal.element.scrollTo).toBeCalledWith(4, 10)
     })
   })
 })

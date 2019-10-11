@@ -25,6 +25,8 @@ describe('makeEDHRecButton', function () {
     document.body.appendChild(deckbuilderElement)
 
     jest.spyOn(iframe, 'create').mockResolvedValue()
+    // jest doesn't know about the scrollTo method on elements
+    jest.spyOn(Modal.prototype, 'scrollTo').mockImplementation()
   })
 
   it('makes a button', async function () {
