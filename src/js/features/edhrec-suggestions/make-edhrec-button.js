@@ -283,7 +283,11 @@ function createCardElement (card) {
     }
   })
 
-  cardElement.addEventListener('click', toggleCardState)
+  cardElement.addEventListener('click', function () {
+    toggleCardState()
+
+    cardElement.blur()
+  })
 
   return cardElement
 }
