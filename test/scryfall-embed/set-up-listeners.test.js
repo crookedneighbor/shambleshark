@@ -19,6 +19,7 @@ describe('set up listeners on Scryfall page', function () {
     setUpListeners()
 
     expect(bus.on).toBeCalledWith('REQUEST_DECK', expect.any(Function))
+    expect(bus.on).toBeCalledWith('SCRYFALL_PUSH_NOTIFICATION', expect.any(Function))
     expect(bus.on).toBeCalledWith('ADD_CARD_TO_DECK', expect.any(Function))
     expect(bus.on).toBeCalledWith('REMOVE_CARD_FROM_DECK', expect.any(Function))
     expect(bus.on).toBeCalledWith('CLEAN_UP_DECK', expect.any(Function))
@@ -48,6 +49,64 @@ describe('set up listeners on Scryfall page', function () {
         expect(Scryfall.getDeck).toHaveBeenCalled()
         expect(spy).toHaveBeenCalled()
         expect(spy.mock.calls[0][0]).toBe(fakeDeck)
+      })
+    })
+  })
+
+  describe('SCRYFALL_PUSH_NOTIFICATION', function () {
+    let pushData
+
+    beforeEach(function () {
+      bus.on.mockImplementation((event, cb) => {
+        if (event === 'SCRYFALL_PUSH_NOTIFICATION') {
+          cb(pushData)
+        }
+      })
+    })
+
+    it('sends a push notification', function () {
+      pushData = {
+        header: 'header',
+        message: 'message',
+        color: 'blue',
+        type: 'foo'
+      }
+
+      setUpListeners('active-deck-id')
+
+      return wait().then(() => {
+        expect(Scryfall.pushNotification.mock.calls.length).toBe(1)
+        expect(Scryfall.pushNotification.mock.calls[0]).toEqual(['header', 'message', 'blue', 'foo'])
+      })
+    })
+
+    it('defaults push notification color to purple', function () {
+      pushData = {
+        header: 'header',
+        message: 'message',
+        type: 'foo'
+      }
+
+      setUpListeners('active-deck-id')
+
+      return wait().then(() => {
+        expect(Scryfall.pushNotification.mock.calls.length).toBe(1)
+        expect(Scryfall.pushNotification.mock.calls[0]).toEqual(['header', 'message', 'purple', 'foo'])
+      })
+    })
+
+    it('defaults push notification type to deck', function () {
+      pushData = {
+        header: 'header',
+        message: 'message',
+        color: 'blue'
+      }
+
+      setUpListeners('active-deck-id')
+
+      return wait().then(() => {
+        expect(Scryfall.pushNotification.mock.calls.length).toBe(1)
+        expect(Scryfall.pushNotification.mock.calls[0]).toEqual(['header', 'message', 'blue', 'deck'])
       })
     })
   })

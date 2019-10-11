@@ -6,6 +6,15 @@ export default function setUpListeners () {
     Scryfall.getDeck().then(reply)
   })
 
+  bus.on('SCRYFALL_PUSH_NOTIFICATION', function ({
+    header,
+    message,
+    color = 'purple',
+    type = 'deck'
+  }) {
+    Scryfall.pushNotification(header, message, color, type)
+  })
+
   bus.on('ADD_CARD_TO_DECK', function ({
     cardName,
     cardId,
