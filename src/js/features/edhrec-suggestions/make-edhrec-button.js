@@ -26,28 +26,75 @@ export default async function makeEDHRecButton () {
   addEDHRecIframe()
 
   const button = document.createElement('button')
-  const modalTitle = 'EDHRec Suggestions'
+  const modal = createModal(button)
+
+  configureButton(button, modal)
+
+  const initialCommanders = await getInitialCommanderList()
+  await setDisabledState(button, initialCommanders)
+
+  updateButtonStateOnCommanderChange(button, initialCommanders)
+
+  return button
+}
+
+async function setDisabledState (button, commanders) {
+  const allLegal = await deckParser.hasLegalCommanders(commanders)
+
+  // TODO: should we mark it as enabled if at least one commander
+  // is a legal commander, and then only send the legal ones to edhrec?
+  if (allLegal) {
+    button.removeAttribute('disabled')
+  } else {
+    button.setAttribute('disabled', 'disabled')
+  }
+}
+
+function createModal (button) {
   const modal = new Modal({
     id: 'edhrec-modal',
     headerSymbol: EDHREC_SYMBOL,
-    header: modalTitle,
+    header: 'EDHRec Suggestions',
     loadingMessage: 'Loading EDHRec Suggestions',
     onClose (modalInstance) {
+      bus.emit('CLEAN_UP_DECK')
+
       // reset this in case the error state changes it
       modalInstance.resetHeader()
-      bus.emit('CLEAN_UP_DECK')
       modalInstance.setLoading(true)
+
+      // re-focus the EDHRec Suggestion button
+      // for accessibility navigation
       button.focus()
     }
   })
+  // TODO: the modal class should probably handle this
   document.getElementById('deckbuilder').appendChild(modal.element)
 
+  return modal
+}
+
+function addEDHRecIframe () {
+  const iframe = document.createElement('iframe')
+  // does not matter where on edhrec we open the page
+  // just need to be on the edhrec domain to access
+  // the recs JSON endpoint
+  iframe.src = 'https://edhrec.com/404'
+  iframe.id = 'edhrec-suggestions-iframe'
+  iframe.style.width = '0px'
+  iframe.style.height = '0px'
+  iframe.style.opacity = 0
+
+  document.body.appendChild(iframe)
+}
+
+function configureButton (button, modal) {
   button.id = 'edhrec-suggestions'
   button.setAttribute('aria-label', 'EDHRec Suggestions')
   button.classList.add('button-n', 'tiny')
   button.innerHTML = `
-  ${EDHREC_SYMBOL}
-  <i>EDHRec Suggestions</i>
+    ${EDHREC_SYMBOL}
+    <i>EDHRec Suggestions</i>
   `
   button.setAttribute('disabled', true)
 
@@ -219,10 +266,12 @@ export default async function makeEDHRecButton () {
       })
     })
   })
+}
 
+async function getInitialCommanderList () {
   const initialDeck = await scryfall.getDeck()
 
-  let commanders = initialDeck.entries.commanders.reduce((all, card) => {
+  return initialDeck.entries.commanders.reduce((all, card) => {
     if (!card.card_digest) {
       return all
     }
@@ -231,9 +280,9 @@ export default async function makeEDHRecButton () {
 
     return all
   }, []).sort()
+}
 
-  await setDisabledState(button, commanders)
-
+function updateButtonStateOnCommanderChange (button, commanders) {
   mutation.change('.deckbuilder-editor-inner .deckbuilder-column .deckbuilder-section', async (el) => {
     const title = el.querySelector('.deckbuilder-section-title')
 
@@ -263,6 +312,7 @@ export default async function makeEDHRecButton () {
 
       return all
     }, [])
+
     commanderList.sort()
 
     // hack to determine if the arrays are equal
@@ -271,32 +321,6 @@ export default async function makeEDHRecButton () {
       await setDisabledState(button, commanders)
     }
   })
-
-  return button
-}
-
-async function setDisabledState (button, commanders) {
-  const allLegal = await deckParser.hasLegalCommanders(commanders)
-
-  if (allLegal) {
-    button.removeAttribute('disabled')
-  } else {
-    button.setAttribute('disabled', 'disabled')
-  }
-}
-
-function addEDHRecIframe () {
-  const iframe = document.createElement('iframe')
-  // does not matter where on edhrec we open the page
-  // just need to be on the edhrec domain to access
-  // the recs JSON endpoint
-  iframe.src = 'https://edhrec.com/404'
-  iframe.id = 'edhrec-suggestions-iframe'
-  iframe.style.width = '0px'
-  iframe.style.height = '0px'
-  iframe.style.opacity = 0
-
-  document.body.appendChild(iframe)
 }
 
 function formatEDHRecSuggestions (list) {
