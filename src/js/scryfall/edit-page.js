@@ -9,6 +9,13 @@ export default function () {
       z-index: 9000;
     }
 
+    .modal-dialog-title-symbol svg {
+      fill: #343242;
+      width: 20px;
+      position: relative;
+      top: 2px;
+    }
+
     /* EDHRec Suggestions CSS */
     .edhrec-suggestion-card-container {
       display: inline-block;

@@ -81,6 +81,15 @@ export default class Modal {
     const modal = document.createElement('div')
     const titleId = `modal-title-${options.id}`
 
+    let header = options.header
+
+    if (options.headerSymbol) {
+      header = `
+        <span class="modal-dialog-title-symbol">${options.headerSymbol || ''}</span>
+
+        ${header}
+      `
+    }
     document.addEventListener('keyup', this._onEscKey.bind(this))
 
     modal.id = options.id
@@ -96,7 +105,7 @@ export default class Modal {
     modal.innerHTML = `
       <div class="modal-dialog">
         <h6 class="modal-dialog-title">
-          <span class='modal-dialog-title-content' id="${titleId}">${options.header}</span>
+          <span class='modal-dialog-title-content' id="${titleId}">${header}</span>
           <button type="button" title="${CLOSE_BUTTON_LOADING_MESSAGE}" class="modal-dialog-close">
             <span class="vh">Close this dialog</span> <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path d="M217.5 256l137.2-137.2c4.7-4.7 4.7-12.3 0-17l-8.5-8.5c-4.7-4.7-12.3-4.7-17 0L192 230.5 54.8 93.4c-4.7-4.7-12.3-4.7-17 0l-8.5 8.5c-4.7 4.7-4.7 12.3 0 17L166.5 256 29.4 393.2c-4.7 4.7-4.7 12.3 0 17l8.5 8.5c4.7 4.7 12.3 4.7 17 0L192 281.5l137.2 137.2c4.7 4.7 12.3 4.7 17 0l8.5-8.5c4.7-4.7 4.7-12.3 0-17L217.5 256z"></path></svg>
           </button>

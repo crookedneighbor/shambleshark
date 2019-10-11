@@ -40,6 +40,16 @@ describe('makeModal', function () {
       expect(modal.element.querySelector('.modal-dialog-title-content').innerHTML).toBe('Title')
     })
 
+    it('can provide a symbol to header', function () {
+      const modal = new Modal({
+        headerSymbol: '<div class="symbol"></div>',
+        header: 'Title'
+      })
+
+      expect(modal.element.querySelector('.modal-dialog-title-content').querySelector('.symbol')).toBeTruthy()
+      expect(modal.element.querySelector('.modal-dialog-title-content').innerHTML).toContain('Title')
+    })
+
     it('has default loading label', function () {
       const modal = new Modal()
 
