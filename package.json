@@ -1,7 +1,7 @@
 {
   "name": "scryfall-extend-extension",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "A browser extension for adding features to the Scryfall site.",
   "scripts": {
     "lint": "standard --verbose | snazzy",
