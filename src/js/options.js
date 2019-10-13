@@ -21,6 +21,7 @@ page.innerHTML = `
       <div class="columns is-5-tablet is-4-desktop is-3-widescreen">
         <div class="column box">
           <form id="settings-form">
+            <h3 class="subtitle has-text-dark has-text-centered">Unofficial Scryfall Browser Extension</h3>
             <div id="deck-builder">
               <h2 class="title has-text-dark">Deckbuilder Page</h2>
             </div>
