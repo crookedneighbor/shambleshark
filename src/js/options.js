@@ -1,6 +1,7 @@
 import 'bulma/css/bulma.min.css'
 import 'bulma-switch/dist/css/bulma-switch.min.css'
 import '../css/options.css'
+import '../img/big-logo.png'
 
 import deckbuilderFeatures from './features/deck-builder-features'
 import deckViewFeatures from './features/deck-view-features'
@@ -14,7 +15,7 @@ page.innerHTML = `
     <div id="settings-container" class="container">
       <div class="columns is-5-tablet is-4-desktop is-3-widescreen">
         <div class="column has-text-centered">
-          <h1 class="title is-2">Scryfall Extend Settings</h1>
+          <img src="big-logo.png" />
         </div>
       </div>
       <div class="columns is-5-tablet is-4-desktop is-3-widescreen">
