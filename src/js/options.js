@@ -64,7 +64,7 @@ Promise.all(features.map((Feature) => {
 
   container.innerHTML = `
     <div>
-      <input id="${enabledSwitchId}" type="checkbox" name="switchExample" class="switch">
+      <input id="${enabledSwitchId}" type="checkbox" name="switchExample" class="switch" aria-label="${title} - ${data.description}">
       <label class="has-text-weight-bold" for="${enabledSwitchId}">${title}</label>
     </div>
     <p class="content">${data.description}</p>
