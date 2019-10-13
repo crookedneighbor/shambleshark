@@ -52,5 +52,14 @@ describe('storage', function () {
         foo: 'bar'
       }, expect.any(Function))
     })
+
+    it('can pass a single key name with a value as a convenience', async function () {
+      await set('foo', 'bar')
+
+      expect(global.chrome.storage.sync.set).toBeCalledTimes(1)
+      expect(global.chrome.storage.sync.set).toBeCalledWith({
+        foo: 'bar'
+      }, expect.any(Function))
+    })
   })
 })

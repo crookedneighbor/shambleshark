@@ -21,7 +21,15 @@ export function get (keys) {
   })
 }
 
-export function set (obj) {
+export function set (obj, value) {
+  const singleKey = typeof obj === 'string'
+
+  if (singleKey) {
+    obj = {
+      [obj]: value
+    }
+  }
+
   return setStorage(obj)
 }
 

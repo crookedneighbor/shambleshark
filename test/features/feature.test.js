@@ -148,11 +148,9 @@ describe('Base Feature', function () {
 
       expect(FeatureThatSavesSettings.getSettings).toBeCalledTimes(1)
       expect(storage.set).toBeCalledTimes(1)
-      expect(storage.set).toBeCalledWith({
-        'feature-that-saves': {
-          baz: 'buz',
-          foo: 'value'
-        }
+      expect(storage.set).toBeCalledWith('feature-that-saves', {
+        baz: 'buz',
+        foo: 'value'
       })
     })
   })

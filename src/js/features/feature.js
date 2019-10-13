@@ -9,8 +9,7 @@ function createStaticProperty (propertyName) {
     get: function () {
       return this.hasOwnProperty(privatePropertyName) ? this[privatePropertyName] : void 0 // eslint-disable-line no-prototype-builtins
     },
-    set: function (value) { this[privatePropertyName] = value }
-  })
+    set: function (value) { this[privatePropertyName] = value } })
 }
 
 class Feature {
@@ -38,9 +37,7 @@ class Feature {
 
     settings[property] = value
 
-    return storage.set({
-      [this.metadata.id]: settings
-    })
+    return storage.set(this.metadata.id, settings)
   }
 
   static async getSettings () {
