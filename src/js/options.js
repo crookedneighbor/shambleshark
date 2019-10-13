@@ -81,15 +81,24 @@ Promise.all(features.map((Feature) => {
   return Feature.getSettings().then((settings) => {
     const enabledSwitch = container.querySelector('input')
 
-    enabledSwitch.addEventListener('change', function () {
-      if (this.checked) {
+    function toggleFeature () {
+      if (enabledSwitch.checked) {
         Feature.enable()
       } else {
         Feature.disable()
       }
+    }
+
+    enabledSwitch.addEventListener('change', toggleFeature)
+    enabledSwitch.addEventListener('keydown', function (event) {
+      if (event.key === 'Enter') {
+        enabledSwitch.checked = !enabledSwitch.checked
+        toggleFeature()
+      }
     })
+
     if (!isFutureFeature && settings.enabled) {
-      enabledSwitch.checked = 'checked'
+      enabledSwitch.checked = true
     }
   })
 })).then(() => {
