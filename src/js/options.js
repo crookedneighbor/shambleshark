@@ -3,10 +3,23 @@ import 'bulma-switch/dist/css/bulma-switch.min.css'
 import '../css/options.css'
 import '../img/big-logo.png'
 
+import globalFeatures from './features/global-features'
 import deckbuilderFeatures from './features/deck-builder-features'
 import deckViewFeatures from './features/deck-view-features'
 
-const features = deckbuilderFeatures.concat(deckViewFeatures)
+const features = globalFeatures
+  .concat(deckbuilderFeatures)
+  .concat(deckViewFeatures)
+
+function setupToggleListeners (element, fn) {
+  element.addEventListener('change', fn)
+  element.addEventListener('keydown', function (event) {
+    if (event.key === 'Enter') {
+      element.checked = !element.checked
+      fn()
+    }
+  })
+}
 
 const page = document.createElement('div')
 page.innerHTML = `
@@ -22,6 +35,10 @@ page.innerHTML = `
         <div class="column box">
           <form id="settings-form">
             <h3 class="subtitle has-text-dark has-text-centered">Unofficial Scryfall Browser Extension</h3>
+
+            <div id="global">
+              <h2 class="title has-text-dark">Global Settings</h2>
+            </div>
             <div id="deck-builder">
               <h2 class="title has-text-dark">Deckbuilder Page</h2>
             </div>
@@ -45,12 +62,10 @@ page.innerHTML = `
 </section>
 `
 
-document.body.appendChild(page)
-
 Promise.all(features.map((Feature) => {
   const container = document.createElement('fieldset')
   const data = Feature.metadata
-  const section = document.getElementById(data.section)
+  const section = page.querySelector(`#${data.section}`)
   const enabledSwitchId = `${data.id}-enabled-switch`
   const isFutureFeature = data.futureFeature
 
@@ -64,7 +79,7 @@ Promise.all(features.map((Feature) => {
 
   container.innerHTML = `
     <div>
-      <input id="${enabledSwitchId}" type="checkbox" name="switchExample" class="switch" aria-label="${title} - ${data.description}">
+      <input id="${enabledSwitchId}" type="checkbox" class="switch" aria-label="${title} toggle - ${data.description}">
       <label class="has-text-weight-bold" for="${enabledSwitchId}">${title}</label>
     </div>
     <p class="content">${data.description}</p>
@@ -76,24 +91,16 @@ Promise.all(features.map((Feature) => {
   }
 
   section.appendChild(container)
-  // construct HTML
+  // construct HTML for additioanl settings
 
   return Feature.getSettings().then((settings) => {
     const enabledSwitch = container.querySelector('input')
 
-    function toggleFeature () {
+    setupToggleListeners(enabledSwitch, () => {
       if (enabledSwitch.checked) {
         Feature.enable()
       } else {
         Feature.disable()
-      }
-    }
-
-    enabledSwitch.addEventListener('change', toggleFeature)
-    enabledSwitch.addEventListener('keydown', function (event) {
-      if (event.key === 'Enter') {
-        enabledSwitch.checked = !enabledSwitch.checked
-        toggleFeature()
       }
     })
 
@@ -102,5 +109,5 @@ Promise.all(features.map((Feature) => {
     }
   })
 })).then(() => {
-  // enable ui
+  document.body.appendChild(page)
 })
