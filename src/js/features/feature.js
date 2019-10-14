@@ -35,6 +35,10 @@ class Feature {
     // of too many settings being saved at once
     const settings = await this.getSettings()
 
+    if (!(property in this.settingsDefaults)) {
+      return Promise.reject(new Error(`Internal Error: Could not find property "${property}" on feature`))
+    }
+
     settings[property] = value
 
     return storage.set(this.metadata.id, settings)
@@ -42,6 +46,21 @@ class Feature {
 
   static async getSettings () {
     let settings = await storage.get(this.metadata.id)
+
+    if (!settings) {
+      const futureFeatureSettings = await storage.get('future-opt-in')
+      const disableFutureFeature = futureFeatureSettings && futureFeatureSettings.enabled === false
+
+      if (disableFutureFeature) {
+        settings = {
+          enabled: false
+        }
+
+        await storage.set(this.metadata.id, settings)
+
+        return settings
+      }
+    }
 
     settings = Object.assign({}, this.settingsDefaults, settings)
 

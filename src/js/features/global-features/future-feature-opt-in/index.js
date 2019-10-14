@@ -8,6 +8,7 @@ class FutureFeatureOptIn extends Feature {
 }
 
 FutureFeatureOptIn.metadata = {
+  // TODO constant
   id: 'future-opt-in',
   title: 'Opt-In To New Features Automatically',
   section: sections.GLOBAL,

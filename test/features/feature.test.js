@@ -94,12 +94,14 @@ describe('Base Feature', function () {
       id: 'feature-with-saved'
     }
     FeatureWithSavedSettings.settingsDefaults = {
+      enabled: true,
       foo: 'bar',
       baz: 'buz'
     }
 
     beforeEach(function () {
-      jest.spyOn(storage, 'get').mockResolvedValue({})
+      jest.spyOn(storage, 'get')
+      jest.spyOn(storage, 'set').mockResolvedValue()
     })
 
     it('calls out to storage for settings', async function () {
@@ -111,11 +113,12 @@ describe('Base Feature', function () {
 
       expect(storage.get).toBeCalledTimes(1)
       expect(storage.get).toBeCalledWith('feature-with-saved')
+      expect(settings.enabled).toBe(true)
       expect(settings.foo).toBe('value1')
       expect(settings.baz).toBe('value2')
     })
 
-    it('applies defaults when not saved', async function () {
+    it('applies defaults when param is not available', async function () {
       storage.get.mockResolvedValue({
         foo: 'value1'
       })
@@ -123,8 +126,59 @@ describe('Base Feature', function () {
 
       expect(storage.get).toBeCalledTimes(1)
       expect(storage.get).toBeCalledWith('feature-with-saved')
+      expect(settings.enabled).toBe(true)
       expect(settings.foo).toBe('value1')
       expect(settings.baz).toBe('buz')
+    })
+
+    it('applies defaults when existing settingsa re not available and future opt in setting is not available', async function () {
+      storage.get.mockResolvedValueOnce()
+      storage.get.mockResolvedValueOnce()
+
+      const settings = await FeatureWithSavedSettings.getSettings()
+
+      expect(storage.get).toBeCalledTimes(2)
+      expect(storage.get).toBeCalledWith('feature-with-saved')
+      expect(storage.get).toBeCalledWith('future-opt-in')
+      expect(settings.enabled).toBe(true)
+      expect(settings.foo).toBe('bar')
+      expect(settings.baz).toBe('buz')
+    })
+
+    it('applies defaults when existing settings are not available and future opt in setting is enabled', async function () {
+      storage.get.mockResolvedValueOnce()
+      storage.get.mockResolvedValueOnce({
+        enabled: true
+      })
+
+      const settings = await FeatureWithSavedSettings.getSettings()
+
+      expect(storage.get).toBeCalledTimes(2)
+      expect(storage.get).toBeCalledWith('feature-with-saved')
+      expect(storage.get).toBeCalledWith('future-opt-in')
+      expect(settings.enabled).toBe(true)
+      expect(settings.foo).toBe('bar')
+      expect(settings.baz).toBe('buz')
+    })
+
+    it('saves it as enabled "false" when no previous settings are present and future opt in is disabled', async function () {
+      storage.get.mockResolvedValueOnce()
+      storage.get.mockResolvedValueOnce({
+        enabled: false
+      })
+      const settings = await FeatureWithSavedSettings.getSettings()
+
+      expect(storage.get).toBeCalledTimes(2)
+      expect(storage.get).toBeCalledWith('feature-with-saved')
+      expect(storage.get).toBeCalledWith('future-opt-in')
+      expect(storage.set).toBeCalledTimes(1)
+      expect(storage.set).toBeCalledWith('feature-with-saved', {
+        enabled: false
+      })
+
+      expect(settings.enabled).toBe(false)
+      expect(settings.foo).toBeFalsy()
+      expect(settings.baz).toBeFalsy()
     })
   })
 
@@ -133,6 +187,10 @@ describe('Base Feature', function () {
     }
     FeatureThatSavesSettings.metadata = {
       id: 'feature-that-saves'
+    }
+    FeatureThatSavesSettings.settingsDefaults = {
+      enabled: true,
+      foo: 'bar'
     }
 
     beforeEach(function () {
@@ -152,6 +210,26 @@ describe('Base Feature', function () {
         baz: 'buz',
         foo: 'value'
       })
+    })
+
+    it('rejects if attempting to set a property that does not exist in defaults', async function () {
+      let error
+
+      jest.spyOn(FeatureThatSavesSettings, 'getSettings').mockResolvedValue({
+        foo: 'bar',
+        baz: 'buz'
+      })
+
+      try {
+        await FeatureThatSavesSettings.saveSetting('does-not-exist', 'value')
+      } catch (e) {
+        error = e
+      }
+
+      expect(error).toBeTruthy()
+      expect(error.message).toBe('Internal Error: Could not find property "does-not-exist" on feature')
+
+      expect(storage.set).toBeCalledTimes(0)
     })
   })
 })
