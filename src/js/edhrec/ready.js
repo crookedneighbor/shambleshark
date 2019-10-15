@@ -1,8 +1,8 @@
 import bus from 'framebus'
-import locationCheck from '../lib/location'
+import iframe from '../lib/iframe'
 
 export default function start () {
-  if (!locationCheck.isIframe()) {
+  if (!iframe.isInsideIframe()) {
     return
   }
 

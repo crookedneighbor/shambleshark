@@ -1,5 +1,5 @@
 import start from '../../src/js/edhrec/ready'
-import locationCheck from '../../src/js/lib/location'
+import iframe from '../../src/js/lib/iframe'
 import wait from '../../src/js/lib/wait'
 import bus from 'framebus'
 
@@ -7,7 +7,7 @@ describe('EDHRec Ready', function () {
   let replySpy, fetchSpy
 
   beforeEach(function () {
-    jest.spyOn(locationCheck, 'isIframe').mockReturnValue(true)
+    jest.spyOn(iframe, 'isInsideIframe').mockReturnValue(true)
 
     jest.spyOn(bus, 'on').mockImplementation((event, reply) => {
       const response = {
@@ -33,7 +33,7 @@ describe('EDHRec Ready', function () {
   })
 
   it('does not listen for recomendations if not in an iframe', function () {
-    locationCheck.isIframe.mockReturnValue(false)
+    iframe.isInsideIframe.mockReturnValue(false)
 
     start()
 

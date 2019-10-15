@@ -15,6 +15,11 @@ export async function create ({
   })
 }
 
+export function isInsideIframe (windowContext = window) {
+  return windowContext.location !== windowContext.parent.location
+}
+
 export default {
-  create
+  create,
+  isInsideIframe
 }
