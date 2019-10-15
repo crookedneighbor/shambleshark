@@ -1,4 +1,4 @@
-import Modal from '../../src/js/lib/modal'
+import Modal from '../../../src/js/lib/ui-elements/modal'
 
 describe('makeModal', function () {
   describe('element', function () {

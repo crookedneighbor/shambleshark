@@ -1,6 +1,6 @@
 import bus from 'framebus'
 import mutation from '../../../lib/mutation'
-import Modal from '../../../lib/modal'
+import Modal from '../../../lib/ui-elements/modal'
 import scryfall from '../../../lib/scryfall'
 import deckParser from '../../../lib/deck-parser'
 import iframe from '../../../lib/iframe'
