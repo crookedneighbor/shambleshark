@@ -1,5 +1,5 @@
-import Feature from '../feature'
-import { sections } from '../constants'
+import Feature from '../../feature'
+import { sections } from '../../constants'
 
 class ScryfallSearch extends Feature {
   async run () {

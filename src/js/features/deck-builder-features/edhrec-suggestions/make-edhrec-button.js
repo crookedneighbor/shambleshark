@@ -1,14 +1,14 @@
 import bus from 'framebus'
-import mutation from '../../lib/mutation'
-import Modal from '../../lib/modal'
-import scryfall from '../../lib/scryfall'
-import deckParser from '../../lib/deck-parser'
-import iframe from '../../lib/iframe'
+import mutation from '../../../lib/mutation'
+import Modal from '../../../lib/modal'
+import scryfall from '../../../lib/scryfall'
+import deckParser from '../../../lib/deck-parser'
+import iframe from '../../../lib/iframe'
 import {
   CHECK_SYMBOL,
   EDHREC_SYMBOL,
   PLUS_SYMBOL
-} from '../../resources/svg'
+} from '../../../resources/svg'
 
 const TYPE_ORDER = [
   'creature',

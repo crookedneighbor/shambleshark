@@ -1,5 +1,5 @@
 import bus from 'framebus'
-import makeEDHRecButton from '../../../src/js/features/edhrec-suggestions/make-edhrec-button'
+import makeEDHRecButton from '../../../src/js/features/deck-builder-features/edhrec-suggestions/make-edhrec-button'
 import deckParser from '../../../src/js/lib/deck-parser'
 import wait from '../../../src/js/lib/wait'
 import Modal from '../../../src/js/lib/modal'
