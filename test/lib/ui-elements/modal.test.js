@@ -37,7 +37,7 @@ describe('makeModal', function () {
         header: 'Title'
       })
 
-      expect(modal.element.querySelector('.modal-dialog-title-content').innerHTML).toBe('Title')
+      expect(modal.element.querySelector('.dialog-title-content').innerHTML).toBe('Title')
     })
 
     it('can provide a symbol to header', function () {
@@ -46,8 +46,8 @@ describe('makeModal', function () {
         header: 'Title'
       })
 
-      expect(modal.element.querySelector('.modal-dialog-title-content').querySelector('.symbol')).toBeTruthy()
-      expect(modal.element.querySelector('.modal-dialog-title-content').innerHTML).toContain('Title')
+      expect(modal.element.querySelector('.dialog-title-content').querySelector('.symbol')).toBeTruthy()
+      expect(modal.element.querySelector('.dialog-title-content').innerHTML).toContain('Title')
     })
 
     it('has default loading label', function () {
@@ -131,7 +131,7 @@ describe('makeModal', function () {
       modal.setHeader('new title')
       modal.resetHeader()
 
-      expect(modal.element.querySelector('.modal-dialog-title-content').innerHTML).toBe('Some title')
+      expect(modal.element.querySelector('.dialog-title-content').innerHTML).toBe('Some title')
     })
   })
 
@@ -143,7 +143,7 @@ describe('makeModal', function () {
 
       modal.setHeader('new title')
 
-      expect(modal.element.querySelector('.modal-dialog-title-content').innerHTML).toBe('new title')
+      expect(modal.element.querySelector('.dialog-title-content').innerHTML).toBe('new title')
     })
   })
 

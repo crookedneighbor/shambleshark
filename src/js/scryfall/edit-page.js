@@ -9,7 +9,7 @@ export default function () {
       z-index: 9000;
     }
 
-    .modal-dialog-title-symbol svg {
+    .dialog-title-symbol svg {
       fill: #343242;
       width: 20px;
       position: relative;

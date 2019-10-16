@@ -1,6 +1,7 @@
 import wait from '../../src/js/lib/wait'
 import {
-  create
+  create,
+  isInsideIframe
 } from '../../src/js/lib/iframe'
 
 describe('iframe', function () {
@@ -25,6 +26,30 @@ describe('iframe', function () {
       expect(fakeIframe.style.width).toBe('0px')
       expect(fakeIframe.style.height).toBe('0px')
       expect(fakeIframe.style.opacity).toBe('0')
+    })
+  })
+
+  describe('isInsideIframe', function () {
+    it('returns false when parent location is identitical to window location', function () {
+      const fakeWindow = {
+        location: 'foo',
+        parent: {
+          location: 'foo'
+        }
+      }
+
+      expect(isInsideIframe(fakeWindow)).toBe(false)
+    })
+
+    it('returns true when parent location is not identitical to window location', function () {
+      const fakeWindow = {
+        location: 'foo',
+        parent: {
+          location: 'bar'
+        }
+      }
+
+      expect(isInsideIframe(fakeWindow)).toBe(true)
     })
   })
 })
