@@ -1,3 +1,4 @@
+import scrollLock from '../scroll-lock'
 const CLOSE_BUTTON_LOADING_MESSAGE = 'Dialog is loading. You may cancel this dialog by using this button.'
 
 function noop () {
@@ -64,6 +65,8 @@ export default class Modal {
   }
 
   open () {
+    scrollLock(true)
+
     this.element.style.display = ''
     this._isOpen = true
 
@@ -73,6 +76,8 @@ export default class Modal {
   }
 
   close () {
+    scrollLock(false)
+
     this.element.style.display = 'none'
     this._isOpen = false
 
