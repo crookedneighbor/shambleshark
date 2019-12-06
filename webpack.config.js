@@ -2,7 +2,7 @@ var webpack = require('webpack')
 var path = require('path')
 var fileSystem = require('fs')
 var env = require('./utils/env')
-var CleanWebpackPlugin = require('clean-webpack-plugin')
+var { CleanWebpackPlugin } = require('clean-webpack-plugin')
 var CopyWebpackPlugin = require('copy-webpack-plugin')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
 var WriteFilePlugin = require('write-file-webpack-plugin')
@@ -63,7 +63,7 @@ var options = {
   },
   plugins: [
     // clean the build folder
-    new CleanWebpackPlugin([`build/${BROWSER.toLowerCase()}`]),
+    new CleanWebpackPlugin(),
     // expose and write the allowed env vars on the compiled bundle
     new webpack.EnvironmentPlugin(['NODE_ENV']),
     new CopyWebpackPlugin([{
