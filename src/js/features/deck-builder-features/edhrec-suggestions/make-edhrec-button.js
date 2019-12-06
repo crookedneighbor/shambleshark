@@ -1,6 +1,7 @@
 import bus from 'framebus'
 import mutation from '../../../lib/mutation'
 import Modal from '../../../lib/ui-elements/modal'
+import Drawer from '../../../lib/ui-elements/drawer'
 import scryfall from '../../../lib/scryfall'
 import deckParser from '../../../lib/deck-parser'
 import iframe from '../../../lib/iframe'
@@ -58,7 +59,7 @@ async function setDisabledState (button, commanders) {
 }
 
 function createModal (button) {
-  const modal = new Modal({
+  const modal = new Drawer({
     id: 'edhrec-modal',
     headerSymbol: EDHREC_SYMBOL,
     header: 'EDHRec Suggestions',
@@ -301,8 +302,10 @@ function createEDHRecResponseHandler (modal) {
     container.id = 'edhrec-card-suggestions'
     container.style.textAlign = 'center'
     container.style.overflowY = 'scroll'
-    container.style.height = '500px'
-    container.style.width = '100%'
+    if (modal instanceof Modal) {
+      container.style.height = '500px'
+      container.style.width = '100%'
+    }
 
     Object.values(recomendations).forEach(card => {
       const sectionId = card.type.toLowerCase()

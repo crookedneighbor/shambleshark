@@ -1,0 +1,30 @@
+.drawer-dialog {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #F6F4FA;
+  overflow-y: scroll;
+  transition: all 0.75s ease-in-out;
+}
+
+.drawer-dialog.drawer-dialog-position-right {
+  left: auto;
+  width: 500px;
+  margin-right: -500px;
+}
+
+.drawer-dialog.drawer-dialog-position-left {
+  right: auto;
+  width: 500px;
+  margin-left: -500px;
+}
+
+.drawer-dialog-overlay.open .drawer-dialog.drawer-dialog-position-right {
+  margin-right: 0px;
+}
+
+.drawer-dialog-overlay.open .drawer-dialog.drawer-dialog-position-left {
+  margin-left: 0px;
+}
