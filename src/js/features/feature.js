@@ -6,10 +6,13 @@ function createStaticProperty (propertyName) {
   const privatePropertyName = `_${propertyName}`
 
   Object.defineProperty(Feature, propertyName, {
-    get: function () {
-      return this.hasOwnProperty(privatePropertyName) ? this[privatePropertyName] : void 0 // eslint-disable-line no-prototype-builtins
+    get () {
+      return this.hasOwnProperty(privatePropertyName) ? this[privatePropertyName] : undefined // eslint-disable-line no-prototype-builtins
     },
-    set: function (value) { this[privatePropertyName] = value } })
+    set (value) {
+      this[privatePropertyName] = value
+    }
+  })
 }
 
 class Feature {
