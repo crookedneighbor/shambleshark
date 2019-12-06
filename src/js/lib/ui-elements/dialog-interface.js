@@ -1,3 +1,5 @@
+import scrollLock from '../scroll-lock'
+
 function noop () {
   // do nothing!
 }
@@ -62,6 +64,8 @@ export default class DialogInterface {
   }
 
   open () {
+    scrollLock(true)
+
     this.element.style.display = ''
     this._isOpen = true
 
@@ -71,6 +75,8 @@ export default class DialogInterface {
   }
 
   close () {
+    scrollLock(false)
+
     this.element.style.display = 'none'
     this._isOpen = false
 
