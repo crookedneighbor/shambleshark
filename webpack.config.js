@@ -65,10 +65,10 @@ var options = {
     // clean the build folder
     new CleanWebpackPlugin({
       cleanOnceBeforeBuildPatterns: [
-        `!*manifest.json`,
+        '!*manifest.json'
       ],
       cleanAfterEveryBuildPatterns: [
-        `!*manifest.json`,
+        '!*manifest.json'
       ]
     }),
     // expose and write the allowed env vars on the compiled bundle
