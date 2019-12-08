@@ -6,17 +6,10 @@ export default class Modal extends DialogInterface {
     const titleId = `modal-title-${options.id}`
     const header = this._originalHeader
 
-    document.addEventListener('keyup', this._onEscKey.bind(this))
-
-    modal.id = options.id
     modal.classList.add('modal-dialog-overlay')
     modal.setAttribute('aria-modal', 'true')
     modal.setAttribute('role', 'dialog')
     modal.setAttribute('aria-labelledby', titleId)
-
-    if (!options.open) {
-      modal.style.display = 'none'
-    }
 
     modal.innerHTML = `
       <div class="modal-dialog">

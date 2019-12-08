@@ -23,10 +23,18 @@ export default class DialogInterface {
     }
 
     this.element = this._constructElement(options)
+    this.element.id = options.id
+    document.addEventListener('keyup', this._onEscKey.bind(this))
+
     this._contentNodeContainer = this.element.querySelector('.dialog-content-container')
     this._contentNode = this._contentNodeContainer.querySelector('.dialog-content')
     this._loaderNode = this.element.querySelector('.dialog-loader')
     this._headerNode = this.element.querySelector('.dialog-title-content')
+
+    if (!options.open) {
+      this.element.style.display = 'none'
+    }
+
   }
 
   setContent (content) {
@@ -52,15 +60,14 @@ export default class DialogInterface {
     if (state) {
       this._contentNodeContainer.style.display = 'none'
       this._loaderNode.removeAttribute('style')
-      closeBtn.title = this._getCloseButtonMessage()
     } else {
       this._contentNodeContainer.removeAttribute('style')
       this._loaderNode.style.display = 'none'
-      closeBtn.title = 'Close this dialog.'
       // Firefox often scrolls down content is
       // loading. This puts us back to the top
       this.scrollTo(0, 0)
     }
+    closeBtn.title = this._getCloseButtonMessage(state)
   }
 
   open () {
@@ -98,8 +105,12 @@ export default class DialogInterface {
     }
   }
 
-  _getCloseButtonMessage () {
-    return 'The dialog is loading. You may cancel this dialog by using this button.'
+  _getCloseButtonMessage (isLoading) {
+    if (isLoading) {
+      return 'The dialog is loading. You may cancel this dialog by using this button.'
+    } else {
+      return 'Close this dialog.'
+    }
   }
 
   _constructElement (options) {

@@ -21,17 +21,10 @@ export default class Drawer extends DialogInterface {
 
     this.position = options.position || 'right'
 
-    document.addEventListener('keyup', this._onEscKey.bind(this))
-
-    drawer.id = options.id
     drawer.classList.add('drawer-dialog-overlay', 'modal-dialog-overlay')
     drawer.setAttribute('aria-modal', 'true')
     drawer.setAttribute('role', 'dialog')
     drawer.setAttribute('aria-labelledby', titleId)
-
-    if (!options.open) {
-      drawer.style.display = 'none'
-    }
 
     drawer.innerHTML = `
       <!-- sometimes modal dialog classes are used to take advantage of existing style rules on the site -->
