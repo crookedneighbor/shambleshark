@@ -2,7 +2,7 @@ import bus from 'framebus'
 import makeEDHRecButton from '../../../src/js/features/deck-builder-features/edhrec-suggestions/make-edhrec-button'
 import deckParser from '../../../src/js/lib/deck-parser'
 import wait from '../../../src/js/lib/wait'
-import Modal from '../../../src/js/lib/ui-elements/modal'
+import Drawer from '../../../src/js/lib/ui-elements/drawer'
 import mutation from '../../../src/js/lib/mutation'
 import scryfall from '../../../src/js/lib/scryfall'
 import iframe from '../../../src/js/lib/iframe'
@@ -26,7 +26,7 @@ describe('makeEDHRecButton', function () {
 
     jest.spyOn(iframe, 'create').mockResolvedValue()
     // jest doesn't know about the scrollTo method on elements
-    jest.spyOn(Modal.prototype, 'scrollTo').mockImplementation()
+    jest.spyOn(Drawer.prototype, 'scrollTo').mockImplementation()
   })
 
   it('makes a button', async function () {
@@ -242,11 +242,11 @@ describe('makeEDHRecButton', function () {
       bus.emit.mockImplementation()
       const btn = await makeEDHRecButton()
 
-      jest.spyOn(Modal.prototype, 'open')
+      jest.spyOn(Drawer.prototype, 'open')
 
       btn.click()
 
-      expect(Modal.prototype.open).toBeCalledTimes(1)
+      expect(Drawer.prototype.open).toBeCalledTimes(1)
     })
 
     it('emits a request for EDHRec recomendations with deck data', async function () {
@@ -353,7 +353,7 @@ describe('makeEDHRecButton', function () {
 
         reply([err])
       })
-      jest.spyOn(Modal.prototype, 'setContent')
+      jest.spyOn(Drawer.prototype, 'setContent')
 
       const btn = await makeEDHRecButton()
 
@@ -374,7 +374,7 @@ describe('makeEDHRecButton', function () {
 
         reply([err])
       })
-      jest.spyOn(Modal.prototype, 'setContent')
+      jest.spyOn(Drawer.prototype, 'setContent')
 
       const btn = await makeEDHRecButton()
 
@@ -388,8 +388,8 @@ describe('makeEDHRecButton', function () {
     })
 
     it('populates modal with list of recomendations organized by type', async function () {
-      jest.spyOn(Modal.prototype, 'setContent')
-      jest.spyOn(Modal.prototype, 'setLoading')
+      jest.spyOn(Drawer.prototype, 'setContent')
+      jest.spyOn(Drawer.prototype, 'setLoading')
 
       const btn = await makeEDHRecButton()
 
@@ -397,8 +397,8 @@ describe('makeEDHRecButton', function () {
 
       await wait()
 
-      expect(Modal.prototype.setContent).toBeCalledTimes(1)
-      expect(Modal.prototype.setLoading).toBeCalledWith(false)
+      expect(Drawer.prototype.setContent).toBeCalledTimes(1)
+      expect(Drawer.prototype.setLoading).toBeCalledWith(false)
 
       const sections = document.querySelectorAll('#edhrec-modal .edhrec-suggestions-container')
 

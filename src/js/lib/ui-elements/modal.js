@@ -20,13 +20,13 @@ export default class Modal extends DialogInterface {
           </button>
         </h6>
 
-        <div class="dialog-loader modal-dialog-content" role="alert" aria-label="${options.loadingMessage || 'Loading'}">
+        <div class="dialog-loader modal-dialog-content" role="alert">
           <img src="https://assets.scryfall.com/assets/spinner-0e5953300e953759359ad94bcff35ac64ff73a403d3a0702e809d6c43e7e5ed5.gif" class="modal-dialog-spinner" aria-hidden="true">
         </div>
       <!---->
         <div class="dialog-content-container modal-dialog-stage" style="position:fixed;left:-100%;visibility:hidden">
           <div role="alert" aria-label="${options.contentMessage || 'Modal Loaded'}"></div>
-          <div class="dialog-content modal-dialog-stage-content">${this._originalContent}</div>
+          <div class="dialog-content modal-dialog-stage-content"></div>
         </div>
       </div>
       `

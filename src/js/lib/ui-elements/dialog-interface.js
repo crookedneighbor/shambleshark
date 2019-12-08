@@ -28,13 +28,15 @@ export default class DialogInterface {
 
     this._contentNodeContainer = this.element.querySelector('.dialog-content-container')
     this._contentNode = this._contentNodeContainer.querySelector('.dialog-content')
+    this._contentNode.innerHTML = this._originalContent
     this._loaderNode = this.element.querySelector('.dialog-loader')
+    this._loaderNode.setAttribute('aria-label', options.loadingMessage || 'Loading')
     this._headerNode = this.element.querySelector('.dialog-title-content')
+    this._headerNode.innerHTML = this._originalHeader
 
     if (!options.open) {
       this.element.style.display = 'none'
     }
-
   }
 
   setContent (content) {

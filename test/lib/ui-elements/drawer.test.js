@@ -1,7 +1,8 @@
 import DialogInterface from '../../../src/js/lib/ui-elements/dialog-interface'
 import Drawer from '../../../src/js/lib/ui-elements/drawer'
 
-describe('Drawer', function () { it('is a DialogInterface', function () {
+describe('Drawer', function () {
+  it('is a DialogInterface', function () {
     const drawer = new Drawer()
 
     expect(drawer).toBeInstanceOf(DialogInterface)

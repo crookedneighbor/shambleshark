@@ -1,16 +1,14 @@
 import DialogInterface from '../../../src/js/lib/ui-elements/dialog-interface'
 
 class ChildDialog extends DialogInterface {
-  _constructElement(options) {
+  _constructElement (options) {
     const el = document.createElement('div')
     el.innerHTML = `
       <div class="dialog-close"></div>
-      <div class="dialog-title-content">
-        ${this._originalHeader}
-      </div>
+      <div class="dialog-title-content"></div>
       <div class="dialog-content-container">
-        <div class="dialog-loader">${options.loadingMessage}</div>
-        <div class="dialog-content">${this._originalContent}</div>
+        <div class="dialog-loader"></div>
+        <div class="dialog-content"></div>
         <div class="dialog-stage"></div>
       </div>
     `
@@ -24,7 +22,7 @@ describe('DialogInterface', function () {
     let err
 
     try {
-      const instance = new DialogInterface()
+      new DialogInterface() // eslint-disable-line no-new
     } catch (e) {
       err = e
     }
@@ -69,7 +67,6 @@ describe('DialogInterface', function () {
 
       expect(dialog.element.querySelector('.dialog-content').innerHTML).toBe('')
     })
-
 
     it('can provide a header', function () {
       const dialog = new ChildDialog({
