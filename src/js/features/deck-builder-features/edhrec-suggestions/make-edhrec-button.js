@@ -1,6 +1,5 @@
 import bus from 'framebus'
 import mutation from '../../../lib/mutation'
-import Modal from '../../../lib/ui-elements/modal'
 import Drawer from '../../../lib/ui-elements/drawer'
 import scryfall from '../../../lib/scryfall'
 import deckParser from '../../../lib/deck-parser'
@@ -34,9 +33,9 @@ export default async function makeEDHRecButton () {
   })
 
   const button = document.createElement('button')
-  const modal = createModal(button)
+  const drawer = createDrawer(button)
 
-  configureButton(button, modal)
+  configureButton(button, drawer)
 
   const initialCommanders = await getInitialCommanderList()
   await setDisabledState(button, initialCommanders)
@@ -58,31 +57,31 @@ async function setDisabledState (button, commanders) {
   }
 }
 
-function createModal (button) {
-  const modal = new Drawer({
-    id: 'edhrec-modal',
+function createDrawer (button) {
+  const drawer = new Drawer({
+    id: 'edhrec-drawer',
     headerSymbol: EDHREC_SYMBOL,
     header: 'EDHRec Suggestions',
     loadingMessage: 'Loading EDHRec Suggestions',
-    onClose (modalInstance) {
+    onClose (drawerInstance) {
       bus.emit('CLEAN_UP_DECK')
 
       // reset this in case the error state changes it
-      modalInstance.resetHeader()
-      modalInstance.setLoading(true)
+      drawerInstance.resetHeader()
+      drawerInstance.setLoading(true)
 
       // re-focus the EDHRec Suggestion button
       // for accessibility navigation
       button.focus()
     }
   })
-  // TODO: the modal class should probably handle this
-  document.getElementById('deckbuilder').appendChild(modal.element)
+  // TODO: the drawer class should probably handle this
+  document.getElementById('deckbuilder').appendChild(drawer.element)
 
-  return modal
+  return drawer
 }
 
-function configureButton (button, modal) {
+function configureButton (button, drawer) {
   button.id = 'edhrec-suggestions'
   button.setAttribute('aria-label', 'EDHRec Suggestions')
   button.classList.add('button-n', 'tiny')
@@ -95,7 +94,7 @@ function configureButton (button, modal) {
   button.addEventListener('click', (e) => {
     e.preventDefault()
 
-    modal.open()
+    drawer.open()
 
     scryfall.getDeck().then((deck) => {
       const commanders = deck.entries.commanders.filter(filterOutInvalidCards).map(getCardName)
@@ -104,7 +103,7 @@ function configureButton (button, modal) {
       bus.emit('REQUEST_EDHREC_RECOMENDATIONS', {
         commanders,
         cards: cardsInDeck
-      }, createEDHRecResponseHandler(modal))
+      }, createEDHRecResponseHandler(drawer))
     })
   })
 }
@@ -286,10 +285,10 @@ function createCardElement (card) {
   return cardElement
 }
 
-function createEDHRecResponseHandler (modal) {
+function createEDHRecResponseHandler (drawer) {
   return function ([err, result]) {
     if (err) {
-      createErrorModalState(modal, err)
+      createErrorDrawerState(drawer, err)
       return
     }
 
@@ -302,10 +301,6 @@ function createEDHRecResponseHandler (modal) {
     container.id = 'edhrec-card-suggestions'
     container.style.textAlign = 'center'
     container.style.overflowY = 'scroll'
-    if (modal instanceof Modal) {
-      container.style.height = '500px'
-      container.style.width = '100%'
-    }
 
     Object.values(recomendations).forEach(card => {
       const sectionId = card.type.toLowerCase()
@@ -335,8 +330,8 @@ function createEDHRecResponseHandler (modal) {
       container.appendChild(section.element)
     })
 
-    modal.setContent(container)
-    modal.setLoading(false)
+    drawer.setContent(container)
+    drawer.setLoading(false)
   }
 }
 
@@ -361,8 +356,8 @@ function formatEDHRecSuggestions (list) {
   }, {})
 }
 
-function createErrorModalState (modal, err) {
-  modal.setHeader('Something went wrong')
+function createErrorDrawerState (drawer, err) {
+  drawer.setHeader('Something went wrong')
 
   const container = document.createElement('div')
 
@@ -382,8 +377,8 @@ function createErrorModalState (modal, err) {
     `
   }
 
-  modal.setContent(container)
-  modal.setLoading(false)
+  drawer.setContent(container)
+  drawer.setLoading(false)
 }
 
 function filterOutInvalidCards (card) {

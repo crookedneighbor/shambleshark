@@ -51,10 +51,10 @@ describe('makeEDHRecButton', function () {
     expect(btn.getAttribute('disabled')).toBeFalsy()
   })
 
-  it('adds an edhrec modal to page', async function () {
+  it('adds an edhrec drawer to page', async function () {
     await makeEDHRecButton()
 
-    expect(document.querySelector('#edhrec-modal')).not.toBeFalsy()
+    expect(document.querySelector('#edhrec-drawer')).not.toBeFalsy()
   })
 
   it('adds an edhrec iframe to page', async function () {
@@ -67,13 +67,13 @@ describe('makeEDHRecButton', function () {
     })
   })
 
-  it('cleans up deck after modal is closed', async function () {
+  it('cleans up deck after drawer is closed', async function () {
     const button = await makeEDHRecButton()
 
     button.click()
 
-    const modal = document.querySelector('#edhrec-modal')
-    const closeButton = modal.querySelector('.modal-dialog-close')
+    const drawer = document.querySelector('#edhrec-drawer')
+    const closeButton = drawer.querySelector('.modal-dialog-close')
 
     closeButton.click()
 
@@ -85,8 +85,8 @@ describe('makeEDHRecButton', function () {
 
     button.click()
 
-    const modal = document.querySelector('#edhrec-modal')
-    const closeButton = modal.querySelector('.modal-dialog-close')
+    const drawer = document.querySelector('#edhrec-drawer')
+    const closeButton = drawer.querySelector('.modal-dialog-close')
 
     closeButton.click()
 
@@ -238,7 +238,7 @@ describe('makeEDHRecButton', function () {
       await wait()
     })
 
-    it('opens the modal', async function () {
+    it('opens the drawer', async function () {
       bus.emit.mockImplementation()
       const btn = await makeEDHRecButton()
 
@@ -361,7 +361,7 @@ describe('makeEDHRecButton', function () {
 
       await wait()
 
-      const body = document.querySelector('#edhrec-modal').innerHTML
+      const body = document.querySelector('#edhrec-drawer').innerHTML
       expect(body).toContain('An unknown error occurred:')
       expect(body).toContain('network error')
     })
@@ -382,12 +382,12 @@ describe('makeEDHRecButton', function () {
 
       await wait()
 
-      const errors = document.querySelectorAll('#edhrec-modal li')
+      const errors = document.querySelectorAll('#edhrec-drawer li')
       expect(errors[0].innerHTML).toContain('1 error')
       expect(errors[1].innerHTML).toContain('2 error')
     })
 
-    it('populates modal with list of recomendations organized by type', async function () {
+    it('populates drawer with list of recomendations organized by type', async function () {
       jest.spyOn(Drawer.prototype, 'setContent')
       jest.spyOn(Drawer.prototype, 'setLoading')
 
@@ -400,7 +400,7 @@ describe('makeEDHRecButton', function () {
       expect(Drawer.prototype.setContent).toBeCalledTimes(1)
       expect(Drawer.prototype.setLoading).toBeCalledWith(false)
 
-      const sections = document.querySelectorAll('#edhrec-modal .edhrec-suggestions-container')
+      const sections = document.querySelectorAll('#edhrec-drawer .edhrec-suggestions-container')
 
       expect(sections.length).toBe(3)
       expect(sections[0].querySelector('h3').innerHTML).toBe('Instants')
@@ -426,7 +426,7 @@ describe('makeEDHRecButton', function () {
 
       await wait()
 
-      const cardElement = document.querySelectorAll('#edhrec-modal .edhrec-suggestion-card-container')[0]
+      const cardElement = document.querySelectorAll('#edhrec-drawer .edhrec-suggestion-card-container')[0]
 
       cardElement.click()
 
@@ -454,7 +454,7 @@ describe('makeEDHRecButton', function () {
 
       await wait()
 
-      const cardElement = document.querySelectorAll('#edhrec-modal .edhrec-suggestion-card-container')[0]
+      const cardElement = document.querySelectorAll('#edhrec-drawer .edhrec-suggestion-card-container')[0]
 
       cardElement.click()
 
@@ -482,7 +482,7 @@ describe('makeEDHRecButton', function () {
 
       await wait()
 
-      const cardElement = document.querySelectorAll('#edhrec-modal .edhrec-suggestion-card-container')[0]
+      const cardElement = document.querySelectorAll('#edhrec-drawer .edhrec-suggestion-card-container')[0]
 
       cardElement.focus()
       const evt = new global.KeyboardEvent('keydown', {
@@ -521,7 +521,7 @@ describe('makeEDHRecButton', function () {
 
       await wait()
 
-      const cardElement = document.querySelectorAll('#edhrec-modal .edhrec-suggestion-card-container')[0]
+      const cardElement = document.querySelectorAll('#edhrec-drawer .edhrec-suggestion-card-container')[0]
 
       cardElement.click()
 
@@ -553,7 +553,7 @@ describe('makeEDHRecButton', function () {
 
       await wait()
 
-      const cardElement = document.querySelectorAll('#edhrec-modal .edhrec-suggestion-card-container')[0]
+      const cardElement = document.querySelectorAll('#edhrec-drawer .edhrec-suggestion-card-container')[0]
 
       cardElement.click()
 
@@ -663,7 +663,7 @@ describe('makeEDHRecButton', function () {
 
       await wait()
 
-      const sections = document.querySelectorAll('#edhrec-modal .edhrec-suggestions-container')
+      const sections = document.querySelectorAll('#edhrec-drawer .edhrec-suggestions-container')
 
       expect(sections.length).toBe(7)
       expect(sections[0].querySelector('h3').innerHTML).toBe('Creatures')
@@ -706,7 +706,7 @@ describe('makeEDHRecButton', function () {
 
       await wait()
 
-      const sections = document.querySelectorAll('#edhrec-modal .edhrec-suggestions-container')
+      const sections = document.querySelectorAll('#edhrec-drawer .edhrec-suggestions-container')
 
       expect(sections.length).toBe(3)
       expect(sections[0].querySelector('h3').innerHTML).toBe('Instants')
