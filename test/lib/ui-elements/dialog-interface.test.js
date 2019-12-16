@@ -86,6 +86,30 @@ describe('DialogInterface', function () {
       expect(dialog.element.querySelector('.dialog-title-content').innerHTML).toContain('Title')
     })
 
+    it('closes when the backdrop is clicked', function () {
+      const dialog = new ChildDialog()
+
+      jest.spyOn(dialog, 'close').mockImplementation()
+
+      dialog.open()
+
+      dialog.element.click()
+
+      expect(dialog.close).toBeCalledTimes(1)
+    })
+
+    it('does not close when modal element is clicked', function () {
+      const dialog = new ChildDialog()
+
+      jest.spyOn(dialog, 'close').mockImplementation()
+
+      dialog.open()
+
+      dialog.element.querySelector('.dialog-content-container').click()
+
+      expect(dialog.close).toBeCalledTimes(0)
+    })
+
     it('closes when the esc key is typed', function () {
       const dialog = new ChildDialog()
 

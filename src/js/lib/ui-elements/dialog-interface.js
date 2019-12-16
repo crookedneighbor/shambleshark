@@ -23,6 +23,13 @@ export default class DialogInterface {
     }
 
     this.element = this._constructElement(options)
+    this.element.addEventListener('click', (evt) => {
+      if (evt.target !== this.element) {
+        return
+      }
+
+      this.close()
+    })
     this.element.id = options.id
     document.addEventListener('keyup', this._onEscKey.bind(this))
 
