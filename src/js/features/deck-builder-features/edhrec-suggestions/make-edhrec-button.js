@@ -1,6 +1,6 @@
 import bus from 'framebus'
 import mutation from '../../../lib/mutation'
-import CardElement from '../../../lib/ui-elements/card-element'
+import AddCardElement from '../../../lib/ui-elements/add-card-element'
 import Drawer from '../../../lib/ui-elements/drawer'
 import scryfall from '../../../lib/scryfall'
 import deckParser from '../../../lib/deck-parser'
@@ -218,7 +218,7 @@ function createEDHRecResponseHandler (drawer) {
         section = sections[sectionId] = constructEDHRecSection(sectionId, card.type)
       }
 
-      card.cardElement = new CardElement({
+      card.cardElement = new AddCardElement({
         name: card.name,
         img: card.img,
         type: card.type,

@@ -1,17 +1,17 @@
 import bus from 'framebus'
-import CardElement from '../../../src/js/lib/ui-elements/card-element'
+import AddCardElement from '../../../src/js/lib/ui-elements/add-card-element'
 import {
   CHECK_SYMBOL,
   PLUS_SYMBOL
 } from '../../../src/js/resources/svg'
 
-describe('CardElement', function () {
+describe('AddCardElement', function () {
   beforeEach(function () {
     jest.spyOn(bus, 'emit').mockImplementation()
   })
 
   it('defaults card in deck status to false', async function () {
-    const cardEl = new CardElement({
+    const cardEl = new AddCardElement({
       name: 'Arcane Denial',
       id: 'arcane-denial-id',
       type: 'Instant',
@@ -24,7 +24,7 @@ describe('CardElement', function () {
   })
 
   it('can set card in deck status to true', async function () {
-    const cardEl = new CardElement({
+    const cardEl = new AddCardElement({
       name: 'Arcane Denial',
       id: 'arcane-denial-id',
       cardInDeck: true,
@@ -39,7 +39,7 @@ describe('CardElement', function () {
   })
 
   it('calls toggleCardState when clicked', async function () {
-    const cardEl = new CardElement({
+    const cardEl = new AddCardElement({
       name: 'Arcane Denial',
       id: 'arcane-denial-id',
       type: 'Instant',
@@ -58,7 +58,7 @@ describe('CardElement', function () {
   })
 
   it('calls toggleCardState when pressing enter while focussed', async function () {
-    const cardEl = new CardElement({
+    const cardEl = new AddCardElement({
       name: 'Arcane Denial',
       id: 'arcane-denial-id',
       type: 'Instant',
@@ -87,7 +87,7 @@ describe('CardElement', function () {
 
   describe('addCardToDeck', function () {
     it('emits event to add card to deck', async function () {
-      const cardEl = new CardElement({
+      const cardEl = new AddCardElement({
         name: 'Arcane Denial',
         id: 'arcane-denial-id',
         type: 'Instant',
@@ -104,7 +104,7 @@ describe('CardElement', function () {
     })
 
     it('emits event to add card to deck with isLand property set to true when card is a land', async function () {
-      const cardEl = new CardElement({
+      const cardEl = new AddCardElement({
         name: 'Island',
         id: 'island-id',
         type: 'Basic Land - Island',
@@ -121,7 +121,7 @@ describe('CardElement', function () {
     })
 
     it('updates card ui', async function () {
-      const cardEl = new CardElement({
+      const cardEl = new AddCardElement({
         name: 'Arcane Denial',
         id: 'arcane-denial-id',
         type: 'Instant',
@@ -140,7 +140,7 @@ describe('CardElement', function () {
     })
 
     it('can pass a custom getScryfallId function', async function () {
-      const cardEl = new CardElement({
+      const cardEl = new AddCardElement({
         name: 'Arcane Denial',
         id: 'arcane-denial-id',
         type: 'Instant',
@@ -161,7 +161,7 @@ describe('CardElement', function () {
 
     it('handles error when getScryfallId fails', async function () {
       const errFromScryfall = new Error('Error from scryfall')
-      const cardEl = new CardElement({
+      const cardEl = new AddCardElement({
         name: 'Arcane Denial',
         id: 'arcane-denial-id',
         type: 'Instant',
@@ -192,7 +192,7 @@ describe('CardElement', function () {
 
   describe('removeCardFromDeck', function () {
     it('emits event to remove from deck', function () {
-      const cardEl = new CardElement({
+      const cardEl = new AddCardElement({
         name: 'Arcane Denial',
         id: 'arcane-denial-id',
         type: 'Instant',
@@ -207,7 +207,7 @@ describe('CardElement', function () {
     })
 
     it('sets card element state to removed', async function () {
-      const cardEl = new CardElement({
+      const cardEl = new AddCardElement({
         name: 'Arcane Denial',
         id: 'arcane-denial-id',
         type: 'Instant',
@@ -230,7 +230,7 @@ describe('CardElement', function () {
 
   describe('toggleCardState', function () {
     it('adds card to deck if card is not already in deck', function () {
-      const cardEl = new CardElement({
+      const cardEl = new AddCardElement({
         name: 'Arcane Denial',
         id: 'arcane-denial-id',
         type: 'Instant',
@@ -249,7 +249,7 @@ describe('CardElement', function () {
     })
 
     it('removes card from deck if card is already in deck', function () {
-      const cardEl = new CardElement({
+      const cardEl = new AddCardElement({
         name: 'Arcane Denial',
         id: 'arcane-denial-id',
         type: 'Instant',

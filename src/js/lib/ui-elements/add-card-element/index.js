@@ -2,10 +2,10 @@ import bus from 'framebus'
 import {
   CHECK_SYMBOL,
   PLUS_SYMBOL
-} from '../../resources/svg'
-import './card-element.css'
+} from '../../../resources/svg'
+import './index.css'
 
-export default class CardElement {
+export default class AddCardElement {
   constructor (options = {}) {
     this.element = document.createElement('div')
     this.cardInDeck = Boolean(options.cardInDeck)
@@ -20,17 +20,17 @@ export default class CardElement {
       }
     }
 
-    this.element.classList.add('edhrec-suggestion-card-container')
+    this.element.classList.add('add-card-element-container')
     this.element.setAttribute('role', 'button')
     this.element.setAttribute('tabindex', '0')
     this.element.setAttribute('aria-pressed', 'false')
 
     this.element.innerHTML = `
       <img src="${this.img}"/>
-      <div class="edhrec-suggestion-overlay"></div>
+      <div class="add-card-element-overlay"></div>
       `
     this.img = this.element.querySelector('img')
-    this.overlay = this.element.querySelector('.edhrec-suggestion-overlay')
+    this.overlay = this.element.querySelector('.add-card-element-overlay')
 
     this.img.alt = this.cardInDeck ? `Remove ${this.name} from deck.` : `Add ${this.name} to deck.`
     this.overlay.innerHTML = this.cardInDeck ? CHECK_SYMBOL : PLUS_SYMBOL

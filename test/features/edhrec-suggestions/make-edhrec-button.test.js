@@ -408,13 +408,13 @@ describe('makeEDHRecButton', function () {
       expect(sections.length).toBe(3)
       expect(sections[0].querySelector('h3').innerHTML).toBe('Instants')
       expect(sections[0].querySelector('.edhrec-suggestions img').src).toBe('https://img.scryfall.com/cards/normal/front/9/d/9d1ffeb1-6c31-45f7-8140-913c397022a3.jpg?1562439019')
-      expect(sections[0].querySelector('.edhrec-suggestions img').alt).toBe('Add Arcane Denial to deck')
+      expect(sections[0].querySelector('.edhrec-suggestions img').alt).toBe('Add Arcane Denial to deck.')
       expect(sections[1].querySelector('h3').innerHTML).toBe('Artifacts')
       expect(sections[1].querySelector('.edhrec-suggestions img').src).toBe('https://img.scryfall.com/cards/normal/front/8/4/84128e98-87d6-4c2f-909b-9435a7833e63.jpg?1567631723')
-      expect(sections[1].querySelector('.edhrec-suggestions img').alt).toBe('Add Arcane Signet to deck')
+      expect(sections[1].querySelector('.edhrec-suggestions img').alt).toBe('Add Arcane Signet to deck.')
       expect(sections[2].querySelector('h3').innerHTML).toBe('Lands')
       expect(sections[2].querySelector('.edhrec-suggestions img').src).toBe('https://img.scryfall.com/cards/normal/front/f/1/f1d33afd-6f2a-43c8-ae5d-17a0674fcdd3.jpg?1562049659')
-      expect(sections[2].querySelector('.edhrec-suggestions img').alt).toBe('Add Shivan Reef to deck')
+      expect(sections[2].querySelector('.edhrec-suggestions img').alt).toBe('Add Shivan Reef to deck.')
     })
 
     it('looks up nonland card in scryfall and adds it to deck when chosen', async function () {
@@ -429,7 +429,7 @@ describe('makeEDHRecButton', function () {
 
       await wait()
 
-      const cardElement = document.querySelectorAll('#edhrec-drawer .edhrec-suggestion-card-container')[0]
+      const cardElement = document.querySelectorAll('#edhrec-drawer .add-card-element-container')[0]
 
       cardElement.click()
 
@@ -455,7 +455,7 @@ describe('makeEDHRecButton', function () {
 
       await wait()
 
-      const cardElement = document.querySelectorAll('#edhrec-drawer .edhrec-suggestion-card-container')[2]
+      const cardElement = document.querySelectorAll('#edhrec-drawer .add-card-element-container')[2]
 
       cardElement.click()
 

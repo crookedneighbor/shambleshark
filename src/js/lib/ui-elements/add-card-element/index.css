@@ -1,4 +1,4 @@
-.edhrec-suggestion-card-container {
+.add-card-element-container {
   display: inline-block;
   width: 45%;
   min-width: 200px;
@@ -7,16 +7,16 @@
   cursor: pointer;
 }
 
-.edhrec-suggestion-card-container img {
+.add-card-element-container img {
   max-width: 100%;
   border-radius: 10px;
 }
 
-.edhrec-suggestion-card-container svg {
+.add-card-element-container svg {
   max-width: 100px;
 }
 
-.edhrec-suggestion-card-container .edhrec-suggestion-overlay {
+.add-card-element-container .add-card-element-overlay {
   position: absolute;
   top: 0;
   bottom: 0;
@@ -31,9 +31,9 @@
   display: none;
 }
 
-.edhrec-suggestion-card-container:hover .edhrec-suggestion-overlay,
-.edhrec-suggestion-card-container:focus .edhrec-suggestion-overlay,
-.edhrec-suggestion-card-container.in-deck .edhrec-suggestion-overlay {
+.add-card-element-container:hover .add-card-element-overlay,
+.add-card-element-container:focus .add-card-element-overlay,
+.add-card-element-container.in-deck .add-card-element-overlay {
   display: block;
 }
 
