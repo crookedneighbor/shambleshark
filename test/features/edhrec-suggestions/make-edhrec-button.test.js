@@ -138,6 +138,7 @@ describe('makeEDHRecButton', function () {
           {
             sanitized: 'arcane-signet',
             scryfall_uri: 'https://scryfall.com/card/eld/331/arcane-signet?utm_source=api',
+            type: 'artifact',
             cmc: 2,
             names: [
               'Arcane Signet'
@@ -166,6 +167,7 @@ describe('makeEDHRecButton', function () {
           {
             sanitized: 'shivan-reef',
             scryfall_uri: 'https://scryfall.com/card/ori/251/shivan-reef?utm_source=api',
+            type: 'land',
             cmc: 0,
             names: [
               'Shivan Reef'
@@ -196,6 +198,7 @@ describe('makeEDHRecButton', function () {
           {
             sanitized: 'arcane-denial',
             scryfall_uri: 'https://scryfall.com/card/a25/41/arcane-denial?utm_source=api',
+            type: 'instant',
             cmc: 2,
             names: [
               'Arcane Denial'
@@ -445,124 +448,26 @@ describe('makeEDHRecButton', function () {
     it('looks up land card in scryfall and adds it to deck when chosen', async function () {
       const btn = await makeEDHRecButton()
       jest.spyOn(scryfall.api, 'get').mockResolvedValue({
-        name: 'Island',
-        id: 'island-id',
-        type_line: 'Basic Land'
+        id: 'shivan-reef-id'
       })
 
       btn.click()
 
       await wait()
 
-      const cardElement = document.querySelectorAll('#edhrec-drawer .edhrec-suggestion-card-container')[0]
+      const cardElement = document.querySelectorAll('#edhrec-drawer .edhrec-suggestion-card-container')[2]
 
       cardElement.click()
 
       expect(scryfall.api.get).toBeCalledTimes(1)
-      expect(scryfall.api.get).toBeCalledWith('/cards/a25/41')
+      expect(scryfall.api.get).toBeCalledWith('/cards/ori/251')
 
       await wait()
 
       expect(bus.emit).toBeCalledWith('ADD_CARD_TO_DECK', {
-        cardName: 'Island',
-        cardId: 'island-id',
+        cardName: 'Shivan Reef',
+        cardId: 'shivan-reef-id',
         isLand: true
-      })
-    })
-
-    it('can handle add/remove with enter key when focused', async function () {
-      const btn = await makeEDHRecButton()
-      jest.spyOn(scryfall.api, 'get').mockResolvedValue({
-        name: 'Arcane Denial',
-        id: 'arcane-denial-id',
-        type_line: 'Instant'
-      })
-
-      btn.click()
-
-      await wait()
-
-      const cardElement = document.querySelectorAll('#edhrec-drawer .edhrec-suggestion-card-container')[0]
-
-      cardElement.focus()
-      const evt = new global.KeyboardEvent('keydown', {
-        key: 'Enter',
-        keyCode: 13,
-        which: 13
-      })
-      cardElement.dispatchEvent(evt)
-
-      expect(scryfall.api.get).toBeCalledTimes(1)
-      expect(scryfall.api.get).toBeCalledWith('/cards/a25/41')
-
-      await wait()
-
-      expect(bus.emit).toBeCalledWith('ADD_CARD_TO_DECK', {
-        cardName: 'Arcane Denial',
-        cardId: 'arcane-denial-id',
-        isLand: false
-      })
-
-      cardElement.dispatchEvent(evt)
-
-      expect(bus.emit).toBeCalledWith('REMOVE_CARD_FROM_DECK', {
-        cardName: 'Arcane Denial'
-      })
-    })
-
-    it('handles error from scryfall lookup when card is chosen', async function () {
-      const errFromScryfall = new Error('Error from scryfall')
-      const btn = await makeEDHRecButton()
-
-      jest.spyOn(scryfall.api, 'get').mockRejectedValue(errFromScryfall)
-      jest.spyOn(console, 'error').mockImplementation()
-
-      btn.click()
-
-      await wait()
-
-      const cardElement = document.querySelectorAll('#edhrec-drawer .edhrec-suggestion-card-container')[0]
-
-      cardElement.click()
-
-      expect(scryfall.api.get).toBeCalledTimes(1)
-      expect(scryfall.api.get).toBeCalledWith('/cards/a25/41')
-
-      await wait()
-
-      expect(bus.emit).not.toBeCalledWith('ADD_CARD_TO_DECK', expect.any(Object))
-      expect(bus.emit).toBeCalledWith('SCRYFALL_PUSH_NOTIFICATION', {
-        header: 'Card could not be added',
-        message: 'There was an error adding Arcane Denial to the deck. See console for more details.',
-        color: 'red'
-      })
-
-      expect(cardElement.querySelector('img').alt).toBe('Error adding Arcane Denial to deck.')
-      expect(console.error).toBeCalledWith(errFromScryfall)
-    })
-
-    it('removes card from deck when chosen a second time', async function () {
-      const btn = await makeEDHRecButton()
-      jest.spyOn(scryfall.api, 'get').mockResolvedValue({
-        name: 'Arcane Denial',
-        id: 'arcane-denial-id',
-        type_line: 'Instant'
-      })
-
-      btn.click()
-
-      await wait()
-
-      const cardElement = document.querySelectorAll('#edhrec-drawer .edhrec-suggestion-card-container')[0]
-
-      cardElement.click()
-
-      await wait()
-
-      cardElement.click()
-
-      expect(bus.emit).toBeCalledWith('REMOVE_CARD_FROM_DECK', {
-        cardName: 'Arcane Denial'
       })
     })
 

@@ -1,13 +1,12 @@
 import bus from 'framebus'
 import mutation from '../../../lib/mutation'
+import CardElement from '../../../lib/ui-elements/card-element'
 import Drawer from '../../../lib/ui-elements/drawer'
 import scryfall from '../../../lib/scryfall'
 import deckParser from '../../../lib/deck-parser'
 import iframe from '../../../lib/iframe'
 import {
-  CHECK_SYMBOL,
-  EDHREC_SYMBOL,
-  PLUS_SYMBOL
+  EDHREC_SYMBOL
 } from '../../../resources/svg'
 
 const TYPE_ORDER = [
@@ -192,98 +191,7 @@ function constructEDHRecSection (sectionId, cardType) {
   return section
 }
 
-function createCardElement (card) {
-  const cardElement = document.createElement('div')
-  let cardInDeck = false
-
-  cardElement.classList.add('edhrec-suggestion-card-container')
-  cardElement.setAttribute('role', 'button')
-  cardElement.setAttribute('tabindex', '0')
-  cardElement.setAttribute('aria-pressed', 'false')
-
-  cardElement.innerHTML = `
-    <img src="${card.img}" alt="Add ${card.name} to deck" />
-    <div class="edhrec-suggestion-overlay">
-    ${PLUS_SYMBOL}
-    </div>
-    `
-  const img = cardElement.querySelector('img')
-
-  cardElement.addEventListener('blur', function () {
-    if (cardInDeck) {
-      img.alt = `Remove ${card.name} from deck`
-    } else {
-      img.alt = `Add ${card.name} to deck`
-    }
-  })
-
-  const overlay = cardElement.querySelector('.edhrec-suggestion-overlay')
-
-  function addCardToDeck () {
-    cardElement.setAttribute('aria-pressed', 'true')
-
-    cardElement.classList.add('in-deck')
-    img.alt = `${card.name} added to deck.`
-    overlay.innerHTML = CHECK_SYMBOL
-
-    scryfall.api.get(`/cards/${card.set}/${card.collectorNumber}`).then((cardFromScryfall) => {
-      bus.emit('ADD_CARD_TO_DECK', {
-        cardName: cardFromScryfall.name,
-        cardId: cardFromScryfall.id,
-        isLand: cardFromScryfall.type_line.toLowerCase().indexOf('land') > -1
-      })
-    }).catch(err => {
-      console.error(err)
-
-      bus.emit('SCRYFALL_PUSH_NOTIFICATION', {
-        header: 'Card could not be added',
-        message: `There was an error adding ${card.name} to the deck. See console for more details.`,
-        color: 'red'
-      })
-
-      img.alt = `Error adding ${card.name} to deck.`
-      cardElement.classList.remove('in-deck')
-      overlay.innerHTML = PLUS_SYMBOL
-      cardInDeck = false
-    })
-  }
-
-  function removeCardFromDeck () {
-    img.alt = `${card.name} removed from deck.`
-    cardElement.classList.remove('in-deck')
-    overlay.innerHTML = PLUS_SYMBOL
-
-    cardElement.setAttribute('aria-pressed', 'false')
-    bus.emit('REMOVE_CARD_FROM_DECK', {
-      cardName: card.name
-    })
-  }
-
-  // TODO: disable while update in progress?
-  function toggleCardState () {
-    cardInDeck = !cardInDeck
-
-    if (cardInDeck) {
-      addCardToDeck()
-    } else {
-      removeCardFromDeck()
-    }
-  }
-
-  cardElement.addEventListener('keydown', function (event) {
-    if (event.key === 'Enter') {
-      toggleCardState()
-    }
-  })
-
-  cardElement.addEventListener('click', function () {
-    toggleCardState()
-
-    cardElement.blur()
-  })
-
-  return cardElement
-}
+// TODO pull out into helper function
 
 function createEDHRecResponseHandler (drawer) {
   return function ([err, result]) {
@@ -310,7 +218,16 @@ function createEDHRecResponseHandler (drawer) {
         section = sections[sectionId] = constructEDHRecSection(sectionId, card.type)
       }
 
-      card.element = createCardElement(card)
+      card.cardElement = new CardElement({
+        name: card.name,
+        img: card.img,
+        type: card.type,
+        getScryfallId () {
+          return scryfall.api.get(`/cards/${card.set}/${card.collectorNumber}`).then((cardFromScryfall) => {
+            return cardFromScryfall.id
+          })
+        }
+      })
 
       section.cards.push(card)
     })
@@ -325,7 +242,7 @@ function createEDHRecResponseHandler (drawer) {
       const suggestions = section.element.querySelector('.edhrec-suggestions')
 
       section.cards.forEach(card => {
-        suggestions.appendChild(card.element)
+        suggestions.appendChild(card.cardElement.element)
       })
       container.appendChild(section.element)
     })
