@@ -10,6 +10,34 @@ describe('CardElement', function () {
     jest.spyOn(bus, 'emit').mockImplementation()
   })
 
+  it('defaults card in deck status to false', async function () {
+    const cardEl = new CardElement({
+      name: 'Arcane Denial',
+      id: 'arcane-denial-id',
+      type: 'Instant',
+      img: 'https://example.com/arcane-signet'
+    })
+
+    expect(cardEl.cardInDeck).toBe(false)
+    expect(cardEl.img.alt).toBe('Add Arcane Denial to deck.')
+    expect(cardEl.overlay.innerHTML).toContain(PLUS_SYMBOL)
+  })
+
+  it('can set card in deck status to true', async function () {
+    const cardEl = new CardElement({
+      name: 'Arcane Denial',
+      id: 'arcane-denial-id',
+      cardInDeck: true,
+      type: 'Instant',
+      img: 'https://example.com/arcane-signet'
+    })
+
+    expect(cardEl.cardInDeck).toBe(true)
+    expect(cardEl.img.alt).toBe('Remove Arcane Denial from deck.')
+    expect(cardEl.overlay.innerHTML).not.toContain(PLUS_SYMBOL)
+    expect(cardEl.overlay.innerHTML).toContain(CHECK_SYMBOL)
+  })
+
   it('calls toggleCardState when clicked', async function () {
     const cardEl = new CardElement({
       name: 'Arcane Denial',

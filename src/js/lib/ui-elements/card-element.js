@@ -8,7 +8,7 @@ import './card-element.css'
 export default class CardElement {
   constructor (options = {}) {
     this.element = document.createElement('div')
-    this.cardInDeck = false
+    this.cardInDeck = Boolean(options.cardInDeck)
     this.name = options.name
     this.img = options.img
     this.type = options.type
@@ -26,12 +26,14 @@ export default class CardElement {
     this.element.setAttribute('aria-pressed', 'false')
 
     this.element.innerHTML = `
-      <img src="${this.img}" alt="Add ${this.name} to deck" />
-      <div class="edhrec-suggestion-overlay">
-      ${PLUS_SYMBOL}
-      </div>
+      <img src="${this.img}"/>
+      <div class="edhrec-suggestion-overlay"></div>
       `
     this.img = this.element.querySelector('img')
+    this.overlay = this.element.querySelector('.edhrec-suggestion-overlay')
+
+    this.img.alt = this.cardInDeck ? `Remove ${this.name} from deck.` : `Add ${this.name} to deck.`
+    this.overlay.innerHTML = this.cardInDeck ? CHECK_SYMBOL : PLUS_SYMBOL
 
     this.element.addEventListener('blur', () => {
       if (this.cardInDeck) {
@@ -40,8 +42,6 @@ export default class CardElement {
         this.img.alt = `Add ${this.name} to deck`
       }
     })
-
-    this.overlay = this.element.querySelector('.edhrec-suggestion-overlay')
 
     this.element.addEventListener('keydown', (event) => {
       if (event.key === 'Enter') {
