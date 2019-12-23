@@ -62,4 +62,18 @@ describe('Drawer', function () {
     drawer.close()
     expect(drawer.element.classList.contains('open')).toBeFalsy()
   })
+
+  it('can set on onScroll callback', function () {
+    const spy = jest.fn()
+    const drawer = new Drawer({
+      onScroll: spy
+    })
+    expect(spy).toBeCalledTimes(0)
+
+    const event = document.createEvent('UIEvents')
+    event.initUIEvent('scroll', true, true, window, 1)
+    drawer.element.querySelector('.drawer-dialog').dispatchEvent(event)
+
+    expect(spy).toBeCalledTimes(1)
+  })
 })

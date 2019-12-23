@@ -49,6 +49,13 @@ export default class Drawer extends DialogInterface {
       this.close()
     })
 
+    if (options.onScroll) {
+      const scrollable = drawer.querySelector('.drawer-dialog')
+      scrollable.addEventListener('scroll', () => {
+        options.onScroll(scrollable)
+      })
+    }
+
     return drawer
   }
 }

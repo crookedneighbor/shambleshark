@@ -9,6 +9,7 @@ export default class AddCardElement {
   constructor (options = {}) {
     this.element = document.createElement('div')
     this.cardInDeck = Boolean(options.cardInDeck)
+    this.id = options.id
     this.name = options.name
     this.img = options.img
     this.type = options.type
@@ -16,7 +17,7 @@ export default class AddCardElement {
       this._getScryfallId = options.getScryfallId
     } else {
       this._getScryfallId = () => {
-        return Promise.resolve(options.id)
+        return Promise.resolve(this.id)
       }
     }
 

@@ -5,6 +5,7 @@
   margin: 2%;
   position: relative;
   cursor: pointer;
+  text-align: center;
 }
 
 .add-card-element-container img {
