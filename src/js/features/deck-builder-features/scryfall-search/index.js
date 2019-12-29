@@ -5,9 +5,13 @@ import Drawer from '../../../lib/ui-elements/drawer'
 import AddCardElement from '../../../lib/ui-elements/add-card-element'
 import { api } from '../../../lib/scryfall'
 
+// TODO
+// add multiples
+// fix ff style
+
 class ScryfallSearch extends Feature {
   async run () {
-    const drawer = this.createDrawer()
+    this.drawer = this.createDrawer()
 
     document.getElementById('header-search-field').addEventListener('keydown', (e) => {
       if (e.key !== 'Enter') {
@@ -15,16 +19,19 @@ class ScryfallSearch extends Feature {
       }
       e.preventDefault()
 
-      const query = e.target.value
-      drawer.open()
+      this.onEnter(e.target.value)
+    })
+  }
 
-      api.get('cards/search', {
-        q: query
-      }).then(cards => {
-        this.cardList = cards
-        this.addCards()
-        drawer.setLoading(false)
-      })
+  onEnter(query) {
+    this.drawer.open()
+
+    api.get('cards/search', {
+      q: query
+    }).then(cards => {
+      this.cardList = cards
+      this.addCards()
+      this.drawer.setLoading(false)
     })
   }
 
@@ -42,6 +49,14 @@ class ScryfallSearch extends Feature {
     })
   }
 
+  isReadyToLookupNextBatch (el) {
+    if (self._nextInProgress || !self.cardList || !self.cardList.has_more) {
+      return false
+    }
+
+    return el.scrollTop + el.clientHeight >= el.scrollHeight - 15000
+  }
+
   createDrawer (button) {
     const self = this
     const drawer = new Drawer({
@@ -51,21 +66,17 @@ class ScryfallSearch extends Feature {
       header: 'Scryfall Search',
       loadingMessage: 'Loading Scryfall Search',
       onScroll (el) {
-        if (self._nextInProgress || !self.cardList || !self.cardList.has_more) {
-          // noop
+        if (!self.isReadyToLookupNextBatch(el)) {
           return
         }
 
-        // TODO pull out magic number caluclation
-        if (el.scrollTop + el.clientHeight >= el.scrollHeight - 15000) {
-          self._nextInProgress = true
+        self._nextInProgress = true
 
-          self.cardList.next().then(cards => {
-            self.cardList = cards
-            self.addCards()
-            self._nextInProgress = false
-          })
-        }
+        self.cardList.next().then(cards => {
+          self.cardList = cards
+          self.addCards()
+          self._nextInProgress = false
+        })
       },
       onClose (drawerInstance) {
         self.cardList = null
