@@ -23,10 +23,10 @@ class ScryfallSearch extends Feature {
     })
   }
 
-  onEnter(query) {
+  onEnter (query) {
     this.drawer.open()
 
-    api.get('cards/search', {
+    return api.get('cards/search', {
       q: query
     }).then(cards => {
       this.cardList = cards
@@ -50,7 +50,7 @@ class ScryfallSearch extends Feature {
   }
 
   isReadyToLookupNextBatch (el) {
-    if (self._nextInProgress || !self.cardList || !self.cardList.has_more) {
+    if (this._nextInProgress || !this.cardList || !this.cardList.has_more) {
       return false
     }
 
@@ -65,14 +65,14 @@ class ScryfallSearch extends Feature {
       // headerSymbol: EDHREC_SYMBOL,
       header: 'Scryfall Search',
       loadingMessage: 'Loading Scryfall Search',
-      onScroll (el) {
-        if (!self.isReadyToLookupNextBatch(el)) {
+      onScroll (drawerInstance) {
+        if (!self.isReadyToLookupNextBatch(drawerInstance.getScrollableElement())) {
           return
         }
 
         self._nextInProgress = true
 
-        self.cardList.next().then(cards => {
+        return self.cardList.next().then(cards => {
           self.cardList = cards
           self.addCards()
           self._nextInProgress = false
@@ -80,6 +80,7 @@ class ScryfallSearch extends Feature {
       },
       onClose (drawerInstance) {
         self.cardList = null
+        // TODO constant
         bus.emit('CLEAN_UP_DECK')
 
         // reset this in case the error state changes it

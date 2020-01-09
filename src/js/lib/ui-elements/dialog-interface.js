@@ -11,6 +11,7 @@ export default class DialogInterface {
     this._resetContentOnClose = Boolean(options.resetContentOnClose)
     this._onClose = options.onClose || noop
     this._onOpen = options.onOpen || noop
+    this._onScroll = options.onScroll || noop
 
     this._originalHeader = options.header
 
@@ -85,7 +86,7 @@ export default class DialogInterface {
     this.element.style.display = ''
     this._isOpen = true
 
-    this._onOpen(this)
+    this.triggerOnOpen()
 
     this.element.querySelector('.dialog-close').focus()
   }
@@ -99,7 +100,19 @@ export default class DialogInterface {
     if (this._resetContentOnClose) {
       this.setContent(this._originalContent)
     }
-    this._onClose(this)
+    this.triggerOnClose()
+  }
+
+  triggerOnClose () {
+    return this._onClose(this)
+  }
+
+  triggerOnOpen () {
+    return this._onOpen(this)
+  }
+
+  triggerOnScroll () {
+    return this._onScroll(this)
   }
 
   _onEscKey (event) {

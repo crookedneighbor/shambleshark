@@ -313,4 +313,52 @@ describe('DialogInterface', function () {
       expect(dialog.element.scrollTo).toBeCalledWith(4, 10)
     })
   })
+
+  describe('triggerOnClose', function () {
+    it('triggers onClose', function () {
+      const onClose = jest.fn()
+      const dialog = new ChildDialog({
+        onClose
+      })
+
+      expect(onClose).toBeCalledTimes(0)
+
+      dialog.triggerOnClose()
+
+      expect(onClose).toBeCalledTimes(1)
+      expect(onClose).toBeCalledWith(dialog)
+    })
+  })
+
+  describe('triggerOnOpen', function () {
+    it('triggers onOpen', function () {
+      const onOpen = jest.fn()
+      const dialog = new ChildDialog({
+        onOpen
+      })
+
+      expect(onOpen).toBeCalledTimes(0)
+
+      dialog.triggerOnOpen()
+
+      expect(onOpen).toBeCalledTimes(1)
+      expect(onOpen).toBeCalledWith(dialog)
+    })
+  })
+
+  describe('triggerOnScroll', function () {
+    it('triggers onScroll', function () {
+      const onScroll = jest.fn()
+      const dialog = new ChildDialog({
+        onScroll
+      })
+
+      expect(onScroll).toBeCalledTimes(0)
+
+      dialog.triggerOnScroll()
+
+      expect(onScroll).toBeCalledTimes(1)
+      expect(onScroll).toBeCalledWith(dialog)
+    })
+  })
 })

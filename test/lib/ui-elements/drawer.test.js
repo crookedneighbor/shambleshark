@@ -76,4 +76,12 @@ describe('Drawer', function () {
 
     expect(spy).toBeCalledTimes(1)
   })
+
+  it('can return the scrollable element', function () {
+    const drawer = new Drawer()
+
+    const el = drawer.getScrollableElement()
+
+    expect(el.classList.contains('drawer-dialog')).toBeTruthy()
+  })
 })

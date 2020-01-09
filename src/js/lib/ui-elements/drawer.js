@@ -14,6 +14,10 @@ export default class Drawer extends DialogInterface {
     this.element.classList.remove('open')
   }
 
+  getScrollableElement () {
+    return this._scrollableEl
+  }
+
   _constructElement (options) {
     const drawer = document.createElement('div')
     const titleId = `drawer-title-${options.id}`
@@ -49,10 +53,11 @@ export default class Drawer extends DialogInterface {
       this.close()
     })
 
+    this._scrollableEl = drawer.querySelector('.drawer-dialog')
+
     if (options.onScroll) {
-      const scrollable = drawer.querySelector('.drawer-dialog')
-      scrollable.addEventListener('scroll', () => {
-        options.onScroll(scrollable)
+      this._scrollableEl.addEventListener('scroll', () => {
+        this.triggerOnScroll()
       })
     }
 

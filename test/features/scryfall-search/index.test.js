@@ -1,4 +1,6 @@
 import ScryfallSearch from '../../../src/js/features/deck-builder-features/scryfall-search'
+import { api } from '../../../src/js/lib/scryfall'
+import bus from 'framebus'
 
 describe('Scryfall Search', function () {
   describe('run', function () {
@@ -30,12 +32,234 @@ describe('Scryfall Search', function () {
       await ss.run()
 
       headerSearchField.value = 'is:commander'
-      headerSearchField.dispatchEvent(new KeyboardEvent('keydown',{key:'a'}));
+      headerSearchField.dispatchEvent(new window.KeyboardEvent('keydown', {
+        key: 'a'
+      }))
       expect(ss.onEnter).toBeCalledTimes(0)
 
-      headerSearchField.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter'}));
+      headerSearchField.dispatchEvent(new window.KeyboardEvent('keydown', {
+        key: 'Enter'
+      }))
       expect(ss.onEnter).toBeCalledTimes(1)
       expect(ss.onEnter).toBeCalledWith('is:commander')
+    })
+  })
+
+  describe('createDrawer', function () {
+    let deckbuilderContainer, searchInput
+
+    beforeEach(function () {
+      deckbuilderContainer = document.createElement('input')
+      deckbuilderContainer.id = 'deckbuilder'
+      searchInput = document.createElement('input')
+      searchInput.id = 'header-search-field'
+
+      document.body.appendChild(deckbuilderContainer)
+      document.body.appendChild(searchInput)
+    })
+
+    it('adds a drawer to the page', function () {
+      const ss = new ScryfallSearch()
+      const drawer = ss.createDrawer()
+
+      expect(deckbuilderContainer.querySelector('#scryfall-search-drawer')).toBe(drawer.element)
+    })
+
+    it('triggers cleanup on close', function () {
+      const ss = new ScryfallSearch()
+      const drawer = ss.createDrawer()
+
+      jest.spyOn(bus, 'emit').mockReturnValue(null)
+
+      drawer.triggerOnClose()
+
+      expect(bus.emit).toBeCalledTimes(1)
+      expect(bus.emit).toBeCalledWith('CLEAN_UP_DECK')
+    })
+
+    it('focuses search input on close', function () {
+      const ss = new ScryfallSearch()
+      const drawer = ss.createDrawer()
+
+      jest.spyOn(searchInput, 'focus').mockReturnValue(null)
+
+      drawer.triggerOnClose()
+
+      expect(searchInput.focus).toBeCalledTimes(1)
+    })
+
+    it('adds cards on scroll if ready for the next batch', async function () {
+      const ss = new ScryfallSearch()
+      const drawer = ss.createDrawer()
+
+      jest.spyOn(ss, 'isReadyToLookupNextBatch').mockReturnValue(true)
+      jest.spyOn(ss, 'addCards').mockReturnValue(null)
+      ss.cardList = {
+        next: jest.fn().mockResolvedValue([])
+      }
+
+      expect(ss.addCards).toBeCalledTimes(0)
+
+      await drawer.triggerOnScroll()
+
+      expect(ss.addCards).toBeCalledTimes(1)
+    })
+
+    it('does not add cards on scroll if not ready for the next batch', async function () {
+      const ss = new ScryfallSearch()
+      const drawer = ss.createDrawer()
+
+      jest.spyOn(ss, 'isReadyToLookupNextBatch').mockReturnValue(false)
+      jest.spyOn(ss, 'addCards')
+      ss.cardList = {
+        next: jest.fn().mockResolvedValue([])
+      }
+
+      await drawer.triggerOnScroll()
+
+      expect(ss.addCards).toBeCalledTimes(0)
+    })
+  })
+
+  describe('onEnter', function () {
+    let ss
+
+    beforeEach(function () {
+      ss = new ScryfallSearch()
+      ss.drawer = {
+        open: jest.fn(),
+        setLoading: jest.fn()
+      }
+
+      jest.spyOn(api, 'get').mockResolvedValue([])
+      jest.spyOn(ss, 'addCards').mockReturnValue(null)
+    })
+
+    it('opens the drawer', async function () {
+      await ss.onEnter('foo')
+
+      expect(ss.drawer.open).toBeCalledTimes(1)
+    })
+
+    it('queries the api', async function () {
+      await ss.onEnter('foo')
+
+      expect(api.get).toBeCalledTimes(1)
+      expect(api.get).toBeCalledWith('cards/search', {
+        q: 'foo'
+      })
+    })
+
+    it('adds cards from the api result', async function () {
+      const cards = [{}, {}]
+
+      api.get.mockResolvedValue(cards)
+
+      await ss.onEnter('foo')
+
+      expect(ss.cardList).toBe(cards)
+      expect(ss.addCards).toBeCalledTimes(1)
+    })
+
+    it('shows the drawer', async function () {
+      await ss.onEnter('foo')
+
+      expect(ss.drawer.setLoading).toBeCalledTimes(1)
+      expect(ss.drawer.setLoading).toBeCalledWith(false)
+    })
+  })
+
+  describe('addCards', function () {
+    let ss
+
+    beforeEach(function () {
+      ss = new ScryfallSearch()
+      ss.container = document.createElement('div')
+    })
+
+    it('creates card elements to add to container', function () {
+      ss.cardList = [{
+        id: 'id-1',
+        name: 'card 1',
+        getImage () {
+          return 'https://example.com/1'
+        },
+        type_line: 'type 1'
+      }, {
+        id: 'id-2',
+        name: 'card 2',
+        getImage () {
+          return 'https://example.com/2'
+        },
+        type_line: 'type 2'
+      }]
+
+      ss.addCards()
+
+      expect(ss.container.querySelector('img[src="https://example.com/1"]')).toBeTruthy()
+      expect(ss.container.querySelector('img[src="https://example.com/2"]')).toBeTruthy()
+    })
+  })
+
+  describe('isReadyToLookupNextBatch ', function () {
+    let el
+
+    beforeEach(function () {
+      el = document.createElement('div')
+    })
+
+    it('returns false if lookup is already in progress', function () {
+      const ss = new ScryfallSearch()
+
+      ss._nextInProgress = true
+
+      expect(ss.isReadyToLookupNextBatch(el)).toBe(false)
+    })
+
+    it('returns false if there is no card list', function () {
+      const ss = new ScryfallSearch()
+
+      ss.cardList = null
+
+      expect(ss.isReadyToLookupNextBatch(el)).toBe(false)
+    })
+
+    it('returns false if card list has no more in list', function () {
+      const ss = new ScryfallSearch()
+
+      ss.cardList = {
+        has_more: false
+      }
+
+      expect(ss.isReadyToLookupNextBatch(el)).toBe(false)
+    })
+
+    it('returns false if element position is beneath the scroll threshold', function () {
+      const ss = new ScryfallSearch()
+
+      ss.cardList = {
+        has_more: true
+      }
+
+      expect(ss.isReadyToLookupNextBatch({
+        scrollTop: 100,
+        clientHeight: 100,
+        scrollHeight: 9999999
+      })).toBe(false)
+    })
+
+    it('returns true if element position is within the scroll threshold', function () {
+      const ss = new ScryfallSearch()
+
+      ss.cardList = {
+        has_more: true
+      }
+
+      expect(ss.isReadyToLookupNextBatch({
+        scrollTop: 100,
+        clientHeight: 100,
+        scrollHeight: 100
+      })).toBe(true)
     })
   })
 })
