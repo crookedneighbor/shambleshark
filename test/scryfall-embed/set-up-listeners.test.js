@@ -8,6 +8,7 @@ describe('set up listeners on Scryfall page', function () {
     jest.spyOn(bus, 'on')
     jest.spyOn(bus, 'emit')
     jest.spyOn(Scryfall, 'getDeck')
+    jest.spyOn(Scryfall, 'hasDedicatedLandSection').mockResolvedValue(false)
     jest.spyOn(Scryfall, 'addCard')
     jest.spyOn(Scryfall, 'updateEntry')
     jest.spyOn(Scryfall, 'removeEntry')
@@ -137,8 +138,9 @@ describe('set up listeners on Scryfall page', function () {
       expect(Scryfall.addCard.mock.calls[0][0]).toBe('id-1')
     })
 
-    it('updates lands to be put in lands section', function () {
+    it('updates lands to be put in lands section if deck has dedicated lands section', function () {
       cardData.isLand = true
+      Scryfall.hasDedicatedLandSection.mockResolvedValue(true)
 
       setUpListeners('active-deck-id')
 
@@ -146,6 +148,17 @@ describe('set up listeners on Scryfall page', function () {
         expect(Scryfall.updateEntry.mock.calls.length).toBe(1)
         expect(scryfallCard.section).toBe('lands')
         expect(Scryfall.updateEntry.mock.calls[0][0]).toBe(scryfallCard)
+      })
+    })
+
+    it('does not update lands to be put in lands section if deck does not have dedicated lands section', function () {
+      cardData.isLand = true
+      Scryfall.hasDedicatedLandSection.mockResolvedValue(false)
+
+      setUpListeners('active-deck-id')
+
+      return wait().then(() => {
+        expect(Scryfall.updateEntry.mock.calls.length).toBe(0)
       })
     })
 

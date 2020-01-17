@@ -20,10 +20,16 @@ export default function setUpListeners () {
     cardId,
     isLand
   }) {
+    // adds card if it does not exist and increments
+    // the card if it already exists
     Scryfall.addCard(cardId).then(function (addedCardInfo) {
       if (isLand) {
-        addedCardInfo.section = 'lands'
-        Scryfall.updateEntry(addedCardInfo)
+        Scryfall.hasDedicatedLandSection().then(hasLandSection => {
+          if (hasLandSection) {
+            addedCardInfo.section = 'lands'
+            Scryfall.updateEntry(addedCardInfo)
+          }
+        })
       }
       Scryfall.pushNotification('Card Added', `Added ${cardName}.`, 'purple', 'deck')
     })
