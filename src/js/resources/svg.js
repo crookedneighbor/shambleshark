@@ -5,6 +5,12 @@ export const PLUS_SYMBOL = `
   </svg>
 `
 
+export const MINUS_SYMBOL = `
+  <svg aria-hidden="true" focusable="false" class="svg-plus-symbol" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30">
+    <path d="m15,0c-8.284,0 -15,6.716 -15,15s6.716,15 15,15s15,-6.716 15,-15s-6.716,-15 -15,-15zm0,28c-7.18,0 -13,-5.82 -13,-13s5.82,-13 13,-13s13,5.82 13,13s-5.82,13 -13,13zm-1,-14l-8,0l0,2l8,0l2,0l8,0l0,-2l-8,0l-2,0z" fill="#FFF"/>
+  </svg>
+`
+
 export const CHECK_SYMBOL = `
   <svg aria-hidden="true" focusable="false" class="svg-check-symbol" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
     <path d="M413.505 91.951L133.49 371.966l-98.995-98.995c-4.686-4.686-12.284-4.686-16.971 0L6.211 284.284c-4.686 4.686-4.686 12.284 0 16.971l118.794 118.794c4.686 4.686 12.284 4.686 16.971 0l299.813-299.813c4.686-4.686 4.686-12.284 0-16.971l-11.314-11.314c-4.686-4.686-12.284-4.686-16.97 0z" fill="#FFF"></path>
