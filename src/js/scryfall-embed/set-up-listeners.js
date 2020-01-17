@@ -53,9 +53,12 @@ export default function setUpListeners () {
         })
       }, false)
 
-      return cardToRemove.id
-    }).then((cardId) => {
-      return Scryfall.removeEntry(cardId)
+      if (cardToRemove.count <= 1) {
+        return Scryfall.removeEntry(cardToRemove.id)
+      } else {
+        cardToRemove.count--
+        return Scryfall.updateEntry(cardToRemove)
+      }
     }).then(() => {
       Scryfall.pushNotification('Card Removed', `Removed ${cardName}.`, 'purple', 'deck')
     })

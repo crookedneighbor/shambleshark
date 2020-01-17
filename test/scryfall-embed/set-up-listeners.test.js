@@ -10,8 +10,8 @@ describe('set up listeners on Scryfall page', function () {
     jest.spyOn(Scryfall, 'getDeck')
     jest.spyOn(Scryfall, 'hasDedicatedLandSection').mockResolvedValue(false)
     jest.spyOn(Scryfall, 'addCard')
-    jest.spyOn(Scryfall, 'updateEntry')
-    jest.spyOn(Scryfall, 'removeEntry')
+    jest.spyOn(Scryfall, 'updateEntry').mockResolvedValue()
+    jest.spyOn(Scryfall, 'removeEntry').mockResolvedValue()
     jest.spyOn(Scryfall, 'pushNotification').mockImplementation()
     jest.spyOn(Scryfall, 'cleanUp').mockImplementation()
   })
@@ -181,8 +181,10 @@ describe('set up listeners on Scryfall page', function () {
   })
 
   describe('REMOVE_CARD_FROM_DECK', function () {
+    let cardData
+
     beforeEach(function () {
-      const cardData = {
+      cardData = {
         cardName: 'Rashmi, Etrnities Crafter'
       }
       bus.on.mockImplementation((event, cb) => {
@@ -194,6 +196,7 @@ describe('set up listeners on Scryfall page', function () {
         entries: {
           commanders: [{
             id: 'rashmi-id',
+            count: 1,
             card_digest: {
               name: 'Rashmi, Etrnities Crafter'
             }
@@ -202,22 +205,40 @@ describe('set up listeners on Scryfall page', function () {
           }],
           nonlands: [{
             id: 'birds-id',
+            count: 2,
             card_digest: {
               name: 'Birds of Paradise'
             }
           }]
         }
       })
-      Scryfall.removeEntry.mockResolvedValue()
     })
 
-    it('removes card from deck', async function () {
+    it('removes card from deck if there was only 1 left', async function () {
       setUpListeners('active-deck-id')
 
       await wait(5)
 
       expect(Scryfall.removeEntry).toBeCalledTimes(1)
       expect(Scryfall.removeEntry).toBeCalledWith('rashmi-id')
+    })
+
+    it('decrements count if card has more than 1 entry', async function () {
+      cardData.cardName = 'Birds of Paradise'
+
+      setUpListeners('active-deck-id')
+
+      await wait(5)
+
+      expect(Scryfall.removeEntry).toBeCalledTimes(0)
+      expect(Scryfall.updateEntry).toBeCalledTimes(1)
+      expect(Scryfall.updateEntry).toBeCalledWith({
+        id: 'birds-id',
+        count: 1,
+        card_digest: {
+          name: 'Birds of Paradise'
+        }
+      })
     })
 
     it('sends a push notification', async function () {
