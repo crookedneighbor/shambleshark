@@ -1,4 +1,18 @@
 let getActiveDeckPromise = null
+let getDeckMetadataPromise = null
+
+function getDeckMetadata () {
+  if (!getDeckMetadataPromise) {
+    getDeckMetadataPromise = getDeck().then(deck => {
+      return {
+        id: deck.id,
+        sections: deck.sections,
+      }
+    })
+  }
+
+  return getDeckMetadataPromise
+}
 
 export function getActiveDeckId () {
   if (Scryfall.deckbuilder && Scryfall.deckbuilder.deckId) {
@@ -6,6 +20,14 @@ export function getActiveDeckId () {
   }
 
   return getActiveDeck().then(({ id }) => id)
+}
+
+export function hasDedicatedLandSection () {
+  return getDeckMetadata().then(meta => {
+    return Object.keys(meta.sections).find(kind => {
+      return meta.sections[kind].find(name => name === 'lands')
+    })
+  }).then(res => Boolean(res))
 }
 
 export function getActiveDeck () {
@@ -20,8 +42,9 @@ export function getActiveDeck () {
   return getActiveDeckPromise
 }
 
-export function resetActiveDeck () {
+export function reset () {
   getActiveDeckPromise = null
+  getDeckMetadataPromise = null
 }
 
 export function getDeck () {
@@ -80,6 +103,7 @@ export default {
   addCard,
   cleanUp,
   getDeck,
+  hasDedicatedLandSection,
   removeEntry,
   updateEntry,
   pushNotification

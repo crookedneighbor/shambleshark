@@ -1,18 +1,26 @@
 import {
+  reset,
   addCard,
   cleanUp,
   getActiveDeck,
   getActiveDeckId,
   getDeck,
+  hasDedicatedLandSection,
   removeEntry,
   updateEntry,
   pushNotification
 } from '../../src/js/scryfall-embed/scryfall-globals'
 
 describe('Scryfall Globals', function () {
+  let fakeDeck
+
   beforeEach(function () {
-    const fakeDeck = {
-      id: 'deck-id'
+    fakeDeck = {
+      id: 'deck-id',
+      sections: {
+        primary: ['mainboard'],
+        secondary: ['sideboard', 'maybeboard']
+      }
     }
     global.ScryfallAPI = {
       decks: {
@@ -21,7 +29,9 @@ describe('Scryfall Globals', function () {
         }),
         addCard: jest.fn(),
         destroyEntry: jest.fn(),
-        get: jest.fn(),
+        get: jest.fn().mockImplementation((id, cb) => {
+          cb(fakeDeck)
+        }),
         updateEntry: jest.fn()
       }
     }
@@ -47,6 +57,36 @@ describe('Scryfall Globals', function () {
       return getActiveDeckId().then((id) => {
         expect(id).toBe('deck-id-from-window')
         expect(global.ScryfallAPI.decks.active).not.toBeCalled()
+      })
+    })
+  })
+
+  describe('hasDedicatedLandSection', function () {
+    beforeEach(function () {
+      reset()
+    })
+
+    it('resolves with false if deck does not have a lands section', function () {
+      return hasDedicatedLandSection().then(res => {
+        expect(res).toBe(false)
+      })
+    })
+
+    it('resolves with false if deck does not have a lands section', function () {
+      fakeDeck.sections.secondary.push('lands')
+
+      return hasDedicatedLandSection().then(res => {
+        expect(res).toBe(true)
+      })
+    })
+
+    it('catches result after first run to avoid multiple api calls', function () {
+      return hasDedicatedLandSection().then(res => {
+        expect(global.ScryfallAPI.decks.get).toBeCalledTimes(1)
+
+        return hasDedicatedLandSection()
+      }).then(res => {
+        expect(global.ScryfallAPI.decks.get).toBeCalledTimes(1)
       })
     })
   })
