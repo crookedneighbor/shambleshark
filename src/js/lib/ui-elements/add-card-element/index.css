@@ -24,17 +24,50 @@
   left: 0;
   right: 0;
   background: #2B253A;
-  opacity: .8;
+  opacity: 0;
   color: white;
   font-size: 80px;
-  padding-top: 90px;
+  padding-top: 10px;
   border-radius: 10px;
+}
+
+.add-card-element-overlay .metadata {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  color: white;
+  font-size: 15px;
+  text-align: right;
+}
+
+.add-card-element-container.in-deck .add-card-element-overlay {
+  opacity: .65;
+}
+
+.add-card-element-overlay:hover,
+.add-card-element-overlay:focus-within,
+.add-card-element-container.in-deck .add-card-element-overlay:hover,
+.add-card-element-container.in-deck .add-card-element-overlay:focus-within {
+  opacity: .85;
+}
+
+.add-card-element__panel {
+  opacity: .5;
+  height: 50%;
+}
+
+.add-card-element__panel.hidden {
   display: none;
 }
 
-.add-card-element-container:hover .add-card-element-overlay,
-.add-card-element-container:focus .add-card-element-overlay,
-.add-card-element-container.in-deck .add-card-element-overlay {
-  display: block;
+.add-card-element__panel.solo svg {
+  padding-top: 90px;
 }
 
+.add-card-element__panel:hover,
+.add-card-element__panel:focus {
+  opacity: 1;
+}
+.add-card-element__panel svg {
+  padding-top: 20px;
+}

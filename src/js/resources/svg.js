@@ -7,7 +7,7 @@ export const PLUS_SYMBOL = `
 
 export const MINUS_SYMBOL = `
   <svg aria-hidden="true" focusable="false" class="svg-plus-symbol" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30">
-    <path d="m15,0c-8.284,0 -15,6.716 -15,15s6.716,15 15,15s15,-6.716 15,-15s-6.716,-15 -15,-15zm0,28c-7.18,0 -13,-5.82 -13,-13s5.82,-13 13,-13s13,5.82 13,13s-5.82,13 -13,13zm-1,-14l-8,0l0,2l8,0l2,0l8,0l0,-2l-8,0l-2,0z" fill="#FFF"/>
+    <path d="m15,0c-8.284,0 -15,6.716 -15,15s6.716,15 15,15s15,-6.716 15,-15s-6.716,-15 -15,-15zm0,28c-7.18,0 -13,-5.82 -13,-13s5.82,-13 13,-13s13,5.82 13,13s-5.82,13 -13,13zm-1,-14l-8,0l0,2l8,0l2,0l8,0l0,-2l-8,0l-2,0z" fill="#FFF"></path>
   </svg>
 `
 

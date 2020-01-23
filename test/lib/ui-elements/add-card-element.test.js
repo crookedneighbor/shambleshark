@@ -2,6 +2,7 @@ import bus from 'framebus'
 import AddCardElement from '../../../src/js/lib/ui-elements/add-card-element'
 import {
   CHECK_SYMBOL,
+  MINUS_SYMBOL,
   PLUS_SYMBOL
 } from '../../../src/js/resources/svg'
 
@@ -18,27 +19,24 @@ describe('AddCardElement', function () {
       img: 'https://example.com/arcane-signet'
     })
 
-    expect(cardEl.cardInDeck).toBe(false)
-    expect(cardEl.img.alt).toBe('Add Arcane Denial to deck.')
-    expect(cardEl.overlay.innerHTML).toContain(PLUS_SYMBOL)
+    expect(cardEl.cardInDeck()).toBe(false)
+    expect(cardEl.element.classList.contains('in-deck')).toBe(false)
   })
 
-  it('can set card in deck status to true', async function () {
+  it('can set card in deck status to true when quantity is greater than 0', async function () {
     const cardEl = new AddCardElement({
       name: 'Arcane Denial',
       id: 'arcane-denial-id',
-      cardInDeck: true,
+      quantity: 1,
       type: 'Instant',
       img: 'https://example.com/arcane-signet'
     })
 
-    expect(cardEl.cardInDeck).toBe(true)
-    expect(cardEl.img.alt).toBe('Remove Arcane Denial from deck.')
-    expect(cardEl.overlay.innerHTML).not.toContain(PLUS_SYMBOL)
-    expect(cardEl.overlay.innerHTML).toContain(CHECK_SYMBOL)
+    expect(cardEl.cardInDeck()).toBe(true)
+    expect(cardEl.element.classList.contains('in-deck')).toBe(true)
   })
 
-  it('calls toggleCardState when clicked', async function () {
+  it('defaults to having the minus button be hidden', async function () {
     const cardEl = new AddCardElement({
       name: 'Arcane Denial',
       id: 'arcane-denial-id',
@@ -46,18 +44,64 @@ describe('AddCardElement', function () {
       img: 'https://example.com/arcane-signet'
     })
 
-    jest.spyOn(cardEl, 'toggleCardState').mockImplementation()
-
-    cardEl.element.click()
-
-    expect(cardEl.toggleCardState).toBeCalledTimes(1)
-
-    cardEl.element.click()
-
-    expect(cardEl.toggleCardState).toBeCalledTimes(2)
+    expect(cardEl.plusButton.classList.contains('solo')).toBe(true)
+    expect(cardEl.minusButton.classList.contains('hidden')).toBe(true)
   })
 
-  it('calls toggleCardState when pressing enter while focussed', async function () {
+  it('shows the minus button if quantity > 0', async function () {
+    const cardEl = new AddCardElement({
+      name: 'Arcane Denial',
+      quantity: 1,
+      id: 'arcane-denial-id',
+      type: 'Instant',
+      img: 'https://example.com/arcane-signet'
+    })
+
+    expect(cardEl.plusButton.classList.contains('solo')).toBe(false)
+    expect(cardEl.minusButton.classList.contains('hidden')).toBe(false)
+  })
+
+  it('sets minus button to use check symbol when in singleton mode', async function () {
+    const cardElInNormalMode = new AddCardElement({
+      name: 'Arcane Denial',
+      id: 'arcane-denial-id',
+      type: 'Instant',
+      img: 'https://example.com/arcane-signet'
+    })
+    const cardElInSingletonMode = new AddCardElement({
+      name: 'Arcane Denial',
+      singleton: true,
+      id: 'arcane-denial-id',
+      type: 'Instant',
+      img: 'https://example.com/arcane-signet'
+    })
+
+    expect(cardElInNormalMode.minusButton.innerHTML).toContain(MINUS_SYMBOL)
+    expect(cardElInNormalMode.minusButton.innerHTML).not.toContain(CHECK_SYMBOL)
+    expect(cardElInSingletonMode.minusButton.innerHTML).toContain(CHECK_SYMBOL)
+    expect(cardElInSingletonMode.minusButton.innerHTML).not.toContain(MINUS_SYMBOL)
+  })
+
+  it('calls addCardToDeck when plus button is clicked', async function () {
+    const cardEl = new AddCardElement({
+      name: 'Arcane Denial',
+      id: 'arcane-denial-id',
+      type: 'Instant',
+      img: 'https://example.com/arcane-signet'
+    })
+
+    jest.spyOn(cardEl, 'addCardToDeck').mockImplementation()
+
+    cardEl.plusButton.click()
+
+    expect(cardEl.addCardToDeck).toBeCalledTimes(1)
+
+    cardEl.plusButton.click()
+
+    expect(cardEl.addCardToDeck).toBeCalledTimes(2)
+  })
+
+  it('calls addCardToDeck when pressing enter while plus button is focussed', async function () {
     const cardEl = new AddCardElement({
       name: 'Arcane Denial',
       id: 'arcane-denial-id',
@@ -70,19 +114,312 @@ describe('AddCardElement', function () {
       which: 13
     })
 
-    jest.spyOn(cardEl, 'toggleCardState').mockImplementation()
+    jest.spyOn(cardEl, 'addCardToDeck').mockImplementation()
 
-    // does not do anything if element is not the focus
-    document.dispatchEvent(evt)
-    expect(cardEl.toggleCardState).toBeCalledTimes(0)
+    expect(cardEl.addCardToDeck).toBeCalledTimes(0)
 
-    cardEl.element.dispatchEvent(evt)
+    cardEl.plusButton.dispatchEvent(evt)
 
-    expect(cardEl.toggleCardState).toBeCalledTimes(1)
+    expect(cardEl.addCardToDeck).toBeCalledTimes(1)
 
-    cardEl.element.dispatchEvent(evt)
+    cardEl.plusButton.dispatchEvent(evt)
 
-    expect(cardEl.toggleCardState).toBeCalledTimes(2)
+    expect(cardEl.addCardToDeck).toBeCalledTimes(2)
+  })
+
+  it('calls removeCardFromDeck when minus button is clicked', async function () {
+    const cardEl = new AddCardElement({
+      name: 'Arcane Denial',
+      id: 'arcane-denial-id',
+      type: 'Instant',
+      img: 'https://example.com/arcane-signet'
+    })
+
+    jest.spyOn(cardEl, 'removeCardFromDeck').mockImplementation()
+
+    cardEl.minusButton.click()
+
+    expect(cardEl.removeCardFromDeck).toBeCalledTimes(1)
+
+    cardEl.minusButton.click()
+
+    expect(cardEl.removeCardFromDeck).toBeCalledTimes(2)
+  })
+
+  it('calls removeCardFromDeck when pressing enter while minus button is focussed', async function () {
+    const cardEl = new AddCardElement({
+      name: 'Arcane Denial',
+      quantity: 3,
+      id: 'arcane-denial-id',
+      type: 'Instant',
+      img: 'https://example.com/arcane-signet'
+    })
+    const evt = new global.KeyboardEvent('keydown', {
+      key: 'Enter',
+      keyCode: 13,
+      which: 13
+    })
+
+    jest.spyOn(cardEl, 'removeCardFromDeck').mockImplementation()
+
+    expect(cardEl.removeCardFromDeck).toBeCalledTimes(0)
+
+    cardEl.minusButton.dispatchEvent(evt)
+
+    expect(cardEl.removeCardFromDeck).toBeCalledTimes(1)
+
+    cardEl.minusButton.dispatchEvent(evt)
+
+    expect(cardEl.removeCardFromDeck).toBeCalledTimes(2)
+  })
+
+  it('focuses on plus button when last card is removed from deck using the keyboard', async function () {
+    const cardEl = new AddCardElement({
+      name: 'Arcane Denial',
+      quantity: 0,
+      id: 'arcane-denial-id',
+      type: 'Instant',
+      img: 'https://example.com/arcane-signet'
+    })
+    const evt = new global.KeyboardEvent('keydown', {
+      key: 'Enter',
+      keyCode: 13,
+      which: 13
+    })
+
+    jest.spyOn(cardEl.plusButton, 'focus').mockImplementation()
+    jest.spyOn(cardEl, 'removeCardFromDeck').mockImplementation()
+
+    expect(cardEl.plusButton.focus).toBeCalledTimes(0)
+
+    cardEl.minusButton.dispatchEvent(evt)
+
+    expect(cardEl.plusButton.focus).toBeCalledTimes(1)
+  })
+
+  it('does not focus on plus button when cards remain in deck when being removed using the keyboard', async function () {
+    const cardEl = new AddCardElement({
+      name: 'Arcane Denial',
+      quantity: 2,
+      id: 'arcane-denial-id',
+      type: 'Instant',
+      img: 'https://example.com/arcane-signet'
+    })
+    const evt = new global.KeyboardEvent('keydown', {
+      key: 'Enter',
+      keyCode: 13,
+      which: 13
+    })
+
+    jest.spyOn(cardEl.plusButton, 'focus').mockImplementation()
+    jest.spyOn(cardEl, 'removeCardFromDeck').mockImplementation()
+
+    expect(cardEl.plusButton.focus).toBeCalledTimes(0)
+
+    cardEl.minusButton.dispatchEvent(evt)
+
+    expect(cardEl.plusButton.focus).toBeCalledTimes(0)
+  })
+
+  describe('setMetadata', function () {
+    it('sets metadata to quantity when there is a quantity and no value is passed in', function () {
+      const cardEl = new AddCardElement({
+        name: 'Arcane Denial',
+        quantity: 2,
+        id: 'arcane-denial-id',
+        type: 'Instant',
+        img: 'https://example.com/arcane-signet'
+      })
+
+      cardEl.quantity = 3
+
+      cardEl.setMetadata()
+
+      expect(cardEl.metadata.innerHTML).toBe('3x')
+    })
+
+    it('sets metadata to empty when in singleton mode', function () {
+      const cardEl = new AddCardElement({
+        name: 'Arcane Denial',
+        singleton: true,
+        quantity: 1,
+        id: 'arcane-denial-id',
+        type: 'Instant',
+        img: 'https://example.com/arcane-signet'
+      })
+
+      cardEl.setMetadata()
+
+      expect(cardEl.metadata.innerHTML).toBe('')
+    })
+
+    it('sets metadata to empty when quantity is 0 and no value is passed in', function () {
+      const cardEl = new AddCardElement({
+        name: 'Arcane Denial',
+        quantity: 2,
+        id: 'arcane-denial-id',
+        type: 'Instant',
+        img: 'https://example.com/arcane-signet'
+      })
+
+      cardEl.quantity = 0
+
+      cardEl.setMetadata()
+
+      expect(cardEl.metadata.innerHTML).toBe('')
+    })
+
+    it('sets metadata to value when value is passed in', function () {
+      const cardEl = new AddCardElement({
+        name: 'Arcane Denial',
+        quantity: 2,
+        id: 'arcane-denial-id',
+        type: 'Instant',
+        img: 'https://example.com/arcane-signet'
+      })
+
+      cardEl.setMetadata('custom message')
+
+      expect(cardEl.metadata.innerHTML).toBe('custom message')
+    })
+  })
+
+  describe('updateUI', function () {
+    it('sets the state for card not being in deck', function () {
+      const cardEl = new AddCardElement({
+        name: 'Arcane Denial',
+        id: 'arcane-denial-id',
+        quantity: 1,
+        type: 'Instant',
+        img: 'https://example.com/arcane-signet'
+      })
+
+      jest.spyOn(cardEl, 'setMetadata')
+
+      expect(cardEl.minusButton.classList.contains('hidden')).toBe(false)
+      expect(cardEl.plusButton.classList.contains('solo')).toBe(false)
+      expect(cardEl.plusButton.classList.contains('hidden')).toBe(false)
+      expect(cardEl.element.classList.contains('in-deck')).toBe(true)
+
+      cardEl.quantity = 0
+
+      cardEl.updateUI()
+
+      expect(cardEl.setMetadata).toBeCalledTimes(1)
+      expect(cardEl.minusButton.classList.contains('hidden')).toBe(true)
+      expect(cardEl.plusButton.classList.contains('solo')).toBe(true)
+      expect(cardEl.plusButton.classList.contains('hidden')).toBe(false)
+      expect(cardEl.element.classList.contains('in-deck')).toBe(false)
+    })
+
+    it('sets the state for card being in deck', function () {
+      const cardEl = new AddCardElement({
+        name: 'Arcane Denial',
+        id: 'arcane-denial-id',
+        quantity: 0,
+        type: 'Instant',
+        img: 'https://example.com/arcane-signet'
+      })
+
+      jest.spyOn(cardEl, 'setMetadata')
+
+      expect(cardEl.minusButton.classList.contains('hidden')).toBe(true)
+      expect(cardEl.plusButton.classList.contains('solo')).toBe(true)
+      expect(cardEl.plusButton.classList.contains('hidden')).toBe(false)
+      expect(cardEl.element.classList.contains('in-deck')).toBe(false)
+
+      cardEl.quantity = 1
+
+      cardEl.updateUI()
+
+      expect(cardEl.setMetadata).toBeCalledTimes(1)
+      expect(cardEl.minusButton.classList.contains('hidden')).toBe(false)
+      expect(cardEl.plusButton.classList.contains('solo')).toBe(false)
+      expect(cardEl.plusButton.classList.contains('hidden')).toBe(false)
+      expect(cardEl.element.classList.contains('in-deck')).toBe(true)
+    })
+
+    it('sets the state for card not being in deck in singleton mode', function () {
+      const cardEl = new AddCardElement({
+        name: 'Arcane Denial',
+        id: 'arcane-denial-id',
+        singleton: true,
+        quantity: 1,
+        type: 'Instant',
+        img: 'https://example.com/arcane-signet'
+      })
+
+      jest.spyOn(cardEl, 'setMetadata')
+
+      expect(cardEl.minusButton.classList.contains('hidden')).toBe(false)
+      expect(cardEl.plusButton.classList.contains('solo')).toBe(false)
+      expect(cardEl.plusButton.classList.contains('hidden')).toBe(true)
+      expect(cardEl.element.classList.contains('in-deck')).toBe(true)
+
+      cardEl.quantity = 0
+
+      cardEl.updateUI()
+
+      expect(cardEl.setMetadata).toBeCalledTimes(1)
+      expect(cardEl.minusButton.classList.contains('hidden')).toBe(true)
+      expect(cardEl.plusButton.classList.contains('solo')).toBe(true)
+      expect(cardEl.plusButton.classList.contains('hidden')).toBe(false)
+      expect(cardEl.element.classList.contains('in-deck')).toBe(false)
+    })
+
+    it('sets the state for card being in deck in singleton mode', function () {
+      const cardEl = new AddCardElement({
+        name: 'Arcane Denial',
+        id: 'arcane-denial-id',
+        singleton: true,
+        quantity: 0,
+        type: 'Instant',
+        img: 'https://example.com/arcane-signet'
+      })
+
+      jest.spyOn(cardEl, 'setMetadata')
+
+      expect(cardEl.minusButton.classList.contains('hidden')).toBe(true)
+      expect(cardEl.plusButton.classList.contains('solo')).toBe(true)
+      expect(cardEl.plusButton.classList.contains('hidden')).toBe(false)
+      expect(cardEl.element.classList.contains('in-deck')).toBe(false)
+
+      cardEl.quantity = 1
+
+      cardEl.updateUI()
+
+      expect(cardEl.setMetadata).toBeCalledTimes(1)
+      expect(cardEl.minusButton.classList.contains('hidden')).toBe(false)
+      expect(cardEl.plusButton.classList.contains('solo')).toBe(false)
+      expect(cardEl.plusButton.classList.contains('hidden')).toBe(true)
+      expect(cardEl.element.classList.contains('in-deck')).toBe(true)
+    })
+  })
+
+  describe('cardInDeck', function () {
+    it('returns true when quantity is greater than zero', function () {
+      const cardEl = new AddCardElement({
+        name: 'Arcane Denial',
+        id: 'arcane-denial-id',
+        quantity: 1,
+        type: 'Instant',
+        img: 'https://example.com/arcane-signet'
+      })
+
+      expect(cardEl.cardInDeck()).toBe(true)
+    })
+
+    it('returns false when quantity is zero', function () {
+      const cardEl = new AddCardElement({
+        name: 'Arcane Denial',
+        id: 'arcane-denial-id',
+        quantity: 0,
+        type: 'Instant',
+        img: 'https://example.com/arcane-signet'
+      })
+
+      expect(cardEl.cardInDeck()).toBe(false)
+    })
   })
 
   describe('addCardToDeck', function () {
@@ -128,15 +465,11 @@ describe('AddCardElement', function () {
         img: 'https://example.com/arcane-signet'
       })
 
-      expect(cardEl.element.classList.contains('in-deck')).toBe(false)
-      expect(cardEl.img.alt).not.toBe('Arcane Denial added to deck.')
-      expect(cardEl.overlay.innerHTML).not.toContain(CHECK_SYMBOL)
+      jest.spyOn(cardEl, 'updateUI')
 
       await cardEl.addCardToDeck()
 
-      expect(cardEl.element.classList.contains('in-deck')).toBe(true)
-      expect(cardEl.img.alt).toBe('Arcane Denial added to deck.')
-      expect(cardEl.overlay.innerHTML).toContain(CHECK_SYMBOL)
+      expect(cardEl.updateUI).toBeCalledTimes(1)
     })
 
     it('can pass a custom getScryfallId function', async function () {
@@ -182,9 +515,8 @@ describe('AddCardElement', function () {
         color: 'red'
       })
 
-      expect(cardEl.img.alt).toBe('Error adding Arcane Denial to deck.')
       expect(console.error).toBeCalledWith(errFromScryfall)
-      expect(cardEl.cardInDeck).toBe(false)
+      expect(cardEl.cardInDeck()).toBe(false)
       expect(cardEl.element.classList.contains('in-deck')).toBe(false)
       expect(cardEl.overlay.innerHTML).toContain(PLUS_SYMBOL)
     })
@@ -206,9 +538,24 @@ describe('AddCardElement', function () {
       })
     })
 
-    it('sets card element state to removed', async function () {
+    it('decrements quantity', function () {
       const cardEl = new AddCardElement({
         name: 'Arcane Denial',
+        quantity: 10,
+        id: 'arcane-denial-id',
+        type: 'Instant',
+        img: 'https://example.com/arcane-signet'
+      })
+
+      cardEl.removeCardFromDeck()
+
+      expect(cardEl.quantity).toBe(9)
+    })
+
+    it('updates ui', async function () {
+      const cardEl = new AddCardElement({
+        name: 'Arcane Denial',
+        singleton: true,
         id: 'arcane-denial-id',
         type: 'Instant',
         img: 'https://example.com/arcane-signet'
@@ -216,55 +563,11 @@ describe('AddCardElement', function () {
 
       await cardEl.addCardToDeck()
 
-      expect(cardEl.img.alt).not.toBe('Arcane Denial removed from deck.')
-      expect(cardEl.element.classList.contains('in-deck')).toBe(true)
-      expect(cardEl.overlay.innerHTML).not.toContain(PLUS_SYMBOL)
+      jest.spyOn(cardEl, 'updateUI')
 
       cardEl.removeCardFromDeck()
 
-      expect(cardEl.img.alt).toBe('Arcane Denial removed from deck.')
-      expect(cardEl.element.classList.contains('in-deck')).toBe(false)
-      expect(cardEl.overlay.innerHTML).toContain(PLUS_SYMBOL)
-    })
-  })
-
-  describe('toggleCardState', function () {
-    it('adds card to deck if card is not already in deck', function () {
-      const cardEl = new AddCardElement({
-        name: 'Arcane Denial',
-        id: 'arcane-denial-id',
-        type: 'Instant',
-        img: 'https://example.com/arcane-signet'
-      })
-
-      expect(cardEl.cardInDeck).toBe(false)
-
-      jest.spyOn(cardEl, 'addCardToDeck').mockImplementation()
-      jest.spyOn(cardEl, 'removeCardFromDeck').mockImplementation()
-
-      cardEl.toggleCardState()
-
-      expect(cardEl.addCardToDeck).toBeCalledTimes(1)
-      expect(cardEl.removeCardFromDeck).toBeCalledTimes(0)
-    })
-
-    it('removes card from deck if card is already in deck', function () {
-      const cardEl = new AddCardElement({
-        name: 'Arcane Denial',
-        id: 'arcane-denial-id',
-        type: 'Instant',
-        img: 'https://example.com/arcane-signet'
-      })
-
-      cardEl.cardInDeck = true
-
-      jest.spyOn(cardEl, 'addCardToDeck').mockImplementation()
-      jest.spyOn(cardEl, 'removeCardFromDeck').mockImplementation()
-
-      cardEl.toggleCardState()
-
-      expect(cardEl.removeCardFromDeck).toBeCalledTimes(1)
-      expect(cardEl.addCardToDeck).toBeCalledTimes(0)
+      expect(cardEl.updateUI).toBeCalledTimes(1)
     })
   })
 })

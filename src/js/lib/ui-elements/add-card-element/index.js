@@ -1,6 +1,7 @@
 import bus from 'framebus'
 import {
   CHECK_SYMBOL,
+  MINUS_SYMBOL,
   PLUS_SYMBOL
 } from '../../../resources/svg'
 import './index.css'
@@ -8,11 +9,13 @@ import './index.css'
 export default class AddCardElement {
   constructor (options = {}) {
     this.element = document.createElement('div')
-    this.cardInDeck = Boolean(options.cardInDeck)
+    this.quantity = options.quantity || 0
     this.id = options.id
     this.name = options.name
     this.img = options.img
     this.type = options.type
+    this.singleton = Boolean(options.singleton)
+
     if (options.getScryfallId) {
       this._getScryfallId = options.getScryfallId
     } else {
@@ -22,47 +25,108 @@ export default class AddCardElement {
     }
 
     this.element.classList.add('add-card-element-container')
-    this.element.setAttribute('role', 'button')
-    this.element.setAttribute('tabindex', '0')
-    this.element.setAttribute('aria-pressed', 'false')
 
     this.element.innerHTML = `
       <img src="${this.img}"/>
-      <div class="add-card-element-overlay"></div>
+      <div class="add-card-element-overlay">
+        <div role="button" tabindex="0" class="add-card-element__panel minus-symbol">
+          ${MINUS_SYMBOL}
+        </div>
+        <div role="button" tabindex="0" class="add-card-element__panel plus-symbol">
+          ${PLUS_SYMBOL}
+        </div>
+        <div class="metadata"></div>
+      </div>
       `
     this.img = this.element.querySelector('img')
     this.overlay = this.element.querySelector('.add-card-element-overlay')
+    this.minusButton = this.overlay.querySelector('.minus-symbol')
+    this.plusButton = this.overlay.querySelector('.plus-symbol')
+    this.metadata = this.overlay.querySelector('.metadata')
 
-    this.img.alt = this.cardInDeck ? `Remove ${this.name} from deck.` : `Add ${this.name} to deck.`
-    this.overlay.innerHTML = this.cardInDeck ? CHECK_SYMBOL : PLUS_SYMBOL
+    if (this.singleton) {
+      this.minusButton.innerHTML = CHECK_SYMBOL
+      this.minusButton.classList.add('solo')
+      this.plusButton.classList.add('solo')
+    }
 
-    this.element.addEventListener('blur', () => {
-      if (this.cardInDeck) {
-        this.img.alt = `Remove ${this.name} from deck`
-      } else {
-        this.img.alt = `Add ${this.name} to deck`
+    this.updateUI()
+
+    this._setupListeners()
+  }
+
+  _setupListeners () {
+    this.plusButton.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter') {
+        return
+      }
+
+      this.addCardToDeck()
+    })
+
+    this.plusButton.addEventListener('click', () => {
+      this.addCardToDeck()
+    })
+
+    this.minusButton.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter') {
+        return
+      }
+
+      this.removeCardFromDeck()
+
+      if (!this.cardInDeck()) {
+        this.plusButton.focus()
       }
     })
 
-    this.element.addEventListener('keydown', (event) => {
-      if (event.key === 'Enter') {
-        this.toggleCardState()
+    this.minusButton.addEventListener('click', () => {
+      this.removeCardFromDeck()
+
+      if (!this.cardInDeck()) {
+        this.minusButton.blur()
       }
-    })
-
-    this.element.addEventListener('click', () => {
-      this.toggleCardState()
-
-      this.element.blur()
     })
   }
 
-  addCardToDeck () {
-    this.element.setAttribute('aria-pressed', 'true')
+  setMetadata (value) {
+    if (value) {
+      this.metadata.innerHTML = value
+      return
+    }
 
-    this.element.classList.add('in-deck')
-    this.img.alt = `${this.name} added to deck.`
-    this.overlay.innerHTML = CHECK_SYMBOL
+    if (this.singleton) {
+      return
+    }
+
+    if (!this.cardInDeck()) {
+      this.metadata.innerHTML = ''
+    } else {
+      this.metadata.innerHTML = this.quantity + 'x'
+    }
+  }
+
+  updateUI () {
+    this.minusButton.classList.toggle('hidden', !this.cardInDeck())
+    this.plusButton.classList.toggle('solo', !this.cardInDeck())
+
+    this.setMetadata()
+
+    if (this.singleton) {
+      this.plusButton.classList.toggle('hidden', this.cardInDeck())
+    }
+
+    this.element.classList.toggle('in-deck', this.cardInDeck())
+  }
+
+  cardInDeck () {
+    return this.quantity > 0
+  }
+
+  addCardToDeck () {
+    this.quantity++
+
+    this.updateUI()
 
     return this._getScryfallId().then(id => {
       bus.emit('ADD_CARD_TO_DECK', {
@@ -71,6 +135,8 @@ export default class AddCardElement {
         isLand: this.type.toLowerCase().indexOf('land') > -1
       })
     }).catch(err => {
+      this.quantity--
+
       console.error(err)
 
       bus.emit('SCRYFALL_PUSH_NOTIFICATION', {
@@ -79,32 +145,17 @@ export default class AddCardElement {
         color: 'red'
       })
 
-      this.img.alt = `Error adding ${this.name} to deck.`
-      this.element.classList.remove('in-deck')
-      this.overlay.innerHTML = PLUS_SYMBOL
-      this.cardInDeck = false
+      this.updateUI()
     })
   }
 
   removeCardFromDeck () {
-    this.img.alt = `${this.name} removed from deck.`
-    this.element.classList.remove('in-deck')
-    this.overlay.innerHTML = PLUS_SYMBOL
+    this.quantity--
 
-    this.element.setAttribute('aria-pressed', 'false')
+    this.updateUI()
+
     bus.emit('REMOVE_CARD_FROM_DECK', {
       cardName: this.name
     })
-  }
-
-  // TODO: disable while update in progress?
-  toggleCardState () {
-    this.cardInDeck = !this.cardInDeck
-
-    if (this.cardInDeck) {
-      this.addCardToDeck()
-    } else {
-      this.removeCardFromDeck()
-    }
   }
 }

@@ -222,6 +222,7 @@ function createEDHRecResponseHandler (drawer) {
         name: card.name,
         img: card.img,
         type: card.type,
+        singleton: true,
         getScryfallId () {
           return scryfall.api.get(`/cards/${card.set}/${card.collectorNumber}`).then((cardFromScryfall) => {
             return cardFromScryfall.id
