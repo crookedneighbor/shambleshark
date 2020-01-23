@@ -1,5 +1,5 @@
 import ScryfallSearch from '../../../src/js/features/deck-builder-features/scryfall-search'
-import { api } from '../../../src/js/lib/scryfall'
+import scryfall from '../../../src/js/lib/scryfall'
 import bus from 'framebus'
 
 describe('Scryfall Search', function () {
@@ -131,7 +131,8 @@ describe('Scryfall Search', function () {
         setLoading: jest.fn()
       }
 
-      jest.spyOn(api, 'get').mockResolvedValue([])
+      jest.spyOn(scryfall.api, 'get').mockResolvedValue([])
+      jest.spyOn(scryfall, 'getDeck').mockResolvedValue({})
       jest.spyOn(ss, 'addCards').mockReturnValue(null)
     })
 
@@ -144,8 +145,8 @@ describe('Scryfall Search', function () {
     it('queries the api', async function () {
       await ss.onEnter('foo')
 
-      expect(api.get).toBeCalledTimes(1)
-      expect(api.get).toBeCalledWith('cards/search', {
+      expect(scryfall.api.get).toBeCalledTimes(1)
+      expect(scryfall.api.get).toBeCalledWith('cards/search', {
         q: 'foo'
       })
     })
@@ -153,12 +154,30 @@ describe('Scryfall Search', function () {
     it('adds cards from the api result', async function () {
       const cards = [{}, {}]
 
-      api.get.mockResolvedValue(cards)
+      scryfall.api.get.mockResolvedValue(cards)
 
       await ss.onEnter('foo')
 
       expect(ss.cardList).toBe(cards)
       expect(ss.addCards).toBeCalledTimes(1)
+    })
+
+    it('fetches the current deck', async function () {
+      await ss.onEnter('foo')
+
+      expect(scryfall.getDeck).toBeCalledTimes(1)
+    })
+
+    it('adds deck to instance', async function () {
+      const fakeDeck = {
+        foo: 'bar'
+      }
+
+      scryfall.getDeck.mockResolvedValue(fakeDeck)
+
+      await ss.onEnter('foo')
+
+      expect(ss.deck).toBe(fakeDeck)
     })
 
     it('shows the drawer', async function () {
@@ -175,11 +194,25 @@ describe('Scryfall Search', function () {
     beforeEach(function () {
       ss = new ScryfallSearch()
       ss.container = document.createElement('div')
+      ss.deck = {
+        sections: {
+          primary: ['mainboard']
+        },
+        entries: {
+          mainboard: [{
+            count: 3,
+            card_digest: {
+              oracle_id: 'oracle-id-2'
+            }
+          }]
+        }
+      }
     })
 
     it('creates card elements to add to container', function () {
       ss.cardList = [{
         id: 'id-1',
+        oracle_id: 'oracle-id-1',
         name: 'card 1',
         getImage () {
           return 'https://example.com/1'
@@ -187,6 +220,7 @@ describe('Scryfall Search', function () {
         type_line: 'type 1'
       }, {
         id: 'id-2',
+        oracle_id: 'oracle-id-2',
         name: 'card 2',
         getImage () {
           return 'https://example.com/2'

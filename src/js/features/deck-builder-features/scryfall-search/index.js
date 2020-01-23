@@ -3,10 +3,9 @@ import bus from 'framebus'
 import { sections } from '../../constants'
 import Drawer from '../../../lib/ui-elements/drawer'
 import AddCardElement from '../../../lib/ui-elements/add-card-element'
-import { api } from '../../../lib/scryfall'
+import scryfall from '../../../lib/scryfall'
 
 // TODO
-// add multiples
 // fix ff style
 
 class ScryfallSearch extends Feature {
@@ -23,22 +22,29 @@ class ScryfallSearch extends Feature {
     })
   }
 
-  onEnter (query) {
+  async onEnter (query) {
     this.drawer.open()
 
-    return api.get('cards/search', {
+    const deckPromise = scryfall.getDeck()
+    const searchPromise = scryfall.api.get('cards/search', {
       q: query
-    }).then(cards => {
-      this.cardList = cards
-      this.addCards()
-      this.drawer.setLoading(false)
     })
+
+    const [deck, cards] = await Promise.all([deckPromise, searchPromise])
+
+    this.deck = deck
+    this.cardList = cards
+    this.addCards()
+    this.drawer.setLoading(false)
   }
 
   addCards () {
+    const entries = this.deck.entries[this.deck.sections.primary[0]]
     this.cardList.forEach(card => {
+      const cardInDeck = entries.find(entry => entry.card_digest && entry.card_digest.oracle_id === card.oracle_id)
+      const quantity = cardInDeck ? cardInDeck.count : 0
       const addCardEl = new AddCardElement({
-        cardInDeck: false, // TODO
+        quantity,
         id: card.id,
         name: card.name,
         img: card.getImage(),
