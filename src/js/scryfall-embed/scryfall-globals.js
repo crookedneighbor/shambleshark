@@ -6,7 +6,7 @@ function getDeckMetadata () {
     getDeckMetadataPromise = getDeck().then(deck => {
       return {
         id: deck.id,
-        sections: deck.sections,
+        sections: deck.sections
       }
     })
   }
