@@ -7,7 +7,7 @@ var CopyWebpackPlugin = require('copy-webpack-plugin')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
 var WriteFilePlugin = require('write-file-webpack-plugin')
 
-const BROWSER = process.env.BROWSER || 'GOOGLE_CHROME'
+const BROWSER = env.BROWSER
 
 const alias = {
 }
@@ -27,7 +27,7 @@ if (fileSystem.existsSync(secretsPath)) {
 }
 
 var options = {
-  mode: process.env.NODE_ENV || 'development',
+  mode: env.NODE_ENV,
   entry: {
     popup: path.join(__dirname, 'src', 'js', 'popup.js'),
     options: path.join(__dirname, 'src', 'js', 'options.js'),
