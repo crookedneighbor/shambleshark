@@ -68,10 +68,10 @@ export default class DialogInterface {
     const closeBtn = this.element.querySelector('.dialog-close')
 
     if (state) {
-      this._contentNodeContainer.style.display = 'none'
+      this._contentNodeContainer.classList.add('loading')
       this._loaderNode.removeAttribute('style')
     } else {
-      this._contentNodeContainer.removeAttribute('style')
+      this._contentNodeContainer.classList.remove('loading')
       this._loaderNode.style.display = 'none'
       // Firefox often scrolls down content is
       // loading. This puts us back to the top

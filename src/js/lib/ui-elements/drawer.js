@@ -1,5 +1,8 @@
 import DialogInterface from './dialog-interface'
-import './drawer.css'
+import injectCSS from '../inject-css'
+import css from './drawer.css'
+
+injectCSS(css)
 
 export default class Drawer extends DialogInterface {
   open () {
@@ -43,7 +46,7 @@ export default class Drawer extends DialogInterface {
           <img src="https://assets.scryfall.com/assets/spinner-0e5953300e953759359ad94bcff35ac64ff73a403d3a0702e809d6c43e7e5ed5.gif" class="modal-dialog-spinner" aria-hidden="true">
         </div>
       <!---->
-        <div class="dialog-content-container drawer-dialog-stage" style="position:fixed;left:-100%;visibility:hidden">
+        <div class="dialog-content-container drawer-dialog-stage loading">
           <div role="alert" aria-label="${options.contentMessage || 'Dialog Loaded'}"></div>
           <div class="dialog-content drawer-dialog-stage-content"></div>
         </div>

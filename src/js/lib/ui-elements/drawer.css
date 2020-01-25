@@ -28,3 +28,9 @@
 .drawer-dialog-overlay.open .drawer-dialog.drawer-dialog-position-left {
   margin-left: 0px;
 }
+
+.dialog-content-container.drawer-dialog-stage.loading {
+  position:fixed;
+  left:-100%;
+  visibility:hidden
+}

@@ -4,7 +4,10 @@ import {
   MINUS_SYMBOL,
   PLUS_SYMBOL
 } from '../../../resources/svg'
-import './index.css'
+import injectCSS from '../../inject-css'
+import css from './index.css'
+
+injectCSS(css)
 
 export default class AddCardElement {
   constructor (options = {}) {

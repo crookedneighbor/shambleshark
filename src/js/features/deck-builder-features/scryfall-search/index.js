@@ -6,7 +6,6 @@ import AddCardElement from '../../../lib/ui-elements/add-card-element'
 import scryfall from '../../../lib/scryfall'
 
 // TODO
-// fix ff style
 // use singleton mode when in commander deck
 
 class ScryfallSearch extends Feature {

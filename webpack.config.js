@@ -44,7 +44,7 @@ var options = {
     rules: [
       {
         test: /\.css$/,
-        loader: 'style-loader!css-loader'
+        loader: 'raw-loader'
       },
       {
         test: new RegExp('\.(' + fileExtensions.join('|') + ')$'), // eslint-disable-line

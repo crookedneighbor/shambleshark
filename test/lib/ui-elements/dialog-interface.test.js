@@ -228,7 +228,7 @@ describe('DialogInterface', function () {
 
       dialog.setLoading(true)
 
-      expect(dialog.element.querySelector('.dialog-content-container').style.display).toBe('none')
+      expect(dialog.element.querySelector('.dialog-content-container').classList.contains('loading')).toBe(true)
       expect(dialog.element.querySelector('.dialog-loader').style.display).toBeFalsy()
     })
   })
