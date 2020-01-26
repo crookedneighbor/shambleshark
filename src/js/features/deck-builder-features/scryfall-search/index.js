@@ -28,6 +28,9 @@ class ScryfallSearch extends Feature {
     const deckPromise = scryfall.getDeck()
     const searchPromise = scryfall.api.get('cards/search', {
       q: query
+    }).catch((e) => {
+      // most likely a 404, return no results
+      return []
     })
 
     const [deck, cards] = await Promise.all([deckPromise, searchPromise])
@@ -39,6 +42,12 @@ class ScryfallSearch extends Feature {
   }
 
   addCards () {
+    if (this.cardList.length === 0) {
+      this.container.innerHTML = '<div style="text-align:center;margin-top:10px;">No search results.</div>'
+
+      return
+    }
+
     const entries = this.deck.entries[this.deck.sections.primary[0]]
     this.cardList.forEach(card => {
       const cardInDeck = entries.find(entry => entry.card_digest && entry.card_digest.oracle_id === card.oracle_id)

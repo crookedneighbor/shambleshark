@@ -233,6 +233,14 @@ describe('Scryfall Search', function () {
       expect(ss.container.querySelector('img[src="https://example.com/1"]')).toBeTruthy()
       expect(ss.container.querySelector('img[src="https://example.com/2"]')).toBeTruthy()
     })
+
+    it('adds an error message when no card list is available', function () {
+      ss.cardList = []
+
+      ss.addCards()
+
+      expect(ss.container.innerHTML).toContain('No search results.')
+    })
   })
 
   describe('isReadyToLookupNextBatch ', function () {
