@@ -17,6 +17,13 @@ export const CHECK_SYMBOL = `
   </svg>
 `
 
+export const EXTERNAL_ARROW = `
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488.4 488.4">
+    <polygon points="441.1,318.3 441.1,441.1 47.3,441.1 47.3,47.3 170.1,47.3 170.1,0 0,0 0,488.4 488.4,488.4 488.4,318.3 "></polygon>
+    <polygon points="318.3,0 318.3,47.3 407.8,47.3 217.6,237.6 250.9,270.9 441.1,80.6 441.1,170.1 488.4,170.1 488.4,0 "></polygon>
+  </svg>
+`
+
 // Logos
 export const EDHREC_SYMBOL = `
   <svg aria-hidden="true" focusable="false" viewbox="0 0 848 848" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">

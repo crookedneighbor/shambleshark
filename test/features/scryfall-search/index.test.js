@@ -128,6 +128,7 @@ describe('Scryfall Search', function () {
       ss = new ScryfallSearch()
       ss.drawer = {
         open: jest.fn(),
+        setHeader: jest.fn(),
         setLoading: jest.fn()
       }
 

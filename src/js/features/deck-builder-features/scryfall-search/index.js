@@ -4,6 +4,9 @@ import { sections } from '../../constants'
 import Drawer from '../../../lib/ui-elements/drawer'
 import AddCardElement from '../../../lib/ui-elements/add-card-element'
 import scryfall from '../../../lib/scryfall'
+import {
+  EXTERNAL_ARROW
+} from '../../../resources/svg'
 
 // TODO
 // use singleton mode when in commander deck
@@ -35,6 +38,7 @@ class ScryfallSearch extends Feature {
 
     const [deck, cards] = await Promise.all([deckPromise, searchPromise])
 
+    this.drawer.setHeader(`Scryfall Search - ${cards.total_cards} results <a style="display:inline-block;width:12px;" href="/search?q=${encodeURI(query)}">${EXTERNAL_ARROW}</a>`)
     this.deck = deck
     this.cardList = cards
     this.addCards()
