@@ -1,11 +1,15 @@
-import 'bulma/css/bulma.min.css'
-import 'bulma-switch/dist/css/bulma-switch.min.css'
-import '../css/options.css'
+import bulmaCSS from 'bulma/css/bulma.min.css'
+import bulmaSwitchCSS from 'bulma-switch/dist/css/bulma-switch.min.css'
+import optionsCSS from '../css/options.css'
 import '../img/big-logo.png'
+
+import injectCSS from './lib/inject-css'
 
 import globalFeatures from './features/global-features'
 import deckbuilderFeatures from './features/deck-builder-features'
 import deckViewFeatures from './features/deck-view-features'
+
+injectCSS(bulmaCSS + bulmaSwitchCSS + optionsCSS)
 
 const features = globalFeatures
   .concat(deckbuilderFeatures)
@@ -19,6 +23,29 @@ function setupToggleListeners (element, fn) {
       fn()
     }
   })
+}
+
+function createInputForType (def, inputValue, Feature) {
+  switch(def.input) {
+    case 'checkbox':
+      return createCheckbox(def, inputValue, Feature)
+  }
+}
+
+function createCheckbox(def, inputValue, Feature) {
+  const checkboxContainer = document.createElement('label')
+  checkboxContainer.innerHTML = `
+    <input type="checkbox" id="${def.id}-checkbox" />
+    ${def.label}
+  `
+  checkboxContainer.classList.add('checkbox')
+  const checkbox = checkboxContainer.querySelector('input')
+  checkbox.checked = inputValue
+  checkbox.addEventListener('change', () => {
+    Feature.saveSetting(def.id, checkbox.checked)
+  })
+
+  return checkboxContainer
 }
 
 const page = document.createElement('div')
@@ -82,8 +109,7 @@ Promise.all(features.map((Feature) => {
       <input id="${enabledSwitchId}" type="checkbox" class="switch" aria-label="${title} toggle - ${data.description}">
       <label class="has-text-weight-bold" for="${enabledSwitchId}">${title}</label>
     </div>
-    <p class="content">${data.description}</p>
-    <div class="disabled-overlay"></div>
+    <p class="content feature-description">${data.description}</p>
   `
 
   if (isFutureFeature) {
@@ -107,6 +133,23 @@ Promise.all(features.map((Feature) => {
     if (!isFutureFeature && settings.enabled) {
       enabledSwitch.checked = true
     }
+
+    if (Feature.settingDefinitions.length) {
+      container.querySelector('.feature-description').classList.add('has-options')
+    }
+
+    Feature.settingDefinitions.forEach(def => {
+      const input = createInputForType(def, settings[def.id], Feature)
+      input.classList.add('feature-option')
+
+      if (input) {
+        container.appendChild(input)
+      }
+    })
+
+    const disabledOverlay = document.createElement('div')
+    disabledOverlay.classList.add('disabled-overlay')
+    container.appendChild(disabledOverlay)
   })
 })).then(() => {
   document.body.appendChild(page)

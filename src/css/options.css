@@ -10,6 +10,17 @@ fieldset.field[disabled] {
   position: relative;
 }
 
+.feature-option {
+  padding-left: 54px;
+}
+.feature-description.has-options {
+  margin-bottom: 0;
+}
+
+.feature-option:last-of-type {
+  margin-bottom: 1.5rem;
+}
+
 fieldset.field[disabled] .disabled-overlay {
   opacity: .5;
   cursor: not-allowed;
