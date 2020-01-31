@@ -131,10 +131,12 @@ describe('Scryfall Search', function () {
         setHeader: jest.fn(),
         setLoading: jest.fn()
       }
+      ss.container = document.createElement('div')
 
       jest.spyOn(scryfall.api, 'get').mockResolvedValue([])
       jest.spyOn(scryfall, 'getDeck').mockResolvedValue({
-        sections: {}
+        sections: {},
+        entries: {}
       })
       jest.spyOn(ss, 'addCards').mockReturnValue(null)
     })
@@ -174,7 +176,8 @@ describe('Scryfall Search', function () {
     it('adds deck to instance', async function () {
       const fakeDeck = {
         foo: 'bar',
-        sections: {}
+        sections: {},
+        entries: {}
       }
 
       scryfall.getDeck.mockResolvedValue(fakeDeck)

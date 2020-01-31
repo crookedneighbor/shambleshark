@@ -4,16 +4,21 @@ import { sections } from '../../constants'
 import Drawer from '../../../lib/ui-elements/drawer'
 import AddCardElement from '../../../lib/ui-elements/add-card-element'
 import {
+  getSections,
   flattenEntries,
   isSingletonTypeDeck
 } from '../../../lib/deck-parser'
 import scryfall from '../../../lib/scryfall'
+import injectCSS from '../../../lib/inject-css'
+import css from './index.css'
+
 import {
   EXTERNAL_ARROW
 } from '../../../resources/svg'
 
+injectCSS(css)
+
 // TODO
-// use singleton mode when in commander deck
 
 class ScryfallSearch extends Feature {
   async run () {
@@ -23,7 +28,6 @@ class ScryfallSearch extends Feature {
       if (e.key !== 'Enter') {
         return
       }
-      e.preventDefault()
 
       this.onEnter(e.target.value)
     })
@@ -31,8 +35,13 @@ class ScryfallSearch extends Feature {
 
   async onEnter (query) {
     this.drawer.open()
+    this.currentQuery = query
 
-    const deckPromise = scryfall.getDeck()
+    const deckPromise = scryfall.getDeck().then(deck => {
+      this.isSingleton = isSingletonTypeDeck(deck)
+
+      return deck
+    })
     const searchPromise = scryfall.api.get('cards/search', {
       q: query
     }).catch((e) => {
@@ -42,17 +51,56 @@ class ScryfallSearch extends Feature {
 
     const [deck, cards] = await Promise.all([deckPromise, searchPromise])
 
-    this.drawer.setHeader(`Scryfall Search - ${cards.total_cards} result${cards.total_cards !== 1 ? 's' : ''} <a style="display:inline-block;width:12px;" href="/search?q=${encodeURI(query)}">${EXTERNAL_ARROW}</a>`)
     this.deck = deck
-    this.isSingleton = isSingletonTypeDeck(deck)
+
     this.cardList = cards
+
+    this.addSearchOptionsElement()
+
     this.addCards()
+
     this.drawer.setLoading(false)
+  }
+
+  addSearchOptionsElement () {
+    const totalCards = this.cardList.total_cards
+    const el = document.createElement('div')
+    el.classList.add('scryfall-search__options-container', 'scryfall-search__non-card-element')
+    el.innerHTML = `
+      <div class="scryfall-search__search-results-counter">
+        ${totalCards} result${totalCards !== 1 ? 's' : ''}&nbsp;
+        <a class="scryfall-search__external-link-icon" href="/search?q=${encodeURI(this.currentQuery)}">${EXTERNAL_ARROW}</a>
+      </div>
+
+      <div class="form-row-content-band">
+        <select id="scryfall-search__section-selection" class="form-input auto small-select">
+          <option value="" selected disabled>Section (auto)</option>
+        </select>
+      </div>
+    `
+
+    this.sectionSelect = el.querySelector('#scryfall-search__section-selection')
+
+    getSections(this.deck).sort().forEach(section => {
+      const option = document.createElement('option')
+      const sectionLabel = section[0].toUpperCase() + section.slice(1)
+
+      option.value = section
+      option.innerText = `Add to ${sectionLabel}`
+
+      this.sectionSelect.appendChild(option)
+    })
+
+    const hr = document.createElement('hr')
+    hr.classList.add('scryfall-search__hr')
+
+    this.container.appendChild(el)
+    this.container.appendChild(hr)
   }
 
   addCards () {
     if (this.cardList.length === 0) {
-      this.container.innerHTML = '<div style="text-align:center;margin-top:10px;">No search results.</div>'
+      this.container.innerHTML = '<div class="scryfall-search__no-results scryfall-search__non-card-element">No search results.</div>'
 
       return
     }
@@ -67,7 +115,10 @@ class ScryfallSearch extends Feature {
         id: card.id,
         name: card.name,
         img: card.getImage(),
-        type: card.type_line
+        type: card.type_line,
+        onAddCard: (payload) => {
+          payload.section = this.sectionSelect.value
+        }
       })
 
       this.container.appendChild(addCardEl.element)

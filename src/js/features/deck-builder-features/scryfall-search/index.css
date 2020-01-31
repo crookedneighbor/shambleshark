@@ -1,0 +1,26 @@
+.scryfall-search__non-card-element {
+  padding: 10px;
+}
+
+.scryfall-search__hr {
+  border-bottom: 1px solid #E0DEE3;
+}
+
+.scryfall-search__options-container {
+  position: relative;
+}
+
+.scryfall-search__external-link-icon {
+  display:inline-block;
+  width:12px;
+}
+
+.scryfall-search__no-results {
+  text-align: center;
+}
+
+.scryfall-search__search-results-counter {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
