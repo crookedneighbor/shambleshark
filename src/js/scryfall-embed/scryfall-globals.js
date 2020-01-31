@@ -1,3 +1,7 @@
+import {
+  getSections
+} from '../lib/deck-parser'
+
 let getActiveDeckPromise = null
 let getDeckMetadataPromise = null
 
@@ -24,9 +28,7 @@ export function getActiveDeckId () {
 
 export function hasDedicatedLandSection () {
   return getDeckMetadata().then(meta => {
-    return Object.keys(meta.sections).find(kind => {
-      return meta.sections[kind].find(name => name === 'lands')
-    })
+    return getSections(meta).includes('lands')
   }).then(res => Boolean(res))
 }
 

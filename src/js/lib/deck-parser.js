@@ -53,10 +53,9 @@ export function hasLegalCommanders (commanders) {
 }
 
 export function isSingletonTypeDeck (deck) {
-  const section = getSections(deck)
-    .find(section => section === 'commanders' || section === 'nonlands')
+  const sections = getSections(deck)
 
-  return Boolean(section)
+  return sections.includes('nonlands') || sections.includes('commanders')
 }
 
 export default {
