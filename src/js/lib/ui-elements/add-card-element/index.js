@@ -168,4 +168,8 @@ export default class AddCardElement {
       cardName: this.name
     })
   }
+
+  toggleAppearance (shouldHide) {
+    this.element.classList.toggle('hidden', shouldHide)
+  }
 }

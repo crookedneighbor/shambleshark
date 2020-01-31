@@ -592,4 +592,43 @@ describe('AddCardElement', function () {
       expect(cardEl.updateUI).toBeCalledTimes(1)
     })
   })
+
+  describe('toggleAppearance', function () {
+    it('adds hidden class if true is passed in', function () {
+      const cardEl = new AddCardElement({
+        name: 'Arcane Denial',
+        singleton: true,
+        id: 'arcane-denial-id',
+        type: 'Instant',
+        img: 'https://example.com/arcane-signet'
+      })
+
+      expect(cardEl.element.classList.contains('hidden')).toBe(false)
+
+      cardEl.toggleAppearance(true)
+      expect(cardEl.element.classList.contains('hidden')).toBe(true)
+
+      cardEl.toggleAppearance(true)
+      expect(cardEl.element.classList.contains('hidden')).toBe(true)
+    })
+
+    it('removes hidden class if false is passed in', function () {
+      const cardEl = new AddCardElement({
+        name: 'Arcane Denial',
+        singleton: true,
+        id: 'arcane-denial-id',
+        type: 'Instant',
+        img: 'https://example.com/arcane-signet'
+      })
+
+      cardEl.toggleAppearance(true)
+      expect(cardEl.element.classList.contains('hidden')).toBe(true)
+
+      cardEl.toggleAppearance(false)
+      expect(cardEl.element.classList.contains('hidden')).toBe(false)
+
+      cardEl.toggleAppearance(false)
+      expect(cardEl.element.classList.contains('hidden')).toBe(false)
+    })
+  });
 })
