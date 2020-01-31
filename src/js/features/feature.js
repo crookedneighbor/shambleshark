@@ -2,12 +2,12 @@ import storage from '../lib/storage'
 
 const notImplementedError = new Error('Method not Implemented')
 
-function createStaticProperty (propertyName) {
+function createStaticProperty (propertyName, defaultValue) {
   const privatePropertyName = `_${propertyName}`
 
   Object.defineProperty(Feature, propertyName, {
     get () {
-      return this.hasOwnProperty(privatePropertyName) ? this[privatePropertyName] : undefined // eslint-disable-line no-prototype-builtins
+      return this.hasOwnProperty(privatePropertyName) ? this[privatePropertyName] : defaultValue
     },
     set (value) {
       this[privatePropertyName] = value
@@ -73,5 +73,6 @@ class Feature {
 
 createStaticProperty('metadata')
 createStaticProperty('settingsDefaults')
+createStaticProperty('settingDefinitions', [])
 
 export default Feature
