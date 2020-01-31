@@ -1,6 +1,7 @@
 import {
   getSections,
   flattenEntries,
+  isCommanderLike,
   isSingletonTypeDeck,
   hasLegalCommanders
 } from '../../src/js/lib/deck-parser'
@@ -133,6 +134,32 @@ describe('Deck Parser', function () {
       expect(scryfall.get).toBeCalledWith('/cards/search', {
         q: '!"Craterhoof Behemoth" is:commander'
       })
+    })
+  })
+
+  describe('isCommanderLike', function () {
+    it('returns true when deck has a commanders section', function () {
+      const deck = {
+        sections: {
+          a: ['foo'],
+          b: ['foo', 'bar', 'commanders', 'baz'],
+          c: ['foo']
+        }
+      }
+
+      expect(isCommanderLike(deck)).toBe(true)
+    })
+
+    it('returns false when deck has no commanders', function () {
+      const deck = {
+        sections: {
+          a: ['foo'],
+          b: ['foo', 'bar', 'baz', 'nonlands'],
+          c: ['foo']
+        }
+      }
+
+      expect(isCommanderLike(deck)).toBe(false)
     })
   })
 

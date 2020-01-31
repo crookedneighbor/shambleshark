@@ -52,15 +52,18 @@ export function hasLegalCommanders (commanders) {
   })
 }
 
-export function isSingletonTypeDeck (deck) {
-  const sections = getSections(deck)
+export function isCommanderLike (deck) {
+  return getSections(deck).includes('commanders')
+}
 
-  return sections.includes('nonlands') || sections.includes('commanders')
+export function isSingletonTypeDeck (deck) {
+  return getSections(deck).includes('nonlands') || isCommanderLike(deck)
 }
 
 export default {
   getSections,
   flattenEntries,
   hasLegalCommanders,
+  isCommanderLike,
   isSingletonTypeDeck
 }
