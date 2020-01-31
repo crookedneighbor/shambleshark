@@ -138,7 +138,33 @@ describe('set up listeners on Scryfall page', function () {
       expect(Scryfall.addCard.mock.calls[0][0]).toBe('id-1')
     })
 
-    it('updates lands to be put in lands section if deck has dedicated lands section', function () {
+    it('updates card for specific section if section is specified', function () {
+      cardData.section = 'sideboard'
+
+      setUpListeners('active-deck-id')
+
+      return wait().then(() => {
+        expect(Scryfall.updateEntry.mock.calls.length).toBe(1)
+        expect(scryfallCard.section).toBe('sideboard')
+        expect(Scryfall.updateEntry.mock.calls[0][0]).toBe(scryfallCard)
+      })
+    })
+
+    it('updates card for specific section if section is specified even when isLand is true and there is a dedicated land section', function () {
+      cardData.section = 'sideboard'
+      cardData.isLand = true
+      Scryfall.hasDedicatedLandSection.mockResolvedValue(true)
+
+      setUpListeners('active-deck-id')
+
+      return wait().then(() => {
+        expect(Scryfall.updateEntry.mock.calls.length).toBe(1)
+        expect(scryfallCard.section).toBe('sideboard')
+        expect(Scryfall.updateEntry.mock.calls[0][0]).toBe(scryfallCard)
+      })
+    })
+
+    it('updates lands to be put in lands section if deck has dedicated lands section and no section is specified', function () {
       cardData.isLand = true
       Scryfall.hasDedicatedLandSection.mockResolvedValue(true)
 

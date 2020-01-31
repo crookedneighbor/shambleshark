@@ -18,6 +18,7 @@ export default class AddCardElement {
     this.img = options.img
     this.type = options.type
     this.singleton = Boolean(options.singleton)
+    this.onAddCard = options.onAddCard
 
     if (options.getScryfallId) {
       this._getScryfallId = options.getScryfallId
@@ -132,11 +133,17 @@ export default class AddCardElement {
     this.updateUI()
 
     return this._getScryfallId().then(id => {
-      bus.emit('ADD_CARD_TO_DECK', {
+      const payload = {
         cardName: this.name,
         cardId: id,
         isLand: this.type.toLowerCase().indexOf('land') > -1
-      })
+      }
+
+      if (this.onAddCard) {
+        this.onAddCard(payload)
+      }
+
+      bus.emit('ADD_CARD_TO_DECK', payload)
     }).catch(err => {
       this.quantity--
 

@@ -18,12 +18,16 @@ export default function setUpListeners () {
   bus.on('ADD_CARD_TO_DECK', function ({
     cardName,
     cardId,
-    isLand
+    isLand,
+    section
   }) {
     // adds card if it does not exist and increments
     // the card if it already exists
     Scryfall.addCard(cardId).then(function (addedCardInfo) {
-      if (isLand) {
+      if (section) {
+        addedCardInfo.section = section
+        Scryfall.updateEntry(addedCardInfo)
+      } else if (isLand) {
         Scryfall.hasDedicatedLandSection().then(hasLandSection => {
           if (hasLandSection) {
             addedCardInfo.section = 'lands'
