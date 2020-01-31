@@ -2,8 +2,15 @@ import {
   api as scryfall
 } from './scryfall'
 
+export function getSections (deck) {
+  return Object.keys(deck.sections).reduce((sections, type) => {
+    deck.sections[type].forEach(section => sections.push(section))
+    return sections
+  }, [])
+}
+
 export function flattenEntries (deck) {
-  const sections = deck.sections.primary.concat(deck.sections.secondary || [])
+  const sections = getSections(deck)
   const entries = []
   const oracleIds = {}
 
@@ -46,14 +53,14 @@ export function hasLegalCommanders (commanders) {
 }
 
 export function isSingletonTypeDeck (deck) {
-  const section = Object.keys(deck.sections).find(type => {
-    return deck.sections[type].find(section => section === 'commanders' || section === 'nonlands')
-  })
+  const section = getSections(deck)
+    .find(section => section === 'commanders' || section === 'nonlands')
 
   return Boolean(section)
 }
 
 export default {
+  getSections,
   flattenEntries,
   hasLegalCommanders,
   isSingletonTypeDeck

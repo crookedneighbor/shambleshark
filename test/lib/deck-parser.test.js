@@ -1,4 +1,5 @@
 import {
+  getSections,
   flattenEntries,
   isSingletonTypeDeck,
   hasLegalCommanders
@@ -8,6 +9,19 @@ import {
 } from '../../src/js/lib/scryfall'
 
 describe('Deck Parser', function () {
+  describe('getSections', function () {
+    it('returns a flattened array of deck sections', function () {
+      const fakeDeck = {
+        sections: {
+          primary: ['1', '2'],
+          secondary: ['3', '4']
+        }
+      }
+
+      expect(getSections(fakeDeck)).toEqual(['1', '2', '3', '4'])
+    })
+  })
+
   describe('flattenEntries', function () {
     let fakeDeck
 
