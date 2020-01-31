@@ -18,20 +18,20 @@ describe('Deck Parser', function () {
         },
         entries: {
           1: [
-            { id: 'id-1' },
-            { id: 'id-2' }
+            { id: 'id-1', count: 1, card_digest: { oracle_id: 'oracle-1' } },
+            { id: 'id-2', count: 1, card_digest: { oracle_id: 'oracle-2' } }
           ],
           2: [
-            { id: 'id-3' },
-            { id: 'id-4' }
+            { id: 'id-3', count: 1, card_digest: { oracle_id: 'oracle-3' } },
+            { id: 'id-4', count: 1, card_digest: { oracle_id: 'oracle-4' } }
           ],
           3: [
-            { id: 'id-5' },
-            { id: 'id-6' }
+            { id: 'id-5', count: 1, card_digest: { oracle_id: 'oracle-5' } },
+            { id: 'id-6', count: 1, card_digest: { oracle_id: 'oracle-6' } }
           ],
           4: [
-            { id: 'id-7' },
-            { id: 'id-8' }
+            { id: 'id-7', count: 1, card_digest: { oracle_id: 'oracle-7' } },
+            { id: 'id-8', count: 1, card_digest: { oracle_id: 'oracle-8' } }
           ]
         }
       }
@@ -41,18 +41,36 @@ describe('Deck Parser', function () {
       const entries = flattenEntries(fakeDeck)
 
       expect(entries.length).toBe(8)
-      expect(entries).toContainEqual({ id: 'id-1' })
-      expect(entries).toContainEqual({ id: 'id-2' })
-      expect(entries).toContainEqual({ id: 'id-3' })
-      expect(entries).toContainEqual({ id: 'id-4' })
-      expect(entries).toContainEqual({ id: 'id-5' })
-      expect(entries).toContainEqual({ id: 'id-6' })
-      expect(entries).toContainEqual({ id: 'id-7' })
-      expect(entries).toContainEqual({ id: 'id-8' })
+      expect(entries).toContainEqual({ id: 'id-1', count: 1, card_digest: { oracle_id: 'oracle-1' } })
+      expect(entries).toContainEqual({ id: 'id-2', count: 1, card_digest: { oracle_id: 'oracle-2' } })
+      expect(entries).toContainEqual({ id: 'id-3', count: 1, card_digest: { oracle_id: 'oracle-3' } })
+      expect(entries).toContainEqual({ id: 'id-4', count: 1, card_digest: { oracle_id: 'oracle-4' } })
+      expect(entries).toContainEqual({ id: 'id-5', count: 1, card_digest: { oracle_id: 'oracle-5' } })
+      expect(entries).toContainEqual({ id: 'id-6', count: 1, card_digest: { oracle_id: 'oracle-6' } })
+      expect(entries).toContainEqual({ id: 'id-7', count: 1, card_digest: { oracle_id: 'oracle-7' } })
+      expect(entries).toContainEqual({ id: 'id-8', count: 1, card_digest: { oracle_id: 'oracle-8' } })
     })
 
-    it.skip('collapses cards with multiple entries in sections into one', function () {
-      // TODO not implemented
+    it('collapses cards with multiple entries in sections into one', function () {
+      fakeDeck.entries['3'] = [
+        {
+          id: 'id-2',
+          count: 2,
+          card_digest: {
+            oracle_id: 'oracle-2'
+          }
+        }
+      ]
+
+      const entries = flattenEntries(fakeDeck)
+
+      expect(entries.length).toBe(6)
+      expect(entries).toContainEqual({ id: 'id-1', count: 1, card_digest: { oracle_id: 'oracle-1' } })
+      expect(entries).toContainEqual({ id: 'id-2', count: 3, card_digest: { oracle_id: 'oracle-2' } })
+      expect(entries).toContainEqual({ id: 'id-3', count: 1, card_digest: { oracle_id: 'oracle-3' } })
+      expect(entries).toContainEqual({ id: 'id-4', count: 1, card_digest: { oracle_id: 'oracle-4' } })
+      expect(entries).toContainEqual({ id: 'id-7', count: 1, card_digest: { oracle_id: 'oracle-7' } })
+      expect(entries).toContainEqual({ id: 'id-8', count: 1, card_digest: { oracle_id: 'oracle-8' } })
     })
   })
 

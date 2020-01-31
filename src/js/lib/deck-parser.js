@@ -3,11 +3,24 @@ import {
 } from './scryfall'
 
 export function flattenEntries (deck) {
-  const sections = deck.sections.primary.concat(deck.sections.secondary)
+  const sections = deck.sections.primary.concat(deck.sections.secondary || [])
   const entries = []
+  const oracleIds = {}
 
   sections.forEach(section => {
-    entries.push.apply(entries, deck.entries[section])
+    deck.entries[section].forEach(entry => {
+      const oracleId = entry.card_digest && entry.card_digest.oracle_id
+
+      if (oracleId) {
+        if (oracleId in oracleIds) {
+          const original = oracleIds[oracleId]
+          original.count = Number(original.count) + Number(entry.count)
+        } else {
+          oracleIds[oracleId] = entry
+          entries.push(entry)
+        }
+      }
+    })
   })
 
   return entries
