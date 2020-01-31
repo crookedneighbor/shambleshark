@@ -2,6 +2,17 @@ import {
   api as scryfall
 } from './scryfall'
 
+export function flattenEntries (deck) {
+  const sections = deck.sections.primary.concat(deck.sections.secondary)
+  const entries = []
+
+  sections.forEach(section => {
+    entries.push.apply(entries, deck.entries[section])
+  })
+
+  return entries
+}
+
 export function hasLegalCommanders (commanders) {
   if (commanders.length === 0) {
     // no commanders in commander section
@@ -22,5 +33,6 @@ export function hasLegalCommanders (commanders) {
 }
 
 export default {
+  flattenEntries,
   hasLegalCommanders
 }

@@ -3,6 +3,9 @@ import bus from 'framebus'
 import { sections } from '../../constants'
 import Drawer from '../../../lib/ui-elements/drawer'
 import AddCardElement from '../../../lib/ui-elements/add-card-element'
+import {
+  flattenEntries
+} from '../../../lib/deck-parser'
 import scryfall from '../../../lib/scryfall'
 import {
   EXTERNAL_ARROW
@@ -52,7 +55,7 @@ class ScryfallSearch extends Feature {
       return
     }
 
-    const entries = this.deck.entries[this.deck.sections.primary[0]]
+    const entries = flattenEntries(this.deck)
     this.cardList.forEach(card => {
       const cardInDeck = entries.find(entry => entry.card_digest && entry.card_digest.oracle_id === card.oracle_id)
       const quantity = cardInDeck ? cardInDeck.count : 0
