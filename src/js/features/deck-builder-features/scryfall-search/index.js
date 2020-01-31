@@ -4,7 +4,8 @@ import { sections } from '../../constants'
 import Drawer from '../../../lib/ui-elements/drawer'
 import AddCardElement from '../../../lib/ui-elements/add-card-element'
 import {
-  flattenEntries
+  flattenEntries,
+  isSingletonTypeDeck
 } from '../../../lib/deck-parser'
 import scryfall from '../../../lib/scryfall'
 import {
@@ -41,8 +42,9 @@ class ScryfallSearch extends Feature {
 
     const [deck, cards] = await Promise.all([deckPromise, searchPromise])
 
-    this.drawer.setHeader(`Scryfall Search - ${cards.total_cards} results <a style="display:inline-block;width:12px;" href="/search?q=${encodeURI(query)}">${EXTERNAL_ARROW}</a>`)
+    this.drawer.setHeader(`Scryfall Search - ${cards.total_cards} result${cards.total_cards !== 1 ? 's' : ''} <a style="display:inline-block;width:12px;" href="/search?q=${encodeURI(query)}">${EXTERNAL_ARROW}</a>`)
     this.deck = deck
+    this.isSingleton = isSingletonTypeDeck(deck)
     this.cardList = cards
     this.addCards()
     this.drawer.setLoading(false)
@@ -61,6 +63,7 @@ class ScryfallSearch extends Feature {
       const quantity = cardInDeck ? cardInDeck.count : 0
       const addCardEl = new AddCardElement({
         quantity,
+        singleton: this.isSingleton,
         id: card.id,
         name: card.name,
         img: card.getImage(),

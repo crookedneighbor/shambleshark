@@ -133,7 +133,9 @@ describe('Scryfall Search', function () {
       }
 
       jest.spyOn(scryfall.api, 'get').mockResolvedValue([])
-      jest.spyOn(scryfall, 'getDeck').mockResolvedValue({})
+      jest.spyOn(scryfall, 'getDeck').mockResolvedValue({
+        sections: {}
+      })
       jest.spyOn(ss, 'addCards').mockReturnValue(null)
     })
 
@@ -171,7 +173,8 @@ describe('Scryfall Search', function () {
 
     it('adds deck to instance', async function () {
       const fakeDeck = {
-        foo: 'bar'
+        foo: 'bar',
+        sections: {}
       }
 
       scryfall.getDeck.mockResolvedValue(fakeDeck)

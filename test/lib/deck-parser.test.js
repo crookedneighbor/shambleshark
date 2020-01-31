@@ -1,5 +1,6 @@
 import {
   flattenEntries,
+  isSingletonTypeDeck,
   hasLegalCommanders
 } from '../../src/js/lib/deck-parser'
 import {
@@ -102,7 +103,7 @@ describe('Deck Parser', function () {
       })
     })
 
-    it('returns false if deck has a commanders section and any cards in it are not legal commanders', async function () {
+    it('returns false if any cards in it are not legal commanders', async function () {
       const commanders = [
         'Tana the Bloodsower',
         'Craterhoof Behemoth'
@@ -118,6 +119,44 @@ describe('Deck Parser', function () {
       expect(scryfall.get).toBeCalledWith('/cards/search', {
         q: '!"Craterhoof Behemoth" is:commander'
       })
+    })
+  })
+
+  describe('isSingletonTypeDeck', function () {
+    it('returns true when deck has a commanders section', function () {
+      const deck = {
+        sections: {
+          a: ['foo'],
+          b: ['foo', 'bar', 'commanders', 'baz'],
+          c: ['foo']
+        }
+      }
+
+      expect(isSingletonTypeDeck(deck)).toBe(true)
+    })
+
+    it('returns true when deck has a nonlands section', function () {
+      const deck = {
+        sections: {
+          a: ['foo'],
+          b: ['foo', 'bar', 'nonlands', 'baz'],
+          c: ['foo']
+        }
+      }
+
+      expect(isSingletonTypeDeck(deck)).toBe(true)
+    })
+
+    it('returns false when deck has no commanders or nonlands section', function () {
+      const deck = {
+        sections: {
+          a: ['foo'],
+          b: ['foo', 'bar', 'baz'],
+          c: ['foo']
+        }
+      }
+
+      expect(isSingletonTypeDeck(deck)).toBe(false)
     })
   })
 })

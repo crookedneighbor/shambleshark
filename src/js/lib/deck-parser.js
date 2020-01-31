@@ -45,7 +45,16 @@ export function hasLegalCommanders (commanders) {
   })
 }
 
+export function isSingletonTypeDeck (deck) {
+  const section = Object.keys(deck.sections).find(type => {
+    return deck.sections[type].find(section => section === 'commanders' || section === 'nonlands')
+  })
+
+  return Boolean(section)
+}
+
 export default {
   flattenEntries,
-  hasLegalCommanders
+  hasLegalCommanders,
+  isSingletonTypeDeck
 }
