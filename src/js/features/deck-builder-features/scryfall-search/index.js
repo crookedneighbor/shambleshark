@@ -29,6 +29,8 @@ class ScryfallSearch extends Feature {
         return
       }
 
+      e.preventDefault()
+
       this.onEnter(e.target.value)
     })
   }
