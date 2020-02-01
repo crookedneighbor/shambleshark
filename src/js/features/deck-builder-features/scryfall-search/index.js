@@ -25,7 +25,7 @@ class ScryfallSearch extends Feature {
     this.drawer = this.createDrawer()
 
     document.getElementById('header-search-field').addEventListener('keydown', (e) => {
-      if (e.key !== 'Enter') {
+      if (e.key !== 'Enter' || !e.target.value) {
         return
       }
 

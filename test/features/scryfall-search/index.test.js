@@ -43,6 +43,21 @@ describe('Scryfall Search', function () {
       expect(ss.onEnter).toBeCalledTimes(1)
       expect(ss.onEnter).toBeCalledWith('is:commander')
     })
+
+    it('does not call onEnter if no value in the header search field', async function () {
+      const ss = new ScryfallSearch()
+
+      jest.spyOn(ss, 'createDrawer').mockReturnValue({})
+      jest.spyOn(ss, 'onEnter').mockReturnValue({})
+
+      await ss.run()
+
+      headerSearchField.value = ''
+      headerSearchField.dispatchEvent(new window.KeyboardEvent('keydown', {
+        key: 'Enter'
+      }))
+      expect(ss.onEnter).toBeCalledTimes(0)
+    })
   })
 
   describe('createDrawer', function () {
