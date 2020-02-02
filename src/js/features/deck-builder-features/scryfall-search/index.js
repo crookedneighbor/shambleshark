@@ -185,7 +185,7 @@ ScryfallSearch.metadata = {
   id: 'scryfall-search',
   title: 'Scryfall Search',
   section: sections.DECK_BUILDER,
-  description: 'Search for Scryfall cards right inside the deckbuilder! You can save the searches for later too!'
+  description: 'Search for Scryfall cards right inside the deckbuilder! (Coming Soon: Save searches for specific decks for later)'
 }
 
 ScryfallSearch.settingsDefaults = {
