@@ -68,6 +68,24 @@ describe('Deck Parser', function () {
       })
     })
 
+    it('returns array of c when color idenity is empty', async function () {
+      const fakeDeck = {
+        entries: {
+          commanders: [{
+            card_digest: { oracle_id: 'id-1' }
+          }]
+        }
+      }
+
+      scryfall.get.mockResolvedValue([{
+        color_identity: []
+      }])
+
+      const colors = await getCommanderColorIdentity(fakeDeck)
+
+      expect(colors).toEqual(['C'])
+    })
+
     it('ignores cards without a card digeest', async function () {
       const fakeDeck = {
         entries: {

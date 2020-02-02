@@ -23,6 +23,10 @@ export function getCommanderColorIdentity (deck) {
       return id
     }, []))
 
+    if (colors.size === 0) {
+      colors.add('C')
+    }
+
     return Array.from(colors)
   })
 }
