@@ -15,6 +15,7 @@ import {
 injectCSS(css)
 
 // TODO
+// saved searches
 
 class ScryfallSearch extends Feature {
   async run () {
