@@ -1,4 +1,5 @@
 import ScryfallSearch from '../../../src/js/features/deck-builder-features/scryfall-search'
+import deckParser from '../../../src/js/lib/deck-parser'
 import scryfall from '../../../src/js/lib/scryfall'
 import bus from 'framebus'
 
@@ -9,6 +10,7 @@ describe('Scryfall Search', function () {
     beforeEach(function () {
       headerSearchField = document.createElement('input')
       headerSearchField.id = 'header-search-field'
+      jest.spyOn(ScryfallSearch, 'getSettings').mockResolvedValue({})
 
       document.body.appendChild(headerSearchField)
     })
@@ -147,6 +149,7 @@ describe('Scryfall Search', function () {
         setLoading: jest.fn()
       }
       ss.container = document.createElement('div')
+      ss.settings = {}
 
       jest.spyOn(scryfall.api, 'get').mockResolvedValue([])
       jest.spyOn(scryfall, 'getDeck').mockResolvedValue({
@@ -168,6 +171,68 @@ describe('Scryfall Search', function () {
       expect(scryfall.api.get).toBeCalledTimes(1)
       expect(scryfall.api.get).toBeCalledWith('cards/search', {
         q: 'foo'
+      })
+    })
+
+    it('adds `not:funny` to query when restrictFunnyCards setting is active', async function () {
+      ss.settings.restrictFunnyCards = true
+      await ss.onEnter('foo')
+
+      expect(scryfall.api.get).toBeCalledTimes(1)
+      expect(scryfall.api.get).toBeCalledWith('cards/search', {
+        q: 'foo not:funny'
+      })
+    })
+
+    it('adds `ids` to query when restrictToCommanderColorIdentity setting is active and deck is commanderlike', async function () {
+      ss.settings.restrictToCommanderColorIdentity = true
+      jest.spyOn(deckParser, 'isSingletonTypeDeck').mockReturnValue(true)
+      jest.spyOn(deckParser, 'isCommanderLike').mockReturnValue(true)
+      jest.spyOn(deckParser, 'getCommanderColorIdentity').mockResolvedValue([
+        'B',
+        'G'
+      ])
+
+      await ss.onEnter('foo')
+
+      expect(scryfall.api.get).toBeCalledTimes(1)
+      expect(scryfall.api.get).toBeCalledWith('cards/search', {
+        q: 'foo ids:BG'
+      })
+    })
+
+    it('does not add `ids` to query when restrictToCommanderColorIdentity setting is active and deck is not commanderlike', async function () {
+      ss.settings.restrictToCommanderColorIdentity = true
+      jest.spyOn(deckParser, 'isSingletonTypeDeck').mockReturnValue(true)
+      jest.spyOn(deckParser, 'isCommanderLike').mockReturnValue(false)
+      jest.spyOn(deckParser, 'getCommanderColorIdentity').mockResolvedValue([
+        'B',
+        'G'
+      ])
+
+      await ss.onEnter('foo')
+
+      expect(scryfall.api.get).toBeCalledTimes(1)
+      expect(scryfall.api.get).toBeCalledWith('cards/search', {
+        q: 'foo'
+      })
+    })
+
+    it('can add both `not:funny` and `ids` to query', async function () {
+      ss.settings.restrictFunnyCards = true
+      ss.settings.restrictToCommanderColorIdentity = true
+      jest.spyOn(deckParser, 'isSingletonTypeDeck').mockReturnValue(true)
+      jest.spyOn(deckParser, 'isCommanderLike').mockReturnValue(true)
+      jest.spyOn(deckParser, 'getCommanderColorIdentity').mockResolvedValue([
+        'B',
+        'G'
+      ])
+
+      await ss.onEnter('foo')
+
+      expect(scryfall.api.get).toBeCalledTimes(1)
+      expect(scryfall.api.get).toBeCalledWith('cards/search', {
+        q: 'foo not:funny ids:BG'
       })
     })
 

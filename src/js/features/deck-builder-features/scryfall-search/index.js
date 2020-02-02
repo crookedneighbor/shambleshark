@@ -3,11 +3,7 @@ import bus from 'framebus'
 import { sections } from '../../constants'
 import Drawer from '../../../lib/ui-elements/drawer'
 import AddCardElement from '../../../lib/ui-elements/add-card-element'
-import {
-  getSections,
-  flattenEntries,
-  isSingletonTypeDeck
-} from '../../../lib/deck-parser'
+import deckParser from '../../../lib/deck-parser'
 import scryfall from '../../../lib/scryfall'
 import injectCSS from '../../../lib/inject-css'
 import css from './index.css'
@@ -23,6 +19,7 @@ injectCSS(css)
 class ScryfallSearch extends Feature {
   async run () {
     this.drawer = this.createDrawer()
+    this.settings = await ScryfallSearch.getSettings()
 
     document.getElementById('header-search-field').addEventListener('keydown', (e) => {
       if (e.key !== 'Enter' || !e.target.value) {
@@ -39,23 +36,26 @@ class ScryfallSearch extends Feature {
     this.drawer.open()
     this.currentQuery = query
 
-    const deckPromise = scryfall.getDeck().then(deck => {
-      this.isSingleton = isSingletonTypeDeck(deck)
+    if (this.settings.restrictFunnyCards) {
+      this.currentQuery += ' not:funny'
+    }
 
-      return deck
-    })
-    const searchPromise = scryfall.api.get('cards/search', {
-      q: query
+    this.deck = await scryfall.getDeck()
+
+    this.isSingleton = deckParser.isSingletonTypeDeck(this.deck)
+
+    if (this.settings.restrictToCommanderColorIdentity && deckParser.isCommanderLike(this.deck)) {
+      const colors = await deckParser.getCommanderColorIdentity(this.deck)
+
+      this.currentQuery += ` ids:${colors.join('')}`
+    }
+
+    this.cardList = await scryfall.api.get('cards/search', {
+      q: this.currentQuery
     }).catch((e) => {
       // most likely a 404, return no results
       return []
     })
-
-    const [deck, cards] = await Promise.all([deckPromise, searchPromise])
-
-    this.deck = deck
-
-    this.cardList = cards
 
     this.addSearchOptionsElement()
 
@@ -80,10 +80,9 @@ class ScryfallSearch extends Feature {
         </select>
       </div>
     `
-
     this.sectionSelect = el.querySelector('#scryfall-search__section-selection')
 
-    getSections(this.deck).sort().forEach(section => {
+    deckParser.getSections(this.deck).sort().forEach(section => {
       const option = document.createElement('option')
       const sectionLabel = section[0].toUpperCase() + section.slice(1)
 
@@ -107,7 +106,7 @@ class ScryfallSearch extends Feature {
       return
     }
 
-    const entries = flattenEntries(this.deck)
+    const entries = deckParser.flattenEntries(this.deck)
     this.cardList.forEach(card => {
       const cardInDeck = entries.find(entry => entry.card_digest && entry.card_digest.oracle_id === card.oracle_id)
       const quantity = cardInDeck ? cardInDeck.count : 0
@@ -189,7 +188,19 @@ ScryfallSearch.metadata = {
 }
 
 ScryfallSearch.settingsDefaults = {
-  enabled: true
+  enabled: true,
+  restrictToCommanderColorIdentity: true,
+  restrictFunnyCards: false
 }
+
+ScryfallSearch.settingDefinitions = [{
+  id: 'restrictToCommanderColorIdentity',
+  label: 'Automatically restrict searches to commander\'s color identity (if applicable)',
+  input: 'checkbox'
+}, {
+  id: 'restrictFunnyCards',
+  label: 'Don\'t include funny cards when doing searches (adds not:funny to all searches)',
+  input: 'checkbox'
+}]
 
 export default ScryfallSearch
