@@ -2,6 +2,31 @@ import {
   api as scryfall
 } from './scryfall'
 
+function getCommanders (deck) {
+  const ids = deck.entries.commanders
+    .filter(card => card.card_digest)
+    .map(card => `id:"${card.card_digest.id}"`)
+    .join(' or ')
+
+  return scryfall.get('/cards/search', {
+    q: ids
+  })
+}
+
+export function getCommanderColorIdentity (deck) {
+  return getCommanders(deck).then(cards => {
+    return cards.map(c => c.color_identity)
+  }).catch(() => []).then(colorIdentities => {
+    const colors = new Set(colorIdentities.reduce((id, ci) => {
+      id.push.apply(id, ci)
+
+      return id
+    }, []))
+
+    return Array.from(colors)
+  })
+}
+
 export function getSections (deck) {
   return Object.keys(deck.sections).reduce((sections, type) => {
     deck.sections[type].forEach(section => sections.push(section))
@@ -61,6 +86,7 @@ export function isSingletonTypeDeck (deck) {
 }
 
 export default {
+  getCommanderColorIdentity,
   getSections,
   flattenEntries,
   hasLegalCommanders,

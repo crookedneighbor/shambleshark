@@ -1,4 +1,5 @@
 import {
+  getCommanderColorIdentity,
   getSections,
   flattenEntries,
   isCommanderLike,
@@ -10,6 +11,92 @@ import {
 } from '../../src/js/lib/scryfall'
 
 describe('Deck Parser', function () {
+  describe('getCommanderColorIdentity', function () {
+    beforeEach(function () {
+      jest.spyOn(scryfall, 'get')
+    })
+
+    it('returns array of color identity for commander', async function () {
+      const fakeDeck = {
+        entries: {
+          commanders: [{
+            card_digest: { id: 'id-1' }
+          }]
+        }
+      }
+
+      scryfall.get.mockResolvedValue([{
+        color_identity: ['U', 'R']
+      }])
+
+      const colors = await getCommanderColorIdentity(fakeDeck)
+
+      expect(colors).toEqual(['U', 'R'])
+      expect(scryfall.get).toBeCalledTimes(1)
+      expect(scryfall.get).toBeCalledWith('/cards/search', {
+        q: 'id:"id-1"'
+      })
+    })
+
+    it('returns array of color identity for multiple commanders', async function () {
+      const fakeDeck = {
+        entries: {
+          commanders: [{
+            card_digest: { id: 'id-1' }
+          }, {
+            card_digest: { id: 'id-2' }
+          }, {
+            card_digest: { id: 'id-3' }
+          }]
+        }
+      }
+
+      scryfall.get.mockResolvedValue([{
+        color_identity: ['U', 'R']
+      }, {
+        color_identity: ['U', 'B']
+      }, {
+        color_identity: ['W']
+      }])
+
+      const colors = await getCommanderColorIdentity(fakeDeck)
+
+      expect(colors).toEqual(['U', 'R', 'B', 'W'])
+      expect(scryfall.get).toBeCalledTimes(1)
+      expect(scryfall.get).toBeCalledWith('/cards/search', {
+        q: 'id:"id-1" or id:"id-2" or id:"id-3"'
+      })
+    })
+
+    it('ignores cards without a card digeest', async function () {
+      const fakeDeck = {
+        entries: {
+          commanders: [{
+            card_digest: { id: 'id-1' }
+          }, {
+            // no card digetst
+          }, {
+            card_digest: { id: 'id-3' }
+          }]
+        }
+      }
+
+      scryfall.get.mockResolvedValue([{
+        color_identity: ['U', 'R']
+      }, {
+        color_identity: ['W']
+      }])
+
+      const colors = await getCommanderColorIdentity(fakeDeck)
+
+      expect(colors).toEqual(['U', 'R', 'W'])
+      expect(scryfall.get).toBeCalledTimes(1)
+      expect(scryfall.get).toBeCalledWith('/cards/search', {
+        q: 'id:"id-1" or id:"id-3"'
+      })
+    })
+  })
+
   describe('getSections', function () {
     it('returns a flattened array of deck sections', function () {
       const fakeDeck = {
