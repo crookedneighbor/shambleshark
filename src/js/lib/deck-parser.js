@@ -5,7 +5,7 @@ import {
 function getCommanders (deck) {
   const ids = deck.entries.commanders
     .filter(card => card.card_digest)
-    .map(card => `id:"${card.card_digest.id}"`)
+    .map(card => `oracle_id:"${card.card_digest.oracle_id}"`)
     .join(' or ')
 
   return scryfall.get('/cards/search', {

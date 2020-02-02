@@ -20,7 +20,7 @@ describe('Deck Parser', function () {
       const fakeDeck = {
         entries: {
           commanders: [{
-            card_digest: { id: 'id-1' }
+            card_digest: { oracle_id: 'id-1' }
           }]
         }
       }
@@ -34,7 +34,7 @@ describe('Deck Parser', function () {
       expect(colors).toEqual(['U', 'R'])
       expect(scryfall.get).toBeCalledTimes(1)
       expect(scryfall.get).toBeCalledWith('/cards/search', {
-        q: 'id:"id-1"'
+        q: 'oracle_id:"id-1"'
       })
     })
 
@@ -42,11 +42,11 @@ describe('Deck Parser', function () {
       const fakeDeck = {
         entries: {
           commanders: [{
-            card_digest: { id: 'id-1' }
+            card_digest: { oracle_id: 'id-1' }
           }, {
-            card_digest: { id: 'id-2' }
+            card_digest: { oracle_id: 'id-2' }
           }, {
-            card_digest: { id: 'id-3' }
+            card_digest: { oracle_id: 'id-3' }
           }]
         }
       }
@@ -64,7 +64,7 @@ describe('Deck Parser', function () {
       expect(colors).toEqual(['U', 'R', 'B', 'W'])
       expect(scryfall.get).toBeCalledTimes(1)
       expect(scryfall.get).toBeCalledWith('/cards/search', {
-        q: 'id:"id-1" or id:"id-2" or id:"id-3"'
+        q: 'oracle_id:"id-1" or oracle_id:"id-2" or oracle_id:"id-3"'
       })
     })
 
@@ -72,11 +72,11 @@ describe('Deck Parser', function () {
       const fakeDeck = {
         entries: {
           commanders: [{
-            card_digest: { id: 'id-1' }
+            card_digest: { oracle_id: 'id-1' }
           }, {
             // no card digetst
           }, {
-            card_digest: { id: 'id-3' }
+            card_digest: { oracle_id: 'id-3' }
           }]
         }
       }
@@ -92,7 +92,7 @@ describe('Deck Parser', function () {
       expect(colors).toEqual(['U', 'R', 'W'])
       expect(scryfall.get).toBeCalledTimes(1)
       expect(scryfall.get).toBeCalledWith('/cards/search', {
-        q: 'id:"id-1" or id:"id-3"'
+        q: 'oracle_id:"id-1" or oracle_id:"id-3"'
       })
     })
   })
