@@ -7,7 +7,7 @@ function createStaticProperty (propertyName, defaultValue) {
 
   Object.defineProperty(Feature, propertyName, {
     get () {
-      return this.hasOwnProperty(privatePropertyName) ? this[privatePropertyName] : defaultValue
+      return this.hasOwnProperty(privatePropertyName) ? this[privatePropertyName] : defaultValue // eslint-disable-line no-prototype-builtins
     },
     set (value) {
       this[privatePropertyName] = value

@@ -445,7 +445,7 @@ describe('AddCardElement', function () {
         name: 'Arcane Denial',
         id: 'arcane-denial-id',
         type: 'Instant',
-        onAddCard(data) {
+        onAddCard (data) {
           data.cardName = 'foo'
           data.section = 'bar'
         },
@@ -630,5 +630,5 @@ describe('AddCardElement', function () {
       cardEl.toggleAppearance(false)
       expect(cardEl.element.classList.contains('hidden')).toBe(false)
     })
-  });
+  })
 })

@@ -26,13 +26,13 @@ function setupToggleListeners (element, fn) {
 }
 
 function createInputForType (def, inputValue, Feature) {
-  switch(def.input) {
+  switch (def.input) {
     case 'checkbox':
       return createCheckbox(def, inputValue, Feature)
   }
 }
 
-function createCheckbox(def, inputValue, Feature) {
+function createCheckbox (def, inputValue, Feature) {
   const checkboxContainer = document.createElement('label')
   checkboxContainer.innerHTML = `
     <input type="checkbox" id="${def.id}-checkbox" />
