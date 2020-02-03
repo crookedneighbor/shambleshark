@@ -98,6 +98,12 @@ describe('Base Feature', function () {
       foo: 'bar',
       baz: 'buz'
     }
+    class FutureFeatureWithSavedSettings extends Feature {
+    }
+    FutureFeatureWithSavedSettings.metadata = {
+      id: 'future-feature',
+      futureFeature: true
+    }
 
     beforeEach(function () {
       jest.spyOn(storage, 'get')
@@ -177,8 +183,39 @@ describe('Base Feature', function () {
       })
 
       expect(settings.enabled).toBe(false)
-      expect(settings.foo).toBeFalsy()
-      expect(settings.baz).toBeFalsy()
+    })
+
+    it('saves it as enabled "true" when no previous settings are present and future opt in is enabled', async function () {
+      storage.get.mockResolvedValueOnce()
+      storage.get.mockResolvedValueOnce({
+        enabled: true
+      })
+      const settings = await FeatureWithSavedSettings.getSettings()
+
+      expect(storage.get).toBeCalledTimes(2)
+      expect(storage.get).toBeCalledWith('feature-with-saved')
+      expect(storage.get).toBeCalledWith('future-opt-in')
+      expect(storage.set).toBeCalledTimes(1)
+      expect(storage.set).toBeCalledWith('feature-with-saved', {
+        enabled: true
+      })
+
+      expect(settings.enabled).toBe(true)
+    })
+
+    it('does not save it as enabled "false" if feature is a future feature', async function () {
+      storage.get.mockResolvedValueOnce()
+      storage.get.mockResolvedValueOnce({
+        enabled: false
+      })
+      const settings = await FutureFeatureWithSavedSettings.getSettings()
+
+      expect(storage.get).toBeCalledTimes(2)
+      expect(storage.get).toBeCalledWith('future-feature')
+      expect(storage.get).toBeCalledWith('future-opt-in')
+      expect(storage.set).toBeCalledTimes(0)
+
+      expect(settings.enabled).toBe(false)
     })
   })
 

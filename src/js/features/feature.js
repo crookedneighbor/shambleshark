@@ -54,20 +54,19 @@ class Feature {
       const futureFeatureSettings = await storage.get('future-opt-in')
       const disableFutureFeature = futureFeatureSettings && futureFeatureSettings.enabled === false
 
-      if (disableFutureFeature) {
-        settings = {
-          enabled: false
-        }
+      settings = {
+        enabled: !disableFutureFeature
+      }
 
+      if (!this.metadata.futureFeature) {
+        // if not a future feature, we should save the settings
+        // so that if the future feature setting gets toggled,
+        // we still maintain the enabled state
         await storage.set(this.metadata.id, settings)
-
-        return settings
       }
     }
 
-    settings = Object.assign({}, this.settingsDefaults, settings)
-
-    return settings
+    return Object.assign({}, this.settingsDefaults, settings)
   }
 }
 
