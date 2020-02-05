@@ -1,7 +1,8 @@
 Changelog
 --------
 
-# unreleased
+# 0.2.0 - Pre-release
+
 * Add opt-in setting for future features
 * Fix issue where modal backdrop did not freeze
 * close modal/drawer when backdrop is clicked
