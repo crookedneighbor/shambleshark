@@ -2,6 +2,11 @@ h1, h2, h3, h4, h5, h6 {
   font-family: monospace;
 }
 
+a {
+  color: #634496;
+  font-weight: bold;
+}
+
 .hero.is-primary {
   background: linear-gradient(to bottom, #1d1c25, #431e3f);
 }

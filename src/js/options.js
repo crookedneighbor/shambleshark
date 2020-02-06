@@ -60,8 +60,10 @@ page.innerHTML = `
       </div>
       <div class="columns is-5-tablet is-4-desktop is-3-widescreen">
         <div class="column box">
-          <form id="settings-form">
+          <p>An unofficial browser extension to add additional functionality to the <a href="https://scryfall.com">Scryfall website</a>. This extension is not developed by the Scryfall team. For support with the extension, please <a href="https://github.com/crookedneighbor/shambleshark/issues">open an issue on Github</a>.</p>
+          <br />
 
+          <form id="settings-form">
             <div id="global">
               <h2 class="title has-text-dark">Global Settings</h2>
             </div>
