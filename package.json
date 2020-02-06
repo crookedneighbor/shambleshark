@@ -1,5 +1,5 @@
 {
-  "name": "scryfall-extend-extension",
+  "name": "shambleshark",
   "private": true,
   "version": "0.2.0",
   "description": "A browser extension for adding features to the Scryfall site.",

@@ -1,12 +1,10 @@
-# Scryfall Extend
+# Shambleshark (Unofficial Scryfall Browser Extension)
 
-An unofficial extension to add additional functionality to the Scryfall website.
+An unofficial browser extension to add additional functionality to the Scryfall website. This extension is not developed by the Scryfall team. For support, please [open an issue](https://github.com/crookedneighbor/shambleshark/issues).
 
-As with many extensions, it relies on the DOM structure and JavaScript of Scryfall remaining consistent. So if something changes on Scryfall, it may result in the extension breaking. If that happens, [open an issue](https://github.com/crookedneighbor/scryfall-extend/issues) and we will work to fix it.
+As with many extensions, it relies on the DOM structure and JavaScript of Scryfall remaining consistent. So if something changes on Scryfall, it may result in the extension breaking. If that happens, [open an issue](https://github.com/crookedneighbor/shambleshark/issues) and we will work to fix it.
 
-## Using the unpacked extension
-
-### In development
+## Development
 
 1. Install the node dependencies:
 

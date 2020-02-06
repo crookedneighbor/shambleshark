@@ -1,5 +1,13 @@
+h1, h2, h3, h4, h5, h6 {
+  font-family: monospace;
+}
+
 .hero.is-primary {
   background: linear-gradient(to bottom, #1d1c25, #431e3f);
+}
+
+.hero.is-primary h1 {
+  font-size: 5em;
 }
 
 #settings-container {

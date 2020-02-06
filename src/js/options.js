@@ -1,7 +1,6 @@
 import bulmaCSS from 'bulma/css/bulma.min.css'
 import bulmaSwitchCSS from 'bulma-switch/dist/css/bulma-switch.min.css'
 import optionsCSS from '../css/options.css'
-import '../img/big-logo.png'
 
 import injectCSS from './lib/inject-css'
 
@@ -55,13 +54,13 @@ page.innerHTML = `
     <div id="settings-container" class="container">
       <div class="columns is-5-tablet is-4-desktop is-3-widescreen">
         <div class="column has-text-centered">
-          <img src="big-logo.png" />
+          <h1 class="title has-text-centered">Shambleshark</h1>
+          <h3 class="subtitle has-text-centered">Unofficial Scryfall Browser Extension</h3>
         </div>
       </div>
       <div class="columns is-5-tablet is-4-desktop is-3-widescreen">
         <div class="column box">
           <form id="settings-form">
-            <h3 class="subtitle has-text-dark has-text-centered">Unofficial Scryfall Browser Extension</h3>
 
             <div id="global">
               <h2 class="title has-text-dark">Global Settings</h2>
