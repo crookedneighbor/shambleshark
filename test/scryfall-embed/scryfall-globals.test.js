@@ -6,6 +6,7 @@ import {
   getActiveDeckId,
   getDeck,
   hasDedicatedLandSection,
+  modifyCleanup,
   removeEntry,
   updateEntry,
   pushNotification
@@ -20,6 +21,11 @@ describe('Scryfall Globals', function () {
       sections: {
         primary: ['mainboard'],
         secondary: ['sideboard', 'maybeboard']
+      },
+      entries: {
+        mainboard: [],
+        sideboard: [],
+        maybeboard: []
       }
     }
     global.ScryfallAPI = {
@@ -168,6 +174,163 @@ describe('Scryfall Globals', function () {
       return cleanUp().then(() => {
         expect(global.Scryfall.deckbuilder.cleanUp).toBeCalledTimes(1)
       })
+    })
+  })
+
+  describe('modifyCleanUp', function () {
+    let originalCleanupFunction
+
+    beforeEach(function () {
+      reset()
+      originalCleanupFunction = global.Scryfall.deckbuilder.cleanUp
+      global.ScryfallAPI.decks.updateEntry.mockImplementation((deckId, cardToUpdate, cb) => {
+        cb()
+      })
+    })
+
+    afterEach(function () {
+      global.Scryfall.deckbuilder.cleanUp = originalCleanupFunction
+    })
+
+    it('replaces the cleanup function', function () {
+      modifyCleanup()
+
+      const newCleanupFunction = global.Scryfall.deckbuilder.cleanUp
+
+      expect(newCleanupFunction).not.toEqual(originalCleanupFunction)
+    })
+
+    it('moves lands in nonlands section back to lands section when configured', async function () {
+      modifyCleanup({
+        cleanUpLandsInSingleton: true
+      })
+
+      fakeDeck.sections.primary.push('nonlands')
+      fakeDeck.sections.secondary.push('lands')
+      fakeDeck.entries.lands = []
+      fakeDeck.entries.nonlands = [{
+        id: 'card-without-a-digest',
+        section: 'nonlands'
+      }, {
+        id: 'card-with-land-type',
+        section: 'nonlands',
+        card_digest: {
+          type_line: 'Land'
+        }
+      }, {
+        id: 'card-with-non-land-type',
+        section: 'nonlands',
+        card_digest: {
+          type_line: 'Creature'
+        }
+      }, {
+        id: 'another-card-with-land-type',
+        section: 'nonlands',
+        card_digest: {
+          type_line: 'Basic Land - Mountain'
+        }
+      }]
+
+      await global.Scryfall.deckbuilder.cleanUp()
+
+      expect(global.ScryfallAPI.decks.updateEntry).toBeCalledTimes(2)
+      expect(global.ScryfallAPI.decks.updateEntry).toBeCalledWith('deck-id', {
+        id: 'card-with-land-type',
+        section: 'lands',
+        card_digest: {
+          type_line: 'Land'
+        }
+      }, expect.any(Function))
+      expect(global.ScryfallAPI.decks.updateEntry).toBeCalledWith('deck-id', {
+        id: 'another-card-with-land-type',
+        section: 'lands',
+        card_digest: {
+          type_line: 'Basic Land - Mountain'
+        }
+      }, expect.any(Function))
+    })
+
+    it('moves nonlands in lands section back to nonlands section when configured', async function () {
+      modifyCleanup({
+        cleanUpLandsInSingleton: true
+      })
+
+      fakeDeck.sections.primary.push('nonlands')
+      fakeDeck.sections.secondary.push('lands')
+      fakeDeck.entries.nonlands = []
+      fakeDeck.entries.lands = [{
+        id: 'card-without-a-digest',
+        section: 'lands'
+      }, {
+        id: 'card-with-non-land-type',
+        section: 'lands',
+        card_digest: {
+          type_line: 'Creature'
+        }
+      }, {
+        id: 'card-with-land-type',
+        section: 'lands',
+        card_digest: {
+          type_line: 'Basic Land - Mountain'
+        }
+      }, {
+        id: 'another-card-with-non-land-type',
+        section: 'lands',
+        card_digest: {
+          type_line: 'Enchantment'
+        }
+      }]
+
+      await global.Scryfall.deckbuilder.cleanUp()
+
+      expect(global.ScryfallAPI.decks.updateEntry).toBeCalledTimes(2)
+      expect(global.ScryfallAPI.decks.updateEntry).toBeCalledWith('deck-id', {
+        id: 'card-with-non-land-type',
+        section: 'nonlands',
+        card_digest: {
+          type_line: 'Creature'
+        }
+      }, expect.any(Function))
+      expect(global.ScryfallAPI.decks.updateEntry).toBeCalledWith('deck-id', {
+        id: 'another-card-with-non-land-type',
+        section: 'nonlands',
+        card_digest: {
+          type_line: 'Enchantment'
+        }
+      }, expect.any(Function))
+    })
+
+    it('does not update if nothing is available to update', async function () {
+      modifyCleanup({
+        cleanUpLandsInSingleton: true
+      })
+
+      fakeDeck.sections.primary.push('nonlands')
+      fakeDeck.sections.secondary.push('lands')
+      fakeDeck.entries.nonlands = [{
+        id: 'card-without-a-digest',
+        section: 'lands'
+      }, {
+        id: 'card-with-non-land-type',
+        section: 'lands',
+        card_digest: {
+          type_line: 'Creature'
+        }
+      }]
+      fakeDeck.entries.lands = [{
+        id: 'card-without-a-digest',
+        section: 'lands'
+      }, {
+        id: 'card-with-land-type',
+        section: 'lands',
+        card_digest: {
+          type_line: 'Basic Land - Mountain'
+        }
+      }]
+
+      await global.Scryfall.deckbuilder.cleanUp()
+
+      expect(global.ScryfallAPI.decks.updateEntry).toBeCalledTimes(0)
     })
   })
 
