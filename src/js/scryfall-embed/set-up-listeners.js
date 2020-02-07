@@ -68,6 +68,10 @@ export default function setUpListeners () {
     })
   })
 
+  bus.on('MODIFY_CLEAN_UP', function (config) {
+    Scryfall.modifyCleanup(config)
+  })
+
   bus.on('CLEAN_UP_DECK', function () {
     Scryfall.cleanUp()
   })

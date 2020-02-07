@@ -14,6 +14,7 @@ describe('set up listeners on Scryfall page', function () {
     jest.spyOn(Scryfall, 'removeEntry').mockResolvedValue()
     jest.spyOn(Scryfall, 'pushNotification').mockImplementation()
     jest.spyOn(Scryfall, 'cleanUp').mockImplementation()
+    jest.spyOn(Scryfall, 'modifyCleanup').mockImplementation()
   })
 
   it('listens for events', function () {
@@ -24,6 +25,7 @@ describe('set up listeners on Scryfall page', function () {
     expect(bus.on).toBeCalledWith('ADD_CARD_TO_DECK', expect.any(Function))
     expect(bus.on).toBeCalledWith('REMOVE_CARD_FROM_DECK', expect.any(Function))
     expect(bus.on).toBeCalledWith('CLEAN_UP_DECK', expect.any(Function))
+    expect(bus.on).toBeCalledWith('MODIFY_CLEAN_UP', expect.any(Function))
   })
 
   it('reports that listeners are ready', function () {
@@ -290,6 +292,25 @@ describe('set up listeners on Scryfall page', function () {
       setUpListeners('active-deck-id')
 
       expect(Scryfall.cleanUp).toBeCalledTimes(1)
+    })
+  })
+
+  describe('MODIFY_CLEAN_UP', function () {
+    const config = {}
+
+    beforeEach(function () {
+      bus.on.mockImplementation((event, cb) => {
+        if (event === 'MODIFY_CLEAN_UP') {
+          cb(config)
+        }
+      })
+    })
+
+    it('calls modifyCleanup', function () {
+      setUpListeners('active-deck-id')
+
+      expect(Scryfall.modifyCleanup).toBeCalledTimes(1)
+      expect(Scryfall.modifyCleanup).toBeCalledWith(config)
     })
   })
 })
