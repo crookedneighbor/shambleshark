@@ -1,0 +1,11 @@
+.tagger-link-button.icon-only {
+  padding: 7px;
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  display: none;
+}
+
+.card-grid-item:hover .tagger-link-button {
+  display: block;
+}

@@ -7,12 +7,14 @@ import injectCSS from './lib/inject-css'
 import globalFeatures from './features/global-features'
 import deckbuilderFeatures from './features/deck-builder-features'
 import deckViewFeatures from './features/deck-view-features'
+import searchResultsFeatures from './features/search-results-features'
 
 injectCSS(bulmaCSS + bulmaSwitchCSS + optionsCSS)
 
 const features = globalFeatures
   .concat(deckbuilderFeatures)
   .concat(deckViewFeatures)
+  .concat(searchResultsFeatures)
 
 function setupToggleListeners (element, fn) {
   element.addEventListener('change', fn)
@@ -73,6 +75,10 @@ page.innerHTML = `
             <hr>
             <div id="deck-view">
               <h2 class="title has-text-dark">Deck View Page</h2>
+            </div>
+            <hr>
+            <div id="search-results">
+              <h2 class="title has-text-dark">Search Results</h2>
             </div>
             <hr>
           </form>

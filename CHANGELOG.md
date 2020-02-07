@@ -1,6 +1,10 @@
 Changelog
 --------
 
+# unreleased
+
+* Add Tagger Link feature
+
 # 0.2.0 - Pre-release
 
 * Add opt-in setting for future features
