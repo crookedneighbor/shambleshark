@@ -1,5 +1,6 @@
 import bus from 'framebus'
 import Scryfall from './scryfall-globals'
+import modifyCleanUp from './modify-clean-up'
 import {
   hasDedicatedLandSection
 } from '../lib/deck-parser'
@@ -32,7 +33,7 @@ export default function setUpListeners () {
         Scryfall.updateEntry(addedCardInfo)
       } else if (isLand) {
         Scryfall.getDeckMetadata().then(meta => {
-          if (hasDedicatedLandSection(meta) ) {
+          if (hasDedicatedLandSection(meta)) {
             addedCardInfo.section = 'lands'
             Scryfall.updateEntry(addedCardInfo)
           }
@@ -71,9 +72,7 @@ export default function setUpListeners () {
     })
   })
 
-  bus.on('MODIFY_CLEAN_UP', function (config) {
-    Scryfall.modifyCleanup(config)
-  })
+  bus.on('MODIFY_CLEAN_UP', modifyCleanUp)
 
   bus.on('CLEAN_UP_DECK', function () {
     Scryfall.cleanUp()

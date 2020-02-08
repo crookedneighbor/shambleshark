@@ -1,5 +1,6 @@
 import wait from '../../src/js/lib/wait'
 import Scryfall from '../../src/js/scryfall-embed/scryfall-globals'
+import modifyCleanUp from '../../src/js/scryfall-embed/modify-clean-up'
 import setUpListeners from '../../src/js/scryfall-embed/set-up-listeners'
 import bus from 'framebus'
 
@@ -8,13 +9,17 @@ describe('set up listeners on Scryfall page', function () {
     jest.spyOn(bus, 'on')
     jest.spyOn(bus, 'emit')
     jest.spyOn(Scryfall, 'getDeck')
-    jest.spyOn(Scryfall, 'hasDedicatedLandSection').mockResolvedValue(false)
+    jest.spyOn(Scryfall, 'getDeckMetadata').mockResolvedValue({
+      sections: {
+        primary: ['mainboard'],
+        secondary: ['sideboard']
+      }
+    })
     jest.spyOn(Scryfall, 'addCard')
     jest.spyOn(Scryfall, 'updateEntry').mockResolvedValue()
     jest.spyOn(Scryfall, 'removeEntry').mockResolvedValue()
     jest.spyOn(Scryfall, 'pushNotification').mockImplementation()
     jest.spyOn(Scryfall, 'cleanUp').mockImplementation()
-    jest.spyOn(Scryfall, 'modifyCleanup').mockImplementation()
   })
 
   it('listens for events', function () {
@@ -25,7 +30,7 @@ describe('set up listeners on Scryfall page', function () {
     expect(bus.on).toBeCalledWith('ADD_CARD_TO_DECK', expect.any(Function))
     expect(bus.on).toBeCalledWith('REMOVE_CARD_FROM_DECK', expect.any(Function))
     expect(bus.on).toBeCalledWith('CLEAN_UP_DECK', expect.any(Function))
-    expect(bus.on).toBeCalledWith('MODIFY_CLEAN_UP', expect.any(Function))
+    expect(bus.on).toBeCalledWith('MODIFY_CLEAN_UP', modifyCleanUp)
   })
 
   it('reports that listeners are ready', function () {
@@ -155,7 +160,11 @@ describe('set up listeners on Scryfall page', function () {
     it('updates card for specific section if section is specified even when isLand is true and there is a dedicated land section', function () {
       cardData.section = 'sideboard'
       cardData.isLand = true
-      Scryfall.hasDedicatedLandSection.mockResolvedValue(true)
+      Scryfall.getDeckMetadata.mockResolvedValue({
+        sections: {
+          mainboard: ['lands']
+        }
+      })
 
       setUpListeners('active-deck-id')
 
@@ -168,7 +177,11 @@ describe('set up listeners on Scryfall page', function () {
 
     it('updates lands to be put in lands section if deck has dedicated lands section and no section is specified', function () {
       cardData.isLand = true
-      Scryfall.hasDedicatedLandSection.mockResolvedValue(true)
+      Scryfall.getDeckMetadata.mockResolvedValue({
+        sections: {
+          mainboard: ['lands']
+        }
+      })
 
       setUpListeners('active-deck-id')
 
@@ -181,7 +194,6 @@ describe('set up listeners on Scryfall page', function () {
 
     it('does not update lands to be put in lands section if deck does not have dedicated lands section', function () {
       cardData.isLand = true
-      Scryfall.hasDedicatedLandSection.mockResolvedValue(false)
 
       setUpListeners('active-deck-id')
 
@@ -292,25 +304,6 @@ describe('set up listeners on Scryfall page', function () {
       setUpListeners('active-deck-id')
 
       expect(Scryfall.cleanUp).toBeCalledTimes(1)
-    })
-  })
-
-  describe('MODIFY_CLEAN_UP', function () {
-    const config = {}
-
-    beforeEach(function () {
-      bus.on.mockImplementation((event, cb) => {
-        if (event === 'MODIFY_CLEAN_UP') {
-          cb(config)
-        }
-      })
-    })
-
-    it('calls modifyCleanup', function () {
-      setUpListeners('active-deck-id')
-
-      expect(Scryfall.modifyCleanup).toBeCalledTimes(1)
-      expect(Scryfall.modifyCleanup).toBeCalledWith(config)
     })
   })
 })

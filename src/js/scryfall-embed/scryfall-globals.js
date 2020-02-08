@@ -14,34 +14,6 @@ export function getDeckMetadata () {
   return getDeckMetadataPromise
 }
 
-function correctLandNonLandColumns (deck) {
-  return hasDedicatedLandSection().then(hasLandsSection => {
-    if (!hasLandsSection) {
-      return
-    }
-
-    const landsInNonLands = deck.entries.nonlands.filter(c => {
-      return c.card_digest && c.card_digest.type_line.includes('Land')
-    })
-    const nonLandsInLands = deck.entries.lands.filter(c => {
-      return c.card_digest && !c.card_digest.type_line.includes('Land')
-    })
-
-    landsInNonLands.forEach(c => {
-      c.section = 'lands'
-    })
-    nonLandsInLands.forEach(c => {
-      c.section = 'nonlands'
-    })
-    const cardPromises = landsInNonLands
-      .concat(nonLandsInLands)
-      .map(c => updateEntry(c))
-
-    return Promise.all(cardPromises)
-  })
-}
-
-
 export function getActiveDeckId () {
   if (Scryfall.deckbuilder && Scryfall.deckbuilder.deckId) {
     return Promise.resolve(Scryfall.deckbuilder.deckId)
@@ -107,20 +79,6 @@ export function removeEntry (cardId) {
   })
 }
 
-export function modifyCleanup (config = {}) {
-  const oldCleanup = Scryfall.deckbuilder.cleanUp
-
-  Scryfall.deckbuilder.cleanUp = () => {
-    return getDeck().then(deck => {
-      if (config.cleanUpLandsInSingleton) {
-        return correctLandNonLandColumns(deck)
-      }
-    }).then(() => {
-      return oldCleanup()
-    })
-  }
-}
-
 export function cleanUp () {
   Scryfall.deckbuilder.cleanUp()
 
@@ -138,7 +96,6 @@ export default {
   cleanUp,
   getDeckMetadata,
   getDeck,
-  modifyCleanup,
   removeEntry,
   updateEntry,
   pushNotification
