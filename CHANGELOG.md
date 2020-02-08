@@ -4,6 +4,7 @@ Changelog
 # unreleased
 
 * Add Tagger Link feature
+* Add Cleanup Improver feature
 
 # 0.2.0 - Pre-release
 
