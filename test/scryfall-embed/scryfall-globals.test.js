@@ -4,6 +4,7 @@ import {
   getActiveDeck,
   getActiveDeckId,
   getDeck,
+  getDeckMetadata,
   removeEntry,
   updateEntry,
   pushNotification
@@ -84,6 +85,25 @@ describe('Scryfall Globals', function () {
         expect(global.ScryfallAPI.decks.get).toBeCalledWith('deck-id', expect.any(Function))
 
         expect(deck).toBe(resolvedDeck)
+      })
+    })
+  })
+
+  describe('getDeckMetadata', function () {
+    it('gets the metadata from active deck', function () {
+      const deck = { id: 'deck-id', sections: {}, foo: 'bar' }
+
+      global.ScryfallAPI.decks.get.mockImplementation((id, cb) => {
+        cb(deck)
+      })
+
+      return getDeckMetadata().then(meta => {
+        expect(global.ScryfallAPI.decks.get).toBeCalledWith('deck-id', expect.any(Function))
+
+        expect(meta).toEqual({
+          id: 'deck-id',
+          sections: {}
+        })
       })
     })
   })
