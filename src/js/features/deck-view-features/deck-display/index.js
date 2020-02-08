@@ -12,7 +12,7 @@ DeckDisplay.metadata = {
   futureFeature: true,
   title: 'Deck Display',
   section: sections.DECK_VIEW,
-  description: 'Allows alternate displays for viewing your cards, such as an image view.'
+  description: 'Allows alternate displays for viewing your cards, such as a stacked card image view.'
 }
 DeckDisplay.settingsDefaults = {
   enabled: true
