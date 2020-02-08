@@ -40,7 +40,6 @@ class TaggerLink extends Feature {
 
 TaggerLink.metadata = {
   id: 'tagger-link',
-  futureFeature: true,
   title: 'Tagger Link',
   section: sections.SEARCH_RESULTS,
   description: 'Provide a button to card\'s tagger page from search results.'
