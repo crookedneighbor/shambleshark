@@ -217,6 +217,21 @@ describe('Base Feature', function () {
 
       expect(settings.enabled).toBe(false)
     })
+
+    it('resolves with enabled false if feature is a future feature', async function () {
+      storage.get.mockResolvedValueOnce()
+      storage.get.mockResolvedValueOnce({
+        enabled: true
+      })
+      const settings = await FutureFeatureWithSavedSettings.getSettings()
+
+      expect(storage.get).toBeCalledTimes(2)
+      expect(storage.get).toBeCalledWith('future-feature')
+      expect(storage.get).toBeCalledWith('future-opt-in')
+      expect(storage.set).toBeCalledTimes(0)
+
+      expect(settings.enabled).toBe(false)
+    })
   })
 
   describe('saveSetting', function () {

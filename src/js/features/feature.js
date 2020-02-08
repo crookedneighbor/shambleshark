@@ -55,7 +55,7 @@ class Feature {
       const disableFutureFeature = futureFeatureSettings && futureFeatureSettings.enabled === false
 
       settings = {
-        enabled: !disableFutureFeature
+        enabled: !disableFutureFeature && !this.metadata.futureFeature
       }
 
       if (!this.metadata.futureFeature) {
