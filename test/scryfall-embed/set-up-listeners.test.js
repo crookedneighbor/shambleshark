@@ -125,10 +125,13 @@ describe('set up listeners on Scryfall page', function () {
     beforeEach(function () {
       cardData = {
         cardName: 'Rashmi, Etrnities Crafter',
-        cardId: 'id-1',
-        isLand: false
+        cardId: 'id-1'
       }
-      scryfallCard = {}
+      scryfallCard = {
+        card_digest: {
+          type_line: 'Creature'
+        }
+      }
       bus.on.mockImplementation((event, cb) => {
         if (event === 'ADD_CARD_TO_DECK') {
           cb(cardData)
@@ -157,9 +160,9 @@ describe('set up listeners on Scryfall page', function () {
       })
     })
 
-    it('updates card for specific section if section is specified even when isLand is true and there is a dedicated land section', function () {
+    it('updates card for specific section if section is specified even when card is a land card and there is a dedicated land section', function () {
       cardData.section = 'sideboard'
-      cardData.isLand = true
+      scryfallCard.card_digest.type_line = 'Land'
       Scryfall.getDeckMetadata.mockResolvedValue({
         sections: {
           mainboard: ['lands']
@@ -176,7 +179,7 @@ describe('set up listeners on Scryfall page', function () {
     })
 
     it('updates lands to be put in lands section if deck has dedicated lands section and no section is specified', function () {
-      cardData.isLand = true
+      scryfallCard.card_digest.type_line = 'Land'
       Scryfall.getDeckMetadata.mockResolvedValue({
         sections: {
           mainboard: ['lands']
@@ -193,7 +196,7 @@ describe('set up listeners on Scryfall page', function () {
     })
 
     it('does not update lands to be put in lands section if deck does not have dedicated lands section', function () {
-      cardData.isLand = true
+      scryfallCard.card_digest.type_line = 'Land'
 
       setUpListeners('active-deck-id')
 

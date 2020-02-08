@@ -435,8 +435,7 @@ describe('AddCardElement', function () {
 
       expect(bus.emit).toBeCalledWith('ADD_CARD_TO_DECK', {
         cardName: 'Arcane Denial',
-        cardId: 'arcane-denial-id',
-        isLand: false
+        cardId: 'arcane-denial-id'
       })
     })
 
@@ -457,25 +456,7 @@ describe('AddCardElement', function () {
       expect(bus.emit).toBeCalledWith('ADD_CARD_TO_DECK', {
         cardName: 'foo',
         section: 'bar',
-        cardId: 'arcane-denial-id',
-        isLand: false
-      })
-    })
-
-    it('emits event to add card to deck with isLand property set to true when card is a land', async function () {
-      const cardEl = new AddCardElement({
-        name: 'Island',
-        id: 'island-id',
-        type: 'Basic Land - Island',
-        img: 'https://example.com/island'
-      })
-
-      await cardEl.addCardToDeck()
-
-      expect(bus.emit).toBeCalledWith('ADD_CARD_TO_DECK', {
-        cardName: 'Island',
-        cardId: 'island-id',
-        isLand: true
+        cardId: 'arcane-denial-id'
       })
     })
 
@@ -509,8 +490,7 @@ describe('AddCardElement', function () {
 
       expect(bus.emit).toBeCalledWith('ADD_CARD_TO_DECK', {
         cardName: 'Arcane Denial',
-        cardId: 'different-id',
-        isLand: false
+        cardId: 'different-id'
       })
     })
 

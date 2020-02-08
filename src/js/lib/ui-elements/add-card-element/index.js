@@ -135,8 +135,7 @@ export default class AddCardElement {
     return this._getScryfallId().then(id => {
       const payload = {
         cardName: this.name,
-        cardId: id,
-        isLand: this.type.toLowerCase().indexOf('land') > -1
+        cardId: id
       }
 
       if (this.onAddCard) {

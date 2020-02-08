@@ -2,7 +2,8 @@ import bus from 'framebus'
 import Scryfall from './scryfall-globals'
 import modifyCleanUp from './modify-clean-up'
 import {
-  hasDedicatedLandSection
+  hasDedicatedLandSection,
+  isLandCard
 } from '../lib/deck-parser'
 
 export default function setUpListeners () {
@@ -22,7 +23,6 @@ export default function setUpListeners () {
   bus.on('ADD_CARD_TO_DECK', function ({
     cardName,
     cardId,
-    isLand,
     section
   }) {
     // adds card if it does not exist and increments
@@ -31,7 +31,7 @@ export default function setUpListeners () {
       if (section) {
         addedCardInfo.section = section
         Scryfall.updateEntry(addedCardInfo)
-      } else if (isLand) {
+      } else if (isLandCard(addedCardInfo)) {
         Scryfall.getDeckMetadata().then(meta => {
           if (hasDedicatedLandSection(meta)) {
             addedCardInfo.section = 'lands'

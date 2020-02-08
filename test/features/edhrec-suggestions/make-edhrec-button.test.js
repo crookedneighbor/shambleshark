@@ -414,7 +414,7 @@ describe('makeEDHRecButton', function () {
       expect(sections[2].querySelector('.edhrec-suggestions img').src).toBe('https://img.scryfall.com/cards/normal/front/f/1/f1d33afd-6f2a-43c8-ae5d-17a0674fcdd3.jpg?1562049659')
     })
 
-    it('looks up nonland card in scryfall and adds it to deck when chosen', async function () {
+    it('looks up card in scryfall and adds it to deck when chosen', async function () {
       const btn = await makeEDHRecButton()
       jest.spyOn(scryfall.api, 'get').mockResolvedValue({
         name: 'Arcane Denial',
@@ -437,34 +437,7 @@ describe('makeEDHRecButton', function () {
 
       expect(bus.emit).toBeCalledWith('ADD_CARD_TO_DECK', {
         cardName: 'Arcane Denial',
-        cardId: 'arcane-denial-id',
-        isLand: false
-      })
-    })
-
-    it('looks up land card in scryfall and adds it to deck when chosen', async function () {
-      const btn = await makeEDHRecButton()
-      jest.spyOn(scryfall.api, 'get').mockResolvedValue({
-        id: 'shivan-reef-id'
-      })
-
-      btn.click()
-
-      await wait()
-
-      const cardElement = document.querySelectorAll('#edhrec-drawer .add-card-element-container .add-card-element__panel.plus-symbol')[2]
-
-      cardElement.click()
-
-      expect(scryfall.api.get).toBeCalledTimes(1)
-      expect(scryfall.api.get).toBeCalledWith('/cards/ori/251')
-
-      await wait()
-
-      expect(bus.emit).toBeCalledWith('ADD_CARD_TO_DECK', {
-        cardName: 'Shivan Reef',
-        cardId: 'shivan-reef-id',
-        isLand: true
+        cardId: 'arcane-denial-id'
       })
     })
 

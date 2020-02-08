@@ -5,6 +5,7 @@ Changelog
 
 * Add Tagger Link feature
 * Add Cleanup Improver feature
+* Fix auto-add behavior when adding cards that flip into lands into singleton deck
 
 # 0.2.0 - Pre-release
 
