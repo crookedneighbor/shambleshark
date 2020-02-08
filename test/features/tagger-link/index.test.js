@@ -13,7 +13,7 @@ describe('Tagger Link', function () {
       await tl.run()
 
       expect(mutation.ready).toBeCalledTimes(1)
-      expect(mutation.ready).toBeCalledWith('.card-grid-item', expect.any(Function))
+      expect(mutation.ready).toBeCalledWith('.card-grid-item a.card-grid-item-card', expect.any(Function))
     })
 
     it('adds a button to .card-grid-item', async function () {
@@ -23,7 +23,7 @@ describe('Tagger Link', function () {
       el.innerHTML = '<a class="card-grid-item-card" href="https://scryfall.com/card/set/number"></a>'
 
       mutation.ready.mockImplementation((cssSelector, cb) => {
-        cb(el)
+        cb(el.querySelector('a'))
       })
 
       await tl.run()

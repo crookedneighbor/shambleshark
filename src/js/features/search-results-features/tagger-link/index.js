@@ -30,11 +30,10 @@ function makeButton (link) {
 
 class TaggerLink extends Feature {
   async run () {
-    mutation.ready('.card-grid-item', (el) => {
-      const link = el.querySelector('a.card-grid-item-card')
+    mutation.ready('.card-grid-item a.card-grid-item-card', (link) => {
       const button = makeButton(link.href)
 
-      el.appendChild(button)
+      link.parentNode.appendChild(button)
     })
   }
 }
