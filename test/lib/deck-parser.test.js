@@ -2,7 +2,9 @@ import {
   getCommanderColorIdentity,
   getSections,
   flattenEntries,
+  hasDedicatedLandSection,
   isCommanderLike,
+  isLandCard,
   isSingletonTypeDeck,
   hasLegalCommanders
 } from '../../src/js/lib/deck-parser'
@@ -125,6 +127,76 @@ describe('Deck Parser', function () {
       }
 
       expect(getSections(fakeDeck)).toEqual(['1', '2', '3', '4'])
+    })
+  })
+
+  describe('isLandCard', function () {
+    it('returns false if card is not a land card', function () {
+      expect(isLandCard({
+        card_digest: {
+          type_line: 'Enchantment'
+        }
+      })).toBe(false)
+    })
+
+    it('returns true if card is a land card', function () {
+      expect(isLandCard({
+        card_digest: {
+          type_line: 'Land'
+        }
+      })).toBe(true)
+    })
+
+    it('returns false if card is land card on flip side', function () {
+      expect(isLandCard({
+        card_digest: {
+          type_line: 'Enchantment // Land'
+        }
+      })).toBe(false)
+    })
+
+    it('returns true if card is a land card on front side', function () {
+      expect(isLandCard({
+        card_digest: {
+          type_line: 'Land // Creature'
+        }
+      })).toBe(true)
+    })
+
+    it('returns false if card is a creature land', function () {
+      expect(isLandCard({
+        card_digest: {
+          type_line: 'Land Creature'
+        }
+      })).toBe(false)
+    })
+
+    it('returns true if card is a creature on the flipside', function () {
+      expect(isLandCard({
+        card_digest: {
+          type_line: 'Land // Creature'
+        }
+      })).toBe(true)
+    })
+  })
+
+  describe('hasDedicatedLandSection', function () {
+    it('returns false if deck does not have a lands section', function () {
+      expect(hasDedicatedLandSection({
+        sections: {
+          primary: ['mainboard', 'sideboard'],
+          seconday: ['maybeboard']
+        }
+      })).toBe(false)
+    })
+
+    it('returns true if deck does have a lands section', function () {
+      expect(hasDedicatedLandSection({
+        sections: {
+          primary: ['mainboard', 'lands'],
+          seconday: ['maybeboard']
+        }
+      })).toBe(true)
     })
   })
 

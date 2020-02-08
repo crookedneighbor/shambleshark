@@ -13,6 +13,19 @@ function getCommanders (deck) {
   })
 }
 
+export function isLandCard (card) {
+  const frontType = card.card_digest.type_line.split('//')[0].trim()
+
+  return Boolean(
+    frontType.includes('Land') &&
+    !frontType.includes('Creature')
+  )
+}
+
+export function hasDedicatedLandSection (deck) {
+  return getSections(deck).includes('lands')
+}
+
 export function getCommanderColorIdentity (deck) {
   return getCommanders(deck).then(cards => {
     return cards.map(c => c.color_identity)
@@ -91,8 +104,10 @@ export function isSingletonTypeDeck (deck) {
 
 export default {
   getCommanderColorIdentity,
+  isLandCard,
   getSections,
   flattenEntries,
+  hasDedicatedLandSection,
   hasLegalCommanders,
   isCommanderLike,
   isSingletonTypeDeck

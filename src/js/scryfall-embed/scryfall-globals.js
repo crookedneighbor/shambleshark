@@ -1,11 +1,7 @@
-import {
-  getSections
-} from '../lib/deck-parser'
-
 let getActiveDeckPromise = null
 let getDeckMetadataPromise = null
 
-function getDeckMetadata () {
+export function getDeckMetadata () {
   if (!getDeckMetadataPromise) {
     getDeckMetadataPromise = getDeck().then(deck => {
       return {
@@ -52,12 +48,6 @@ export function getActiveDeckId () {
   }
 
   return getActiveDeck().then(({ id }) => id)
-}
-
-export function hasDedicatedLandSection () {
-  return getDeckMetadata().then(meta => {
-    return getSections(meta).includes('lands')
-  }).then(res => Boolean(res))
 }
 
 export function getActiveDeck () {
@@ -146,8 +136,8 @@ export function pushNotification (title, message, color, type) {
 export default {
   addCard,
   cleanUp,
+  getDeckMetadata,
   getDeck,
-  hasDedicatedLandSection,
   modifyCleanup,
   removeEntry,
   updateEntry,

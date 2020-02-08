@@ -1,5 +1,8 @@
 import bus from 'framebus'
 import Scryfall from './scryfall-globals'
+import {
+  hasDedicatedLandSection
+} from '../lib/deck-parser'
 
 export default function setUpListeners () {
   bus.on('REQUEST_DECK', function (reply) {
@@ -28,8 +31,8 @@ export default function setUpListeners () {
         addedCardInfo.section = section
         Scryfall.updateEntry(addedCardInfo)
       } else if (isLand) {
-        Scryfall.hasDedicatedLandSection().then(hasLandSection => {
-          if (hasLandSection) {
+        Scryfall.getDeckMetadata().then(meta => {
+          if (hasDedicatedLandSection(meta) ) {
             addedCardInfo.section = 'lands'
             Scryfall.updateEntry(addedCardInfo)
           }
