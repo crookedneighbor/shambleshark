@@ -13,6 +13,14 @@ function getCommanders (deck) {
   })
 }
 
+function getIdFromEntry (entry, idType) {
+  if (idType === 'id') {
+    return entry.raw_text && entry.id
+  } else if (idType === 'oracleId') {
+    return entry.card_digest && entry.card_digest.oracle_id
+  }
+}
+
 export function isLandCard (card) {
   const frontType = card.card_digest.type_line.split('//')[0].trim()
 
@@ -51,21 +59,22 @@ export function getSections (deck) {
   }, [])
 }
 
-export function flattenEntries (deck) {
+export function flattenEntries (deck, options = {}) {
   const sections = getSections(deck)
   const entries = []
-  const oracleIds = {}
+  const ids = {}
+  const idToGroupBy = options.idToGroupBy || 'oracleId'
 
   sections.forEach(section => {
     deck.entries[section].forEach(entry => {
-      const oracleId = entry.card_digest && entry.card_digest.oracle_id
+      const id = getIdFromEntry(entry, idToGroupBy)
 
-      if (oracleId) {
-        if (oracleId in oracleIds) {
-          const original = oracleIds[oracleId]
+      if (id) {
+        if (id in ids) {
+          const original = ids[id]
           original.count = Number(original.count) + Number(entry.count)
         } else {
-          oracleIds[oracleId] = entry
+          ids[id] = entry
           entries.push(entry)
         }
       }
