@@ -14,7 +14,15 @@ export function getDeckMetadata () {
   return getDeckMetadataPromise
 }
 
-export function getActiveDeckId () {
+export function getActiveDeckId (waitTime = 300) {
+  if (!ScryfallAPI.grantSecret) {
+    return wait(waitTime).then(() => {
+      console.log('got here with wait time', waitTime)
+      // progressively wait longer and longer to try looking up the grant secret
+      return getActiveDeckId(waitTime * 2)
+    })
+  }
+
   if (Scryfall.deckbuilder && Scryfall.deckbuilder.deckId) {
     return Promise.resolve(Scryfall.deckbuilder.deckId)
   }

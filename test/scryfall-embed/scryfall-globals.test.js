@@ -27,6 +27,7 @@ describe('Scryfall Globals', function () {
       }
     }
     global.ScryfallAPI = {
+      grantSecret: 'secret',
       decks: {
         active: jest.fn().mockImplementation((cb) => {
           cb(fakeDeck)
@@ -53,6 +54,30 @@ describe('Scryfall Globals', function () {
       return getActiveDeckId().then((id) => {
         expect(id).toBe('deck-id')
       })
+    })
+
+    it('waits progressively longer for grant secret', async function () {
+      let hasResolved = false
+      jest.useFakeTimers()
+      delete global.ScryfallAPI.grantSecret
+
+      const getActiveDeckIdPromise = getActiveDeckId().then(() => {
+        hasResolved = true
+      })
+
+      expect(hasResolved).toBe(false)
+
+      await Promise.resolve().then(() => jest.advanceTimersByTime(300))
+
+      expect(hasResolved).toBe(false)
+
+      global.ScryfallAPI.grantSecret = 'secret'
+
+      await Promise.resolve().then(() => jest.advanceTimersByTime(10000))
+
+      await getActiveDeckIdPromise
+
+      expect(hasResolved).toBe(true)
     })
 
     it('skips api call if the deck id is available on the window', function () {
