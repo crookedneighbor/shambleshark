@@ -20,6 +20,7 @@ describe('set up listeners on Scryfall page', function () {
     jest.spyOn(Scryfall, 'removeEntry').mockResolvedValue()
     jest.spyOn(Scryfall, 'pushNotification').mockImplementation()
     jest.spyOn(Scryfall, 'cleanUp').mockImplementation()
+    jest.spyOn(Scryfall, 'addHooksToCardManagementEvents').mockImplementation()
   })
 
   it('listens for events', function () {
@@ -37,6 +38,12 @@ describe('set up listeners on Scryfall page', function () {
     setUpListeners()
 
     expect(bus.emit).toBeCalledWith('SCRYFALL_LISTENERS_READY')
+  })
+
+  it('adds hooks to card management events', function () {
+    setUpListeners()
+
+    expect(Scryfall.addHooksToCardManagementEvents).toBeCalledTimes(1)
   })
 
   describe('REQUEST_DECK', function () {

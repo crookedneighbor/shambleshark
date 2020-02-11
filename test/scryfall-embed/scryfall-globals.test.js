@@ -1,19 +1,22 @@
+import bus from 'framebus'
 import {
   addCard,
+  addHooksToCardManagementEvents,
   cleanUp,
   getActiveDeck,
   getActiveDeckId,
   getDeck,
   getDeckMetadata,
+  pushNotification,
   removeEntry,
-  updateEntry,
-  pushNotification
+  updateEntry
 } from '../../src/js/scryfall-embed/scryfall-globals'
 
 describe('Scryfall Globals', function () {
   let fakeDeck
 
   beforeEach(function () {
+    jest.spyOn(bus, 'emit').mockImplementation()
     fakeDeck = {
       id: 'deck-id',
       sections: {
@@ -33,7 +36,9 @@ describe('Scryfall Globals', function () {
           cb(fakeDeck)
         }),
         addCard: jest.fn(),
+        createEntry: jest.fn(),
         destroyEntry: jest.fn(),
+        replaceEntry: jest.fn(),
         get: jest.fn().mockImplementation((id, cb) => {
           cb(fakeDeck)
         }),
@@ -47,6 +52,44 @@ describe('Scryfall Globals', function () {
       },
       pushNotification: jest.fn()
     }
+  })
+
+  describe('addHooksToCardManagementEvents', function () {
+    it.each([
+      'addCard',
+      'updateEntry',
+      'replaceEntry',
+      'createEntry',
+      'destroyEntry'
+    ])('replaces ScryfallAPI.decks.%s with a method that emits a bus event when calling the original method', function (s) {
+      const original = global.ScryfallAPI.decks[s]
+
+      addHooksToCardManagementEvents()
+
+      expect(original).not.toBe(global.ScryfallAPI.decks[s])
+      global.ScryfallAPI.decks[s]('foo', 'bar')
+
+      expect(bus.emit).toBeCalledTimes(1)
+      expect(bus.emit).toBeCalledWith(`CALLED_${s.toUpperCase()}`, {
+        deckId: 'foo',
+        payload: 'bar'
+      })
+      expect(original).toBeCalledWith('foo', 'bar')
+    })
+
+    it('replaces Scryfall.deckbuilder.cleanUp with a method that emits a bus event when calling the original method', function () {
+      const original = global.Scryfall.deckbuilder.cleanUp
+
+      addHooksToCardManagementEvents()
+
+      expect(original).not.toBe(global.Scryfall.deckbuilder.cleanUp)
+      global.Scryfall.deckbuilder.cleanUp('foo', 'bar')
+
+      expect(bus.emit).toBeCalledTimes(1)
+      expect(bus.emit).toBeCalledWith('CALLED_CLEANUP')
+      expect(original).toBeCalledTimes(1)
+      expect(original).toBeCalledWith('foo', 'bar')
+    })
   })
 
   describe('getActiveDeckId', function () {

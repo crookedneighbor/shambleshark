@@ -1,5 +1,33 @@
+import bus from 'framebus'
+import wait from '../lib/wait'
+
 let getActiveDeckPromise = null
 let getDeckMetadataPromise = null
+
+export function addHooksToCardManagementEvents () {
+  [
+    'addCard',
+    'updateEntry',
+    'replaceEntry',
+    'createEntry',
+    'destroyEntry'
+  ].forEach(method => {
+    const original = ScryfallAPI.decks[method]
+    ScryfallAPI.decks[method] = function (deckId, payload, cb, ____) {
+      original(...arguments)
+      bus.emit(`CALLED_${method.toUpperCase()}`, {
+        deckId,
+        payload
+      })
+    }
+  })
+
+  const originalCleanup = Scryfall.deckbuilder.cleanUp
+  Scryfall.deckbuilder.cleanUp = function () {
+    originalCleanup(...arguments)
+    bus.emit('CALLED_CLEANUP');
+  }
+}
 
 export function getDeckMetadata () {
   if (!getDeckMetadataPromise) {
@@ -17,7 +45,6 @@ export function getDeckMetadata () {
 export function getActiveDeckId (waitTime = 300) {
   if (!ScryfallAPI.grantSecret) {
     return wait(waitTime).then(() => {
-      console.log('got here with wait time', waitTime)
       // progressively wait longer and longer to try looking up the grant secret
       return getActiveDeckId(waitTime * 2)
     })
@@ -101,10 +128,11 @@ export function pushNotification (title, message, color, type) {
 
 export default {
   addCard,
+  addHooksToCardManagementEvents,
   cleanUp,
-  getDeckMetadata,
   getDeck,
+  getDeckMetadata,
+  pushNotification,
   removeEntry,
-  updateEntry,
-  pushNotification
+  updateEntry
 }

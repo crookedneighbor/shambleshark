@@ -7,6 +7,8 @@ import {
 } from '../lib/deck-parser'
 
 export default function setUpListeners () {
+  Scryfall.addHooksToCardManagementEvents()
+
   bus.on('REQUEST_DECK', function (reply) {
     Scryfall.getDeck().then(reply)
   })
