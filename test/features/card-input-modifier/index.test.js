@@ -1,3 +1,4 @@
+import bus from 'framebus'
 import CardInputModifier from '../../../src/js/features/deck-builder-features/card-input-modifier'
 import deckParser from '../../../src/js/lib/deck-parser'
 import scryfall from '../../../src/js/lib/scryfall'
@@ -11,6 +12,7 @@ describe('Card Input Modifier', function () {
     cim = new CardInputModifier()
     jest.spyOn(scryfall, 'getDeck').mockResolvedValue({})
     jest.spyOn(deckParser, 'flattenEntries').mockReturnValue([])
+    jest.spyOn(bus, 'on').mockImplementation()
   })
 
   describe('run', function () {
@@ -27,7 +29,7 @@ describe('Card Input Modifier', function () {
     })
 
     it('waits for #card-tooltip to be ready', async function () {
-      const fakeTooltip = {}
+      const fakeTooltip = document.createElement('div')
 
       mutation.ready.mockImplementationOnce(function (name, cb) {
         cb(fakeTooltip)
@@ -39,70 +41,116 @@ describe('Card Input Modifier', function () {
       expect(cim.tooltipElement).toBe(fakeTooltip)
     })
 
-    it('waits for new deckbuilder entries', async function () {
+    it('waits for new deckbuilder entries to attach listeners', async function () {
+      const secondFakeEntry = document.createElement('div')
       mutation.ready.mockImplementation(function (name, cb) {
-        const fakeTooltip = document.createElement('div')
-
-        if (name === '#card-tooltip') {
-          cb(fakeTooltip)
-        } else if (name === '.deckbuilder-entry') {
+        if (name === '.deckbuilder-entry') {
           cb(fakeEntry)
+          cb(secondFakeEntry)
         }
       })
+      jest.spyOn(cim, 'attachListenersToEntry').mockImplementation()
 
       await cim.run()
 
       expect(mutation.ready).toBeCalledWith('.deckbuilder-entry', expect.any(Function))
+
+      await wait()
+
+      expect(cim.attachListenersToEntry).toBeCalledTimes(2)
+      expect(cim.attachListenersToEntry).toBeCalledWith(fakeEntry)
+      expect(cim.attachListenersToEntry).toBeCalledWith(secondFakeEntry)
     })
 
-    it('applies event listeners entry', async function () {
-      const ta = fakeEntry.querySelector('textarea')
+    it('listens for card update events', async function () {
+      await cim.run()
 
-      jest.spyOn(fakeEntry, 'addEventListener')
-      jest.spyOn(ta, 'addEventListener')
+      expect(bus.on).toBeCalledTimes(5)
+      expect(bus.on).toBeCalledWith('CALLED_DESTROYENTRY', expect.any(Function))
+      expect(bus.on).toBeCalledWith('CALLED_CREATEENTRY', expect.any(Function))
+      expect(bus.on).toBeCalledWith('CALLED_UPDATEENTRY', expect.any(Function))
+      expect(bus.on).toBeCalledWith('CALLED_REPLACEENTRY', expect.any(Function))
+      expect(bus.on).toBeCalledWith('CALLED_CLEANUP', expect.any(Function))
+    })
 
-      mutation.ready.mockImplementation(function (name, cb) {
-        const fakeTooltip = document.createElement('div')
-
-        if (name === '#card-tooltip') {
-          cb(fakeTooltip)
-        } else if (name === '.deckbuilder-entry') {
-          cb(fakeEntry)
+    it('removes card id from image cache when destroy entry event fires', async function () {
+      const payload = {
+        payload: 'foo'
+      }
+      cim.imageCache.foo = 'foo'
+      bus.on.mockImplementation((event, cb) => {
+        if (event === 'CALLED_DESTROYENTRY') {
+          cb(payload)
         }
       })
 
       await cim.run()
 
-      expect(mutation.ready).toBeCalledWith('.deckbuilder-entry', expect.any(Function))
+      expect(cim.imageCache.foo).toBeFalsy()
+    })
 
-      expect(fakeEntry.addEventListener).toBeCalledTimes(2)
-      expect(fakeEntry.addEventListener).toBeCalledWith('mousemove', expect.any(Function))
-      expect(fakeEntry.addEventListener).toBeCalledWith('mouseout', expect.any(Function))
-      expect(ta.addEventListener).toBeCalledTimes(1)
-      expect(ta.addEventListener).toBeCalledWith('change', expect.any(Function))
+    it.each([
+      'CLEANUP',
+      'UPDATEENTRY',
+      'REPLACEENTRY',
+      'CREATEENTRY'
+    ])('refreshes cache when CALLED_%s event is called', async function (eventName) {
+      jest.spyOn(cim, 'refreshCache').mockResolvedValue()
 
-      jest.spyOn(cim, 'moveTooltip').mockImplementation()
-      fakeEntry.dispatchEvent(new global.Event('mousemove'))
+      bus.on.mockImplementation((event, cb) => {
+        if (event === `CALLED_${eventName}`) {
+          cb()
+        }
+      })
 
-      expect(cim.moveTooltip).toBeCalledTimes(1)
-      expect(cim.moveTooltip).toBeCalledWith(expect.anything(), 'entry-id')
+      await cim.run()
+      await wait()
 
-      jest.spyOn(cim, 'dismissTooltip').mockImplementation()
-      fakeEntry.dispatchEvent(new global.Event('mouseout'))
+      expect(cim.refreshCache).toBeCalledTimes(1)
+    })
+  })
 
-      expect(cim.dismissTooltip).toBeCalledTimes(1)
+  describe('getEntries', function () {
+    it('flattens entries from getDeck call', async function () {
+      const deck = {}
+      const mockedEntries = [{
+        id: '1'
+      }]
+      scryfall.getDeck.mockResolvedValue(deck)
+      deckParser.flattenEntries.mockReturnValue(mockedEntries)
 
-      jest.spyOn(cim, 'refreshImage').mockImplementation()
-      ta.dispatchEvent(new global.Event('change'))
+      const entries = await cim.getEntries()
 
-      expect(cim.refreshImage).toBeCalledTimes(1)
-      expect(cim.refreshImage).toBeCalledWith('entry-id')
+      expect(entries).toBe(mockedEntries)
+      expect(scryfall.getDeck).toBeCalledTimes(1)
+      expect(deckParser.flattenEntries).toBeCalledTimes(1)
+      expect(deckParser.flattenEntries).toBeCalledWith(deck, {
+        idToGroupBy: 'id'
+      })
+    })
+
+    it('caches the lookup', async function () {
+      await cim.getEntries()
+      await cim.getEntries()
+      await cim.getEntries()
+
+      expect(scryfall.getDeck).toBeCalledTimes(1)
+      expect(deckParser.flattenEntries).toBeCalledTimes(1)
+    })
+
+    it('can bust the cache', async function () {
+      await cim.getEntries()
+      await cim.getEntries(true)
+      await cim.getEntries(true)
+
+      expect(scryfall.getDeck).toBeCalledTimes(3)
+      expect(deckParser.flattenEntries).toBeCalledTimes(3)
     })
   })
 
   describe('lookupImage', function () {
     it('resolves with image url if it is in the cache', async function () {
-      cim.idCache.foo = 'https://example.com/foo'
+      cim.imageCache.foo = 'https://example.com/foo'
 
       const url = await cim.lookupImage('foo')
 
@@ -122,7 +170,7 @@ describe('Card Input Modifier', function () {
 
       expect(scryfall.getDeck).toBeCalledTimes(1)
       expect(url).toBe('https://example.com/foo-in-card-digest')
-      expect(cim.idCache.foo).toBe('https://example.com/foo-in-card-digest')
+      expect(cim.imageCache.foo).toBe('https://example.com/foo-in-card-digest')
     })
 
     it('returns nothing if entry with specific id cannot be found', async function () {
@@ -151,7 +199,7 @@ describe('Card Input Modifier', function () {
     })
 
     it('can bust the cache to re-lookup card image', async function () {
-      cim.idCache.foo = 'https://example.com/cached-foo'
+      cim.imageCache.foo = 'https://example.com/cached-foo'
       deckParser.flattenEntries.mockReturnValue([{
         id: 'foo',
         card_digest: {
@@ -163,40 +211,57 @@ describe('Card Input Modifier', function () {
 
       expect(scryfall.getDeck).toBeCalledTimes(1)
       expect(url).toBe('https://example.com/foo-in-card-digest')
-      expect(cim.idCache.foo).toBe('https://example.com/foo-in-card-digest')
+      expect(cim.imageCache.foo).toBe('https://example.com/foo-in-card-digest')
     })
   })
 
-  describe('refreshImage', function () {
-    it('deletes image from cache and calls lookup image after a second', async function () {
-      jest.spyOn(cim, 'lookupImage').mockResolvedValue()
-      cim.idCache.foo = 'https://example.com/cached-foo'
+  describe('refreshCache', function () {
+    it('resets the entry cache after 1 second', async function () {
+      jest.spyOn(cim, 'getEntries').mockResolvedValue([{
+        id: 'foo',
+        card_digest: {
+          image: 'https://example.com/new-foo'
+        }
+      }, {
+        id: 'bar',
+        card_digest: {
+          image: 'https://example.com/bar'
+        }
+      }, {
+        id: 'baz'
+      }])
+      cim.imageCache.foo = 'https://example.com/cached-foo'
 
       jest.useFakeTimers()
 
-      cim.refreshImage('foo')
-      expect(cim.idCache.foo).toBeFalsy()
+      const refresh = cim.refreshCache()
 
-      expect(cim.lookupImage).toBeCalledTimes(0)
+      expect(cim.getEntries).toBeCalledTimes(0)
 
       // this is in a promise.resolve.then to not 'lock' on the await
       // https://stackoverflow.com/a/51132058/2601552
       await Promise.resolve().then(() => jest.advanceTimersByTime(999))
 
-      expect(cim.lookupImage).toBeCalledTimes(0)
+      expect(cim.getEntries).toBeCalledTimes(0)
 
       await Promise.resolve().then(() => jest.advanceTimersByTime(2))
 
-      expect(cim.lookupImage).toBeCalledTimes(1)
-      expect(cim.lookupImage).toBeCalledWith('foo', true)
+      expect(cim.getEntries).toBeCalledTimes(1)
+
+      // let the entries finish assigning the new cache
+      await refresh
+
+      expect(cim.imageCache.foo).toBe('https://example.com/new-foo')
+      expect(cim.imageCache.bar).toBe('https://example.com/bar')
+      expect(cim.imageCache.baz).toBeFalsy()
     })
   })
 
   describe('moveTooltip', function () {
-    let fakeEvent
+    let fakeEvent, fakeEntry
 
     beforeEach(function () {
-      cim.idCache.foo = 'https://example.com/foo'
+      cim.imageCache.foo = 'https://example.com/foo'
       cim.tooltipElement = document.createElement('div')
       cim.tooltipElement.innerHTML = `
         <img id="card-tooltip-img" />
@@ -206,6 +271,15 @@ describe('Card Input Modifier', function () {
         pageX: 100,
         pageY: 100
       }
+      fakeEntry = document.createElement('div')
+      fakeEntry.setAttribute('data-entry', 'foo')
+    })
+
+    it('does not error if tooltip does not exist', function () {
+      delete cim.tooltipElement
+      expect(() => {
+        cim.moveTooltip(fakeEvent, fakeEntry)
+      }).not.toThrow()
     })
 
     it('noops when window width is small', function () {
@@ -213,7 +287,7 @@ describe('Card Input Modifier', function () {
 
       window.innerWidth = 600
 
-      cim.moveTooltip(fakeEvent, 'foo')
+      cim.moveTooltip(fakeEvent, fakeEntry)
 
       // indicates it never got to the point where it would open
       expect(cim.tooltipElement.style.display).not.toBe('block')
@@ -222,14 +296,15 @@ describe('Card Input Modifier', function () {
     })
 
     it('noops when id does not exist in cache', function () {
-      cim.moveTooltip(fakeEvent, 'bar')
+      fakeEntry.setAttribute('data-entry', 'bar')
+      cim.moveTooltip(fakeEvent, fakeEntry)
 
       // indicates it never got to the point where it would open
       expect(cim.tooltipElement.style.display).not.toBe('block')
     })
 
     it('opens tooltip', function () {
-      cim.moveTooltip(fakeEvent, 'foo')
+      cim.moveTooltip(fakeEvent, fakeEntry)
       expect(cim.tooltipElement.style.display).toBe('block')
       expect(cim.tooltipElement.style.left).toBe('150px')
       expect(cim.tooltipElement.style.top).toBe('70px')
@@ -246,6 +321,14 @@ describe('Card Input Modifier', function () {
       cim.dismissTooltip()
 
       expect(cim.tooltipElement.style.display).toBe('none')
+    })
+
+    it('noops if tooltipElementt is not available', function () {
+      delete cim.tooltipElement
+
+      expect(() => {
+        cim.dismissTooltip()
+      }).not.toThrow()
     })
   })
 })

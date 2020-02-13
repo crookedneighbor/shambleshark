@@ -1,42 +1,66 @@
 import Feature from '../../feature'
 import { sections } from '../../constants'
+import bus from 'framebus'
 import mutation from '../../../lib/mutation'
 import scryfall from '../../../lib/scryfall'
 import deckParser from '../../../lib/deck-parser'
 import wait from '../../../lib/wait'
 
+const CARD_EVENTS = [
+  'CLEANUP',
+  'UPDATEENTRY',
+  'REPLACEENTRY',
+  'CREATEENTRY'
+]
+
 class CardInputModifier extends Feature {
   constructor () {
     super()
 
-    this.idCache = {}
+    this.imageCache = {}
+    this.listeners = {}
   }
 
   async run () {
+    bus.on('CALLED_DESTROYENTRY', async (data) => {
+      // clean up our imageCache
+      delete this.imageCache[data.payload]
+    })
+
+    CARD_EVENTS.forEach(method => {
+      bus.on(`CALLED_${method}`, () => {
+        this.refreshCache()
+      })
+    })
+
     mutation.ready('#card-tooltip', (tooltip) => {
       this.tooltipElement = tooltip
+    })
 
-      mutation.ready('.deckbuilder-entry', async (entry) => {
-        const id = entry.getAttribute('data-entry')
-        const textarea = entry.querySelector('.deckbuilder-entry-input')
-        const hasValue = textarea.value
-
-        if (hasValue) {
-          this.lookupImage(id)
-        }
-
-        entry.addEventListener('mousemove', e => this.moveTooltip(e, id))
-        entry.addEventListener('mouseout', e => this.dismissTooltip(e))
-        textarea.addEventListener('change', () => this.refreshImage(id))
-      })
+    mutation.ready('.deckbuilder-entry', (entry) => {
+      this.attachListenersToEntry(entry)
     })
   }
 
-  async lookupImage (id, bustCache) {
-    if (!bustCache && id in this.idCache) {
-      return Promise.resolve(this.idCache[id])
+  attachListenersToEntry (entry, bustCache) {
+    const id = entry.getAttribute('data-entry')
+
+    if (!id) {
+      return
     }
 
+    if (id in this.listeners && entry === this.listeners[id]) {
+      // already has listeners
+      return
+    }
+    this.listeners[id] = entry
+
+    this.lookupImage(id, bustCache)
+    entry.addEventListener('mousemove', e => this.moveTooltip(e, entry))
+    entry.addEventListener('mouseout', e => this.dismissTooltip(e))
+  }
+
+  getEntries (bustCache) {
     if (!this._getEntriesPromise || bustCache) {
       this._getEntriesPromise = scryfall.getDeck()
         .then(d => deckParser.flattenEntries(d, {
@@ -44,7 +68,15 @@ class CardInputModifier extends Feature {
         }))
     }
 
-    const entries = await this._getEntriesPromise
+    return this._getEntriesPromise
+  }
+
+  async lookupImage (id, bustCache) {
+    if (!bustCache && id in this.imageCache) {
+      return Promise.resolve(this.imageCache[id])
+    }
+
+    const entries = await this.getEntries(bustCache)
     const entry = entries.find(e => e.id === id)
 
     if (!entry) {
@@ -53,30 +85,36 @@ class CardInputModifier extends Feature {
 
     const img = entry.card_digest && entry.card_digest.image
 
-    this.idCache[id] = img
+    this.imageCache[id] = img
 
     return img
   }
 
-  async refreshImage (id) {
-    delete this.idCache[id]
-
-    // give Scryfall enough time to load new card
+  async refreshCache () {
+    // give Scryfall enough time to load new cards
     await wait(1000)
 
-    this.lookupImage(id, true)
+    const entries = await this.getEntries(true)
+    entries.forEach(entry => {
+      this.imageCache[entry.id] = entry.card_digest && entry.card_digest.image
+    })
   }
 
-  moveTooltip (event, id) {
+  moveTooltip (event, entry) {
     // largley adapted from Scryfall's site, if that changes
     // this may also need ot be updated
+
+    if (!this.tooltipElement) {
+      return
+    }
 
     if (window.innerWidth < 768) {
       // window is too small to bother with presenting card image
       return
     }
 
-    const img = this.idCache[id]
+    const id = entry.getAttribute('data-entry')
+    const img = this.imageCache[id]
 
     if (!img) {
       return
@@ -103,6 +141,10 @@ class CardInputModifier extends Feature {
   }
 
   dismissTooltip () {
+    if (!this.tooltipElement) {
+      return
+    }
+
     this.tooltipElement.style.display = 'none'
   }
 }
