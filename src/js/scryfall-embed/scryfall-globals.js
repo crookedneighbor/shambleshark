@@ -25,7 +25,7 @@ export function addHooksToCardManagementEvents () {
   const originalCleanup = Scryfall.deckbuilder.cleanUp
   Scryfall.deckbuilder.cleanUp = function () {
     originalCleanup(...arguments)
-    bus.emit('CALLED_CLEANUP');
+    bus.emit('CALLED_CLEANUP')
   }
 }
 
