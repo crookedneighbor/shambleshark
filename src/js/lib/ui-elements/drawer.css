@@ -34,3 +34,7 @@
   left:-100%;
   visibility:hidden
 }
+
+.drawer-dialog-stage-content {
+  padding: 10px;
+}
