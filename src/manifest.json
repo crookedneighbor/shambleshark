@@ -1,5 +1,6 @@
 {
   "name": "Shambleshark (Unofficial Scryfall Extension)",
+  "short_name": "Shambleshark",
   "options_ui": {
     "page": "options.html",
     "open_in_tab": true

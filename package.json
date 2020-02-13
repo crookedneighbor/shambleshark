@@ -2,7 +2,7 @@
   "name": "shambleshark",
   "private": true,
   "version": "0.2.0",
-  "description": "An unofficial browser extension to add additional functionality to the Scryfall website. This extension is not developed by the Scryfall team.",
+  "description": "Unofficial browser extension to add functionality to the Scryfall website. This extension is not developed by the Scryfall team.",
   "scripts": {
     "lint": "standard --verbose | snazzy",
     "posttest": "npm run lint",
