@@ -28,6 +28,11 @@ if (fileSystem.existsSync(secretsPath)) {
 
 var options = {
   mode: env.NODE_ENV,
+  optimization: {
+    // extensions don't receive a performance boost by doing this
+    // and Firefox requires extension code to be unminified
+    minimize: false
+  },
   entry: {
     popup: path.join(__dirname, 'src', 'js', 'popup.js'),
     options: path.join(__dirname, 'src', 'js', 'options.js'),
