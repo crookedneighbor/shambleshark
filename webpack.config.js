@@ -60,6 +60,15 @@ var options = {
         test: /\.html$/,
         loader: 'html-loader',
         exclude: /node_modules/
+      },
+      {
+        enforce: 'post',
+        loader: 'string-replace-loader',
+        options: {
+          search: 'new Function("return this")()',
+          replace: 'null',
+        },
+        test: /\.js$/,
       }
     ]
   },
