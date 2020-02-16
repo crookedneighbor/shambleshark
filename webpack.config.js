@@ -94,6 +94,7 @@ var options = {
           // generates the manifest file using the package.json informations
           description: process.env.npm_package_description,
           version: process.env.npm_package_version,
+          content_security_policy: `script-src 'self'; object-src 'self'`,
           ...JSON.parse(content.toString())
         }
         if (BROWSER === 'FIREFOX') {
@@ -103,6 +104,11 @@ var options = {
               strict_min_version: '69.0'
             }
           }
+        }
+
+        if (env.NODE_ENV !== 'production') {
+          // so the background script can hot-reload
+          json.content_security_policy = `script-src 'self' 'unsafe-eval'; object-src 'self'`
         }
 
         return Buffer.from(JSON.stringify(json))
