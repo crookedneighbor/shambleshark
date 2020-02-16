@@ -66,9 +66,9 @@ var options = {
         loader: 'string-replace-loader',
         options: {
           search: 'new Function("return this")()',
-          replace: 'null',
+          replace: 'null'
         },
-        test: /\.js$/,
+        test: /\.js$/
       }
     ]
   },
