@@ -1,17 +1,16 @@
 import DialogInterface from './dialog-interface'
+import createElement from '../create-element'
 
 export default class Modal extends DialogInterface {
   _constructElement (options) {
-    const modal = document.createElement('div')
     const titleId = `modal-title-${options.id}`
     const header = this._originalHeader
-
-    modal.classList.add('modal-dialog-overlay')
-    modal.setAttribute('aria-modal', 'true')
-    modal.setAttribute('role', 'dialog')
-    modal.setAttribute('aria-labelledby', titleId)
-
-    modal.innerHTML = `
+    const modal = createElement(`<div
+      class="modal-dialog-overlay"
+      aria-modal="true"
+      role="dialog")
+      aria-labelledby="${titleId}"
+    >
       <div class="modal-dialog">
         <h6 class="modal-dialog-title">
           <span class='dialog-title-content' id="${titleId}">${header}</span>
@@ -29,7 +28,8 @@ export default class Modal extends DialogInterface {
           <div class="dialog-content modal-dialog-stage-content"></div>
         </div>
       </div>
-      `
+   </div>`).firstChild
+
     modal.querySelector('.dialog-close').addEventListener('click', () => {
       this.close()
     })

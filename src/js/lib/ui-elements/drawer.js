@@ -1,4 +1,5 @@
 import DialogInterface from './dialog-interface'
+import createElement from '../create-element'
 import injectCSS from '../inject-css'
 import css from './drawer.css'
 
@@ -22,17 +23,16 @@ export default class Drawer extends DialogInterface {
   }
 
   _constructElement (options) {
-    const drawer = document.createElement('div')
     const titleId = `drawer-title-${options.id}`
 
     this.position = options.position || 'right'
 
-    drawer.classList.add('drawer-dialog-overlay', 'modal-dialog-overlay')
-    drawer.setAttribute('aria-modal', 'true')
-    drawer.setAttribute('role', 'dialog')
-    drawer.setAttribute('aria-labelledby', titleId)
-
-    drawer.innerHTML = `
+    const drawer = createElement(`<div
+      class="drawer-dialog-overlay modal-dialog-overlay"
+      aria-modal="true"
+      role="dialog"
+      aria-labelledby="${titleId}"
+    >
       <!-- sometimes modal dialog classes are used to take advantage of existing style rules on the site -->
       <div class="drawer-dialog drawer-dialog-position-${this.position}">
         <h6 class="drawer-dialog-title modal-dialog-title">
@@ -51,7 +51,8 @@ export default class Drawer extends DialogInterface {
           <div class="dialog-content drawer-dialog-stage-content"></div>
         </div>
       </div>
-      `
+    </div>`).firstChild
+
     drawer.querySelector('.dialog-close').addEventListener('click', () => {
       this.close()
     })
