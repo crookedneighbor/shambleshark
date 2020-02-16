@@ -4,6 +4,8 @@ import {
   MINUS_SYMBOL,
   PLUS_SYMBOL
 } from '../../../resources/svg'
+import createElement from '../../create-element'
+import emptyElement from '../../empty-element'
 import injectCSS from '../../inject-css'
 import css from './index.css'
 
@@ -11,7 +13,6 @@ injectCSS(css)
 
 export default class AddCardElement {
   constructor (options = {}) {
-    this.element = document.createElement('div')
     this.quantity = options.quantity || 0
     this.id = options.id
     this.name = options.name
@@ -28,9 +29,9 @@ export default class AddCardElement {
       }
     }
 
-    this.element.classList.add('add-card-element-container')
-
-    this.element.innerHTML = `
+    this.element = createElement(`<div
+      class="add-card-element-container"
+    >
       <img src="${this.img}"/>
       <div class="add-card-element-overlay">
         <div role="button" tabindex="0" class="add-card-element__panel minus-symbol">
@@ -41,7 +42,8 @@ export default class AddCardElement {
         </div>
         <div class="metadata"></div>
       </div>
-      `
+    </div>`).firstChild
+
     this.img = this.element.querySelector('img')
     this.overlay = this.element.querySelector('.add-card-element-overlay')
     this.minusButton = this.overlay.querySelector('.minus-symbol')
@@ -49,7 +51,8 @@ export default class AddCardElement {
     this.metadata = this.overlay.querySelector('.metadata')
 
     if (this.singleton) {
-      this.minusButton.innerHTML = CHECK_SYMBOL
+      emptyElement(this.minusButton)
+      this.minusButton.appendChild(createElement(CHECK_SYMBOL))
       this.minusButton.classList.add('solo')
       this.plusButton.classList.add('solo')
     }
@@ -95,7 +98,8 @@ export default class AddCardElement {
 
   setMetadata (value) {
     if (value) {
-      this.metadata.innerHTML = value
+      emptyElement(this.metadata)
+      this.metadata.appendChild(createElement(`<span>${value}</span>`))
       return
     }
 
@@ -104,9 +108,10 @@ export default class AddCardElement {
     }
 
     if (!this.cardInDeck()) {
-      this.metadata.innerHTML = ''
+      emptyElement(this.metadata)
     } else {
-      this.metadata.innerHTML = this.quantity + 'x'
+      emptyElement(this.metadata)
+      this.metadata.appendChild(createElement(`<span>${this.quantity}x</span>`))
     }
   }
 

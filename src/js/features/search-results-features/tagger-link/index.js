@@ -1,5 +1,6 @@
 import Feature from '../../feature'
 import { sections } from '../../constants'
+import createElement from '../../../lib/create-element'
 import mutation from '../../../lib/mutation'
 import injectCSS from '../../../lib/inject-css'
 import css from './index.css'
@@ -18,12 +19,13 @@ function convertPageLinkToTagger (link) {
 
 function makeButton (link) {
   const taggerLink = convertPageLinkToTagger(link)
-  const button = document.createElement('a')
-
-  button.href = taggerLink
-  button.classList.add('tagger-link-button', 'button-n', 'primary', 'icon-only', 'subdued')
-  button.alt = 'Open in Tagger'
-  button.innerHTML = TAGGER_SYMBOL
+  const button = createElement(`<a
+    href="${taggerLink}"
+    class="tagger-link-button button-n primary icon-only subdued"
+    alt="Open in Tagger"
+  >
+    ${TAGGER_SYMBOL}
+  </a>`).firstChild
 
   return button
 }

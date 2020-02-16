@@ -1,7 +1,7 @@
-export default function createElement(string, options = {}) {
+export default function createElement (string, options = {}) {
   const container = options.container || 'body'
   const fragment = document.createDocumentFragment()
-  const parser = new DOMParser()
+  const parser = new window.DOMParser()
   const parsed = parser.parseFromString(string, 'text/html')
   const elements = parsed[container].children
 

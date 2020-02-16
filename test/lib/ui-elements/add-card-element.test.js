@@ -1,8 +1,6 @@
 import bus from 'framebus'
 import AddCardElement from '../../../src/js/lib/ui-elements/add-card-element'
 import {
-  CHECK_SYMBOL,
-  MINUS_SYMBOL,
   PLUS_SYMBOL
 } from '../../../src/js/resources/svg'
 
@@ -76,10 +74,10 @@ describe('AddCardElement', function () {
       img: 'https://example.com/arcane-signet'
     })
 
-    expect(cardElInNormalMode.minusButton.innerHTML).toContain(MINUS_SYMBOL)
-    expect(cardElInNormalMode.minusButton.innerHTML).not.toContain(CHECK_SYMBOL)
-    expect(cardElInSingletonMode.minusButton.innerHTML).toContain(CHECK_SYMBOL)
-    expect(cardElInSingletonMode.minusButton.innerHTML).not.toContain(MINUS_SYMBOL)
+    expect(cardElInNormalMode.minusButton.innerHTML).toContain('svg-minus-symbol')
+    expect(cardElInNormalMode.minusButton.innerHTML).not.toContain('svg-check-symbol')
+    expect(cardElInSingletonMode.minusButton.innerHTML).toContain('svg-check-symbol')
+    expect(cardElInSingletonMode.minusButton.innerHTML).not.toContain('svg-minus-symbol')
   })
 
   it('calls addCardToDeck when plus button is clicked', async function () {
@@ -235,7 +233,7 @@ describe('AddCardElement', function () {
 
       cardEl.setMetadata()
 
-      expect(cardEl.metadata.innerHTML).toBe('3x')
+      expect(cardEl.metadata.innerHTML).toContain('3x')
     })
 
     it('sets metadata to empty when in singleton mode', function () {
@@ -280,7 +278,7 @@ describe('AddCardElement', function () {
 
       cardEl.setMetadata('custom message')
 
-      expect(cardEl.metadata.innerHTML).toBe('custom message')
+      expect(cardEl.metadata.innerHTML).toContain('custom message')
     })
   })
 

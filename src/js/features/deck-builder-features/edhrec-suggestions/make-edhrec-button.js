@@ -1,5 +1,6 @@
 import bus from 'framebus'
 import mutation from '../../../lib/mutation'
+import createElement from '../../../lib/create-element'
 import AddCardElement from '../../../lib/ui-elements/add-card-element'
 import Drawer from '../../../lib/ui-elements/drawer'
 import scryfall from '../../../lib/scryfall'
@@ -31,10 +32,16 @@ export default async function makeEDHRecButton () {
     id: 'edhrec-suggestions-iframe'
   })
 
-  const button = document.createElement('button')
-  const drawer = createDrawer(button)
-
-  configureButton(button, drawer)
+  const button = createElement(`<button
+    id="edhrec-suggestions"
+    aria-label="EDHRec Suggestions"
+    class="button-n tiny"
+    disabled="true"
+  >
+    ${EDHREC_SYMBOL}
+    <i>EDHRec Suggestions</i>
+</button>`).firstChild
+  createDrawer(button)
 
   const initialCommanders = await getInitialCommanderList()
   await setDisabledState(button, initialCommanders)
@@ -77,19 +84,6 @@ function createDrawer (button) {
   // TODO: the drawer class should probably handle this
   document.getElementById('deckbuilder').appendChild(drawer.element)
 
-  return drawer
-}
-
-function configureButton (button, drawer) {
-  button.id = 'edhrec-suggestions'
-  button.setAttribute('aria-label', 'EDHRec Suggestions')
-  button.classList.add('button-n', 'tiny')
-  button.innerHTML = `
-    ${EDHREC_SYMBOL}
-    <i>EDHRec Suggestions</i>
-  `
-  button.setAttribute('disabled', true)
-
   button.addEventListener('click', (e) => {
     e.preventDefault()
 
@@ -105,6 +99,8 @@ function configureButton (button, drawer) {
       }, createEDHRecResponseHandler(drawer))
     })
   })
+
+  return drawer
 }
 
 async function getInitialCommanderList () {
@@ -120,7 +116,7 @@ function updateButtonStateOnCommanderChange (button, commanders) {
   mutation.change('.deckbuilder-editor-inner .deckbuilder-column .deckbuilder-section', async (el) => {
     const title = el.querySelector('.deckbuilder-section-title')
 
-    if (title.innerHTML.toLowerCase().indexOf('commander') === -1) {
+    if (title.innerText.toLowerCase().indexOf('commander') === -1) {
       // only run mutation on commander column
       return
     }
@@ -173,19 +169,20 @@ function getCardsInDeck (entries) {
 }
 
 function constructEDHRecSection (sectionId, cardType) {
-  const section = {}
-
-  section.name = cardType
-  section.element = document.createElement('div')
-  section.element.id = `edhrec-suggestion-${sectionId}`
-  section.element.classList.add('edhrec-suggestions-container')
-
+  const section = {
+    name: cardType
+  }
   const sectionTitle = TYPES_WITH_IRREGULAR_PLURALS[section.name] || `${section.name}s`
 
-  section.element.innerHTML = `
-    <h3 style="font-size:20px;border-bottom: 1px solid #E0DEE3;padding:15px 0 5px;">${sectionTitle}</h3>
-    <div class="edhrec-suggestions"></div>
-    `
+  section.element = createElement(`<div
+    id="edhrec-suggestion-${sectionId}"
+    class="edhrec-suggestions-container"
+    >
+      <!-- TODO move this css to a css file -->
+      <h3 style="font-size:20px;border-bottom: 1px solid #E0DEE3;padding:15px 0 5px;">${sectionTitle}</h3>
+      <div class="edhrec-suggestions"></div>
+  </div>`).firstChild
+
   section.cards = []
 
   return section
@@ -283,16 +280,16 @@ function createErrorDrawerState (drawer, err) {
     const errorList = document.createElement('ul')
     err.errors.forEach(errorMessage => {
       const errorElement = document.createElement('li')
-      errorElement.innerHTML = errorMessage
+      errorElement.innerText = errorMessage
       errorList.appendChild(errorElement)
     })
 
     container.appendChild(errorList)
   } else {
-    container.innerHTML = `
+    container.appendChild(createElement(`<div>
       <p>An unknown error occurred:</p>
       <pre><code>${err.toString()}</code></pre>
-    `
+    </div>`))
   }
 
   drawer.setContent(container)

@@ -5,6 +5,8 @@ import Drawer from '../../../lib/ui-elements/drawer'
 import AddCardElement from '../../../lib/ui-elements/add-card-element'
 import deckParser from '../../../lib/deck-parser'
 import scryfall from '../../../lib/scryfall'
+import createElement from '../../../lib/create-element'
+import emptyElement from '../../../lib/empty-element'
 import injectCSS from '../../../lib/inject-css'
 import css from './index.css'
 
@@ -67,9 +69,9 @@ class ScryfallSearch extends Feature {
 
   addSearchOptionsElement () {
     const totalCards = this.cardList.total_cards
-    const el = document.createElement('div')
-    el.classList.add('scryfall-search__options-container', 'scryfall-search__non-card-element')
-    el.innerHTML = `
+    const el = createElement(`<div
+      class="scryfall-search__options-container scryfall-search__non-card-element"
+    >
       <div class="scryfall-search__search-results-counter">
         ${totalCards} result${totalCards !== 1 ? 's' : ''}&nbsp;
         <a class="scryfall-search__external-link-icon" href="/search?q=${encodeURI(this.currentQuery)}">${EXTERNAL_ARROW}</a>
@@ -80,7 +82,8 @@ class ScryfallSearch extends Feature {
           <option value="" selected disabled>Section (auto)</option>
         </select>
       </div>
-    `
+    >
+    </div>`).firstChild
     this.sectionSelect = el.querySelector('#scryfall-search__section-selection')
 
     deckParser.getSections(this.deck).sort().forEach(section => {
@@ -102,7 +105,8 @@ class ScryfallSearch extends Feature {
 
   addCards () {
     if (this.cardList.length === 0) {
-      this.container.innerHTML = '<div class="scryfall-search__no-results scryfall-search__non-card-element">No search results.</div>'
+      emptyElement(this.container)
+      this.container.appendChild(createElement('<div class="scryfall-search__no-results scryfall-search__non-card-element">No search results.</div>'))
 
       return
     }
@@ -164,7 +168,7 @@ class ScryfallSearch extends Feature {
         // reset this in case the error state changes it
         drawerInstance.setLoading(true)
         drawerInstance.resetHeader()
-        self.container.innerHTML = ''
+        emptyElement(self.container)
 
         // re-focus the Scryfall Search input
         // for accessibility navigation

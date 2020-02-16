@@ -12,7 +12,7 @@ class EDHRecSuggestions extends Feature {
 
       mutation.ready('.deckbuilder-section-title', async function (title) {
         // TODO support oathbreaker as well
-        if (title.innerHTML.toLowerCase().indexOf('commander') === -1) {
+        if (title.innerText.toLowerCase().indexOf('commander') === -1) {
           // only run this code once deck has loaded and we are reasonably
           // certain it is a commander deck
           return

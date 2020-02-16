@@ -2,6 +2,7 @@ import bulmaCSS from 'bulma/css/bulma.min.css'
 import bulmaSwitchCSS from 'bulma-switch/dist/css/bulma-switch.min.css'
 import optionsCSS from '../css/options.css'
 
+import createElement from './lib/create-element'
 import injectCSS from './lib/inject-css'
 
 import globalFeatures from './features/global-features'
@@ -34,12 +35,12 @@ function createInputForType (def, inputValue, Feature) {
 }
 
 function createCheckbox (def, inputValue, Feature) {
-  const checkboxContainer = document.createElement('label')
-  checkboxContainer.innerHTML = `
+  const checkboxContainer = createElement(`<label
+    class="checkbox"
+  >
     <input type="checkbox" id="${def.id}-checkbox" />
     ${def.label}
-  `
-  checkboxContainer.classList.add('checkbox')
+  </label>`).firstChild
   const checkbox = checkboxContainer.querySelector('input')
   checkbox.checked = inputValue
   checkbox.addEventListener('change', () => {
@@ -49,55 +50,53 @@ function createCheckbox (def, inputValue, Feature) {
   return checkboxContainer
 }
 
-const page = document.createElement('div')
-page.innerHTML = `
-<section class="hero is-primary is-fullheight">
-  <div class="hero-body">
-    <div id="settings-container" class="container">
-      <div class="columns is-5-tablet is-4-desktop is-3-widescreen">
-        <div class="column has-text-centered">
-          <h1 class="title has-text-centered">Shambleshark</h1>
-          <h3 class="subtitle has-text-centered">Unofficial Scryfall Browser Extension</h3>
+const page = createElement(`<div>
+  <section class="hero is-primary is-fullheight">
+    <div class="hero-body">
+      <div id="settings-container" class="container">
+        <div class="columns is-5-tablet is-4-desktop is-3-widescreen">
+          <div class="column has-text-centered">
+            <h1 class="title has-text-centered">Shambleshark</h1>
+            <h3 class="subtitle has-text-centered">Unofficial Scryfall Browser Extension</h3>
+          </div>
         </div>
-      </div>
-      <div class="columns is-5-tablet is-4-desktop is-3-widescreen">
-        <div class="column box">
-          <p>An unofficial browser extension to add additional functionality to the <a href="https://scryfall.com">Scryfall website</a>. This extension is not developed by the Scryfall team. For support with the extension, please <a href="https://github.com/crookedneighbor/shambleshark/issues">open an issue on Github</a>.</p>
-          <br />
+        <div class="columns is-5-tablet is-4-desktop is-3-widescreen">
+          <div class="column box">
+            <p>An unofficial browser extension to add additional functionality to the <a href="https://scryfall.com">Scryfall website</a>. This extension is not developed by the Scryfall team. For support with the extension, please <a href="https://github.com/crookedneighbor/shambleshark/issues">open an issue on Github</a>.</p>
+            <br />
 
-          <form id="settings-form">
-            <div id="global">
-              <h2 class="title has-text-dark">Global Settings</h2>
-            </div>
-            <div id="deck-builder">
-              <h2 class="title has-text-dark">Deckbuilder Page</h2>
-            </div>
-            <hr>
-            <div id="deck-view">
-              <h2 class="title has-text-dark">Deck View Page</h2>
-            </div>
-            <hr>
-            <div id="search-results">
-              <h2 class="title has-text-dark">Search Results</h2>
-            </div>
-            <hr>
-          </form>
-          <footer class="footer is-paddingless">
-            <div class="has-text-centered">
-              <p>
-                This browser extension is not affiliated nor endorsed by Scryfall LLC.
-              </p>
-            </div>
-          </footer>
+            <form id="settings-form">
+              <div id="global">
+                <h2 class="title has-text-dark">Global Settings</h2>
+              </div>
+              <div id="deck-builder">
+                <h2 class="title has-text-dark">Deckbuilder Page</h2>
+              </div>
+              <hr>
+              <div id="deck-view">
+                <h2 class="title has-text-dark">Deck View Page</h2>
+              </div>
+              <hr>
+              <div id="search-results">
+                <h2 class="title has-text-dark">Search Results</h2>
+              </div>
+              <hr>
+            </form>
+            <footer class="footer is-paddingless">
+              <div class="has-text-centered">
+                <p>
+                  This browser extension is not affiliated nor endorsed by Scryfall LLC.
+                </p>
+              </div>
+            </footer>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
-`
+  </section>
+</div>`).firstChild
 
 Promise.all(features.map((Feature) => {
-  const container = document.createElement('fieldset')
   const data = Feature.metadata
   const section = page.querySelector(`#${data.section}`)
   const enabledSwitchId = `${data.id}-enabled-switch`
@@ -109,15 +108,15 @@ Promise.all(features.map((Feature) => {
     title += ' (Coming Soon)'
   }
 
-  container.className = 'field'
-
-  container.innerHTML = `
+  const container = createElement(`<fieldset
+    class="field"
+  >
     <div>
       <input id="${enabledSwitchId}" type="checkbox" class="switch" aria-label="${title} toggle - ${data.description}">
       <label class="has-text-weight-bold" for="${enabledSwitchId}">${title}</label>
     </div>
     <p class="content feature-description">${data.description}</p>
-  `
+  </fieldset>`).firstChild
 
   if (isFutureFeature) {
     container.setAttribute('disabled', 'disabled')

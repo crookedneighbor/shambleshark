@@ -25,7 +25,7 @@ describe('EDHRec Suggestions', function () {
       jest.spyOn(mutation, 'change').mockImplementation()
       jest.spyOn(mutation, 'ready').mockImplementation((selector, cb) => {
         const el = document.createElement('div')
-        el.innerHTML = 'Commander(s)'
+        el.innerText = 'Commander(s)'
 
         cb(el)
       })
@@ -46,7 +46,7 @@ describe('EDHRec Suggestions', function () {
 
       mutation.ready.mockImplementation((selector, cb) => {
         const el = document.createElement('div')
-        el.innerHTML = 'Lands'
+        el.innerText = 'Lands'
 
         cb(el)
       })

@@ -386,8 +386,8 @@ describe('makeEDHRecButton', function () {
       await wait()
 
       const errors = document.querySelectorAll('#edhrec-drawer li')
-      expect(errors[0].innerHTML).toContain('1 error')
-      expect(errors[1].innerHTML).toContain('2 error')
+      expect(errors[0].innerText).toContain('1 error')
+      expect(errors[1].innerText).toContain('2 error')
     })
 
     it('populates drawer with list of recomendations organized by type', async function () {
@@ -630,9 +630,10 @@ describe('makeEDHRecButton', function () {
       }
       commanderSection = document.createElement('div')
       commanderSection.innerHTML = `
-        <div class="deckbuilder-section-title">Commander(s)</div>
+        <div class="deckbuilder-section-title"></div>
         <ul></ul>
       `
+      commanderSection.querySelector('.deckbuilder-section-title').innerText = 'Commander(s)'
 
       scryfall.getDeck.mockResolvedValue(fakeDeck)
       document.body.appendChild(commanderSection)
@@ -803,7 +804,7 @@ describe('makeEDHRecButton', function () {
 
     it('does not check commanders when section is not the commander section', async function () {
       const title = document.createElement('div')
-      title.innerHTML = 'Lands'
+      title.innerText = 'Lands'
       const fakeEl = {
         querySelector: jest.fn().mockReturnValue(title),
         querySelectorAll: jest.fn()
