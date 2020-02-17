@@ -2,6 +2,7 @@ Changelog
 --------
 
 # unreleased
+* Fix issue where extension code was running on subdomains by accident (#26)
 * EDHRec Suggestions
   * Add section selector (#23)
 

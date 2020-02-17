@@ -3,6 +3,11 @@ import modifySearchPaage from './search-page'
 import embed from './embed-scryfall-script'
 
 export default function start () {
+  if (window.location.hostname !== 'scryfall.com') {
+    // if we're on a subdomain, we don't want
+    // to run the main scryfall code
+    return
+  }
   embed()
 
   const path = window.location.pathname
