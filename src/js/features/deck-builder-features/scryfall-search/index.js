@@ -2,6 +2,7 @@ import Feature from '../../feature'
 import bus from 'framebus'
 import { sections } from '../../constants'
 import Drawer from '../../../lib/ui-elements/drawer'
+import DeckSectionChooser from '../../../lib/ui-elements/deck-section-chooser'
 import AddCardElement from '../../../lib/ui-elements/add-card-element'
 import deckParser from '../../../lib/deck-parser'
 import scryfall from '../../../lib/scryfall'
@@ -76,25 +77,12 @@ class ScryfallSearch extends Feature {
         ${totalCards} result${totalCards !== 1 ? 's' : ''}&nbsp;
         <a class="scryfall-search__external-link-icon" href="/search?q=${encodeURI(this.currentQuery)}">${EXTERNAL_ARROW}</a>
       </div>
-
-      <div class="form-row-content-band">
-        <select id="scryfall-search__section-selection" class="form-input auto small-select">
-          <option value="" selected disabled>Section (auto)</option>
-        </select>
-      </div>
-    >
     </div>`).firstChild
-    this.sectionSelect = el.querySelector('#scryfall-search__section-selection')
-
-    deckParser.getSections(this.deck).sort().forEach(section => {
-      const option = document.createElement('option')
-      const sectionLabel = section[0].toUpperCase() + section.slice(1)
-
-      option.value = section
-      option.innerText = `Add to ${sectionLabel}`
-
-      this.sectionSelect.appendChild(option)
+    this.deckSectionChooser = new DeckSectionChooser({
+      id: 'scryfall-search__section-selection',
+      deck: this.deck
     })
+    el.appendChild(this.deckSectionChooser.element)
 
     const hr = document.createElement('hr')
     hr.classList.add('scryfall-search__hr')
@@ -123,7 +111,7 @@ class ScryfallSearch extends Feature {
         img: card.getImage(),
         type: card.type_line,
         onAddCard: (payload) => {
-          payload.section = this.sectionSelect.value
+          payload.section = this.deckSectionChooser.getValue()
         }
       })
 
