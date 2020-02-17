@@ -18,6 +18,12 @@ describe('makeEDHRecButton', function () {
       }
     })
     jest.spyOn(deckParser, 'hasLegalCommanders').mockResolvedValue(true)
+    jest.spyOn(deckParser, 'getSections').mockReturnValue([
+      'commanders',
+      'lands',
+      'nonlands',
+      'maybeboard'
+    ])
     jest.spyOn(mutation, 'change').mockImplementation()
 
     const deckbuilderElement = document.createElement('div')
@@ -439,6 +445,36 @@ describe('makeEDHRecButton', function () {
       expect(bus.emit).toBeCalledWith('ADD_CARD_TO_DECK', {
         cardName: 'Arcane Denial',
         cardId: 'arcane-denial-id'
+      })
+    })
+
+    it('looks up card in scryfall and adds it to particualr section in deck when chosen', async function () {
+      const btn = await makeEDHRecButton()
+      jest.spyOn(scryfall.api, 'get').mockResolvedValue({
+        name: 'Arcane Denial',
+        id: 'arcane-denial-id',
+        type_line: 'Instant'
+      })
+
+      btn.click()
+
+      await wait()
+
+      const cardElement = document.querySelectorAll('#edhrec-drawer .add-card-element-container .add-card-element__panel.plus-symbol')[0]
+
+      document.querySelector('#edhrec-suggestions-section-chooser select').value = 'maybeboard'
+
+      cardElement.click()
+
+      expect(scryfall.api.get).toBeCalledTimes(1)
+      expect(scryfall.api.get).toBeCalledWith('/cards/a25/41')
+
+      await wait()
+
+      expect(bus.emit).toBeCalledWith('ADD_CARD_TO_DECK', {
+        cardName: 'Arcane Denial',
+        cardId: 'arcane-denial-id',
+        section: 'maybeboard'
       })
     })
 

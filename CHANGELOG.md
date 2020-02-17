@@ -1,6 +1,10 @@
 Changelog
 --------
 
+# unreleased
+* EDHRec Suggestions
+  * Add section selector (#23)
+
 # 0.3.0 - Pre-release
 
 * Add Tagger Link feature

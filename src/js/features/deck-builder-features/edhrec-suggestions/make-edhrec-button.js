@@ -1,6 +1,7 @@
 import bus from 'framebus'
 import mutation from '../../../lib/mutation'
 import createElement from '../../../lib/create-element'
+import DeckSectionChooser from '../../../lib/ui-elements/deck-section-chooser'
 import AddCardElement from '../../../lib/ui-elements/add-card-element'
 import Drawer from '../../../lib/ui-elements/drawer'
 import scryfall from '../../../lib/scryfall'
@@ -96,7 +97,7 @@ function createDrawer (button) {
       bus.emit('REQUEST_EDHREC_RECOMENDATIONS', {
         commanders,
         cards: cardsInDeck
-      }, createEDHRecResponseHandler(drawer))
+      }, createEDHRecResponseHandler(drawer, deck))
     })
   })
 
@@ -190,7 +191,7 @@ function constructEDHRecSection (sectionId, cardType) {
 
 // TODO pull out into helper function
 
-function createEDHRecResponseHandler (drawer) {
+function createEDHRecResponseHandler (drawer, deck) {
   return function ([err, result]) {
     if (err) {
       createErrorDrawerState(drawer, err)
@@ -206,6 +207,12 @@ function createEDHRecResponseHandler (drawer) {
     container.id = 'edhrec-card-suggestions'
     container.style.textAlign = 'center'
     container.style.overflowY = 'scroll'
+    const deckSectionChooser = new DeckSectionChooser({
+      id: 'edhrec-suggestions-section-chooser',
+      deck
+    })
+    container.appendChild(deckSectionChooser.element)
+    container.appendChild(document.createElement('hr'))
 
     Object.values(recomendations).forEach(card => {
       const sectionId = card.type.toLowerCase()
@@ -224,6 +231,13 @@ function createEDHRecResponseHandler (drawer) {
           return scryfall.api.get(`/cards/${card.set}/${card.collectorNumber}`).then((cardFromScryfall) => {
             return cardFromScryfall.id
           })
+        },
+        onAddCard: (payload) => {
+          const section = deckSectionChooser.getValue()
+
+          if (section) {
+            payload.section = section
+          }
         }
       })
 

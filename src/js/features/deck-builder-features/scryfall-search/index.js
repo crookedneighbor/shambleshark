@@ -111,7 +111,11 @@ class ScryfallSearch extends Feature {
         img: card.getImage(),
         type: card.type_line,
         onAddCard: (payload) => {
-          payload.section = this.deckSectionChooser.getValue()
+          const section = this.deckSectionChooser.getValue()
+
+          if (section) {
+            payload.section = section
+          }
         }
       })
 
