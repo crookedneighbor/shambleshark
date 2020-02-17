@@ -5,6 +5,7 @@ class ChildDialog extends DialogInterface {
     const el = document.createElement('div')
     el.innerHTML = `
       <div class="dialog-close"></div>
+      <div class="dialog-title-symbol">${options.headerSymbol}</div>
       <div class="dialog-title-content"></div>
       <div class="dialog-content-container">
         <div class="dialog-loader"></div>
@@ -73,7 +74,7 @@ describe('DialogInterface', function () {
         header: 'Title'
       })
 
-      expect(dialog.element.querySelector('.dialog-title-content').innerHTML).toContain('Title')
+      expect(dialog.element.querySelector('.dialog-title-content').innerText).toContain('Title')
     })
 
     it('can provide a symbol to header', function () {
@@ -82,8 +83,8 @@ describe('DialogInterface', function () {
         header: 'Title'
       })
 
-      expect(dialog.element.querySelector('.dialog-title-content').querySelector('.symbol')).toBeTruthy()
-      expect(dialog.element.querySelector('.dialog-title-content').innerHTML).toContain('Title')
+      expect(dialog.element.querySelector('.symbol')).toBeTruthy()
+      expect(dialog.element.querySelector('.dialog-title-content').innerText).toContain('Title')
     })
 
     it('closes when the backdrop is clicked', function () {
@@ -152,7 +153,7 @@ describe('DialogInterface', function () {
       dialog.setHeader('new title')
       dialog.resetHeader()
 
-      expect(dialog.element.querySelector('.dialog-title-content').innerHTML).toBe('Some title')
+      expect(dialog.element.querySelector('.dialog-title-content').innerText).toBe('Some title')
     })
   })
 
@@ -164,7 +165,7 @@ describe('DialogInterface', function () {
 
       dialog.setHeader('new title')
 
-      expect(dialog.element.querySelector('.dialog-title-content').innerHTML).toBe('new title')
+      expect(dialog.element.querySelector('.dialog-title-content').innerText).toBe('new title')
     })
   })
 

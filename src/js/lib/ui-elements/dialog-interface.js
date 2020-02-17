@@ -13,15 +13,7 @@ export default class DialogInterface {
     this._onOpen = options.onOpen || noop
     this._onScroll = options.onScroll || noop
 
-    this._originalHeader = options.header
-
-    if (options.headerSymbol) {
-      this._originalHeader = `
-        <span class="dialog-title-symbol">${options.headerSymbol || ''}</span>
-
-        ${this._originalHeader}
-      `
-    }
+    this._originalHeaderText = options.header
 
     this.element = this._constructElement(options)
     this.element.addEventListener('click', (evt) => {
@@ -40,7 +32,7 @@ export default class DialogInterface {
     this._loaderNode = this.element.querySelector('.dialog-loader')
     this._loaderNode.setAttribute('aria-label', options.loadingMessage || 'Loading')
     this._headerNode = this.element.querySelector('.dialog-title-content')
-    this._headerNode.innerHTML = this._originalHeader
+    this.setHeader(this._originalHeaderText)
 
     if (!options.open) {
       this.element.style.display = 'none'
@@ -57,11 +49,11 @@ export default class DialogInterface {
   }
 
   resetHeader () {
-    this.setHeader(this._originalHeader)
+    this.setHeader(this._originalHeaderText)
   }
 
   setHeader (value) {
-    this._headerNode.innerHTML = value
+    this._headerNode.innerText = value
   }
 
   setLoading (state) {
