@@ -1,4 +1,5 @@
 import scrollLock from '../scroll-lock'
+import emptyElement from '../empty-element'
 
 function noop () {
   // do nothing!
@@ -28,7 +29,7 @@ export default class DialogInterface {
 
     this._contentNodeContainer = this.element.querySelector('.dialog-content-container')
     this._contentNode = this._contentNodeContainer.querySelector('.dialog-content')
-    this._contentNode.innerHTML = this._originalContent
+    this.setContent(this._originalContent)
     this._loaderNode = this.element.querySelector('.dialog-loader')
     this._loaderNode.setAttribute('aria-label', options.loadingMessage || 'Loading')
     this._headerNode = this.element.querySelector('.dialog-title-content')
@@ -40,10 +41,11 @@ export default class DialogInterface {
   }
 
   setContent (content) {
+    emptyElement(this._contentNode)
+
     if (typeof content === 'string') {
-      this._contentNode.innerHTML = content
+      this._contentNode.innerText = content
     } else {
-      this._contentNode.innerHTML = ''
       this._contentNode.appendChild(content)
     }
   }

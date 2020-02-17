@@ -60,7 +60,7 @@ describe('DialogInterface', function () {
         content: 'Some content'
       })
 
-      expect(dialog.element.querySelector('.dialog-content').innerHTML).toBe('Some content')
+      expect(dialog.element.querySelector('.dialog-content').innerText).toBe('Some content')
     })
 
     it('does not require content', function () {
@@ -177,7 +177,7 @@ describe('DialogInterface', function () {
 
       dialog.setContent('new content')
 
-      expect(dialog.element.querySelector('.dialog-content').innerHTML).toBe('new content')
+      expect(dialog.element.querySelector('.dialog-content').innerText).toBe('new content')
     })
 
     it('replaces content with DOM node when DOM node is provided', function () {

@@ -391,10 +391,11 @@ describe('makeEDHRecButton', function () {
     })
 
     it('populates drawer with list of recomendations organized by type', async function () {
-      jest.spyOn(Drawer.prototype, 'setContent')
       jest.spyOn(Drawer.prototype, 'setLoading')
 
       const btn = await makeEDHRecButton()
+
+      jest.spyOn(Drawer.prototype, 'setContent')
 
       btn.click()
 
