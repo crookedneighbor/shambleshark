@@ -4,7 +4,8 @@ import '../img/icon-34.png'
 import {
   onInstalled,
   openOptionsPage,
-  getManifest
+  getManifest,
+  onHeadersReceived
 } from 'Browser/runtime'
 
 onInstalled().addListener(function (details) {
@@ -16,4 +17,25 @@ onInstalled().addListener(function (details) {
     // TODO apply defaults for any new features
     console.log('Updated from ' + details.previousVersion + ' to ' + version + '!')
   }
+})
+
+// removes the headers that prevent loading Tagger in an iframe
+onHeadersReceived({
+  addListener (info) {
+    const headers = info.responseHeaders.filter(rawHeader => {
+      const header = rawHeader.name.toLowerCase();
+
+      return header !== 'x-frame-options' && header !== 'frame-options'
+    })
+
+    return {responseHeaders: headers};
+  },
+  config: {
+    urls: [ '*://tagger.scryfall.com/*' ],
+    types: [ 'sub_frame' ]
+  },
+  permissions: [
+    'blocking',
+    'responseHeaders'
+  ]
 })
