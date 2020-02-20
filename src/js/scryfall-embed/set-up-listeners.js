@@ -7,7 +7,7 @@ import {
 } from '../lib/deck-parser'
 
 export default function setUpListeners () {
-  if (!ScryfallAPI || !(Scryfall && Scryfall.deckbuilder)) {
+  if (!window.ScryfallAPI || !(window.Scryfall && window.Scryfall.deckbuilder)) {
     // don't set up listeners if msising Scryfall globals
     return
   }
