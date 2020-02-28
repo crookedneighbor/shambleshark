@@ -6,6 +6,11 @@ import bus from 'framebus'
 
 describe('set up listeners on Scryfall page', function () {
   beforeEach(function () {
+    window.ScryfallAPI = {}
+    window.Scryfall = {
+      deckbuilder: {}
+    }
+
     jest.spyOn(bus, 'on')
     jest.spyOn(bus, 'emit')
     jest.spyOn(Scryfall, 'getDeck')
@@ -21,6 +26,30 @@ describe('set up listeners on Scryfall page', function () {
     jest.spyOn(Scryfall, 'pushNotification').mockImplementation()
     jest.spyOn(Scryfall, 'cleanUp').mockImplementation()
     jest.spyOn(Scryfall, 'addHooksToCardManagementEvents').mockImplementation()
+  })
+
+  it('it does not listen for events if there is no Scryfall API object', function () {
+    delete window.ScryfallAPI
+
+    setUpListeners()
+
+    expect(bus.on).not.toBeCalled()
+  })
+
+  it('it does not listen for events if there is no Scryfall.deckbuilder object', function () {
+    delete window.Scryfall.deckbuilder
+
+    setUpListeners()
+
+    expect(bus.on).not.toBeCalled()
+  })
+
+  it('it does not listen for events if there is no Scryfall object', function () {
+    delete window.Scryfall
+
+    setUpListeners()
+
+    expect(bus.on).not.toBeCalled()
   })
 
   it('listens for events', function () {
