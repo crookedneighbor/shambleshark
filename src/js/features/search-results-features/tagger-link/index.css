@@ -9,3 +9,82 @@
 .card-grid-item:hover .tagger-link-button {
   display: block;
 }
+
+.tagger-link-hover {
+	z-index: 999999;
+  display: none;
+  background: white;
+	color: #343242;
+  padding: 10px;
+  position: absolute;
+  left: 35px;
+  top: -50%;
+  border-radius: 3px;
+  border: 2px solid #7652b1;
+  box-shadow: 1px 1px 6px rgba(0,0,0,0.45);
+}
+
+.tagger-link-hover.left-aligned {
+  left: auto;
+  right: 35px;
+}
+
+.tagger-link-hover.has-content {
+  min-width: 300px;
+}
+
+.tagger-link-hover .modal-dialog-spinner {
+  margin: auto;
+  width: 25px;
+  height: 25px;
+}
+
+.tagger-link-hover .modal-dialog-spinner.hidden {
+  display: none;
+}
+
+.tagger-link-hover svg, .tagger-link-hover svg path {
+	fill: #343242 !important;
+}
+
+.tagger-link-hover ul:empty {
+  display: none;
+}
+
+.tagger-link-hover ul {
+  max-width: 135px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.tagger-link-hover ul:nth-child(2) {
+  padding-left: 15px;
+}
+
+.tagger-link-hover ul li {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.tagger-link-hover svg {
+	top: 2px;
+	position: relative;
+}
+
+.icon-upside-down svg {
+  transform: scale(-1)
+}
+
+.icon-flipped svg {
+  transform: scale(-1, 1)
+}
+
+.tagger-link-button:hover .tagger-link-hover {
+  display: block;
+}
+
+.tagger-link-hover .menu-container {
+  display: flex;
+  flex-direction: row;
+}

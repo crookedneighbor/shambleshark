@@ -12,7 +12,8 @@
     "js":      [ "scryfall.bundle.js" ],
     "matches": [
       "*://*.scryfall.com/*"
-    ]
+    ],
+    "all_frames": true
   }, {
     "js":      [ "edhrec.bundle.js" ],
     "matches": [
@@ -24,8 +25,10 @@
     "scryfallEmbed.bundle.js"
   ],
   "permissions": [
+    "webRequest",
+    "webRequestBlocking",
     "storage",
-    "*://api.scryfall.com/*"
+    "*://*.scryfall.com/*"
   ],
   "browser_action": {
     "default_popup": "popup.html",

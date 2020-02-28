@@ -6,6 +6,8 @@ Changelog
 * Fix issue where an error may occur on Scryfall domains that do not contain the Scryfall deckbuilder globals
 * EDHRec Suggestions
   * Add section selector (#23)
+* Tagger Link
+  * Preview tags for cards in search results (#15)
 
 # 0.3.0 - Pre-release
 

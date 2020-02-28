@@ -1,9 +1,14 @@
+import modifyTagger from './tagger'
 import modifyEditPage from './edit-page'
 import modifySearchPaage from './search-page'
 import embed from './embed-scryfall-script'
 
 export default function start () {
-  if (window.location.hostname !== 'scryfall.com') {
+  const hostname = window.location.hostname
+  if (hostname === 'tagger.scryfall.com') {
+    modifyTagger()
+    return
+  } else if (hostname !== 'scryfall.com') {
     // if we're on a subdomain, we don't want
     // to run the main scryfall code
     return
