@@ -4,7 +4,6 @@ import '../img/icon-34.png'
 import {
   onInstalled,
   openOptionsPage,
-  getManifest,
   onHeadersReceived
 } from 'Browser/runtime'
 
