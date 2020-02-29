@@ -9,7 +9,7 @@ import deckParser from 'Lib/deck-parser'
 import iframe from 'Lib/iframe'
 import {
   EDHREC_SYMBOL
-} from '../../../resources/svg'
+} from 'Svg'
 
 const TYPE_ORDER = [
   'creature',

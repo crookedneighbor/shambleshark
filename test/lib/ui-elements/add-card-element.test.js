@@ -2,7 +2,7 @@ import bus from 'framebus'
 import AddCardElement from 'Ui/add-card-element'
 import {
   PLUS_SYMBOL
-} from '../../../src/js/resources/svg'
+} from 'Svg'
 
 describe('AddCardElement', function () {
   beforeEach(function () {

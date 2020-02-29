@@ -19,7 +19,7 @@ import {
   MIRRORS_SYMBOL,
   RELATED_TO_SYMBOL,
   SIMILAR_TO_SYMBOL
-} from '../../../resources/svg'
+} from 'Svg'
 
 const TAG_SYMBOLS = {
   ILLUSTRATION_TAG: ILLUSTRATION_SYMBOL,

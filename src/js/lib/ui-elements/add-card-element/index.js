@@ -3,7 +3,7 @@ import {
   CHECK_SYMBOL,
   MINUS_SYMBOL,
   PLUS_SYMBOL
-} from '../../../resources/svg'
+} from 'Svg'
 import createElement from '../../create-element'
 import emptyElement from '../../empty-element'
 import './index.css'

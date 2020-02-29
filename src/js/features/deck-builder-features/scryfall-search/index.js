@@ -12,7 +12,7 @@ import './index.css'
 
 import {
   EXTERNAL_ARROW
-} from '../../../resources/svg'
+} from 'Svg'
 
 // TODO
 // saved searches

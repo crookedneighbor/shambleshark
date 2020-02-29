@@ -15,7 +15,7 @@ import {
   MIRRORS_SYMBOL,
   RELATED_TO_SYMBOL,
   SIMILAR_TO_SYMBOL
-} from '../../../src/js/resources/svg'
+} from 'Svg'
 
 describe('Tagger Link', function () {
   describe('run', function () {
