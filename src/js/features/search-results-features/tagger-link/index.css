@@ -11,10 +11,10 @@
 }
 
 .tagger-link-hover {
-	z-index: 999999;
+  z-index: 999999;
   display: none;
   background: white;
-	color: #343242;
+  color: #343242;
   padding: 10px;
   position: absolute;
   left: 35px;
@@ -44,7 +44,7 @@
 }
 
 .tagger-link-hover svg, .tagger-link-hover svg path {
-	fill: #343242 !important;
+  fill: #343242 !important;
 }
 
 .tagger-link-hover ul:empty {
@@ -68,8 +68,8 @@
 }
 
 .tagger-link-hover svg {
-	top: 2px;
-	position: relative;
+  top: 2px;
+  position: relative;
 }
 
 .icon-upside-down svg {

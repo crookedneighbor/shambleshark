@@ -58,7 +58,6 @@ const SYMBOLS_THAT_MUST_BE_REVERSED = {
 // TODOS nice to haves
 // * handle small screens
 // * simple animations when opening the tag menu
-// * fixup Firefox styles
 
 function getTaggerData (link) {
   const parts = link.split('https://scryfall.com/card/')[1].split('/')
