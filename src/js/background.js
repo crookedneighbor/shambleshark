@@ -11,11 +11,6 @@ import {
 onInstalled().addListener(function (details) {
   if (details.reason === 'install') {
     openOptionsPage()
-  } else if (details.reason === 'update') {
-    const version = getManifest().version
-
-    // TODO apply defaults for any new features
-    console.log('Updated from ' + details.previousVersion + ' to ' + version + '!')
   }
 })
 
