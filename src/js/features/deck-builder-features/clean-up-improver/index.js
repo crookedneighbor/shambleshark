@@ -1,5 +1,5 @@
-import Feature from '../../feature'
-import { sections } from '../../constants'
+import Feature from 'Feature'
+import { sections } from 'Features/constants'
 import bus from 'framebus'
 
 class CleanUpImprover extends Feature {

@@ -1,7 +1,7 @@
-import Feature from '../../feature'
+import Feature from 'Feature'
 import makeEDHRecButton from './make-edhrec-button'
 import mutation from 'Lib/mutation'
-import { sections } from '../../constants'
+import { sections } from 'Features/constants'
 
 const TIMEOUT_TO_CONTINUE = 1000
 

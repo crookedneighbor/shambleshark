@@ -1,6 +1,6 @@
 import bus from 'framebus'
-import Feature from '../../feature'
-import { sections } from '../../constants'
+import Feature from 'Feature'
+import { sections } from 'Features/constants'
 import iframe from 'Lib/iframe'
 import createElement from 'Lib/create-element'
 import mutation from 'Lib/mutation'
