@@ -1,4 +1,4 @@
-import searchResultsFeatures from '../features/search-results-features'
+import searchResultsFeatures from 'Features/search-results-features'
 
 export default function () {
   Promise.all(searchResultsFeatures.map(function (Feature) {

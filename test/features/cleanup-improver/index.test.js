@@ -1,4 +1,4 @@
-import CleanUpImprover from '../../../src/js/features/deck-builder-features/clean-up-improver'
+import CleanUpImprover from 'Features/deck-builder-features/clean-up-improver'
 import bus from 'framebus'
 
 describe('Clean Up Improver', function () {

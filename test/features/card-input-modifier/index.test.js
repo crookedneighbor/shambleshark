@@ -1,5 +1,5 @@
 import bus from 'framebus'
-import CardInputModifier from '../../../src/js/features/deck-builder-features/card-input-modifier'
+import CardInputModifier from 'Features/deck-builder-features/card-input-modifier'
 import deckParser from 'Lib/deck-parser'
 import scryfall from 'Lib/scryfall'
 import mutation from 'Lib/mutation'

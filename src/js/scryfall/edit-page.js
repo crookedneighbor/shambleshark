@@ -1,5 +1,5 @@
 import bus from 'framebus'
-import deckbuilderFeatures from '../features/deck-builder-features'
+import deckbuilderFeatures from 'Features/deck-builder-features'
 import './edit-page.css'
 
 export default function () {

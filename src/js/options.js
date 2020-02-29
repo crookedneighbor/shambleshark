@@ -4,10 +4,10 @@ import '../css/options.css'
 
 import createElement from 'Lib/create-element'
 
-import globalFeatures from './features/global-features'
-import deckbuilderFeatures from './features/deck-builder-features'
-import deckViewFeatures from './features/deck-view-features'
-import searchResultsFeatures from './features/search-results-features'
+import globalFeatures from 'Features/global-features'
+import deckbuilderFeatures from 'Features/deck-builder-features'
+import deckViewFeatures from 'Features/deck-view-features'
+import searchResultsFeatures from 'Features/search-results-features'
 
 const features = globalFeatures
   .concat(deckbuilderFeatures)

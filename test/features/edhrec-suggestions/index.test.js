@@ -1,4 +1,4 @@
-import EDHRecSuggestions from '../../../src/js/features/deck-builder-features/edhrec-suggestions'
+import EDHRecSuggestions from 'Features/deck-builder-features/edhrec-suggestions'
 import scryfall from 'Lib/scryfall'
 import mutation from 'Lib/mutation'
 import iframe from 'Lib/iframe'

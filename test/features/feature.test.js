@@ -1,4 +1,4 @@
-import Feature from '../../src/js/features/feature'
+import Feature from 'Features/feature'
 import storage from 'Lib/storage'
 
 describe('Base Feature', function () {
