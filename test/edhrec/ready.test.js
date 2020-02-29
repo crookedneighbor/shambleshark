@@ -1,4 +1,4 @@
-import start from '../../src/js/edhrec/ready'
+import start from 'Js/edhrec/ready'
 import iframe from 'Lib/iframe'
 import wait from 'Lib/wait'
 import bus from 'framebus'

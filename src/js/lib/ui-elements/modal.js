@@ -1,5 +1,5 @@
 import DialogInterface from './dialog-interface'
-import createElement from '../create-element'
+import createElement from 'Lib/create-element'
 
 export default class Modal extends DialogInterface {
   _constructElement (options) {

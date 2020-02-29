@@ -1,4 +1,4 @@
-import start from '../../src/js/scryfall/tagger'
+import start from 'Js/scryfall/tagger'
 import iframe from 'Lib/iframe'
 import bus from 'framebus'
 

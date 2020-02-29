@@ -1,5 +1,5 @@
-import scryfall from '../../src/js/scryfall-embed/scryfall-globals'
-import modifyCleanUp from '../../src/js/scryfall-embed/modify-clean-up'
+import scryfall from 'Js/scryfall-embed/scryfall-globals'
+import modifyCleanUp from 'Js/scryfall-embed/modify-clean-up'
 
 describe('modifyCleanUp', function () {
   let originalCleanupFunction, fakeDeck

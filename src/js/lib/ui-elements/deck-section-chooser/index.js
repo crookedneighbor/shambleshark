@@ -1,5 +1,5 @@
 import deckParser from 'Lib/deck-parser'
-import createElement from '../../create-element'
+import createElement from 'Lib/create-element'
 
 export default class DeckSectionChooser {
   constructor (options = {}) {

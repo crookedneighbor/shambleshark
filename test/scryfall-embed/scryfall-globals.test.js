@@ -10,7 +10,7 @@ import {
   pushNotification,
   removeEntry,
   updateEntry
-} from '../../src/js/scryfall-embed/scryfall-globals'
+} from 'Js/scryfall-embed/scryfall-globals'
 
 describe('Scryfall Globals', function () {
   let fakeDeck

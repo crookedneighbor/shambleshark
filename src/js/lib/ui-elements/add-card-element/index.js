@@ -4,8 +4,8 @@ import {
   MINUS_SYMBOL,
   PLUS_SYMBOL
 } from 'Svg'
-import createElement from '../../create-element'
-import emptyElement from '../../empty-element'
+import createElement from 'Lib/create-element'
+import emptyElement from 'Lib/empty-element'
 import './index.css'
 
 export default class AddCardElement {

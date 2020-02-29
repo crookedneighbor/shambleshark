@@ -1,7 +1,7 @@
 import wait from 'Lib/wait'
-import Scryfall from '../../src/js/scryfall-embed/scryfall-globals'
-import modifyCleanUp from '../../src/js/scryfall-embed/modify-clean-up'
-import setUpListeners from '../../src/js/scryfall-embed/set-up-listeners'
+import Scryfall from 'Js/scryfall-embed/scryfall-globals'
+import modifyCleanUp from 'Js/scryfall-embed/modify-clean-up'
+import setUpListeners from 'Js/scryfall-embed/set-up-listeners'
 import bus from 'framebus'
 
 describe('set up listeners on Scryfall page', function () {

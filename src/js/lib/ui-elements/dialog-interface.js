@@ -1,5 +1,5 @@
-import scrollLock from '../scroll-lock'
-import emptyElement from '../empty-element'
+import scrollLock from 'Lib/scroll-lock'
+import emptyElement from 'Lib/empty-element'
 
 function noop () {
   // do nothing!
