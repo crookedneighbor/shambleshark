@@ -1,6 +1,6 @@
 import Feature from 'Feature'
 import bus from 'framebus'
-import { sections } from 'Features/constants'
+import { FEATURE_SECTIONS as sections } from 'Constants'
 import Drawer from 'Ui/drawer'
 import DeckSectionChooser from 'Ui/deck-section-chooser'
 import AddCardElement from 'Ui/add-card-element'

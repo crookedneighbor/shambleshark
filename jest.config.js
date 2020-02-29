@@ -4,6 +4,7 @@ module.exports = {
   setupFilesAfterEnv: ['./test/_setup.js'],
   moduleNameMapper: {
     '^Js/(.*)$': path.resolve(__dirname, 'src/js/$1'),
+    '^Constants$': path.resolve(__dirname, 'src/js/resources/constants.js'),
     '^Features/(.*)$': path.resolve(__dirname, 'src/js/features/$1'),
     '^Feature$': path.resolve(__dirname, 'src/js/features/feature.js'),
     '^Lib/(.*)$': path.resolve(__dirname, 'src/js/lib/$1'),

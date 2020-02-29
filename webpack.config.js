@@ -11,6 +11,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const BROWSER = env.BROWSER
 
 const alias = {
+  Constants: path.resolve(__dirname, 'src/js/resources/constants.js'),
   Feature: path.resolve(__dirname, 'src/js/features/feature.js'),
   Features: path.resolve(__dirname, 'src/js/features/'),
   Lib: path.resolve(__dirname, 'src/js/lib/'),

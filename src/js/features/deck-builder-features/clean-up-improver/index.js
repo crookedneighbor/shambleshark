@@ -1,5 +1,5 @@
 import Feature from 'Feature'
-import { sections } from 'Features/constants'
+import { FEATURE_SECTIONS as sections } from 'Constants'
 import bus from 'framebus'
 
 class CleanUpImprover extends Feature {
