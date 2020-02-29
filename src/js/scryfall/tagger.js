@@ -1,5 +1,5 @@
 import bus from 'framebus'
-import iframe from '../lib/iframe'
+import iframe from 'Lib/iframe'
 
 const query = `query FetchCard($set: String!, $number: String!, $back: Boolean = false) {
   card: cardBySet(set: $set, number: $number, back: $back) {

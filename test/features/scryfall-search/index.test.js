@@ -1,6 +1,6 @@
 import ScryfallSearch from '../../../src/js/features/deck-builder-features/scryfall-search'
-import deckParser from '../../../src/js/lib/deck-parser'
-import scryfall from '../../../src/js/lib/scryfall'
+import deckParser from 'Lib/deck-parser'
+import scryfall from 'Lib/scryfall'
 import bus from 'framebus'
 
 describe('Scryfall Search', function () {

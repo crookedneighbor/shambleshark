@@ -11,6 +11,8 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const BROWSER = env.BROWSER
 
 const alias = {
+  Lib: path.resolve(__dirname, 'src/js/lib/'),
+  Ui: path.resolve(__dirname, 'src/js/lib/ui-elements/')
 }
 
 if (BROWSER === 'GOOGLE_CHROME') {

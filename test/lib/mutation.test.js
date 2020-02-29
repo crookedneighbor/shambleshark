@@ -2,7 +2,7 @@ import {
   reset,
   change,
   ready
-} from '../../src/js/lib/mutation'
+} from 'Lib/mutation'
 
 describe('mutation', function () {
   describe('ready', function () {

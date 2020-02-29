@@ -1,6 +1,6 @@
 import start from '../../src/js/edhrec/ready'
-import iframe from '../../src/js/lib/iframe'
-import wait from '../../src/js/lib/wait'
+import iframe from 'Lib/iframe'
+import wait from 'Lib/wait'
 import bus from 'framebus'
 
 describe('EDHRec Ready', function () {

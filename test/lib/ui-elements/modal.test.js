@@ -1,5 +1,5 @@
-import DialogInterface from '../../../src/js/lib/ui-elements/dialog-interface'
-import Modal from '../../../src/js/lib/ui-elements/modal'
+import DialogInterface from 'Ui/dialog-interface'
+import Modal from 'Ui/modal'
 
 describe('Modal', function () {
   it('is a DialogInterface', function () {

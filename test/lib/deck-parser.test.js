@@ -7,10 +7,10 @@ import {
   isLandCard,
   isSingletonTypeDeck,
   hasLegalCommanders
-} from '../../src/js/lib/deck-parser'
+} from 'Lib/deck-parser'
 import {
   api as scryfall
-} from '../../src/js/lib/scryfall'
+} from 'Lib/scryfall'
 
 describe('Deck Parser', function () {
   describe('getCommanderColorIdentity', function () {

@@ -1,5 +1,5 @@
 import Feature from '../../src/js/features/feature'
-import storage from '../../src/js/lib/storage'
+import storage from 'Lib/storage'
 
 describe('Base Feature', function () {
   it('requires a run method', async function () {

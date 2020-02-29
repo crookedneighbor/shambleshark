@@ -1,5 +1,5 @@
 import bus from 'framebus'
-import AddCardElement from '../../../src/js/lib/ui-elements/add-card-element'
+import AddCardElement from 'Ui/add-card-element'
 import {
   PLUS_SYMBOL
 } from '../../../src/js/resources/svg'

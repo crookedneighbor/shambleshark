@@ -1,7 +1,7 @@
 import bus from 'framebus'
 import TaggerLink from '../../../src/js/features/search-results-features/tagger-link'
-import iframe from '../../../src/js/lib/iframe'
-import mutation from '../../../src/js/lib/mutation'
+import iframe from 'Lib/iframe'
+import mutation from 'Lib/mutation'
 
 import {
   ILLUSTRATION_SYMBOL,

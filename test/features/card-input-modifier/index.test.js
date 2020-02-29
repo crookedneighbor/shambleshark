@@ -1,9 +1,9 @@
 import bus from 'framebus'
 import CardInputModifier from '../../../src/js/features/deck-builder-features/card-input-modifier'
-import deckParser from '../../../src/js/lib/deck-parser'
-import scryfall from '../../../src/js/lib/scryfall'
-import mutation from '../../../src/js/lib/mutation'
-import wait from '../../../src/js/lib/wait'
+import deckParser from 'Lib/deck-parser'
+import scryfall from 'Lib/scryfall'
+import mutation from 'Lib/mutation'
+import wait from 'Lib/wait'
 
 describe('Card Input Modifier', function () {
   let cim

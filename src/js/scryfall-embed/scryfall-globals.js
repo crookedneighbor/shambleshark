@@ -1,5 +1,5 @@
 import bus from 'framebus'
-import wait from '../lib/wait'
+import wait from 'Lib/wait'
 
 let getActiveDeckPromise = null
 let getDeckMetadataPromise = null

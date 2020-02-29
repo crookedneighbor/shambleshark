@@ -1,5 +1,5 @@
-import DeckSectionChooser from '../../../src/js/lib/ui-elements/deck-section-chooser'
-import deckParser from '../../../src/js/lib/deck-parser'
+import DeckSectionChooser from 'Ui/deck-section-chooser'
+import deckParser from 'Lib/deck-parser'
 
 describe('DeckSectionChooser', function () {
   beforeEach(function () {

@@ -1,4 +1,4 @@
-import DialogInterface from '../../../src/js/lib/ui-elements/dialog-interface'
+import DialogInterface from 'Ui/dialog-interface'
 
 class ChildDialog extends DialogInterface {
   _constructElement (options) {

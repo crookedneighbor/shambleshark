@@ -1,5 +1,5 @@
-import DialogInterface from '../../../src/js/lib/ui-elements/dialog-interface'
-import Drawer from '../../../src/js/lib/ui-elements/drawer'
+import DialogInterface from 'Ui/dialog-interface'
+import Drawer from 'Ui/drawer'
 
 describe('Drawer', function () {
   it('is a DialogInterface', function () {

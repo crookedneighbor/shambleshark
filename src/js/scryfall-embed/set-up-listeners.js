@@ -4,7 +4,7 @@ import modifyCleanUp from './modify-clean-up'
 import {
   hasDedicatedLandSection,
   isLandCard
-} from '../lib/deck-parser'
+} from 'Lib/deck-parser'
 
 export default function setUpListeners () {
   if (!window.ScryfallAPI || !(window.Scryfall && window.Scryfall.deckbuilder)) {

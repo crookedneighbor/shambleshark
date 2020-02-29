@@ -1,4 +1,4 @@
-import wait from '../../src/js/lib/wait'
+import wait from 'Lib/wait'
 
 describe('wait', function () {
   it('wraps setTimeout in a promise', function () {

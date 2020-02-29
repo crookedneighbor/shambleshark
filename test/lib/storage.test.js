@@ -1,7 +1,7 @@
 import {
   get,
   set
-} from '../../src/js/lib/storage'
+} from 'Lib/storage'
 
 describe('storage', function () {
   beforeEach(function () {

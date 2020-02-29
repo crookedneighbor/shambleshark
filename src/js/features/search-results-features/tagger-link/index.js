@@ -1,9 +1,9 @@
 import bus from 'framebus'
 import Feature from '../../feature'
 import { sections } from '../../constants'
-import iframe from '../../../lib/iframe'
-import createElement from '../../../lib/create-element'
-import mutation from '../../../lib/mutation'
+import iframe from 'Lib/iframe'
+import createElement from 'Lib/create-element'
+import mutation from 'Lib/mutation'
 import './index.css'
 
 import {

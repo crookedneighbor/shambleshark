@@ -1,4 +1,4 @@
-import wait from '../../src/js/lib/wait'
+import wait from 'Lib/wait'
 import Scryfall from '../../src/js/scryfall-embed/scryfall-globals'
 import modifyCleanUp from '../../src/js/scryfall-embed/modify-clean-up'
 import setUpListeners from '../../src/js/scryfall-embed/set-up-listeners'

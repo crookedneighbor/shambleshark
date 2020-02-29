@@ -1,4 +1,4 @@
-import deckParser from '../../../lib/deck-parser'
+import deckParser from 'Lib/deck-parser'
 import createElement from '../../create-element'
 
 export default class DeckSectionChooser {

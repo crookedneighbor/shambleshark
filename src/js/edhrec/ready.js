@@ -1,5 +1,5 @@
 import bus from 'framebus'
-import iframe from '../lib/iframe'
+import iframe from 'Lib/iframe'
 
 export default function start () {
   if (!iframe.isInsideIframe()) {

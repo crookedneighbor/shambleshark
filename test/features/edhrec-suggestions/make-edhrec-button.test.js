@@ -1,11 +1,11 @@
 import bus from 'framebus'
 import makeEDHRecButton from '../../../src/js/features/deck-builder-features/edhrec-suggestions/make-edhrec-button'
-import deckParser from '../../../src/js/lib/deck-parser'
-import wait from '../../../src/js/lib/wait'
-import Drawer from '../../../src/js/lib/ui-elements/drawer'
-import mutation from '../../../src/js/lib/mutation'
-import scryfall from '../../../src/js/lib/scryfall'
-import iframe from '../../../src/js/lib/iframe'
+import deckParser from 'Lib/deck-parser'
+import wait from 'Lib/wait'
+import Drawer from 'Ui/drawer'
+import mutation from 'Lib/mutation'
+import scryfall from 'Lib/scryfall'
+import iframe from 'Lib/iframe'
 
 describe('makeEDHRecButton', function () {
   beforeEach(function () {

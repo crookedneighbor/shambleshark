@@ -2,7 +2,7 @@ import scryfall from './scryfall-globals'
 import {
   hasDedicatedLandSection,
   isLandCard
-} from '../lib/deck-parser'
+} from 'Lib/deck-parser'
 
 function correctLandNonLandColumns (deck) {
   if (!hasDedicatedLandSection(deck)) {

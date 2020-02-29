@@ -1,7 +1,7 @@
 import EDHRecSuggestions from '../../../src/js/features/deck-builder-features/edhrec-suggestions'
-import scryfall from '../../../src/js/lib/scryfall'
-import mutation from '../../../src/js/lib/mutation'
-import iframe from '../../../src/js/lib/iframe'
+import scryfall from 'Lib/scryfall'
+import mutation from 'Lib/mutation'
+import iframe from 'Lib/iframe'
 
 describe('EDHRec Suggestions', function () {
   describe('run', function () {

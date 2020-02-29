@@ -1,5 +1,5 @@
 import start from '../../src/js/scryfall/tagger'
-import iframe from '../../src/js/lib/iframe'
+import iframe from 'Lib/iframe'
 import bus from 'framebus'
 
 describe('Tagger', () => {

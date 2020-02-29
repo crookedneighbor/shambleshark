@@ -1,4 +1,4 @@
-import scrollLock from '../../src/js/lib/scroll-lock'
+import scrollLock from 'Lib/scroll-lock'
 
 describe('scrollLock', function () {
   beforeEach(function () {

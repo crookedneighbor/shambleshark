@@ -1,4 +1,4 @@
-import storage from '../lib/storage'
+import storage from 'Lib/storage'
 
 const notImplementedError = new Error('Method not Implemented')
 

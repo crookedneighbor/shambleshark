@@ -1,4 +1,4 @@
-import createElement from '../../src/js/lib/create-element'
+import createElement from 'Lib/create-element'
 
 describe('createElement', function () {
   it('creates an element', function () {

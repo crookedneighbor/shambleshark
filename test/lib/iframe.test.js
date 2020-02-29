@@ -1,8 +1,8 @@
-import wait from '../../src/js/lib/wait'
+import wait from 'Lib/wait'
 import {
   create,
   isInsideIframe
-} from '../../src/js/lib/iframe'
+} from 'Lib/iframe'
 
 describe('iframe', function () {
   describe('create', function () {

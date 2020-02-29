@@ -1,10 +1,10 @@
 import Feature from '../../feature'
 import { sections } from '../../constants'
 import bus from 'framebus'
-import mutation from '../../../lib/mutation'
-import scryfall from '../../../lib/scryfall'
-import deckParser from '../../../lib/deck-parser'
-import wait from '../../../lib/wait'
+import mutation from 'Lib/mutation'
+import scryfall from 'Lib/scryfall'
+import deckParser from 'Lib/deck-parser'
+import wait from 'Lib/wait'
 
 const CARD_EVENTS = [
   'CLEANUP',

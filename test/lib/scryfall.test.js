@@ -1,6 +1,6 @@
 import {
   getDeck
-} from '../../src/js/lib/scryfall'
+} from 'Lib/scryfall'
 import bus from 'framebus'
 
 describe('scryfall', function () {
