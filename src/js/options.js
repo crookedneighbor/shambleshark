@@ -82,7 +82,7 @@ const page = createElement(`<div>
             <footer class="footer is-paddingless">
               <div class="has-text-centered">
                 <p>
-                  This browser extension is not affiliated nor endorsed by Scryfall LLC.
+                  This browser extension is not affiliated with nor endorsed by Scryfall LLC.
                 </p>
               </div>
             </footer>
