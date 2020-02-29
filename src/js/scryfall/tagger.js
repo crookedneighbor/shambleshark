@@ -54,24 +54,31 @@ export default function () {
   }
 
   bus.on('TAGGER_TAGS_REQUEST', (config, reply) => {
+    // Firefox errors with a 422 for some reason when
+    // using the fetch API inside an iframe, so we must
+    // use xhr for this request
     const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+    const xhr = new window.XMLHttpRequest()
 
-    global.fetch('https://tagger.scryfall.com/graphql', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-Token': token
-      },
-      body: JSON.stringify({
-        operationName: 'FetchCard',
-        query,
-        variables: {
-          back: false,
-          set: config.set,
-          number: config.number
-        }
-      })
-    }).then(res => res.json()).then(payload => reply(payload.data.card))
+    xhr.open('POST', 'https://tagger.scryfall.com/graphql', true)
+    xhr.setRequestHeader('Content-Type', 'application/json')
+    xhr.setRequestHeader('X-CSRF-Token', token)
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4 && xhr.status === 200) {
+        const json = JSON.parse(xhr.responseText)
+        reply(json.data.card)
+      }
+    }
+    const body = JSON.stringify({
+      operationName: 'FetchCard',
+      query,
+      variables: {
+        back: false,
+        set: config.set,
+        number: config.number
+      }
+    })
+    xhr.send(body)
   })
 
   bus.emit('TAGGER_READY')
