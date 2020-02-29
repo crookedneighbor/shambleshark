@@ -10,6 +10,7 @@
   },
   "content_scripts": [{
     "js":      [ "scryfall.bundle.js" ],
+    "css":     [ "scryfall.css" ],
     "matches": [
       "*://*.scryfall.com/*"
     ],

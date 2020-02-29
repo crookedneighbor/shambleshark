@@ -1,9 +1,6 @@
 import DialogInterface from './dialog-interface'
 import createElement from '../create-element'
-import injectCSS from '../inject-css'
-import css from './drawer.css'
-
-injectCSS(css)
+import './drawer.css'
 
 export default class Drawer extends DialogInterface {
   open () {

@@ -6,10 +6,7 @@ import {
 } from '../../../resources/svg'
 import createElement from '../../create-element'
 import emptyElement from '../../empty-element'
-import injectCSS from '../../inject-css'
-import css from './index.css'
-
-injectCSS(css)
+import './index.css'
 
 export default class AddCardElement {
   constructor (options = {}) {

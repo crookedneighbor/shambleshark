@@ -1,11 +1,12 @@
-var webpack = require('webpack')
-var path = require('path')
-var fileSystem = require('fs')
-var env = require('./utils/env')
-var { CleanWebpackPlugin } = require('clean-webpack-plugin')
-var CopyWebpackPlugin = require('copy-webpack-plugin')
-var HtmlWebpackPlugin = require('html-webpack-plugin')
-var WriteFilePlugin = require('write-file-webpack-plugin')
+const webpack = require('webpack')
+const path = require('path')
+const fileSystem = require('fs')
+const env = require('./utils/env')
+const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const WriteFilePlugin = require('write-file-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
 const BROWSER = env.BROWSER
 
@@ -48,8 +49,14 @@ var options = {
   module: {
     rules: [
       {
-        test: /\.css$/,
-        loader: 'raw-loader'
+        test: /\.css$/i,
+        use: [{
+          loader: MiniCssExtractPlugin.loader,
+          options: {
+            publicPath: '../',
+            hmr: process.env.NODE_ENV !== 'production'
+          }
+        }, 'css-loader']
       },
       {
         test: new RegExp('\.(' + fileExtensions.join('|') + ')$'), // eslint-disable-line
@@ -129,6 +136,7 @@ var options = {
       filename: 'background.html',
       chunks: ['background']
     }),
+    new MiniCssExtractPlugin(),
     new WriteFilePlugin()
   ]
 }

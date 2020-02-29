@@ -8,14 +8,11 @@ import deckParser from '../../../lib/deck-parser'
 import scryfall from '../../../lib/scryfall'
 import createElement from '../../../lib/create-element'
 import emptyElement from '../../../lib/empty-element'
-import injectCSS from '../../../lib/inject-css'
-import css from './index.css'
+import './index.css'
 
 import {
   EXTERNAL_ARROW
 } from '../../../resources/svg'
-
-injectCSS(css)
 
 // TODO
 // saved searches

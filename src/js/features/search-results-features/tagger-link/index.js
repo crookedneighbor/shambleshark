@@ -4,8 +4,7 @@ import { sections } from '../../constants'
 import iframe from '../../../lib/iframe'
 import createElement from '../../../lib/create-element'
 import mutation from '../../../lib/mutation'
-import injectCSS from '../../../lib/inject-css'
-import css from './index.css'
+import './index.css'
 
 import {
   TAGGER_SYMBOL,
@@ -21,8 +20,6 @@ import {
   RELATED_TO_SYMBOL,
   SIMILAR_TO_SYMBOL
 } from '../../../resources/svg'
-
-injectCSS(css)
 
 const TAG_SYMBOLS = {
   ILLUSTRATION_TAG: ILLUSTRATION_SYMBOL,

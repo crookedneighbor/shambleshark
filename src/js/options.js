@@ -1,16 +1,13 @@
-import bulmaCSS from 'bulma/css/bulma.min.css'
-import bulmaSwitchCSS from 'bulma-switch/dist/css/bulma-switch.min.css'
-import optionsCSS from '../css/options.css'
+import 'bulma/css/bulma.min.css'
+import 'bulma-switch/dist/css/bulma-switch.min.css'
+import '../css/options.css'
 
 import createElement from './lib/create-element'
-import injectCSS from './lib/inject-css'
 
 import globalFeatures from './features/global-features'
 import deckbuilderFeatures from './features/deck-builder-features'
 import deckViewFeatures from './features/deck-view-features'
 import searchResultsFeatures from './features/search-results-features'
-
-injectCSS(bulmaCSS + bulmaSwitchCSS + optionsCSS)
 
 const features = globalFeatures
   .concat(deckbuilderFeatures)
