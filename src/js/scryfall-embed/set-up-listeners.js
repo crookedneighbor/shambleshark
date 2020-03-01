@@ -1,4 +1,7 @@
 import bus from 'framebus'
+import {
+  BUS_EVENTS as events
+} from 'Constants'
 import Scryfall from './scryfall-globals'
 import modifyCleanUp from './modify-clean-up'
 import {
@@ -14,11 +17,11 @@ export default function setUpListeners () {
 
   Scryfall.addHooksToCardManagementEvents()
 
-  bus.on('REQUEST_DECK', function (reply) {
+  bus.on(events.REQUEST_DECK, function (reply) {
     Scryfall.getDeck().then(reply)
   })
 
-  bus.on('SCRYFALL_PUSH_NOTIFICATION', function ({
+  bus.on(events.SCRYFALL_PUSH_NOTIFICATION, function ({
     header,
     message,
     color = 'purple',
@@ -27,7 +30,7 @@ export default function setUpListeners () {
     Scryfall.pushNotification(header, message, color, type)
   })
 
-  bus.on('ADD_CARD_TO_DECK', function ({
+  bus.on(events.ADD_CARD_TO_DECK, function ({
     cardName,
     cardId,
     section
@@ -50,7 +53,7 @@ export default function setUpListeners () {
     })
   })
 
-  bus.on('REMOVE_CARD_FROM_DECK', function ({
+  bus.on(events.REMOVE_CARD_FROM_DECK, function ({
     cardName
   }) {
     Scryfall.getDeck().then((deck) => {
@@ -79,11 +82,11 @@ export default function setUpListeners () {
     })
   })
 
-  bus.on('MODIFY_CLEAN_UP', modifyCleanUp)
+  bus.on(events.MODIFY_CLEAN_UP, modifyCleanUp)
 
-  bus.on('CLEAN_UP_DECK', function () {
+  bus.on(events.CLEAN_UP_DECK, function () {
     Scryfall.cleanUp()
   })
 
-  bus.emit('SCRYFALL_LISTENERS_READY')
+  bus.emit(events.SCRYFALL_LISTENERS_READY)
 }

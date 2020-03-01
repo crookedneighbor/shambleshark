@@ -1,4 +1,7 @@
 import bus from 'framebus'
+import {
+  BUS_EVENTS as events
+} from 'Constants'
 import mutation from 'Lib/mutation'
 import createElement from 'Lib/create-element'
 import DeckSectionChooser from 'Ui/deck-section-chooser'
@@ -71,7 +74,7 @@ function createDrawer (button) {
     header: 'EDHRec Suggestions',
     loadingMessage: 'Loading EDHRec Suggestions',
     onClose (drawerInstance) {
-      bus.emit('CLEAN_UP_DECK')
+      bus.emit(events.CLEAN_UP_DECK)
 
       // reset this in case the error state changes it
       drawerInstance.resetHeader()
@@ -94,7 +97,7 @@ function createDrawer (button) {
       const commanders = deck.entries.commanders.filter(filterOutInvalidCards).map(getCardName)
       const cardsInDeck = getCardsInDeck(deck.entries)
 
-      bus.emit('REQUEST_EDHREC_RECOMENDATIONS', {
+      bus.emit(events.REQUEST_EDHREC_RECOMENDATIONS, {
         commanders,
         cards: cardsInDeck
       }, createEDHRecResponseHandler(drawer, deck))

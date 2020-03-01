@@ -1,5 +1,8 @@
 import bus from 'framebus'
 import ScryfallClient from 'scryfall-client'
+import {
+  BUS_EVENTS as events
+} from 'Constants'
 
 const CACHE_TIMEOUT_FOR_DECK_REQUESTS = 2000 // 2 seconds
 
@@ -13,7 +16,7 @@ export function getDeck () {
   }
 
   getDeckPromise = new Promise((resolve) => {
-    bus.emit('REQUEST_DECK', resolve)
+    bus.emit(events.REQUEST_DECK, resolve)
   })
 
   setTimeout(() => {

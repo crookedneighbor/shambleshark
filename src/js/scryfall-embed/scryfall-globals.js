@@ -1,5 +1,8 @@
 import bus from 'framebus'
 import wait from 'Lib/wait'
+import {
+  BUS_EVENTS as events
+} from 'Constants'
 
 let getActiveDeckPromise = null
 let getDeckMetadataPromise = null
@@ -15,7 +18,7 @@ export function addHooksToCardManagementEvents () {
     const original = ScryfallAPI.decks[method]
     ScryfallAPI.decks[method] = function (deckId, payload, cb, ____) {
       original(...arguments)
-      bus.emit(`CALLED_${method.toUpperCase()}`, {
+      bus.emit(events[`CALLED_${method.toUpperCase()}`], {
         deckId,
         payload
       })
@@ -25,7 +28,7 @@ export function addHooksToCardManagementEvents () {
   const originalCleanup = Scryfall.deckbuilder.cleanUp
   Scryfall.deckbuilder.cleanUp = function () {
     originalCleanup(...arguments)
-    bus.emit('CALLED_CLEANUP')
+    bus.emit(events.CALLED_CLEANUP)
   }
 }
 

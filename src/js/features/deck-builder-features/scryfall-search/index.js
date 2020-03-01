@@ -1,6 +1,9 @@
 import Feature from 'Feature'
 import bus from 'framebus'
-import { FEATURE_SECTIONS as sections } from 'Constants'
+import {
+  BUS_EVENTS as events,
+  FEATURE_SECTIONS as sections
+} from 'Constants'
 import Drawer from 'Ui/drawer'
 import DeckSectionChooser from 'Ui/deck-section-chooser'
 import AddCardElement from 'Ui/add-card-element'
@@ -151,8 +154,7 @@ class ScryfallSearch extends Feature {
       },
       onClose (drawerInstance) {
         self.cardList = null
-        // TODO constant
-        bus.emit('CLEAN_UP_DECK')
+        bus.emit(events.CLEAN_UP_DECK)
 
         // reset this in case the error state changes it
         drawerInstance.setLoading(true)

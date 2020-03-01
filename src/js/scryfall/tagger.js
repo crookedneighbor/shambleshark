@@ -1,5 +1,8 @@
 import bus from 'framebus'
 import iframe from 'Lib/iframe'
+import {
+  BUS_EVENTS as events
+} from 'Constants'
 
 const query = `query FetchCard($set: String!, $number: String!, $back: Boolean = false) {
   card: cardBySet(set: $set, number: $number, back: $back) {
@@ -53,7 +56,7 @@ export default function () {
     return
   }
 
-  bus.on('TAGGER_TAGS_REQUEST', (config, reply) => {
+  bus.on(events.TAGGER_TAGS_REQUEST, (config, reply) => {
     // Firefox errors with a 422 for some reason when
     // using the fetch API inside an iframe, so we must
     // use xhr for this request
@@ -81,5 +84,5 @@ export default function () {
     xhr.send(body)
   })
 
-  bus.emit('TAGGER_READY')
+  bus.emit(events.TAGGER_READY)
 }

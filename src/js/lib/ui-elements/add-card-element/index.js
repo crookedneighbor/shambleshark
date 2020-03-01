@@ -4,6 +4,9 @@ import {
   MINUS_SYMBOL,
   PLUS_SYMBOL
 } from 'Svg'
+import {
+  BUS_EVENTS as events
+} from 'Constants'
 import createElement from 'Lib/create-element'
 import emptyElement from 'Lib/empty-element'
 import './index.css'
@@ -144,13 +147,13 @@ export default class AddCardElement {
         this.onAddCard(payload)
       }
 
-      bus.emit('ADD_CARD_TO_DECK', payload)
+      bus.emit(events.ADD_CARD_TO_DECK, payload)
     }).catch(err => {
       this.quantity--
 
       console.error(err)
 
-      bus.emit('SCRYFALL_PUSH_NOTIFICATION', {
+      bus.emit(events.SCRYFALL_PUSH_NOTIFICATION, {
         header: 'Card could not be added',
         message: `There was an error adding ${this.name} to the deck. See console for more details.`,
         color: 'red'
@@ -165,7 +168,7 @@ export default class AddCardElement {
 
     this.updateUI()
 
-    bus.emit('REMOVE_CARD_FROM_DECK', {
+    bus.emit(events.REMOVE_CARD_FROM_DECK, {
       cardName: this.name
     })
   }

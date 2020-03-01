@@ -1,5 +1,8 @@
 import Feature from 'Feature'
-import { FEATURE_SECTIONS as sections } from 'Constants'
+import {
+  BUS_EVENTS as events,
+  FEATURE_SECTIONS as sections
+} from 'Constants'
 import bus from 'framebus'
 import mutation from 'Lib/mutation'
 import scryfall from 'Lib/scryfall'
@@ -7,10 +10,10 @@ import deckParser from 'Lib/deck-parser'
 import wait from 'Lib/wait'
 
 const CARD_EVENTS = [
-  'CLEANUP',
-  'UPDATEENTRY',
-  'REPLACEENTRY',
-  'CREATEENTRY'
+  events.CALLED_CLEANUP,
+  events.CALLED_UPDATEENTRY,
+  events.CALLED_REPLACEENTRY,
+  events.CALLED_CREATEENTRY
 ]
 
 class CardInputModifier extends Feature {
@@ -22,13 +25,13 @@ class CardInputModifier extends Feature {
   }
 
   async run () {
-    bus.on('CALLED_DESTROYENTRY', async (data) => {
+    bus.on(events.CALLED_DESTROYENTRY, async (data) => {
       // clean up our imageCache
       delete this.imageCache[data.payload]
     })
 
-    CARD_EVENTS.forEach(method => {
-      bus.on(`CALLED_${method}`, () => {
+    CARD_EVENTS.forEach(eventName => {
+      bus.on(eventName, () => {
         this.refreshCache()
       })
     })

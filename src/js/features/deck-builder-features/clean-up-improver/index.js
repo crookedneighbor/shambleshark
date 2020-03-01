@@ -1,11 +1,14 @@
 import Feature from 'Feature'
-import { FEATURE_SECTIONS as sections } from 'Constants'
+import {
+  BUS_EVENTS as events,
+  FEATURE_SECTIONS as sections
+} from 'Constants'
 import bus from 'framebus'
 
 class CleanUpImprover extends Feature {
   async run () {
     const settings = await CleanUpImprover.getSettings()
-    bus.emit('MODIFY_CLEAN_UP', settings)
+    bus.emit(events.MODIFY_CLEAN_UP, settings)
   }
 }
 

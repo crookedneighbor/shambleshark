@@ -1,6 +1,9 @@
 import bus from 'framebus'
 import Feature from 'Feature'
-import { FEATURE_SECTIONS as sections } from 'Constants'
+import {
+  BUS_EVENTS as events,
+  FEATURE_SECTIONS as sections
+} from 'Constants'
 import iframe from 'Lib/iframe'
 import createElement from 'Lib/create-element'
 import mutation from 'Lib/mutation'
@@ -74,7 +77,7 @@ function convertPageLinkToTagger (data) {
 
 class TaggerLink extends Feature {
   async run () {
-    bus.on('TAGGER_READY', () => {
+    bus.on(events.TAGGER_READY, () => {
       mutation.ready('.card-grid-item a.card-grid-item-card', (link) => {
         const button = this.makeButton(link.href)
 
@@ -129,7 +132,7 @@ class TaggerLink extends Feature {
 
       if (!request) {
         request = new Promise((resolve) => {
-          bus.emit('TAGGER_TAGS_REQUEST', taggerData, resolve)
+          bus.emit(events.TAGGER_TAGS_REQUEST, taggerData, resolve)
         }).then(payload => {
           self.addTags(tooltip, payload)
         })

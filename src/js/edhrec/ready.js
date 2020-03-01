@@ -1,13 +1,15 @@
 import bus from 'framebus'
 import iframe from 'Lib/iframe'
+import {
+  BUS_EVENTS as events
+} from 'Constants'
 
 export default function start () {
   if (!iframe.isInsideIframe()) {
     return
   }
 
-  // TODO move event name to constant
-  bus.on('REQUEST_EDHREC_RECOMENDATIONS', function (payload, reply) {
+  bus.on(events.REQUEST_EDHREC_RECOMENDATIONS, function (payload, reply) {
     getRecs(payload).then(result => {
       if (result.errors) {
         reply([result])
