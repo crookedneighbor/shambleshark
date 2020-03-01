@@ -3,7 +3,8 @@ import Feature from 'Feature'
 import {
   BUS_EVENTS as events,
   FEATURE_IDS as ids,
-  FEATURE_SECTIONS as sections
+  FEATURE_SECTIONS as sections,
+  SPINNER_GIF
 } from 'Constants'
 import iframe from 'Lib/iframe'
 import createElement from 'Lib/create-element'
@@ -102,8 +103,7 @@ class TaggerLink extends Feature {
     >
       <div class="tagger-link-hover">
       <div class="menu-container"></div>
-      <!-- TODO use constant -->
-      <img src="https://assets.scryfall.com/assets/spinner-0e5953300e953759359ad94bcff35ac64ff73a403d3a0702e809d6c43e7e5ed5.gif" class="modal-dialog-spinner" aria-hidden="true">
+      <img src="${SPINNER_GIF}" class="modal-dialog-spinner" aria-hidden="true">
       </div>
       ${TAGGER_SYMBOL}
     </a>`).firstChild

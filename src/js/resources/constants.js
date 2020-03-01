@@ -41,3 +41,5 @@ export const BUS_EVENTS = {
   TAGGER_READY: 'TAGGER_READY',
   TAGGER_TAGS_REQUEST: 'TAGGER_TAGS_REQUEST'
 }
+
+export const SPINNER_GIF = 'https://assets.scryfall.com/assets/spinner-0e5953300e953759359ad94bcff35ac64ff73a403d3a0702e809d6c43e7e5ed5.gif'

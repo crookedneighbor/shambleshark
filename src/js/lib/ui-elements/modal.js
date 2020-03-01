@@ -1,5 +1,8 @@
 import DialogInterface from './dialog-interface'
 import createElement from 'Lib/create-element'
+import {
+  SPINNER_GIF
+} from 'Constants'
 
 import './modal.css'
 
@@ -24,7 +27,7 @@ export default class Modal extends DialogInterface {
         </h6>
 
         <div class="dialog-loader modal-dialog-content" role="alert">
-          <img src="https://assets.scryfall.com/assets/spinner-0e5953300e953759359ad94bcff35ac64ff73a403d3a0702e809d6c43e7e5ed5.gif" class="modal-dialog-spinner" aria-hidden="true">
+          <img src="${SPINNER_GIF}" class="modal-dialog-spinner" aria-hidden="true">
         </div>
       <!---->
         <div class="dialog-content-container modal-dialog-stage">
