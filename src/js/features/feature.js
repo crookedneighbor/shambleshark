@@ -71,6 +71,26 @@ class Feature {
 
     return Object.assign({}, this.settingsDefaults, settings)
   }
+
+  async getDeckMetadata (deckId) {
+    let storedData = await storage.get(deckId)
+
+    if (!storedData) {
+      storedData = {}
+      await storage.set(deckId, storedData)
+    }
+
+    return storedData
+  }
+
+  // TODO avoid race condition with a queue
+  async setDeckMetadata (deckId, property, value) {
+    const storedData = await this.getDeckMetadata(deckId)
+
+    storedData[property] = value
+
+    await storage.set(deckId, storedData)
+  }
 }
 
 createStaticProperty('metadata')

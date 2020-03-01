@@ -2,6 +2,11 @@ import Feature from 'Features/feature'
 import storage from 'Lib/storage'
 
 describe('Base Feature', function () {
+  beforeEach(function () {
+    jest.spyOn(storage, 'get').mockResolvedValue()
+    jest.spyOn(storage, 'set').mockResolvedValue()
+  })
+
   it('requires a run method', async function () {
     const spy = jest.fn()
 
@@ -104,11 +109,6 @@ describe('Base Feature', function () {
       id: 'future-feature',
       futureFeature: true
     }
-
-    beforeEach(function () {
-      jest.spyOn(storage, 'get')
-      jest.spyOn(storage, 'set').mockResolvedValue()
-    })
 
     it('calls out to storage for settings', async function () {
       storage.get.mockResolvedValue({
@@ -245,10 +245,6 @@ describe('Base Feature', function () {
       foo: 'bar'
     }
 
-    beforeEach(function () {
-      jest.spyOn(storage, 'set').mockResolvedValue()
-    })
-
     it('grabs previously saved settings and overwrites the single property', async function () {
       jest.spyOn(FeatureThatSavesSettings, 'getSettings').mockResolvedValue({
         foo: 'bar',
@@ -282,6 +278,78 @@ describe('Base Feature', function () {
       expect(error.message).toBe('Internal Error: Could not find property "does-not-exist" on feature')
 
       expect(storage.set).toBeCalledTimes(0)
+    })
+  })
+
+  describe('getDeckMetadata', function () {
+    let feature
+
+    class SubFeature extends Feature {
+    }
+    SubFeature.metadata = {
+      id: 'feature-that-enables'
+    }
+
+    beforeEach(function () {
+      feature = new SubFeature()
+    })
+
+    it('fetches stored data for deck id', async function () {
+      const fakeData = { foo: 'bar' }
+
+      storage.get.mockResolvedValue(fakeData)
+
+      const data = await feature.getDeckMetadata('deck-id')
+
+      expect(storage.get).toBeCalledTimes(1)
+      expect(storage.get).toBeCalledWith('deck-id')
+      expect(data).toBe(fakeData)
+    })
+
+    it('saves an empty if stored data does not exist', async function () {
+      storage.get.mockResolvedValue()
+      const data = await feature.getDeckMetadata('deck-id')
+
+      expect(storage.get).toBeCalledTimes(1)
+      expect(storage.get).toBeCalledWith('deck-id')
+      expect(storage.set).toBeCalledTimes(1)
+      expect(storage.set).toBeCalledWith('deck-id', {})
+
+      expect(data).toEqual({})
+    })
+  })
+
+  describe('setDeckMetadata', function () {
+    let feature
+
+    class SubFeature extends Feature {
+    }
+    SubFeature.metadata = {
+      id: 'feature-that-enables'
+    }
+
+    beforeEach(function () {
+      feature = new SubFeature()
+      jest.spyOn(feature, 'getDeckMetadata').mockResolvedValue({
+        oldData: 'old'
+      })
+    })
+
+    it('gets deck metadata', async function () {
+      await feature.setDeckMetadata('deck-id', 'foo', 'bar')
+
+      expect(feature.getDeckMetadata).toBeCalledTimes(1)
+      expect(feature.getDeckMetadata).toBeCalledWith('deck-id')
+    })
+
+    it('saves value to deck metadata', async function () {
+      await feature.setDeckMetadata('deck-id', 'newData', 'new')
+
+      expect(storage.set).toBeCalledTimes(1)
+      expect(storage.set).toBeCalledWith('deck-id', {
+        oldData: 'old',
+        newData: 'new'
+      })
     })
   })
 })
