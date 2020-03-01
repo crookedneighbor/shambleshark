@@ -28,30 +28,6 @@ describe('set up listeners on Scryfall page', function () {
     jest.spyOn(Scryfall, 'addHooksToCardManagementEvents').mockImplementation()
   })
 
-  it('it does not listen for events if there is no Scryfall API object', function () {
-    delete window.ScryfallAPI
-
-    setUpListeners()
-
-    expect(bus.on).not.toBeCalled()
-  })
-
-  it('it does not listen for events if there is no Scryfall.deckbuilder object', function () {
-    delete window.Scryfall.deckbuilder
-
-    setUpListeners()
-
-    expect(bus.on).not.toBeCalled()
-  })
-
-  it('it does not listen for events if there is no Scryfall object', function () {
-    delete window.Scryfall
-
-    setUpListeners()
-
-    expect(bus.on).not.toBeCalled()
-  })
-
   it('listens for events', function () {
     setUpListeners()
 

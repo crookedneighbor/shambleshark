@@ -8,27 +8,31 @@ let getActiveDeckPromise = null
 let getDeckMetadataPromise = null
 
 export function addHooksToCardManagementEvents () {
-  [
-    'addCard',
-    'updateEntry',
-    'replaceEntry',
-    'createEntry',
-    'destroyEntry'
-  ].forEach(method => {
-    const original = ScryfallAPI.decks[method]
-    ScryfallAPI.decks[method] = function (deckId, payload, cb, ____) {
-      original(...arguments)
-      bus.emit(events[`CALLED_${method.toUpperCase()}`], {
-        deckId,
-        payload
-      })
-    }
-  })
+  if (window.ScryfallAPI) {
+    [
+      'addCard',
+      'updateEntry',
+      'replaceEntry',
+      'createEntry',
+      'destroyEntry'
+    ].forEach(method => {
+      const original = window.ScryfallAPI.decks[method]
+      ScryfallAPI.decks[method] = function (deckId, payload, cb, ____) {
+        original(...arguments)
+        bus.emit(events[`CALLED_${method.toUpperCase()}`], {
+          deckId,
+          payload
+        })
+      }
+    })
+  }
 
-  const originalCleanup = Scryfall.deckbuilder.cleanUp
-  Scryfall.deckbuilder.cleanUp = function () {
-    originalCleanup(...arguments)
-    bus.emit(events.CALLED_CLEANUP)
+  if (window.Scryfall && window.Scryfall.deckbuilder) {
+    const originalCleanup = window.Scryfall.deckbuilder.cleanUp
+    Scryfall.deckbuilder.cleanUp = function () {
+      originalCleanup(...arguments)
+      bus.emit(events.CALLED_CLEANUP)
+    }
   }
 }
 
@@ -53,7 +57,7 @@ export function getActiveDeckId (waitTime = 300) {
     })
   }
 
-  if (Scryfall.deckbuilder && Scryfall.deckbuilder.deckId) {
+  if (Scryfall && Scryfall.deckbuilder && Scryfall.deckbuilder.deckId) {
     return Promise.resolve(Scryfall.deckbuilder.deckId)
   }
 

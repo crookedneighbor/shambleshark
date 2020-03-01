@@ -10,11 +10,6 @@ import {
 } from 'Lib/deck-parser'
 
 export default function setUpListeners () {
-  if (!window.ScryfallAPI || !(window.Scryfall && window.Scryfall.deckbuilder)) {
-    // don't set up listeners if msising Scryfall globals
-    return
-  }
-
   Scryfall.addHooksToCardManagementEvents()
 
   bus.on(events.REQUEST_DECK, function (reply) {

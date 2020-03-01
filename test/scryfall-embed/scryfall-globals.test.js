@@ -90,6 +90,22 @@ describe('Scryfall Globals', function () {
       expect(original).toBeCalledTimes(1)
       expect(original).toBeCalledWith('foo', 'bar')
     })
+
+    it('does not attempt to replace Scryfall.deckbuilder.cleanUp if Scryfall.deckbuilder global is not available', function () {
+      delete global.Scryfall.deckbuilder
+
+      expect(() => {
+        addHooksToCardManagementEvents()
+      }).not.toThrow()
+    })
+
+    it('does not attempt to replace ScryfallAPI methods if Scryfall API is not availabel', function () {
+      delete global.ScryfallAPI
+
+      expect(() => {
+        addHooksToCardManagementEvents()
+      }).not.toThrow()
+    })
   })
 
   describe('getActiveDeckId', function () {
