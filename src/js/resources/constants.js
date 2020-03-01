@@ -5,6 +5,24 @@ export const FEATURE_SECTIONS = {
   SEARCH_RESULTS: 'search-results'
 }
 
+export const FEATURE_IDS = {
+  // Globals
+  FutureFeatureOptIn: 'future-opt-in',
+
+  // Deckbuilders
+  CardInputModifier: 'card-input-modifier',
+  CleanUpImprover: 'clean-up-improver',
+  EDHRecSuggestions: 'edhrec-suggestions-button',
+  ScryfallSearch: 'scryfall-search',
+
+  // Deck Display
+  DeckDisplay: 'deck-display',
+  TokenList: 'token-list',
+
+  // Search results
+  TaggerLink: 'tagger-link'
+}
+
 export const BUS_EVENTS = {
   ADD_CARD_TO_DECK: 'ADD_CARD_TO_DECK',
   CALLED_DESTROYENTRY: 'CALLED_DESTROYENTRY',

@@ -1,7 +1,10 @@
 import Feature from 'Feature'
 import makeEDHRecButton from './make-edhrec-button'
 import mutation from 'Lib/mutation'
-import { FEATURE_SECTIONS as sections } from 'Constants'
+import {
+  FEATURE_IDS as ids,
+  FEATURE_SECTIONS as sections
+} from 'Constants'
 
 import './index.css'
 
@@ -38,7 +41,7 @@ class EDHRecSuggestions extends Feature {
 }
 
 EDHRecSuggestions.metadata = {
-  id: 'edhrec-suggestions-button',
+  id: ids.EDHRecSuggestions,
   title: 'EDHRec Suggestions',
   section: sections.DECK_BUILDER,
   description: 'Inserts an EDHRec button on commander decks. When accessed, will display a list of card suggestions from EDHRec.'

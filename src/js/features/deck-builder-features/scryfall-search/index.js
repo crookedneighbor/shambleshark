@@ -2,6 +2,7 @@ import Feature from 'Feature'
 import bus from 'framebus'
 import {
   BUS_EVENTS as events,
+  FEATURE_IDS as ids,
   FEATURE_SECTIONS as sections
 } from 'Constants'
 import Drawer from 'Ui/drawer'
@@ -177,7 +178,7 @@ class ScryfallSearch extends Feature {
 }
 
 ScryfallSearch.metadata = {
-  id: 'scryfall-search',
+  id: ids.ScryfallSearch,
   title: 'Scryfall Search',
   section: sections.DECK_BUILDER,
   description: 'Search for Scryfall cards right inside the deckbuilder! (Coming Soon: Save searches for specific decks for later)'

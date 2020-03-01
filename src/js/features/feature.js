@@ -1,4 +1,7 @@
 import storage from 'Lib/storage'
+import {
+  FEATURE_IDS as ids
+} from 'Constants'
 
 const notImplementedError = new Error('Method not Implemented')
 
@@ -51,7 +54,7 @@ class Feature {
     let settings = await storage.get(this.metadata.id)
 
     if (!settings) {
-      const futureFeatureSettings = await storage.get('future-opt-in')
+      const futureFeatureSettings = await storage.get(ids.FutureFeatureOptIn)
       const disableFutureFeature = futureFeatureSettings && futureFeatureSettings.enabled === false
 
       settings = {

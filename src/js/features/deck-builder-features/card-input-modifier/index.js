@@ -1,6 +1,7 @@
 import Feature from 'Feature'
 import {
   BUS_EVENTS as events,
+  FEATURE_IDS as ids,
   FEATURE_SECTIONS as sections
 } from 'Constants'
 import bus from 'framebus'
@@ -153,7 +154,7 @@ class CardInputModifier extends Feature {
 }
 
 CardInputModifier.metadata = {
-  id: 'card-input-modifier',
+  id: ids.CardInputModifier,
   title: 'Card Input Modifier',
   section: sections.DECK_BUILDER,
   description: 'Modifiers for the card input.'

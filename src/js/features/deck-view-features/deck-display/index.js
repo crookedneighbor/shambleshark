@@ -1,5 +1,8 @@
 import Feature from 'Feature'
-import { FEATURE_SECTIONS as sections } from 'Constants'
+import {
+  FEATURE_IDS as ids,
+  FEATURE_SECTIONS as sections
+} from 'Constants'
 
 class DeckDisplay extends Feature {
   async run () {
@@ -8,7 +11,7 @@ class DeckDisplay extends Feature {
 }
 
 DeckDisplay.metadata = {
-  id: 'deck-display',
+  id: ids.DeckDisplay,
   futureFeature: true,
   title: 'Deck Display',
   section: sections.DECK_VIEW,

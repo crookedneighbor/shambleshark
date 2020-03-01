@@ -1,5 +1,6 @@
 import Feature from 'Feature'
 import {
+  FEATURE_IDS as ids,
   BUS_EVENTS as events,
   FEATURE_SECTIONS as sections
 } from 'Constants'
@@ -13,7 +14,7 @@ class CleanUpImprover extends Feature {
 }
 
 CleanUpImprover.metadata = {
-  id: 'clean-up-improver',
+  id: ids.CleanUpImprover,
   title: 'Clean Up Improver',
   section: sections.DECK_BUILDER,
   description: 'Modifies the clean up button to better organize the deck.'
