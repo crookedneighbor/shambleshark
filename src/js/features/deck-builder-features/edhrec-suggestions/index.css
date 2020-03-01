@@ -1,0 +1,10 @@
+#edhrec-card-suggestions {
+  text-align: center;
+  overflow-y: scroll;
+}
+
+.edhrec-suggestions-section-title {
+  font-size: 20px;
+  border-bottom: 1px solid #E0DEE3;
+  padding: 15px 0 5px;
+}

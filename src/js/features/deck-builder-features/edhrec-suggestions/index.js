@@ -3,6 +3,8 @@ import makeEDHRecButton from './make-edhrec-button'
 import mutation from 'Lib/mutation'
 import { FEATURE_SECTIONS as sections } from 'Constants'
 
+import './index.css'
+
 const TIMEOUT_TO_CONTINUE = 1000
 
 class EDHRecSuggestions extends Feature {

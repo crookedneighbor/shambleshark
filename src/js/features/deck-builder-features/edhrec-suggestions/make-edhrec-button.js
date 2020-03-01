@@ -182,8 +182,7 @@ function constructEDHRecSection (sectionId, cardType) {
     id="edhrec-suggestion-${sectionId}"
     class="edhrec-suggestions-container"
     >
-      <!-- TODO move this css to a css file -->
-      <h3 style="font-size:20px;border-bottom: 1px solid #E0DEE3;padding:15px 0 5px;">${sectionTitle}</h3>
+      <h3 class="edhrec-suggestions-section-title">${sectionTitle}</h3>
       <div class="edhrec-suggestions"></div>
   </div>`).firstChild
 
@@ -208,8 +207,6 @@ function createEDHRecResponseHandler (drawer, deck) {
     const container = document.createElement('div')
     const sections = {}
     container.id = 'edhrec-card-suggestions'
-    container.style.textAlign = 'center'
-    container.style.overflowY = 'scroll'
     const deckSectionChooser = new DeckSectionChooser({
       id: 'edhrec-suggestions-section-chooser',
       deck

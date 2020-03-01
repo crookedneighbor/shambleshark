@@ -1,0 +1,5 @@
+.dialog-content-container.modal-dialog-stage {
+  position:fixed;
+  left:-100%;
+  visibility:hidden
+}
