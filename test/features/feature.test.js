@@ -1,5 +1,6 @@
 import Feature from 'Features/feature'
 import storage from 'Lib/storage'
+import deckParser from 'Lib/deck-parser'
 
 describe('Base Feature', function () {
   beforeEach(function () {
@@ -282,7 +283,7 @@ describe('Base Feature', function () {
   })
 
   describe('getDeckMetadata', function () {
-    let feature
+    let feature, fakeDeck, entries
 
     class SubFeature extends Feature {
     }
@@ -292,35 +293,150 @@ describe('Base Feature', function () {
 
     beforeEach(function () {
       feature = new SubFeature()
+      fakeDeck = { id: 'deck-id' }
+      entries = []
+      jest.spyOn(deckParser, 'flattenEntries').mockReturnValue(entries)
     })
 
     it('fetches stored data for deck id', async function () {
-      const fakeData = { foo: 'bar' }
+      const fakeData = {
+        foo: 'bar',
+        entries: {}
+      }
 
       storage.get.mockResolvedValue(fakeData)
 
-      const data = await feature.getDeckMetadata({ id: 'deck-id' })
+      const data = await feature.getDeckMetadata(fakeDeck)
 
       expect(storage.get).toBeCalledTimes(1)
       expect(storage.get).toBeCalledWith('deck-id')
       expect(data).toBe(fakeData)
     })
 
-    it('saves an empty if stored data does not exist', async function () {
+    it('saves an empty shell if stored data does not exist', async function () {
       storage.get.mockResolvedValue()
-      const data = await feature.getDeckMetadata({ id: 'deck-id' })
+      const data = await feature.getDeckMetadata(fakeDeck)
 
       expect(storage.get).toBeCalledTimes(1)
       expect(storage.get).toBeCalledWith('deck-id')
       expect(storage.set).toBeCalledTimes(1)
-      expect(storage.set).toBeCalledWith('deck-id', {})
+      expect(storage.set).toBeCalledWith('deck-id', {
+        entries: {}
+      })
 
-      expect(data).toEqual({})
+      expect(data).toEqual({
+        entries: {}
+      })
+    })
+
+    it('saves an empty entries object if stored data does not incude it', async function () {
+      const fakeData = { foo: 'bar' }
+
+      storage.get.mockResolvedValue(fakeData)
+
+      const data = await feature.getDeckMetadata(fakeDeck)
+
+      expect(storage.get).toBeCalledTimes(1)
+      expect(storage.get).toBeCalledWith('deck-id')
+      expect(storage.set).toBeCalledTimes(1)
+      expect(storage.set).toBeCalledWith('deck-id', {
+        foo: 'bar',
+        entries: {}
+      })
+
+      expect(data).toEqual({
+        foo: 'bar',
+        entries: {}
+      })
+    })
+
+    it('saves any entries that don\'t exist in stored data but do exist in deck', async function () {
+      const fakeData = {
+        foo: 'bar',
+        entries: {
+          'a-1': {
+            foo: 'bar'
+          }
+        }
+      }
+      entries.push({
+        id: 'a-1'
+      })
+      entries.push({
+        id: 'b-2'
+      })
+
+      storage.get.mockResolvedValue(fakeData)
+
+      const data = await feature.getDeckMetadata(fakeDeck)
+
+      expect(storage.get).toBeCalledTimes(1)
+      expect(storage.get).toBeCalledWith('deck-id')
+      expect(storage.set).toBeCalledTimes(1)
+      expect(storage.set).toBeCalledWith('deck-id', {
+        foo: 'bar',
+        entries: {
+          'a-1': {
+            foo: 'bar'
+          },
+          'b-2': {}
+        }
+      })
+
+      expect(data).toEqual({
+        foo: 'bar',
+        entries: {
+          'a-1': {
+            foo: 'bar'
+          },
+          'b-2': {}
+        }
+      })
+    })
+
+    it('does not save if no default data is added', async function () {
+      const fakeData = {
+        foo: 'bar',
+        entries: {
+          'a-1': {
+            foo: 'bar'
+          },
+          'b-2': {
+            foo: 'baz'
+          }
+        }
+      }
+      entries.push({
+        id: 'a-1'
+      })
+      entries.push({
+        id: 'b-2'
+      })
+
+      storage.get.mockResolvedValue(fakeData)
+
+      const data = await feature.getDeckMetadata(fakeDeck)
+
+      expect(storage.get).toBeCalledTimes(1)
+      expect(storage.get).toBeCalledWith('deck-id')
+      expect(storage.set).not.toBeCalled()
+
+      expect(data).toEqual({
+        foo: 'bar',
+        entries: {
+          'a-1': {
+            foo: 'bar'
+          },
+          'b-2': {
+            foo: 'baz'
+          }
+        }
+      })
     })
   })
 
   describe('setDeckMetadata', function () {
-    let feature
+    let feature, fakeDeck
 
     class SubFeature extends Feature {
     }
@@ -333,18 +449,20 @@ describe('Base Feature', function () {
       jest.spyOn(feature, 'getDeckMetadata').mockResolvedValue({
         oldData: 'old'
       })
+      fakeDeck = {
+        id: 'deck-id'
+      }
     })
 
     it('gets deck metadata', async function () {
-      const fakeDeck = { id: 'deck-id' }
-      await feature.setDeckMetadata({ id: 'deck-id' }, 'foo', 'bar')
+      await feature.setDeckMetadata(fakeDeck, 'foo', 'bar')
 
       expect(feature.getDeckMetadata).toBeCalledTimes(1)
       expect(feature.getDeckMetadata).toBeCalledWith(fakeDeck)
     })
 
     it('saves value to deck metadata', async function () {
-      await feature.setDeckMetadata({ id: 'deck-id' }, 'newData', 'new')
+      await feature.setDeckMetadata(fakeDeck, 'newData', 'new')
 
       expect(storage.set).toBeCalledTimes(1)
       expect(storage.set).toBeCalledWith('deck-id', {

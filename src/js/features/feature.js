@@ -1,3 +1,4 @@
+import deckParser from 'Lib/deck-parser'
 import storage from 'Lib/storage'
 import {
   FEATURE_IDS as ids
@@ -73,10 +74,29 @@ class Feature {
   }
 
   async getDeckMetadata (deck) {
+    let needsInitialSave = false
     let storedData = await storage.get(deck.id)
 
     if (!storedData) {
+      needsInitialSave = true
       storedData = {}
+    }
+
+    if (!storedData.entries) {
+      needsInitialSave = true
+      storedData.entries = {}
+    }
+
+    const entries = deckParser.flattenEntries(deck)
+
+    entries.forEach(entry => {
+      if (!(entry.id in storedData.entries)) {
+        needsInitialSave = true
+        storedData.entries[entry.id] = {}
+      }
+    })
+
+    if (needsInitialSave) {
       await storage.set(deck.id, storedData)
     }
 
