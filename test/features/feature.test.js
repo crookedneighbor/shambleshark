@@ -299,7 +299,7 @@ describe('Base Feature', function () {
 
       storage.get.mockResolvedValue(fakeData)
 
-      const data = await feature.getDeckMetadata('deck-id')
+      const data = await feature.getDeckMetadata({ id: 'deck-id' })
 
       expect(storage.get).toBeCalledTimes(1)
       expect(storage.get).toBeCalledWith('deck-id')
@@ -308,7 +308,7 @@ describe('Base Feature', function () {
 
     it('saves an empty if stored data does not exist', async function () {
       storage.get.mockResolvedValue()
-      const data = await feature.getDeckMetadata('deck-id')
+      const data = await feature.getDeckMetadata({ id: 'deck-id' })
 
       expect(storage.get).toBeCalledTimes(1)
       expect(storage.get).toBeCalledWith('deck-id')
@@ -336,14 +336,15 @@ describe('Base Feature', function () {
     })
 
     it('gets deck metadata', async function () {
-      await feature.setDeckMetadata('deck-id', 'foo', 'bar')
+      const fakeDeck = { id: 'deck-id' }
+      await feature.setDeckMetadata({ id: 'deck-id' }, 'foo', 'bar')
 
       expect(feature.getDeckMetadata).toBeCalledTimes(1)
-      expect(feature.getDeckMetadata).toBeCalledWith('deck-id')
+      expect(feature.getDeckMetadata).toBeCalledWith(fakeDeck)
     })
 
     it('saves value to deck metadata', async function () {
-      await feature.setDeckMetadata('deck-id', 'newData', 'new')
+      await feature.setDeckMetadata({ id: 'deck-id' }, 'newData', 'new')
 
       expect(storage.set).toBeCalledTimes(1)
       expect(storage.set).toBeCalledWith('deck-id', {

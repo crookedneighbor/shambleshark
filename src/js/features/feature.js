@@ -72,24 +72,24 @@ class Feature {
     return Object.assign({}, this.settingsDefaults, settings)
   }
 
-  async getDeckMetadata (deckId) {
-    let storedData = await storage.get(deckId)
+  async getDeckMetadata (deck) {
+    let storedData = await storage.get(deck.id)
 
     if (!storedData) {
       storedData = {}
-      await storage.set(deckId, storedData)
+      await storage.set(deck.id, storedData)
     }
 
     return storedData
   }
 
   // TODO avoid race condition with a queue
-  async setDeckMetadata (deckId, property, value) {
-    const storedData = await this.getDeckMetadata(deckId)
+  async setDeckMetadata (deck, property, value) {
+    const storedData = await this.getDeckMetadata(deck)
 
     storedData[property] = value
 
-    await storage.set(deckId, storedData)
+    await storage.set(deck.id, storedData)
   }
 }
 
