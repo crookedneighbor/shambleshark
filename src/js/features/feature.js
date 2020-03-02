@@ -74,8 +74,9 @@ class Feature {
   }
 
   async getDeckMetadata (deck) {
+    const id = this._getDeckID(deck)
     let needsInitialSave = false
-    let storedData = await storage.get(deck.id)
+    let storedData = await storage.get(id)
 
     if (!storedData) {
       needsInitialSave = true
@@ -97,7 +98,7 @@ class Feature {
     })
 
     if (needsInitialSave) {
-      await storage.set(deck.id, storedData)
+      await storage.set(id, storedData)
     }
 
     return storedData
@@ -105,11 +106,16 @@ class Feature {
 
   // TODO avoid race condition with a queue
   async setDeckMetadata (deck, property, value) {
+    const id = this._getDeckID(deck)
     const storedData = await this.getDeckMetadata(deck)
 
     storedData[property] = value
 
-    await storage.set(deck.id, storedData)
+    await storage.set(id, storedData)
+  }
+
+  _getDeckID (deck) {
+    return `DECK:${deck.id}`
   }
 }
 

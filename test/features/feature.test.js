@@ -309,7 +309,7 @@ describe('Base Feature', function () {
       const data = await feature.getDeckMetadata(fakeDeck)
 
       expect(storage.get).toBeCalledTimes(1)
-      expect(storage.get).toBeCalledWith('deck-id')
+      expect(storage.get).toBeCalledWith('DECK:deck-id')
       expect(data).toBe(fakeData)
     })
 
@@ -318,9 +318,9 @@ describe('Base Feature', function () {
       const data = await feature.getDeckMetadata(fakeDeck)
 
       expect(storage.get).toBeCalledTimes(1)
-      expect(storage.get).toBeCalledWith('deck-id')
+      expect(storage.get).toBeCalledWith('DECK:deck-id')
       expect(storage.set).toBeCalledTimes(1)
-      expect(storage.set).toBeCalledWith('deck-id', {
+      expect(storage.set).toBeCalledWith('DECK:deck-id', {
         entries: {}
       })
 
@@ -337,9 +337,9 @@ describe('Base Feature', function () {
       const data = await feature.getDeckMetadata(fakeDeck)
 
       expect(storage.get).toBeCalledTimes(1)
-      expect(storage.get).toBeCalledWith('deck-id')
+      expect(storage.get).toBeCalledWith('DECK:deck-id')
       expect(storage.set).toBeCalledTimes(1)
-      expect(storage.set).toBeCalledWith('deck-id', {
+      expect(storage.set).toBeCalledWith('DECK:deck-id', {
         foo: 'bar',
         entries: {}
       })
@@ -371,9 +371,9 @@ describe('Base Feature', function () {
       const data = await feature.getDeckMetadata(fakeDeck)
 
       expect(storage.get).toBeCalledTimes(1)
-      expect(storage.get).toBeCalledWith('deck-id')
+      expect(storage.get).toBeCalledWith('DECK:deck-id')
       expect(storage.set).toBeCalledTimes(1)
-      expect(storage.set).toBeCalledWith('deck-id', {
+      expect(storage.set).toBeCalledWith('DECK:deck-id', {
         foo: 'bar',
         entries: {
           'a-1': {
@@ -418,7 +418,7 @@ describe('Base Feature', function () {
       const data = await feature.getDeckMetadata(fakeDeck)
 
       expect(storage.get).toBeCalledTimes(1)
-      expect(storage.get).toBeCalledWith('deck-id')
+      expect(storage.get).toBeCalledWith('DECK:deck-id')
       expect(storage.set).not.toBeCalled()
 
       expect(data).toEqual({
@@ -465,7 +465,7 @@ describe('Base Feature', function () {
       await feature.setDeckMetadata(fakeDeck, 'newData', 'new')
 
       expect(storage.set).toBeCalledTimes(1)
-      expect(storage.set).toBeCalledWith('deck-id', {
+      expect(storage.set).toBeCalledWith('DECK:deck-id', {
         oldData: 'old',
         newData: 'new'
       })
