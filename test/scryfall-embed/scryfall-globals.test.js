@@ -1,4 +1,5 @@
 import bus from 'framebus'
+import url from 'Lib/url'
 import {
   addCard,
   addHooksToCardManagementEvents,
@@ -139,11 +140,30 @@ describe('Scryfall Globals', function () {
       expect(hasResolved).toBe(true)
     })
 
+    it('skips api call if the deck id is available in the url', function () {
+      jest.spyOn(url, 'getDeckId').mockReturnValue('deck-id-from-url')
+
+      return getActiveDeckId().then((id) => {
+        expect(id).toBe('deck-id-from-url')
+        expect(global.ScryfallAPI.decks.active).not.toBeCalled()
+      })
+    })
+
     it('skips api call if the deck id is available on the window', function () {
       global.Scryfall.deckbuilder.deckId = 'deck-id-from-window'
 
       return getActiveDeckId().then((id) => {
         expect(id).toBe('deck-id-from-window')
+        expect(global.ScryfallAPI.decks.active).not.toBeCalled()
+      })
+    })
+
+    it('prefers deck id from url over window', function () {
+      jest.spyOn(url, 'getDeckId').mockReturnValue('deck-id-from-url')
+      global.Scryfall.deckbuilder.deckId = 'deck-id-from-window'
+
+      return getActiveDeckId().then((id) => {
+        expect(id).toBe('deck-id-from-url')
         expect(global.ScryfallAPI.decks.active).not.toBeCalled()
       })
     })

@@ -1,5 +1,6 @@
 import bus from 'framebus'
 import wait from 'Lib/wait'
+import url from 'Lib/url'
 import {
   BUS_EVENTS as events
 } from 'Constants'
@@ -55,6 +56,12 @@ export function getActiveDeckId (waitTime = 300) {
       // progressively wait longer and longer to try looking up the grant secret
       return getActiveDeckId(waitTime * 2)
     })
+  }
+
+  const deckIDFromUrl = url.getDeckId()
+
+  if (deckIDFromUrl) {
+    return Promise.resolve(deckIDFromUrl)
   }
 
   if (Scryfall && Scryfall.deckbuilder && Scryfall.deckbuilder.deckId) {
