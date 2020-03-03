@@ -360,15 +360,21 @@ describe('Base Feature', function () {
         }
       }
       entries.push({
-        id: 'a-1'
+        id: 'a-1',
+        data: {
+          some: 'data'
+        }
       })
       entries.push({
-        id: 'b-2'
+        id: 'b-2',
+        data: {
+          someOther: 'data'
+        }
       })
 
       storage.get.mockResolvedValue(fakeData)
 
-      const data = await feature.getDeckMetadata(fakeDeck)
+      await feature.getDeckMetadata(fakeDeck)
 
       expect(storage.get).toBeCalledTimes(1)
       expect(storage.get).toBeCalledWith('DECK:deck-id')
@@ -377,19 +383,72 @@ describe('Base Feature', function () {
         foo: 'bar',
         entries: {
           'a-1': {
-            foo: 'bar'
+            foo: 'bar',
+            raw: {
+              id: 'a-1',
+              data: {
+                some: 'data'
+              }
+            }
           },
-          'b-2': {}
+          'b-2': {
+            raw: {
+              id: 'b-2',
+              data: {
+                someOther: 'data'
+              }
+            }
+          }
         }
       })
+    })
+
+    it('decorates data with raw info about the entries', async function () {
+      const fakeData = {
+        foo: 'bar',
+        entries: {
+          'a-1': {
+            foo: 'bar'
+          }
+        }
+      }
+      entries.push({
+        id: 'a-1',
+        data: {
+          some: 'data'
+        }
+      })
+      entries.push({
+        id: 'b-2',
+        data: {
+          someOther: 'data'
+        }
+      })
+
+      storage.get.mockResolvedValue(fakeData)
+
+      const data = await feature.getDeckMetadata(fakeDeck)
 
       expect(data).toEqual({
         foo: 'bar',
         entries: {
           'a-1': {
-            foo: 'bar'
+            foo: 'bar',
+            raw: {
+              id: 'a-1',
+              data: {
+                some: 'data'
+              }
+            }
           },
-          'b-2': {}
+          'b-2': {
+            raw: {
+              id: 'b-2',
+              data: {
+                someOther: 'data'
+              }
+            }
+          }
         }
       })
     })
@@ -425,10 +484,12 @@ describe('Base Feature', function () {
         foo: 'bar',
         entries: {
           'a-1': {
-            foo: 'bar'
+            foo: 'bar',
+            raw: { id: 'a-1' }
           },
           'b-2': {
-            foo: 'baz'
+            foo: 'baz',
+            raw: { id: 'b-2' }
           }
         }
       })
@@ -436,7 +497,7 @@ describe('Base Feature', function () {
   })
 
   describe('setDeckMetadata', function () {
-    let feature, fakeDeck
+    let feature, fakeDeck, entries
 
     class SubFeature extends Feature {
     }
@@ -452,6 +513,8 @@ describe('Base Feature', function () {
       fakeDeck = {
         id: 'deck-id'
       }
+      entries = []
+      jest.spyOn(deckParser, 'flattenEntries').mockReturnValue(entries)
     })
 
     it('gets deck metadata', async function () {
@@ -468,6 +531,63 @@ describe('Base Feature', function () {
       expect(storage.set).toBeCalledWith('DECK:deck-id', {
         oldData: 'old',
         newData: 'new'
+      })
+    })
+
+    it('prunes "raw" data from entries before saving', async function () {
+      entries.push({
+        id: 'id-1'
+      })
+      await feature.setDeckMetadata(fakeDeck, 'entries', {
+        'id-1': {
+          foo: 'bar',
+          raw: {
+            id: 'id-1',
+            data: 'data'
+          }
+        }
+      })
+
+      expect(storage.set).toBeCalledTimes(1)
+      expect(storage.set).toBeCalledWith('DECK:deck-id', {
+        oldData: 'old',
+        entries: {
+          'id-1': {
+            foo: 'bar'
+          }
+        }
+      })
+    })
+
+    it('prunes entries that no longer exist in deck', async function () {
+      entries.push({
+        id: 'id-1'
+      })
+      await feature.setDeckMetadata(fakeDeck, 'entries', {
+        'id-1': {
+          foo: 'bar',
+          raw: {
+            id: 'id-1',
+            data: 'data'
+          }
+        },
+        'not-in-deck-id': {
+          foo: 'bar',
+          raw: {
+            id: 'not-in-deck-id',
+            data: 'data'
+          }
+        }
+      })
+
+      expect(storage.set).toBeCalledTimes(1)
+      expect(storage.set).toBeCalledWith('DECK:deck-id', {
+        oldData: 'old',
+        entries: {
+          'id-1': {
+            foo: 'bar'
+          }
+        }
       })
     })
   })

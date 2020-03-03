@@ -95,6 +95,8 @@ class Feature {
         needsInitialSave = true
         storedData.entries[entry.id] = {}
       }
+
+      storedData.entries[entry.id].raw = entry
     })
 
     if (needsInitialSave) {
@@ -108,6 +110,19 @@ class Feature {
   async setDeckMetadata (deck, property, value) {
     const id = this._getDeckID(deck)
     const storedData = await this.getDeckMetadata(deck)
+    const entries = deckParser.flattenEntries(deck)
+
+    if (property === 'entries') {
+      value = JSON.parse(JSON.stringify(value))
+      Object.keys(value).forEach(id => {
+        if (!entries.find(entry => entry.id === id)) {
+          delete value[id]
+          return
+        }
+
+        delete value[id].raw
+      })
+    }
 
     storedData[property] = value
 
