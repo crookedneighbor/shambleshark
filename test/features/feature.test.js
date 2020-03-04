@@ -282,313 +282,39 @@ describe('Base Feature', function () {
     })
   })
 
-  describe('getDeckMetadata', function () {
-    let feature, fakeDeck, entries
-
+  describe('saveData', function () {
     class SubFeature extends Feature {
     }
     SubFeature.metadata = {
-      id: 'feature-that-enables'
+      id: 'sub-id'
     }
 
-    beforeEach(function () {
-      feature = new SubFeature()
-      fakeDeck = { id: 'deck-id' }
-      entries = []
-      jest.spyOn(deckParser, 'flattenEntries').mockReturnValue(entries)
-    })
+    it('sets storage with metadata id', async function () {
+      const data = {}
 
-    it('fetches stored data for deck id', async function () {
-      const fakeData = {
-        foo: 'bar',
-        entries: {}
-      }
+      jest.spyOn(storage, 'set').mockResolvedValue()
 
-      storage.get.mockResolvedValue(fakeData)
+      await SubFeature.saveData('some-id', data)
 
-      const data = await feature.getDeckMetadata(fakeDeck)
-
-      expect(storage.get).toBeCalledTimes(1)
-      expect(storage.get).toBeCalledWith('DECK:deck-id')
-      expect(data).toBe(fakeData)
-    })
-
-    it('saves an empty shell if stored data does not exist', async function () {
-      storage.get.mockResolvedValue()
-      const data = await feature.getDeckMetadata(fakeDeck)
-
-      expect(storage.get).toBeCalledTimes(1)
-      expect(storage.get).toBeCalledWith('DECK:deck-id')
       expect(storage.set).toBeCalledTimes(1)
-      expect(storage.set).toBeCalledWith('DECK:deck-id', {
-        entries: {}
-      })
-
-      expect(data).toEqual({
-        entries: {}
-      })
-    })
-
-    it('saves an empty entries object if stored data does not incude it', async function () {
-      const fakeData = { foo: 'bar' }
-
-      storage.get.mockResolvedValue(fakeData)
-
-      const data = await feature.getDeckMetadata(fakeDeck)
-
-      expect(storage.get).toBeCalledTimes(1)
-      expect(storage.get).toBeCalledWith('DECK:deck-id')
-      expect(storage.set).toBeCalledTimes(1)
-      expect(storage.set).toBeCalledWith('DECK:deck-id', {
-        foo: 'bar',
-        entries: {}
-      })
-
-      expect(data).toEqual({
-        foo: 'bar',
-        entries: {}
-      })
-    })
-
-    it('saves any entries that don\'t exist in stored data but do exist in deck', async function () {
-      const fakeData = {
-        foo: 'bar',
-        entries: {
-          'a-1': {
-            foo: 'bar'
-          }
-        }
-      }
-      entries.push({
-        id: 'a-1',
-        data: {
-          some: 'data'
-        }
-      })
-      entries.push({
-        id: 'b-2',
-        data: {
-          someOther: 'data'
-        }
-      })
-
-      storage.get.mockResolvedValue(fakeData)
-
-      await feature.getDeckMetadata(fakeDeck)
-
-      expect(storage.get).toBeCalledTimes(1)
-      expect(storage.get).toBeCalledWith('DECK:deck-id')
-      expect(storage.set).toBeCalledTimes(1)
-      expect(storage.set).toBeCalledWith('DECK:deck-id', {
-        foo: 'bar',
-        entries: {
-          'a-1': {
-            foo: 'bar',
-            raw: {
-              id: 'a-1',
-              data: {
-                some: 'data'
-              }
-            }
-          },
-          'b-2': {
-            raw: {
-              id: 'b-2',
-              data: {
-                someOther: 'data'
-              }
-            }
-          }
-        }
-      })
-    })
-
-    it('decorates data with raw info about the entries', async function () {
-      const fakeData = {
-        foo: 'bar',
-        entries: {
-          'a-1': {
-            foo: 'bar'
-          }
-        }
-      }
-      entries.push({
-        id: 'a-1',
-        data: {
-          some: 'data'
-        }
-      })
-      entries.push({
-        id: 'b-2',
-        data: {
-          someOther: 'data'
-        }
-      })
-
-      storage.get.mockResolvedValue(fakeData)
-
-      const data = await feature.getDeckMetadata(fakeDeck)
-
-      expect(data).toEqual({
-        foo: 'bar',
-        entries: {
-          'a-1': {
-            foo: 'bar',
-            raw: {
-              id: 'a-1',
-              data: {
-                some: 'data'
-              }
-            }
-          },
-          'b-2': {
-            raw: {
-              id: 'b-2',
-              data: {
-                someOther: 'data'
-              }
-            }
-          }
-        }
-      })
-    })
-
-    it('does not save if no default data is added', async function () {
-      const fakeData = {
-        foo: 'bar',
-        entries: {
-          'a-1': {
-            foo: 'bar'
-          },
-          'b-2': {
-            foo: 'baz'
-          }
-        }
-      }
-      entries.push({
-        id: 'a-1'
-      })
-      entries.push({
-        id: 'b-2'
-      })
-
-      storage.get.mockResolvedValue(fakeData)
-
-      const data = await feature.getDeckMetadata(fakeDeck)
-
-      expect(storage.get).toBeCalledTimes(1)
-      expect(storage.get).toBeCalledWith('DECK:deck-id')
-      expect(storage.set).not.toBeCalled()
-
-      expect(data).toEqual({
-        foo: 'bar',
-        entries: {
-          'a-1': {
-            foo: 'bar',
-            raw: { id: 'a-1' }
-          },
-          'b-2': {
-            foo: 'baz',
-            raw: { id: 'b-2' }
-          }
-        }
-      })
+      expect(storage.set).toBeCalledWith('sub-id:some-id', data)
     })
   })
 
-  describe('setDeckMetadata', function () {
-    let feature, fakeDeck, entries
-
+  describe('getData', function () {
     class SubFeature extends Feature {
     }
     SubFeature.metadata = {
-      id: 'feature-that-enables'
+      id: 'sub-id'
     }
 
-    beforeEach(function () {
-      feature = new SubFeature()
-      jest.spyOn(feature, 'getDeckMetadata').mockResolvedValue({
-        oldData: 'old'
-      })
-      fakeDeck = {
-        id: 'deck-id'
-      }
-      entries = []
-      jest.spyOn(deckParser, 'flattenEntries').mockReturnValue(entries)
-    })
+    it('gets storage with metadata id', async function () {
+      jest.spyOn(storage, 'get').mockResolvedValue()
 
-    it('gets deck metadata', async function () {
-      await feature.setDeckMetadata(fakeDeck, 'foo', 'bar')
+      await SubFeature.getData('some-id')
 
-      expect(feature.getDeckMetadata).toBeCalledTimes(1)
-      expect(feature.getDeckMetadata).toBeCalledWith(fakeDeck)
-    })
-
-    it('saves value to deck metadata', async function () {
-      await feature.setDeckMetadata(fakeDeck, 'newData', 'new')
-
-      expect(storage.set).toBeCalledTimes(1)
-      expect(storage.set).toBeCalledWith('DECK:deck-id', {
-        oldData: 'old',
-        newData: 'new'
-      })
-    })
-
-    it('prunes "raw" data from entries before saving', async function () {
-      entries.push({
-        id: 'id-1'
-      })
-      await feature.setDeckMetadata(fakeDeck, 'entries', {
-        'id-1': {
-          foo: 'bar',
-          raw: {
-            id: 'id-1',
-            data: 'data'
-          }
-        }
-      })
-
-      expect(storage.set).toBeCalledTimes(1)
-      expect(storage.set).toBeCalledWith('DECK:deck-id', {
-        oldData: 'old',
-        entries: {
-          'id-1': {
-            foo: 'bar'
-          }
-        }
-      })
-    })
-
-    it('prunes entries that no longer exist in deck', async function () {
-      entries.push({
-        id: 'id-1'
-      })
-      await feature.setDeckMetadata(fakeDeck, 'entries', {
-        'id-1': {
-          foo: 'bar',
-          raw: {
-            id: 'id-1',
-            data: 'data'
-          }
-        },
-        'not-in-deck-id': {
-          foo: 'bar',
-          raw: {
-            id: 'not-in-deck-id',
-            data: 'data'
-          }
-        }
-      })
-
-      expect(storage.set).toBeCalledTimes(1)
-      expect(storage.set).toBeCalledWith('DECK:deck-id', {
-        oldData: 'old',
-        entries: {
-          'id-1': {
-            foo: 'bar'
-          }
-        }
-      })
+      expect(storage.get).toBeCalledTimes(1)
+      expect(storage.get).toBeCalledWith('sub-id:some-id')
     })
   })
 })

@@ -73,64 +73,12 @@ class Feature {
     return Object.assign({}, this.settingsDefaults, settings)
   }
 
-  async getDeckMetadata (deck) {
-    const id = this._getDeckID(deck)
-    let needsInitialSave = false
-    let storedData = await storage.get(id)
-
-    if (!storedData) {
-      needsInitialSave = true
-      storedData = {}
-    }
-
-    if (!storedData.entries) {
-      needsInitialSave = true
-      storedData.entries = {}
-    }
-
-    const entries = deckParser.flattenEntries(deck)
-
-    entries.forEach(entry => {
-      if (!(entry.id in storedData.entries)) {
-        needsInitialSave = true
-        storedData.entries[entry.id] = {}
-      }
-
-      storedData.entries[entry.id].raw = entry
-    })
-
-    if (needsInitialSave) {
-      await storage.set(id, storedData)
-    }
-
-    return storedData
+  static async saveData (key, value) {
+    return storage.set(`${this.metadata.id}:${key}`, value)
   }
 
-  // TODO avoid race condition with a queue
-  async setDeckMetadata (deck, property, value) {
-    const id = this._getDeckID(deck)
-    const storedData = await this.getDeckMetadata(deck)
-    const entries = deckParser.flattenEntries(deck)
-
-    if (property === 'entries') {
-      value = JSON.parse(JSON.stringify(value))
-      Object.keys(value).forEach(id => {
-        if (!entries.find(entry => entry.id === id)) {
-          delete value[id]
-          return
-        }
-
-        delete value[id].raw
-      })
-    }
-
-    storedData[property] = value
-
-    await storage.set(id, storedData)
-  }
-
-  _getDeckID (deck) {
-    return `DECK:${deck.id}`
+  static async getData (key) {
+    return storage.get(`${this.metadata.id}:${key}`)
   }
 }
 
