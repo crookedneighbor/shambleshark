@@ -1,4 +1,3 @@
-import deckParser from 'Lib/deck-parser'
 import storage from 'Lib/storage'
 import {
   FEATURE_IDS as ids

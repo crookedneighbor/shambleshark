@@ -1,6 +1,5 @@
 import Feature from 'Features/feature'
 import storage from 'Lib/storage'
-import deckParser from 'Lib/deck-parser'
 
 describe('Base Feature', function () {
   beforeEach(function () {
