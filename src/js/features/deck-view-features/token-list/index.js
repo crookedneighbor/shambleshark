@@ -2,6 +2,9 @@ import Feature from 'Feature'
 import mutation from 'Lib/mutation'
 import scryfall from 'Lib/scryfall'
 import deckParser from 'Lib/deck-parser'
+import {
+  sortByAttribute
+} from 'Lib/sort'
 import createElement from 'Lib/create-element'
 import {
   FEATURE_IDS as ids,
@@ -147,24 +150,9 @@ class TokenList extends Feature {
       return tokens
     }, [])
 
-    flattenedTokens.sort((a, b) => {
-      // we sort by name a bunch
-      // should abstract this function
-      // into a helper
-      const nameA = a.name.toUpperCase() // ignore upper and lowercase
-      const nameB = b.name.toUpperCase() // ignore upper and lowercase
-
-      if (nameA < nameB) {
-        return -1
-      }
-
-      if (nameA > nameB) {
-        return 1
-      }
-
-      // names must be equal
-      return 0
-    })
+    flattenedTokens.sort(sortByAttribute({
+      attributes: ['name']
+    }))
 
     return flattenedTokens
   }

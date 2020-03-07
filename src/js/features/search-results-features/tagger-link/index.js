@@ -9,6 +9,9 @@ import {
 import iframe from 'Lib/iframe'
 import createElement from 'Lib/create-element'
 import mutation from 'Lib/mutation'
+import {
+  sortByAttribute
+} from 'Lib/sort'
 import './index.css'
 
 import {
@@ -248,29 +251,9 @@ class TaggerLink extends Feature {
   }
 
   addTagsToMenu (tags, menu) {
-    // copied from the mdn page on array.sort
-    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
-    tags.sort((a, b) => {
-      const nameA = a.name.toUpperCase() // ignore upper and lowercase
-      const nameB = b.name.toUpperCase() // ignore upper and lowercase
-
-      if (a.isTag && !b.isTag) {
-        return -1
-      } else if (!a.isTag && b.isTag) {
-        return 1
-      }
-
-      if (nameA < nameB) {
-        return -1
-      }
-
-      if (nameA > nameB) {
-        return 1
-      }
-
-      // names must be equal
-      return 0
-    })
+    tags.sort(sortByAttribute({
+      attributes: ['isTag', 'name']
+    }))
 
     tags.forEach(tag => {
       if (menu.children.length > 8) {
