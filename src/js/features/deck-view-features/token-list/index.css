@@ -1,0 +1,13 @@
+.token-list-loading.modal-dialog-spinner {
+  width: 30px;
+  height: 30px;
+  margin: 0 auto;
+}
+
+.deck-details-subtitle.token-list-title {
+  font-size: 15px;
+}
+
+.token-list-container li a {
+  color: #2B253A;
+}

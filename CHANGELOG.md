@@ -1,7 +1,12 @@
 Changelog
 --------
 
+# unreleased
+
+* Add Token List feature
+
 # 0.4.0 - Pre-release
+
 * Fix issue where extension code was running on subdomains by accident (#26)
 * Fix issue where an error may occur on Scryfall domains that do not contain the Scryfall deckbuilder globals
 * EDHRec Suggestions

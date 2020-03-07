@@ -1,0 +1,9 @@
+.sidebar-toolbox {
+  border-bottom: 1px solid #E0DEE3;
+  padding-bottom: 16px !important;
+}
+
+.sidebar-toolbox:last-child {
+  border-bottom: none;
+  padding-bottom: 0 !important;
+}
