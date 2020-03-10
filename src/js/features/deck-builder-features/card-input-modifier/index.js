@@ -9,6 +9,7 @@ import mutation from 'Lib/mutation'
 import scryfall from 'Lib/scryfall'
 import deckParser from 'Lib/deck-parser'
 import wait from 'Lib/wait'
+import CardTooltip from 'Ui/card-tooltip'
 
 const CARD_EVENTS = [
   events.CALLED_CLEANUP,
@@ -23,6 +24,19 @@ class CardInputModifier extends Feature {
 
     this.imageCache = {}
     this.listeners = {}
+
+    this.tooltip = new CardTooltip({
+      onMouseover: (el) => {
+        const id = el.getAttribute('data-entry')
+        const img = this.imageCache[id]
+
+        if (!img) {
+          return
+        }
+
+        this.tooltip.setImage(img)
+      }
+    })
   }
 
   async run () {
@@ -37,16 +51,12 @@ class CardInputModifier extends Feature {
       })
     })
 
-    mutation.ready('#card-tooltip', (tooltip) => {
-      this.tooltipElement = tooltip
-    })
-
     mutation.ready('.deckbuilder-entry', (entry) => {
       this.attachListenersToEntry(entry)
     })
   }
 
-  attachListenersToEntry (entry, bustCache) {
+  attachListenersToEntry (entry) {
     const id = entry.getAttribute('data-entry')
 
     if (!id) {
@@ -59,9 +69,8 @@ class CardInputModifier extends Feature {
     }
     this.listeners[id] = entry
 
-    this.lookupImage(id, bustCache)
-    entry.addEventListener('mousemove', e => this.moveTooltip(e, entry))
-    entry.addEventListener('mouseout', e => this.dismissTooltip(e))
+    this.lookupImage(id)
+    this.tooltip.addElement(entry)
   }
 
   getEntries (bustCache) {
@@ -102,54 +111,6 @@ class CardInputModifier extends Feature {
     entries.forEach(entry => {
       this.imageCache[entry.id] = entry.card_digest && entry.card_digest.image
     })
-  }
-
-  moveTooltip (event, entry) {
-    // largley adapted from Scryfall's site, if that changes
-    // this may also need ot be updated
-
-    if (!this.tooltipElement) {
-      return
-    }
-
-    if (window.innerWidth < 768) {
-      // window is too small to bother with presenting card image
-      return
-    }
-
-    const id = entry.getAttribute('data-entry')
-    const img = this.imageCache[id]
-
-    if (!img) {
-      return
-    }
-
-    if (this.tooltipElement.style.display !== 'block') {
-      this.tooltipElement.style.display = 'block'
-    }
-
-    this.tooltipElement.style.left = event.pageX + 50 + 'px'
-    this.tooltipElement.style.top = event.pageY - 30 + 'px'
-
-    const cardToolTipImg = document.getElementById('card-tooltip-img')
-
-    if (cardToolTipImg.src !== img) {
-      const t = document.createElement('img')
-      t.id = 'card-tooltip-img'
-      t.className = 'card'
-      t.src = img
-
-      this.tooltipElement.removeChild(cardToolTipImg)
-      this.tooltipElement.appendChild(t)
-    }
-  }
-
-  dismissTooltip () {
-    if (!this.tooltipElement) {
-      return
-    }
-
-    this.tooltipElement.style.display = 'none'
   }
 }
 

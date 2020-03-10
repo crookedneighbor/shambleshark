@@ -15,6 +15,30 @@ describe('Card Input Modifier', function () {
     jest.spyOn(bus, 'on').mockImplementation()
   })
 
+  it('sets tooltip image with img from image cache', function () {
+    const el = document.createElement('div')
+    el.setAttribute('data-entry', 'id')
+
+    cim.imageCache.id = 'https://example.com/image.png'
+    jest.spyOn(cim.tooltip, 'setImage').mockImplementation()
+
+    cim.tooltip.triggerOnMouseover(el)
+
+    expect(cim.tooltip.setImage).toBeCalledTimes(1)
+    expect(cim.tooltip.setImage).toBeCalledWith('https://example.com/image.png')
+  })
+
+  it('does not set tooltip image if id is not in image cache', function () {
+    const el = document.createElement('div')
+    el.setAttribute('data-entry', 'id')
+
+    jest.spyOn(cim.tooltip, 'setImage').mockImplementation()
+
+    cim.tooltip.triggerOnMouseover(el)
+
+    expect(cim.tooltip.setImage).not.toBeCalled()
+  })
+
   describe('run', function () {
     let fakeEntry
 
@@ -26,19 +50,6 @@ describe('Card Input Modifier', function () {
       fakeEntry.innerHTML = `
         <textarea class="deckbuilder-entry-input"></textarea>
       `
-    })
-
-    it('waits for #card-tooltip to be ready', async function () {
-      const fakeTooltip = document.createElement('div')
-
-      mutation.ready.mockImplementationOnce(function (name, cb) {
-        cb(fakeTooltip)
-      })
-
-      await cim.run()
-
-      expect(mutation.ready).toBeCalledWith('#card-tooltip', expect.any(Function))
-      expect(cim.tooltipElement).toBe(fakeTooltip)
     })
 
     it('waits for new deckbuilder entries to attach listeners', async function () {
@@ -107,6 +118,60 @@ describe('Card Input Modifier', function () {
       await wait()
 
       expect(cim.refreshCache).toBeCalledTimes(1)
+    })
+  })
+
+  describe('attachListenersToEntry', function () {
+    let entry
+
+    beforeEach(function () {
+      entry = document.createElement('div')
+      entry.setAttribute('data-entry', 'id')
+      jest.spyOn(cim, 'lookupImage').mockImplementation()
+      jest.spyOn(cim.tooltip, 'addElement').mockImplementation()
+    })
+
+    it('noops if no id is available on entry', function () {
+      entry.removeAttribute('data-entry')
+
+      cim.attachListenersToEntry(entry)
+
+      expect(Object.keys(cim.listeners).length).toBe(0)
+      expect(cim.lookupImage).not.toBeCalled()
+      expect(cim.tooltip.addElement).not.toBeCalled()
+    })
+
+    it('noops if listeners already has the entry', function () {
+      cim.listeners.id = entry
+
+      expect(Object.keys(cim.listeners).length).toBe(1)
+
+      cim.attachListenersToEntry(entry)
+
+      expect(Object.keys(cim.listeners).length).toBe(1)
+      expect(cim.lookupImage).not.toBeCalled()
+      expect(cim.tooltip.addElement).not.toBeCalled()
+    })
+
+    it('adds the entry to the listeners', function () {
+      cim.attachListenersToEntry(entry)
+
+      expect(Object.keys(cim.listeners).length).toBe(1)
+      expect(cim.listeners.id).toBe(entry)
+    })
+
+    it('looks up the image', function () {
+      cim.attachListenersToEntry(entry)
+
+      expect(cim.lookupImage).toBeCalledTimes(1)
+      expect(cim.lookupImage).toBeCalledWith('id')
+    })
+
+    it('adds the entry to tooltip', function () {
+      cim.attachListenersToEntry(entry)
+
+      expect(cim.tooltip.addElement).toBeCalledTimes(1)
+      expect(cim.tooltip.addElement).toBeCalledWith(entry)
     })
   })
 
@@ -254,81 +319,6 @@ describe('Card Input Modifier', function () {
       expect(cim.imageCache.foo).toBe('https://example.com/new-foo')
       expect(cim.imageCache.bar).toBe('https://example.com/bar')
       expect(cim.imageCache.baz).toBeFalsy()
-    })
-  })
-
-  describe('moveTooltip', function () {
-    let fakeEvent, fakeEntry
-
-    beforeEach(function () {
-      cim.imageCache.foo = 'https://example.com/foo'
-      cim.tooltipElement = document.createElement('div')
-      cim.tooltipElement.innerHTML = `
-        <img id="card-tooltip-img" />
-      `
-      document.body.appendChild(cim.tooltipElement)
-      fakeEvent = {
-        pageX: 100,
-        pageY: 100
-      }
-      fakeEntry = document.createElement('div')
-      fakeEntry.setAttribute('data-entry', 'foo')
-    })
-
-    it('does not error if tooltip does not exist', function () {
-      delete cim.tooltipElement
-      expect(() => {
-        cim.moveTooltip(fakeEvent, fakeEntry)
-      }).not.toThrow()
-    })
-
-    it('noops when window width is small', function () {
-      const originalWidth = window.innerWidth
-
-      window.innerWidth = 600
-
-      cim.moveTooltip(fakeEvent, fakeEntry)
-
-      // indicates it never got to the point where it would open
-      expect(cim.tooltipElement.style.display).not.toBe('block')
-
-      window.innerWidth = originalWidth
-    })
-
-    it('noops when id does not exist in cache', function () {
-      fakeEntry.setAttribute('data-entry', 'bar')
-      cim.moveTooltip(fakeEvent, fakeEntry)
-
-      // indicates it never got to the point where it would open
-      expect(cim.tooltipElement.style.display).not.toBe('block')
-    })
-
-    it('opens tooltip', function () {
-      cim.moveTooltip(fakeEvent, fakeEntry)
-      expect(cim.tooltipElement.style.display).toBe('block')
-      expect(cim.tooltipElement.style.left).toBe('150px')
-      expect(cim.tooltipElement.style.top).toBe('70px')
-      expect(document.getElementById('card-tooltip-img').src).toBe('https://example.com/foo')
-    })
-  })
-
-  describe('dismissTooltip', function () {
-    it('changes tooltip element display to "none"', function () {
-      cim.tooltipElement = document.createElement('div')
-
-      expect(cim.tooltipElement.style.display).not.toBe('none')
-
-      cim.dismissTooltip()
-
-      expect(cim.tooltipElement.style.display).toBe('none')
-    })
-
-    it('noops if tooltipElementt is not available', function () {
-      delete cim.tooltipElement
-
-      expect(() => {
-        cim.dismissTooltip()
-      }).not.toThrow()
     })
   })
 })
