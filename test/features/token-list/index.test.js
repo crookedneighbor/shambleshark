@@ -12,6 +12,18 @@ describe('Token List', function () {
     container = document.createElement('div')
   })
 
+  it('sets tooltip image from `data-scryfall-image` property', function () {
+    const el = document.createElement('div')
+    el.setAttribute('data-scryfall-image', 'https://example.com/image.png')
+
+    jest.spyOn(tl.tooltip, 'setImage').mockImplementation()
+
+    tl.tooltip.triggerOnMouseover(el)
+
+    expect(tl.tooltip.setImage).toBeCalledTimes(1)
+    expect(tl.tooltip.setImage).toBeCalledWith('https://example.com/image.png')
+  })
+
   describe('run', function () {
     beforeEach(function () {
       jest.spyOn(mutation, 'ready').mockImplementation((selector, cb) => {
@@ -76,9 +88,11 @@ describe('Token List', function () {
     beforeEach(function () {
       tokens = [{
         name: 'Token 1',
-        scryfall_uri: 'https://scryfall.com/token-1'
+        scryfall_uri: 'https://scryfall.com/token-1',
+        getImage: jest.fn()
       }]
       tl.createUI(container)
+      jest.spyOn(tl.tooltip, 'addElement').mockImplementation()
     })
 
     it('hides the spinner', function () {
@@ -92,7 +106,8 @@ describe('Token List', function () {
     it('adds an li and link for each token', function () {
       tokens.push({
         name: 'Token 2',
-        scryfall_uri: 'https://scryfall.com/token-2'
+        scryfall_uri: 'https://scryfall.com/token-2',
+        getImage: jest.fn()
       })
       tl.addToUI(tokens)
 
@@ -102,6 +117,21 @@ describe('Token List', function () {
       expect(links[0].href).toBe('https://scryfall.com/token-1')
       expect(links[1].innerHTML).toBe('Token 2')
       expect(links[1].href).toBe('https://scryfall.com/token-2')
+    })
+
+    it('adds each element to tooltip', function () {
+      tokens.push({
+        name: 'Token 2',
+        scryfall_uri: 'https://scryfall.com/token-2',
+        getImage: jest.fn()
+      })
+      tl.addToUI(tokens)
+
+      const els = container.querySelectorAll('li')
+
+      expect(tl.tooltip.addElement).toBeCalledTimes(2)
+      expect(tl.tooltip.addElement).toBeCalledWith(els[0])
+      expect(tl.tooltip.addElement).toBeCalledWith(els[1])
     })
 
     it('adds a message if no tokens were found', function () {
@@ -228,10 +258,9 @@ describe('Token List', function () {
       }])
     })
 
-    // TODO, eventually this will be by oracle id instead
-    it('removes duplicate names', function () {
+    it('removes duplicate ids', function () {
       tokenCollection[2].push({
-        oracle_id: 'another-token-1',
+        oracle_id: 'id-1',
         name: 'Token 1'
       })
       const tokens = tl.flattenTokenCollection(tokenCollection)
@@ -259,16 +288,20 @@ describe('Token List', function () {
 
     it('looks up th ids of stored entries', async function () {
       tl.findByScryfallId.mockResolvedValueOnce({
-        id: 'token-1'
+        id: 'token-1',
+        getImage: jest.fn()
       })
       tl.findByScryfallId.mockResolvedValueOnce({
-        id: 'token-2'
+        id: 'token-2',
+        getImage: jest.fn()
       })
       tl.findByScryfallId.mockResolvedValueOnce({
-        id: 'token-3'
+        id: 'token-3',
+        getImage: jest.fn()
       })
       tl.findByScryfallId.mockResolvedValueOnce({
-        id: 'token-4'
+        id: 'token-4',
+        getImage: jest.fn()
       })
       tl.storedData.entries.storedEntry1 = {
         tokens: ['token-1', 'token-2']
@@ -291,15 +324,28 @@ describe('Token List', function () {
       expect(tl.findByScryfallId).toBeCalledWith('token-3')
       expect(tl.findByScryfallId).toBeCalledWith('token-4')
 
-      expect(tokenCollection[0][0]).toEqual({ id: 'token-1' })
-      expect(tokenCollection[0][1]).toEqual({ id: 'token-2' })
-      expect(tokenCollection[1][0]).toEqual({ id: 'token-3' })
-      expect(tokenCollection[1][1]).toEqual({ id: 'token-4' })
+      expect(tokenCollection[0][0]).toEqual({
+        id: 'token-1',
+        getImage: expect.any(Function)
+      })
+      expect(tokenCollection[0][1]).toEqual({
+        id: 'token-2',
+        getImage: expect.any(Function)
+      })
+      expect(tokenCollection[1][0]).toEqual({
+        id: 'token-3',
+        getImage: expect.any(Function)
+      })
+      expect(tokenCollection[1][1]).toEqual({
+        id: 'token-4',
+        getImage: expect.any(Function)
+      })
     })
 
     it('does not mark needsUpdate as true if only looking up stored entries', async function () {
       tl.findByScryfallId.mockResolvedValueOnce({
-        id: 'token-1'
+        id: 'token-1',
+        getImage: jest.fn()
       })
       tl.storedData.entries.storedEntry1 = {
         tokens: ['token-1']
@@ -328,10 +374,12 @@ describe('Token List', function () {
         getTokens: jest.fn().mockResolvedValue([
           {
             id: 'token-1',
-            name: 'Token 1'
+            name: 'Token 1',
+            getImage: jest.fn()
           }, {
             id: 'token-2',
-            name: 'Token 2'
+            name: 'Token 2',
+            getImage: jest.fn()
           }
         ])
       }
@@ -350,11 +398,13 @@ describe('Token List', function () {
 
       expect(tokenCollection[0][0]).toEqual({
         id: 'token-1',
-        name: 'Token 1'
+        name: 'Token 1',
+        getImage: expect.any(Function)
       })
       expect(tokenCollection[0][1]).toEqual({
         id: 'token-2',
-        name: 'Token 2'
+        name: 'Token 2',
+        getImage: expect.any(Function)
       })
       expect(tl.storedData.entries['entry-1'].tokens).toEqual(['token-1', 'token-2'])
     })
@@ -389,10 +439,12 @@ describe('Token List', function () {
         getTokens: jest.fn().mockResolvedValue([
           {
             id: 'token-1',
-            name: 'Token 1'
+            name: 'Token 1',
+            getImage: jest.fn()
           }, {
             id: 'token-2',
-            name: 'Token 2'
+            name: 'Token 2',
+            getImage: jest.fn()
           }
         ])
       }
@@ -417,10 +469,12 @@ describe('Token List', function () {
       expect(tl.findByScryfallId).toBeCalledWith('scryfall-id-2')
 
       expect(tokenCollection[0][0]).toEqual({
+        getImage: expect.any(Function),
         id: 'token-1',
         name: 'Token 1'
       })
       expect(tokenCollection[0][1]).toEqual({
+        getImage: expect.any(Function),
         id: 'token-2',
         name: 'Token 2'
       })

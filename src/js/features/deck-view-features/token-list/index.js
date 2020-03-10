@@ -1,4 +1,5 @@
 import Feature from 'Feature'
+import CardTooltip from 'Ui/card-tooltip'
 import mutation from 'Lib/mutation'
 import scryfall from 'Lib/scryfall'
 import deckParser from 'Lib/deck-parser'
@@ -15,6 +16,18 @@ import {
 import './index.css'
 
 class TokenList extends Feature {
+  constructor () {
+    super()
+
+    this.tooltip = new CardTooltip({
+      onMouseover: (el) => {
+        const img = el.getAttribute('data-scryfall-image')
+
+        this.tooltip.setImage(img)
+      }
+    })
+  }
+
   async run () {
     mutation.ready('.sidebar', async (container) => {
       this.createUI(container)
@@ -49,12 +62,14 @@ class TokenList extends Feature {
     }
 
     tokens.forEach(token => {
-      // TODO add card hover tooltip
-      this.tokenListContainer.appendChild(createElement(`
-        <li>
+      const el = createElement(`
+        <li data-scryfall-image="${token.getImage()}">
           <a href="${token.scryfall_uri}">${token.name}</a>
         </li>
-      `))
+      `).firstChild
+
+      this.tooltip.addElement(el)
+      this.tokenListContainer.appendChild(el)
     })
   }
 
@@ -140,10 +155,7 @@ class TokenList extends Feature {
 
   flattenTokenCollection (tokenCollection) {
     const flattenedTokens = tokenCollection.flat().reduce((tokens, token) => {
-      // by oracle id is the more correct way, but we should just
-      // do by name until we can do the hover card tooltip
-      // if (!tokens.find(t => t.oracle_id === token.oracle_id)) {
-      if (!tokens.find(t => t.name === token.name)) {
+      if (!tokens.find(t => t.oracle_id === token.oracle_id)) {
         tokens.push(token)
       }
 
