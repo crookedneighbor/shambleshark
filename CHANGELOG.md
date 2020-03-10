@@ -3,7 +3,7 @@ Changelog
 
 # unreleased
 
-* Add Token List feature
+* Add Token List feature (#3)
 
 # 0.4.0 - Pre-release
 
