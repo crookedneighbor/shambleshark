@@ -317,6 +317,21 @@ describe('Deck Parser', function () {
       expect(entries).toContainEqual({ id: 'id-7', raw_text: 'text', count: 1, card_digest: { oracle_id: 'oracle-7' } })
       expect(entries).toContainEqual({ id: 'id-8', raw_text: 'text', count: 1, card_digest: { oracle_id: 'oracle-8' } })
     })
+
+    it('can ignore sections', function () {
+      const entries = flattenEntries(fakeDeck, {
+        ignoredSections: {
+          1: true,
+          3: true
+        }
+      })
+
+      expect(entries.length).toBe(4)
+      expect(entries).toContainEqual({ id: 'id-3', raw_text: 'text', count: 1, card_digest: { oracle_id: 'oracle-3' } })
+      expect(entries).toContainEqual({ id: 'id-4', raw_text: 'text', count: 1, card_digest: { oracle_id: 'oracle-4' } })
+      expect(entries).toContainEqual({ id: 'id-7', raw_text: 'text', count: 1, card_digest: { oracle_id: 'oracle-7' } })
+      expect(entries).toContainEqual({ id: 'id-8', raw_text: 'text', count: 1, card_digest: { oracle_id: 'oracle-8' } })
+    })
   })
 
   describe('hasLegalCommanders', function () {

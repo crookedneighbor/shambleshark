@@ -64,8 +64,12 @@ export function flattenEntries (deck, options = {}) {
   const entries = []
   const ids = {}
   const idToGroupBy = options.idToGroupBy || 'oracleId'
+  const ignoredSections = options.ignoredSections || {}
 
   sections.forEach(section => {
+    if (section in ignoredSections) {
+      return
+    }
     deck.entries[section].forEach(entry => {
       const id = getIdFromEntry(entry, idToGroupBy)
 
