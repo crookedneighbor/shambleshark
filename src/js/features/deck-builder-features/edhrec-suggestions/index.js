@@ -1,5 +1,6 @@
 import Feature from 'Feature'
 import makeEDHRecButton from './make-edhrec-button'
+import addEDHRecIframe from './add-edhrec-iframe'
 import mutation from 'Lib/mutation'
 import {
   FEATURE_IDS as ids,
@@ -23,9 +24,10 @@ class EDHRecSuggestions extends Feature {
           return
         }
 
-        const edhRecButton = await makeEDHRecButton()
+        const edhRecButton = makeEDHRecButton()
         const buttonsContainer = document.querySelector('.deckbuilder-toolbar-items-right')
 
+        addEDHRecIframe(edhRecButton)
         buttonsContainer.appendChild(edhRecButton)
 
         clearTimeout(timeout)

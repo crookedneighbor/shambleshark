@@ -6,6 +6,8 @@ Changelog
 * Add Token List feature (#3)
 * Tagger Link
   * Allow opting out of displaying tags
+* EDHRec Suggestions
+  * Display button right away in disabled, so you don't have to wonder if the feature faild to load (closes #27)
 
 # 0.4.0 - Pre-release
 
