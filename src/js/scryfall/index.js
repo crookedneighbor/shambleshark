@@ -23,7 +23,7 @@ export default function start () {
   // TODO separate scripts for each page or jsut do it this way?
   if (page === 'search' || page === 'sets') {
     modifySearchPaage()
-  } else if (urlPieces[1] === 'decks' && !urlPieces[3]) {
+  } else if (urlPieces[1] === 'decks' && urlPieces[2] && !urlPieces[3]) {
     modifyDeckDisplayPage()
   } else if (urlPieces[1] === 'decks' && urlPieces[3] === 'build') {
     modifyEditPage()
