@@ -25,29 +25,72 @@ describe('Tagger Link', function () {
         cb()
       })
       jest.spyOn(iframe, 'create').mockImplementation()
-      jest.spyOn(TaggerLink.prototype, 'makeButton').mockReturnValue(document.createElement('button'))
+      jest.spyOn(TaggerLink.prototype, 'setupButtons').mockImplementation()
+      jest.spyOn(TaggerLink, 'getSettings').mockResolvedValue({
+        previewTags: true
+      })
     })
 
-    it('waits for Tager to emit ready event', async function () {
+    it('fetches tagger metadata', async function () {
+      const tl = new TaggerLink()
+
+      await tl.run()
+
+      expect(TaggerLink.getSettings).toBeCalledTimes(1)
+    })
+
+    it('when previewTags setting is true, waits for Tager to emit ready event', async function () {
       bus.on.mockImplementation()
 
       const tl = new TaggerLink()
 
       await tl.run()
 
-      expect(mutation.ready).toBeCalledTimes(0)
+      expect(tl.setupButtons).toBeCalledTimes(0)
 
       const handler = bus.on.mock.calls[0][1]
 
       handler()
 
-      expect(mutation.ready).toBeCalledTimes(1)
+      expect(tl.setupButtons).toBeCalledTimes(1)
+    })
+
+    it('when previewTags setting is true, adds an iframe to communicate with tagger', async function () {
+      const tl = new TaggerLink()
+
+      await tl.run()
+
+      expect(iframe.create).toBeCalledTimes(1)
+      expect(iframe.create).toBeCalledWith({
+        id: 'tagger-link-tagger-iframe',
+        src: 'https://tagger.scryfall.com'
+      })
+    })
+
+    it('when previewTags setting is false, skips setting up Tagger iframe', async function () {
+      const tl = new TaggerLink()
+
+      TaggerLink.getSettings.mockResolvedValue({
+        previewTags: false
+      })
+      await tl.run()
+
+      expect(tl.setupButtons).toBeCalledTimes(1)
+      expect(bus.on).toBeCalledTimes(0)
+      expect(iframe.create).toBeCalledTimes(0)
+    })
+  })
+
+  describe('setupButtons', function () {
+    beforeEach(function () {
+      jest.spyOn(mutation, 'ready').mockImplementation()
+      jest.spyOn(TaggerLink.prototype, 'makeButton').mockReturnValue(document.createElement('button'))
     })
 
     it('listens for new card grid items', async function () {
       const tl = new TaggerLink()
 
-      await tl.run()
+      await tl.setupButtons()
 
       expect(mutation.ready).toBeCalledTimes(1)
       expect(mutation.ready).toBeCalledWith('.card-grid-item a.card-grid-item-card', expect.any(Function))
@@ -67,28 +110,20 @@ describe('Tagger Link', function () {
         cb(el.querySelector('a'))
       })
 
-      await tl.run()
+      await tl.setupButtons()
 
       expect(tl.makeButton).toBeCalledWith('https://scryfall.com/card/set/number')
 
       const btn = el.querySelector('.tagger-link-button')
       expect(btn).toBe(fakeBtn)
     })
-
-    it('adds an iframe to communicate with tagger', async function () {
-      const tl = new TaggerLink()
-
-      await tl.run()
-
-      expect(iframe.create).toBeCalledTimes(1)
-      expect(iframe.create).toBeCalledWith({
-        id: 'tagger-link-tagger-iframe',
-        src: 'https://tagger.scryfall.com'
-      })
-    })
   })
 
   describe('makeButton', () => {
+    beforeEach(() => {
+      jest.spyOn(TaggerLink.prototype, 'createMouseoverHandler').mockReturnValue(() => {})
+    })
+
     it('creates a button link to tagger', () => {
       const tl = new TaggerLink()
       const btn = tl.makeButton('https://scryfall.com/card/set/number')
@@ -96,9 +131,9 @@ describe('Tagger Link', function () {
       expect(btn.href).toBe('https://tagger.scryfall.com/card/set/number')
     })
 
-    it('adds a mosueover event', () => {
+    it('when enabled to show tags, adds a mosueover event', () => {
       const tl = new TaggerLink()
-      jest.spyOn(tl, 'createMouseoverHandler').mockReturnValue(() => {})
+      tl._showPreview = true
 
       const btn = tl.makeButton('https://scryfall.com/card/set/number')
 
@@ -107,6 +142,25 @@ describe('Tagger Link', function () {
         set: 'set',
         number: 'number'
       })
+    })
+
+    it('when enabled to show tags, adds a tag display menu', () => {
+      const tl = new TaggerLink()
+      tl._showPreview = true
+
+      const btn = tl.makeButton('https://scryfall.com/card/set/number')
+
+      expect(btn.querySelector('.menu-container')).toBeTruthy()
+    })
+
+    it('when not enabled to show tags, skips the hover menu and mouseover event', () => {
+      const tl = new TaggerLink()
+      tl._showPreview = false
+
+      const btn = tl.makeButton('https://scryfall.com/card/set/number')
+
+      expect(tl.createMouseoverHandler).toBeCalledTimes(0)
+      expect(btn.querySelector('.menu-container')).toBeFalsy()
     })
   })
 

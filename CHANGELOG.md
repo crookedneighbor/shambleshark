@@ -4,6 +4,8 @@ Changelog
 # unreleased
 
 * Add Token List feature (#3)
+* Tagger Link
+  * Allow opting out of displaying tags
 
 # 0.4.0 - Pre-release
 

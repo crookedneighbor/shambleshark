@@ -82,12 +82,17 @@ function convertPageLinkToTagger (data) {
 
 class TaggerLink extends Feature {
   async run () {
-    bus.on(events.TAGGER_READY, () => {
-      mutation.ready('.card-grid-item a.card-grid-item-card', (link) => {
-        const button = this.makeButton(link.href)
+    const settings = await TaggerLink.getSettings()
+    this._showPreview = Boolean(settings.previewTags)
 
-        link.parentNode.appendChild(button)
-      })
+    if (!this._showPreview) {
+      this.setupButtons()
+
+      return
+    }
+
+    bus.on(events.TAGGER_READY, () => {
+      this.setupButtons()
     })
 
     iframe.create({
@@ -96,22 +101,34 @@ class TaggerLink extends Feature {
     })
   }
 
+  setupButtons () {
+    mutation.ready('.card-grid-item a.card-grid-item-card', (link) => {
+      const button = this.makeButton(link.href)
+
+      link.parentNode.appendChild(button)
+    })
+  }
+
   makeButton (link) {
     const taggerData = getTaggerData(link)
     const taggerLink = convertPageLinkToTagger(taggerData)
+
     const button = createElement(`<a
       href="${taggerLink}"
       class="tagger-link-button button-n primary icon-only subdued"
       alt="Open in Tagger"
     >
-      <div class="tagger-link-hover">
-      <div class="menu-container"></div>
-      <img src="${SPINNER_GIF}" class="modal-dialog-spinner" aria-hidden="true">
-      </div>
       ${TAGGER_SYMBOL}
     </a>`).firstChild
 
-    button.addEventListener('mouseover', this.createMouseoverHandler(button, taggerData))
+    if (this._showPreview) {
+      const tagDisplayMenu = createElement(`<div class="tagger-link-hover">
+        <div class="menu-container"></div>
+        <img src="${SPINNER_GIF}" class="modal-dialog-spinner" aria-hidden="true">
+      </div>`).firstChild
+      button.prepend(tagDisplayMenu)
+      button.addEventListener('mouseover', this.createMouseoverHandler(button, taggerData))
+    }
 
     return button
   }
@@ -285,7 +302,13 @@ TaggerLink.metadata = {
   description: 'Provide a button to card\'s tagger page from search results.'
 }
 TaggerLink.settingsDefaults = {
-  enabled: true
+  enabled: true,
+  previewTags: true
 }
+TaggerLink.settingDefinitions = [{
+  id: 'previewTags',
+  label: 'Show preview of tags for card on hover.',
+  input: 'checkbox'
+}]
 
 export default TaggerLink
