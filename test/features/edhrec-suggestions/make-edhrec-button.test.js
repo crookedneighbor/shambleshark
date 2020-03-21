@@ -89,6 +89,7 @@ describe('makeEDHRecButton', function () {
   it('focuses back on the button when closed', async function () {
     const button = await makeEDHRecButton()
 
+    jest.spyOn(button, 'focus')
     button.click()
 
     const drawer = document.querySelector('#edhrec-drawer')
@@ -96,7 +97,7 @@ describe('makeEDHRecButton', function () {
 
     closeButton.click()
 
-    expect(document.activeElement).toBe(button)
+    expect(button.focus).toBeCalledTimes(1)
   })
 
   describe('when clicked', function () {
