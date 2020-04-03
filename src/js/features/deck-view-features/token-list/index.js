@@ -28,6 +28,7 @@ class TokenList extends Feature {
   }
 
   async run () {
+    // TODO we should lazy load this stuff if more than 100 entries
     mutation.ready('.sidebar', async (container) => {
       this.createUI(container)
 
@@ -79,8 +80,8 @@ class TokenList extends Feature {
   }
 
   async generateTokenCollection () {
-    this.needsUpdate = false
-
+    // TODO there's a bug here where we can't detect tokens
+    // when viewed in visual mode
     const elements = Array.from(document.querySelectorAll('.deck-list-entry .deck-list-entry-name a'))
     const entries = elements.map(el => this.parseSetAndCollectorNumber(el.href))
 
@@ -101,18 +102,8 @@ class TokenList extends Feature {
   }
 
   async lookupTokens (entries) {
-    const entriesInBatches = entries.reduce((array, entry, i) => {
-      if (i % 75 !== 0) {
-        return array
-      }
-
-      return array.concat([entries.slice(i, i + 75)])
-    }, [])
-
-    const cardCollections = await Promise.all(
-      entriesInBatches.map(e => this.lookupCardCollection(e))
-    )
-    const tokens = cardCollections.flat().map(c => c.getTokens())
+    const cards = await scryfall.getCollection(entries)
+    const tokens = cards.map(c => c.getTokens())
 
     return Promise.all(tokens)
   }

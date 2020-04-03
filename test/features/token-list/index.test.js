@@ -151,28 +151,6 @@ describe('Token List', function () {
     })
   })
 
-  describe('lookupCardCollection', function () {
-    it('looks up scryfall card collection', async function () {
-      const fakeCards = [{ id: 'foo' }]
-      jest.spyOn(scryfall.api, 'post').mockResolvedValue(fakeCards)
-
-      const cards = await tl.lookupCardCollection([{
-        set: 'DOM',
-        collector_number: '102'
-      }])
-
-      expect(scryfall.api.post).toBeCalledTimes(1)
-      expect(scryfall.api.post).toBeCalledWith('/cards/collection', {
-        identifiers: [{
-          set: 'DOM',
-          collector_number: '102'
-        }]
-      })
-
-      expect(cards).toBe(fakeCards)
-    })
-  })
-
   describe('flattenTokenCollection', function () {
     let tokenCollection
 
@@ -253,46 +231,32 @@ describe('Token List', function () {
 
   describe('lookupTokens', function () {
     beforeEach(function () {
-      jest.spyOn(tl, 'lookupCardCollection').mockResolvedValue([])
+      jest.spyOn(scryfall, 'getCollection').mockResolvedValue([])
     })
 
-    it('calls lookupCardCollection', async function () {
+    it('calls getCollection', async function () {
       await tl.lookupTokens([{
         set: 'dom',
         collector_number: '102'
       }])
 
-      expect(tl.lookupCardCollection).toBeCalledTimes(1)
-      expect(tl.lookupCardCollection).toBeCalledWith([{
+      expect(scryfall.getCollection).toBeCalledTimes(1)
+      expect(scryfall.getCollection).toBeCalledWith([{
         set: 'dom',
         collector_number: '102'
       }])
     })
 
-    it('calls lookupCardCollection in batches of 75', async function () {
-      const fakeEntry = {
-        set: 'foo',
-        collector_number: '1'
-      }
-      const entries = []
-      let i = 0
-      while (i < 400) {
-        entries.push(fakeEntry)
-        i++
-      }
-
-      await tl.lookupTokens(entries)
-
-      expect(tl.lookupCardCollection).toBeCalledTimes(6)
-      expect(tl.lookupCardCollection.mock.calls[0][0].length).toBe(75)
-      expect(tl.lookupCardCollection.mock.calls[1][0].length).toBe(75)
-      expect(tl.lookupCardCollection.mock.calls[2][0].length).toBe(75)
-      expect(tl.lookupCardCollection.mock.calls[3][0].length).toBe(75)
-      expect(tl.lookupCardCollection.mock.calls[4][0].length).toBe(75)
-      expect(tl.lookupCardCollection.mock.calls[5][0].length).toBe(25)
-    })
-
-    it('resolves with flattened array of the results of each card\'s getTokens call', async function () {
+    it('resolves with array of the results of each card\'s getTokens call', async function () {
+      const fakeToken1 = [{ id: 1 }, { id: 2 }, { id: 3 }]
+      const fakeToken2 = [{ id: 4 }]
+      const spy1 = jest.fn().mockResolvedValue(fakeToken1)
+      const spy2 = jest.fn().mockResolvedValue(fakeToken2)
+      const fakeResults = [{
+        getTokens: spy1
+      }, {
+        getTokens: spy2
+      }]
       const fakeEntry = {
         set: 'foo',
         collector_number: '1'
@@ -304,9 +268,18 @@ describe('Token List', function () {
         i++
       }
 
-      await tl.lookupTokens(entries)
+      scryfall.getCollection.mockResolvedValue(fakeResults)
 
-      expect(tl.lookupCardCollection).toBeCalledTimes(3)
+      const tokens = await tl.lookupTokens(entries)
+
+      expect(spy1).toBeCalledTimes(1)
+      expect(spy2).toBeCalledTimes(1)
+
+      expect(tokens.length).toBe(2)
+      expect(tokens[0][0].id).toBe(1)
+      expect(tokens[0][1].id).toBe(2)
+      expect(tokens[0][2].id).toBe(3)
+      expect(tokens[1][0].id).toBe(4)
     })
   })
 
