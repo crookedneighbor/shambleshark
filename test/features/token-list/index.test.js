@@ -1,7 +1,6 @@
 import TokenList from 'Features/deck-view-features/token-list'
 import mutation from 'Lib/mutation'
 import scryfall from 'Lib/scryfall'
-import deckParser from 'Lib/deck-parser'
 import wait from 'Lib/wait'
 
 describe('Token List', function () {
@@ -143,60 +142,34 @@ describe('Token List', function () {
     })
   })
 
-  describe('findByScryfallId', function () {
-    it('looks up scryfall api by id', async function () {
-      const fakeCard = { id: 'fake-id' }
-      jest.spyOn(scryfall.api, 'get').mockResolvedValue(fakeCard)
-
-      const card = await tl.findByScryfallId('some-id')
-
-      expect(scryfall.api.get).toBeCalledTimes(1)
-      expect(scryfall.api.get).toBeCalledWith('/cards/some-id')
-
-      expect(card).toBe(fakeCard)
+  describe('parseSetAndCollectorNumber', function () {
+    it('parses a scryfall url into a set and collector number', function () {
+      expect(tl.parseSetAndCollectorNumber('https://scryfall.com/card/dom/102')).toEqual({
+        set: 'dom',
+        collector_number: '102'
+      })
     })
   })
 
-  describe('fetchStoredData', function () {
-    beforeEach(function () {
-      jest.spyOn(TokenList, 'getData').mockResolvedValue()
-    })
+  describe('lookupCardCollection', function () {
+    it('looks up scryfall card collection', async function () {
+      const fakeCards = [{ id: 'foo' }]
+      jest.spyOn(scryfall.api, 'post').mockResolvedValue(fakeCards)
 
-    it('gets stored data', async function () {
-      const fakeData = {
-        entries: {
-          id: {}
-        }
-      }
+      const cards = await tl.lookupCardCollection([{
+        set: 'DOM',
+        collector_number: '102'
+      }])
 
-      TokenList.getData.mockResolvedValue(fakeData)
-
-      const data = await tl.fetchStoredData({ id: 'deck-id' })
-
-      expect(TokenList.getData).toBeCalledTimes(1)
-      expect(TokenList.getData).toBeCalledWith('deck-id')
-
-      expect(data).toBe(fakeData)
-    })
-
-    it('supplies data if none exists', async function () {
-      TokenList.getData.mockResolvedValue()
-
-      const data = await tl.fetchStoredData({ id: 'deck-id' })
-
-      expect(data).toEqual({
-        entries: {}
+      expect(scryfall.api.post).toBeCalledTimes(1)
+      expect(scryfall.api.post).toBeCalledWith('/cards/collection', {
+        identifiers: [{
+          set: 'DOM',
+          collector_number: '102'
+        }]
       })
-    })
 
-    it('supplies entries if none exist', async function () {
-      TokenList.getData.mockResolvedValue({})
-
-      const data = await tl.fetchStoredData({ id: 'deck-id' })
-
-      expect(data).toEqual({
-        entries: {}
-      })
+      expect(cards).toBe(fakeCards)
     })
   })
 
@@ -280,272 +253,91 @@ describe('Token List', function () {
 
   describe('lookupTokens', function () {
     beforeEach(function () {
-      tl.storedData = {
-        entries: {}
-      }
-      jest.spyOn(tl, 'findByScryfallId').mockResolvedValue()
+      jest.spyOn(tl, 'lookupCardCollection').mockResolvedValue([])
     })
 
-    it('looks up th ids of stored entries', async function () {
-      tl.findByScryfallId.mockResolvedValueOnce({
-        id: 'token-1',
-        getImage: jest.fn()
-      })
-      tl.findByScryfallId.mockResolvedValueOnce({
-        id: 'token-2',
-        getImage: jest.fn()
-      })
-      tl.findByScryfallId.mockResolvedValueOnce({
-        id: 'token-3',
-        getImage: jest.fn()
-      })
-      tl.findByScryfallId.mockResolvedValueOnce({
-        id: 'token-4',
-        getImage: jest.fn()
-      })
-      tl.storedData.entries.storedEntry1 = {
-        tokens: ['token-1', 'token-2']
-      }
-      tl.storedData.entries.storedEntry2 = {
-        tokens: ['token-3', 'token-4']
-      }
-
-      const tokenCollection = await tl.lookupTokens([{
-        id: 'storedEntry1',
-        card_digest: {}
-      }, {
-        id: 'storedEntry2',
-        card_digest: {}
-      }])
-
-      expect(tl.findByScryfallId).toBeCalledTimes(4)
-      expect(tl.findByScryfallId).toBeCalledWith('token-1')
-      expect(tl.findByScryfallId).toBeCalledWith('token-2')
-      expect(tl.findByScryfallId).toBeCalledWith('token-3')
-      expect(tl.findByScryfallId).toBeCalledWith('token-4')
-
-      expect(tokenCollection[0][0]).toEqual({
-        id: 'token-1',
-        getImage: expect.any(Function)
-      })
-      expect(tokenCollection[0][1]).toEqual({
-        id: 'token-2',
-        getImage: expect.any(Function)
-      })
-      expect(tokenCollection[1][0]).toEqual({
-        id: 'token-3',
-        getImage: expect.any(Function)
-      })
-      expect(tokenCollection[1][1]).toEqual({
-        id: 'token-4',
-        getImage: expect.any(Function)
-      })
-    })
-
-    it('does not mark needsUpdate as true if only looking up stored entries', async function () {
-      tl.findByScryfallId.mockResolvedValueOnce({
-        id: 'token-1',
-        getImage: jest.fn()
-      })
-      tl.storedData.entries.storedEntry1 = {
-        tokens: ['token-1']
-      }
-
+    it('calls lookupCardCollection', async function () {
       await tl.lookupTokens([{
-        id: 'storedEntry1',
-        card_digest: {}
+        set: 'dom',
+        collector_number: '102'
       }])
 
-      expect(tl.needsUpdate).toBeFalsy()
-    })
-
-    it('ignores entries without a card digest that do not exist in stored data', async function () {
-      await tl.lookupTokens([{
-        id: 'entry-1'
+      expect(tl.lookupCardCollection).toBeCalledTimes(1)
+      expect(tl.lookupCardCollection).toBeCalledWith([{
+        set: 'dom',
+        collector_number: '102'
       }])
-
-      expect(tl.needsUpdate).toBeFalsy()
-      expect(tl.findByScryfallId).not.toBeCalled()
     })
 
-    it('looks up cards by card digest id', async function () {
-      const fakeCard = {
-        all_parts: [],
-        getTokens: jest.fn().mockResolvedValue([
-          {
-            id: 'token-1',
-            name: 'Token 1',
-            getImage: jest.fn()
-          }, {
-            id: 'token-2',
-            name: 'Token 2',
-            getImage: jest.fn()
-          }
-        ])
+    it('calls lookupCardCollection in batches of 75', async function () {
+      const fakeEntry = {
+        set: 'foo',
+        collector_number: '1'
       }
-      tl.findByScryfallId.mockResolvedValueOnce(fakeCard)
+      const entries = []
+      let i = 0
+      while (i < 400) {
+        entries.push(fakeEntry)
+        i++
+      }
 
-      const tokenCollection = await tl.lookupTokens([{
-        id: 'entry-1',
-        card_digest: {
-          id: 'scryfall-id'
-        }
-      }])
+      await tl.lookupTokens(entries)
 
-      expect(tl.needsUpdate).toBeTruthy()
-      expect(tl.findByScryfallId).toBeCalledTimes(1)
-      expect(tl.findByScryfallId).toBeCalledWith('scryfall-id')
-
-      expect(tokenCollection[0][0]).toEqual({
-        id: 'token-1',
-        name: 'Token 1',
-        getImage: expect.any(Function)
-      })
-      expect(tokenCollection[0][1]).toEqual({
-        id: 'token-2',
-        name: 'Token 2',
-        getImage: expect.any(Function)
-      })
-      expect(tl.storedData.entries['entry-1'].tokens).toEqual(['token-1', 'token-2'])
+      expect(tl.lookupCardCollection).toBeCalledTimes(6)
+      expect(tl.lookupCardCollection.mock.calls[0][0].length).toBe(75)
+      expect(tl.lookupCardCollection.mock.calls[1][0].length).toBe(75)
+      expect(tl.lookupCardCollection.mock.calls[2][0].length).toBe(75)
+      expect(tl.lookupCardCollection.mock.calls[3][0].length).toBe(75)
+      expect(tl.lookupCardCollection.mock.calls[4][0].length).toBe(75)
+      expect(tl.lookupCardCollection.mock.calls[5][0].length).toBe(25)
     })
 
-    it('does not lookup tokens for cards without the all_parts attribute and provides an empty array instead', async function () {
-      const fakeCard = {
-        getTokens: jest.fn()
+    it('resolves with flattened array of the results of each card\'s getTokens call', async function () {
+      const fakeEntry = {
+        set: 'foo',
+        collector_number: '1'
       }
-      tl.findByScryfallId.mockResolvedValueOnce(fakeCard)
-
-      const tokenCollection = await tl.lookupTokens([{
-        id: 'entry-1',
-        card_digest: {
-          id: 'scryfall-id'
-        }
-      }])
-
-      expect(tl.needsUpdate).toBeTruthy()
-      expect(tl.findByScryfallId).toBeCalledTimes(1)
-      expect(tl.findByScryfallId).toBeCalledWith('scryfall-id')
-      expect(fakeCard.getTokens).not.toBeCalled()
-
-      expect(tokenCollection[0].length).toBe(0)
-      expect(tl.storedData.entries['entry-1'].tokens).toEqual([])
-    })
-
-    it('catches errors, logs them, and returns an empty array for the token lookup', async function () {
-      jest.spyOn(console, 'error').mockImplementation()
-
-      const fakeCard = {
-        all_parts: [],
-        getTokens: jest.fn().mockResolvedValue([
-          {
-            id: 'token-1',
-            name: 'Token 1',
-            getImage: jest.fn()
-          }, {
-            id: 'token-2',
-            name: 'Token 2',
-            getImage: jest.fn()
-          }
-        ])
+      const entries = []
+      let i = 0
+      while (i < 200) {
+        entries.push(fakeEntry)
+        i++
       }
-      const error = new Error('some error')
-      tl.findByScryfallId.mockResolvedValueOnce(fakeCard)
-      tl.findByScryfallId.mockRejectedValueOnce(error)
 
-      const tokenCollection = await tl.lookupTokens([{
-        id: 'entry-1',
-        card_digest: {
-          id: 'scryfall-id'
-        }
-      }, {
-        id: 'entry-2',
-        card_digest: {
-          id: 'scryfall-id-2'
-        }
-      }])
+      await tl.lookupTokens(entries)
 
-      expect(tl.findByScryfallId).toBeCalledTimes(2)
-      expect(tl.findByScryfallId).toBeCalledWith('scryfall-id')
-      expect(tl.findByScryfallId).toBeCalledWith('scryfall-id-2')
-
-      expect(tokenCollection[0][0]).toEqual({
-        getImage: expect.any(Function),
-        id: 'token-1',
-        name: 'Token 1'
-      })
-      expect(tokenCollection[0][1]).toEqual({
-        getImage: expect.any(Function),
-        id: 'token-2',
-        name: 'Token 2'
-      })
-      expect(tokenCollection[1].length).toBe(0)
-      expect(tl.storedData.entries['entry-1'].tokens).toEqual(['token-1', 'token-2'])
-      expect(tl.storedData.entries['entry-2'].tokens).toBeFalsy()
-
-      expect(console.error).toBeCalledTimes(1)
-      expect(console.error).toBeCalledWith(error)
+      expect(tl.lookupCardCollection).toBeCalledTimes(3)
     })
   })
 
   describe('generateTokenCollection', function () {
-    let fakeDeck, fakeEntries
-
     beforeEach(function () {
-      fakeDeck = {
-        id: 'deck-id'
-      }
-      fakeEntries = [
-        { id: 'entry-1' }
-      ]
-
-      jest.spyOn(scryfall, 'getDeck').mockResolvedValue(fakeDeck)
-      jest.spyOn(deckParser, 'flattenEntries').mockReturnValue(fakeEntries)
-      jest.spyOn(tl, 'fetchStoredData').mockResolvedValue({
-        entries: {}
-      })
+      jest.spyOn(document, 'querySelectorAll').mockReturnValue([{
+        href: 'https://scryfall.com/card/dom/102'
+      }, {
+        href: 'https://scryfall.com/card/kld/184'
+      }])
       jest.spyOn(tl, 'lookupTokens').mockResolvedValue([])
-      jest.spyOn(TokenList, 'saveData').mockImplementation()
-      jest.spyOn(tl, 'flattenTokenCollection')
+      jest.spyOn(tl, 'flattenTokenCollection').mockImplementation()
     })
 
-    it('looks up deck and passes flattened entries into lookupTokens', async function () {
-      await tl.generateTokenCollection()
-
-      expect(scryfall.getDeck).toBeCalledTimes(1)
-
-      expect(deckParser.flattenEntries).toBeCalledTimes(1)
-      expect(deckParser.flattenEntries).toBeCalledWith(fakeDeck)
-
-      expect(tl.lookupTokens).toBeCalledTimes(1)
-      expect(tl.lookupTokens).toBeCalledWith(fakeEntries)
-    })
-
-    it('fetches stored data and calls saveData if an update is required', async function () {
-      tl.lookupTokens.mockImplementation(() => {
-        tl.needsUpdate = true
-        tl.storedData.entries.id = { tokens: [] }
-
-        return Promise.resolve([])
-      })
-
-      await tl.generateTokenCollection()
-
-      expect(TokenList.saveData).toBeCalledTimes(1)
-      expect(TokenList.saveData).toBeCalledWith('deck-id', tl.storedData)
-    })
-
-    it('flattens token collection from lookup tokens and returns the result', async function () {
+    it('parses card data from dom and looks up tokens', async function () {
       const tokenCollection = [[{ id: 'token' }]]
-      const result = [{
-        id: 'token',
-        name: 'token name'
-      }]
+      const result = []
 
       tl.lookupTokens.mockResolvedValue(tokenCollection)
       tl.flattenTokenCollection.mockReturnValue(result)
 
       const tokens = await tl.generateTokenCollection()
 
+      expect(tl.lookupTokens).toBeCalledTimes(1)
+      expect(tl.lookupTokens).toBeCalledWith([{
+        set: 'dom',
+        collector_number: '102'
+      }, {
+        set: 'kld',
+        collector_number: '184'
+      }])
       expect(tl.flattenTokenCollection).toBeCalledTimes(1)
       expect(tl.flattenTokenCollection).toBeCalledWith(tokenCollection)
 

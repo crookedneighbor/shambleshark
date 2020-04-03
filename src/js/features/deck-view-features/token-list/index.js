@@ -2,7 +2,6 @@ import Feature from 'Feature'
 import CardTooltip from 'Ui/card-tooltip'
 import mutation from 'Lib/mutation'
 import scryfall from 'Lib/scryfall'
-import deckParser from 'Lib/deck-parser'
 import {
   sortByAttribute
 } from 'Lib/sort'
@@ -73,84 +72,49 @@ class TokenList extends Feature {
     })
   }
 
-  findByScryfallId (id) {
-    return scryfall.api.get(`/cards/${id}`)
-  }
-
-  async fetchStoredData (deck) {
-    let storedData = await TokenList.getData(deck.id)
-
-    if (!storedData) {
-      storedData = {}
-    }
-    if (!storedData.entries) {
-      storedData.entries = {}
-    }
-
-    return storedData
+  lookupCardCollection (cards) {
+    return scryfall.api.post('/cards/collection', {
+      identifiers: cards
+    })
   }
 
   async generateTokenCollection () {
     this.needsUpdate = false
 
-    const deck = await scryfall.getDeck()
-    const entries = deckParser.flattenEntries(deck)
-
-    this.storedData = await this.fetchStoredData(deck)
+    const elements = Array.from(document.querySelectorAll('.deck-list-entry .deck-list-entry-name a'))
+    const entries = elements.map(el => this.parseSetAndCollectorNumber(el.href))
 
     const tokenCollection = await this.lookupTokens(entries)
-
-    if (this.needsUpdate) {
-      TokenList.saveData(deck.id, this.storedData)
-    }
 
     return this.flattenTokenCollection(tokenCollection)
   }
 
-  lookupTokens (entries) {
-    const lookupPromises = []
+  parseSetAndCollectorNumber (url) {
+    const parts = url.split('https://scryfall.com/card/')[1].split('/')
+    const set = parts[0]
+    const number = parts[1]
 
-    entries.forEach(({
-      id,
-      card_digest: cardDigest
-    }) => {
-      this.storedData.entries[id] = this.storedData.entries[id] || {}
+    return {
+      set,
+      collector_number: number
+    }
+  }
 
-      const entry = this.storedData.entries[id]
-      const tokens = entry.tokens
-
-      if (tokens) {
-        lookupPromises.push(Promise.all(tokens.map(token => this.findByScryfallId(token))))
-
-        return
+  async lookupTokens (entries) {
+    const entriesInBatches = entries.reduce((array, entry, i) => {
+      if (i % 75 !== 0) {
+        return array
       }
 
-      if (!cardDigest) {
-        return
-      }
+      return array.concat([entries.slice(i, i + 75)])
+    }, [])
 
-      this.needsUpdate = true
+    const cardCollections = await Promise.all(
+      entriesInBatches.map(e => this.lookupCardCollection(e))
+    )
+    const tokens = cardCollections.flat().map(c => c.getTokens())
 
-      lookupPromises.push(
-        this.findByScryfallId(cardDigest.id)
-          .then(card => {
-            if (card.all_parts) {
-              return card.getTokens()
-            }
-          }).then(tokens => {
-            tokens = tokens || []
-            entry.tokens = tokens.map(token => token.id)
-
-            return tokens
-          }).catch(e => {
-            console.error(e)
-
-            return []
-          })
-      )
-    })
-
-    return Promise.all(lookupPromises)
+    return Promise.all(tokens)
   }
 
   flattenTokenCollection (tokenCollection) {

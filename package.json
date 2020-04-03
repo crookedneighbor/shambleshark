@@ -37,7 +37,7 @@
     "bulma": "^0.8.0",
     "bulma-switch": "^2.0.0",
     "framebus": "^3.0.2",
-    "scryfall-client": "^0.12.0"
+    "scryfall-client": "^0.13.0"
   },
   "standard": {
     "globals": [
