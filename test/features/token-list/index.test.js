@@ -303,6 +303,9 @@ describe('Token List', function () {
 
       const tokens = await tl.generateTokenCollection()
 
+      expect(document.querySelectorAll).toBeCalledTimes(1)
+      expect(document.querySelectorAll).toBeCalledWith('.deck-list-entry .deck-list-entry-name a')
+
       expect(tl.lookupTokens).toBeCalledTimes(1)
       expect(tl.lookupTokens).toBeCalledWith([{
         set: 'dom',
@@ -315,6 +318,52 @@ describe('Token List', function () {
       expect(tl.flattenTokenCollection).toBeCalledWith(tokenCollection)
 
       expect(tokens).toBe(result)
+    })
+
+    it('uses visual deck mode to find tokens when deck list entry comes up empty', async function () {
+      const tokenCollection = [[{ id: 'token' }]]
+      const result = []
+
+      tl.lookupTokens.mockResolvedValue(tokenCollection)
+      tl.flattenTokenCollection.mockReturnValue(result)
+
+      document.querySelectorAll.mockReturnValueOnce([])
+      document.querySelectorAll.mockReturnValueOnce([{
+        href: 'https://scryfall.com/card/dom/102'
+      }, {
+        href: 'https://scryfall.com/card/kld/184'
+      }])
+
+      const tokens = await tl.generateTokenCollection()
+
+      expect(document.querySelectorAll).toBeCalledTimes(2)
+      expect(document.querySelectorAll).toBeCalledWith('.deck-list-entry .deck-list-entry-name a')
+      expect(document.querySelectorAll).toBeCalledWith('a.card-grid-item-card')
+
+      expect(tl.lookupTokens).toBeCalledTimes(1)
+      expect(tl.lookupTokens).toBeCalledWith([{
+        set: 'dom',
+        collector_number: '102'
+      }, {
+        set: 'kld',
+        collector_number: '184'
+      }])
+      expect(tl.flattenTokenCollection).toBeCalledTimes(1)
+      expect(tl.flattenTokenCollection).toBeCalledWith(tokenCollection)
+
+      expect(tokens).toBe(result)
+    })
+
+    it('noops if no elements available', async function () {
+      document.querySelectorAll.mockReturnValue([])
+      const tokens = await tl.generateTokenCollection()
+
+      expect(document.querySelectorAll).toBeCalledTimes(2)
+
+      expect(tl.lookupTokens).not.toBeCalled()
+      expect(tl.flattenTokenCollection).not.toBeCalled()
+
+      expect(tokens).toEqual([])
     })
   })
 })

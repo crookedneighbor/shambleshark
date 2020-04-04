@@ -80,9 +80,14 @@ class TokenList extends Feature {
   }
 
   async generateTokenCollection () {
-    // TODO there's a bug here where we can't detect tokens
-    // when viewed in visual mode
-    const elements = Array.from(document.querySelectorAll('.deck-list-entry .deck-list-entry-name a'))
+    let elements = Array.from(document.querySelectorAll('.deck-list-entry .deck-list-entry-name a'))
+    if (elements.length === 0) {
+      elements = Array.from(document.querySelectorAll('a.card-grid-item-card'))
+    }
+    if (elements.length === 0) {
+      return Promise.resolve([])
+    }
+
     const entries = elements.map(el => this.parseSetAndCollectorNumber(el.href))
 
     const tokenCollection = await this.lookupTokens(entries)
