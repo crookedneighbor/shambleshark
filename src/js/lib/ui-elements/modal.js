@@ -30,7 +30,7 @@ export default class Modal extends DialogInterface {
           <img src="${SPINNER_GIF}" class="modal-dialog-spinner" aria-hidden="true">
         </div>
       <!---->
-        <div class="dialog-content-container modal-dialog-stage">
+        <div class="dialog-content-container modal-dialog-stage loading">
           <div role="alert" aria-label="${options.contentMessage || 'Modal Loaded'}"></div>
           <div class="dialog-content modal-dialog-stage-content"></div>
         </div>

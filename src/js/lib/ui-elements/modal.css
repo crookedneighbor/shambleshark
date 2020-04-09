@@ -1,5 +1,10 @@
-.dialog-content-container.modal-dialog-stage {
+.dialog-content-container.modal-dialog-stage.loading {
   position:fixed;
   left:-100%;
   visibility:hidden
+}
+
+.dialog-content-container.modal-dialog-stage {
+  max-height: 600px;
+  overflow-y: scroll;
 }
