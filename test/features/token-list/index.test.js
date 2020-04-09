@@ -4,43 +4,37 @@ import scryfall from 'Lib/scryfall'
 import wait from 'Lib/wait'
 
 describe('Token List', function () {
-  let tl, container
+  let tl
 
   beforeEach(function () {
     tl = new TokenList()
-    container = document.createElement('div')
-  })
-
-  it('sets tooltip image from `data-scryfall-image` property', function () {
-    const el = document.createElement('div')
-    el.setAttribute('data-scryfall-image', 'https://example.com/image.png')
-
-    jest.spyOn(tl.tooltip, 'setImage').mockImplementation()
-
-    tl.tooltip.triggerOnMouseover(el)
-
-    expect(tl.tooltip.setImage).toBeCalledTimes(1)
-    expect(tl.tooltip.setImage).toBeCalledWith('https://example.com/image.png')
   })
 
   describe('run', function () {
+    let elements, container
+
     beforeEach(function () {
+      container = document.createElement('div')
       jest.spyOn(mutation, 'ready').mockImplementation((selector, cb) => {
         cb(container)
       })
+      elements = []
 
       jest.spyOn(tl, 'createUI').mockImplementation()
+      jest.spyOn(tl, 'getCardElements').mockImplementation(() => {
+        tl.elements = elements
+      })
       jest.spyOn(tl, 'generateTokenCollection').mockResolvedValue([])
       jest.spyOn(tl, 'addToUI').mockImplementation()
     })
 
-    it('waits for sidebar to be on the dom', async function () {
+    it('waits for shambleshark sidebar to be on the dom', async function () {
       mutation.ready.mockImplementation()
 
       await tl.run()
 
       expect(mutation.ready).toBeCalledTimes(1)
-      expect(mutation.ready).toBeCalledWith('.sidebar', expect.any(Function))
+      expect(mutation.ready).toBeCalledWith('#shambleshark-deck-display-sidebar-toolbox', expect.any(Function))
 
       expect(tl.createUI).not.toBeCalled()
 
@@ -49,35 +43,94 @@ describe('Token List', function () {
       expect(tl.createUI).toBeCalled()
     })
 
-    it('adds tokens to ui', async function () {
-      const tokens = [{ id: 'token-id' }]
-      tl.generateTokenCollection.mockResolvedValue(tokens)
-
+    it('creates card elements', async function () {
       await tl.run()
+
       await wait()
 
-      expect(tl.createUI).toBeCalledWith(container)
-      expect(tl.addToUI).toBeCalledWith(tokens)
+      expect(tl.getCardElements).toBeCalledTimes(1)
+    })
+
+    it('prefetches tokens', async function () {
+      await tl.run()
+
+      await wait()
+
+      expect(tl.generateTokenCollection).toBeCalledTimes(1)
+    })
+
+    it('does not prefetch tokens if there are more than 150 elements to look up', async function () {
+      let i = 0
+      while (i < 151) {
+        elements.push(document.createElement('div'))
+        i++
+      }
+      await tl.run()
+
+      await wait()
+
+      expect(tl.generateTokenCollection).toBeCalledTimes(0)
     })
   })
 
   describe('createUI', function () {
-    it('adds elements to container', function () {
-      tl.createUI(container)
+    let container
 
-      expect(container.querySelector('.token-list-title')).toBeTruthy()
+    beforeEach(function () {
+      container = document.createElement('div')
     })
 
-    it('creates references to tooltip', function () {
+    it('adds token list button to UI', function () {
       tl.createUI(container)
 
-      expect(tl.tokenListContainer.classList.contains('token-list-container')).toBe(true)
+      expect(container.querySelector('button.button-n')).toBeTruthy()
     })
 
-    it('creates references to spinner', function () {
+    it('adds modal', function () {
       tl.createUI(container)
 
-      expect(tl.spinner.classList.contains('token-list-loading')).toBe(true)
+      expect(tl.modal).toBeTruthy()
+    })
+
+    it('opens the modal when token list button is clicked', function () {
+      tl.createUI(container)
+
+      jest.spyOn(tl.modal, 'open').mockImplementation()
+
+      const btn = container.querySelector('button.button-n')
+
+      btn.click()
+
+      expect(tl.modal.open).toBeCalledTimes(1)
+    })
+
+    it('adds tokens to modal when it opens', async function () {
+      const tokens = []
+
+      tl.createUI(container)
+
+      jest.spyOn(tl, 'generateTokenCollection').mockResolvedValue(tokens)
+      jest.spyOn(tl, 'addToUI').mockImplementation()
+      jest.spyOn(tl.modal, 'setLoading').mockImplementation()
+
+      await tl.modal.triggerOnOpen()
+
+      expect(tl.generateTokenCollection).toBeCalledTimes(1)
+      expect(tl.addToUI).toBeCalledTimes(1)
+      expect(tl.addToUI).toBeCalledWith(tokens)
+      expect(tl.modal.setLoading).toBeCalledTimes(1)
+      expect(tl.modal.setLoading).toBeCalledWith(false)
+    })
+
+    it('refocuses button when it closes', function () {
+      tl.createUI(container)
+
+      const btn = container.querySelector('button.button-n')
+      jest.spyOn(btn, 'focus').mockImplementation()
+
+      tl.modal.triggerOnClose()
+
+      expect(btn.focus).toBeCalledTimes(1)
     })
   })
 
@@ -85,52 +138,18 @@ describe('Token List', function () {
     let tokens
 
     beforeEach(function () {
+      const container = document.createElement('div')
       tokens = [{
         name: 'Token 1',
         scryfall_uri: 'https://scryfall.com/token-1',
-        getImage: jest.fn()
+        getImage: jest.fn().mockReturnValue('https://img.scryfall.com/token-1')
+      }, {
+        name: 'Token 2',
+        scryfall_uri: 'https://scryfall.com/token-2',
+        getImage: jest.fn().mockReturnValue('https://img.scryfall.com/token-2')
       }]
       tl.createUI(container)
-      jest.spyOn(tl.tooltip, 'addElement').mockImplementation()
-    })
-
-    it('hides the spinner', function () {
-      expect(tl.spinner.classList.contains('hidden')).toBe(false)
-
-      tl.addToUI(tokens)
-
-      expect(tl.spinner.classList.contains('hidden')).toBe(true)
-    })
-
-    it('adds an li and link for each token', function () {
-      tokens.push({
-        name: 'Token 2',
-        scryfall_uri: 'https://scryfall.com/token-2',
-        getImage: jest.fn()
-      })
-      tl.addToUI(tokens)
-
-      const links = container.querySelectorAll('li a')
-
-      expect(links[0].innerHTML).toBe('Token 1')
-      expect(links[0].href).toBe('https://scryfall.com/token-1')
-      expect(links[1].innerHTML).toBe('Token 2')
-      expect(links[1].href).toBe('https://scryfall.com/token-2')
-    })
-
-    it('adds each element to tooltip', function () {
-      tokens.push({
-        name: 'Token 2',
-        scryfall_uri: 'https://scryfall.com/token-2',
-        getImage: jest.fn()
-      })
-      tl.addToUI(tokens)
-
-      const els = container.querySelectorAll('li')
-
-      expect(tl.tooltip.addElement).toBeCalledTimes(2)
-      expect(tl.tooltip.addElement).toBeCalledWith(els[0])
-      expect(tl.tooltip.addElement).toBeCalledWith(els[1])
+      jest.spyOn(tl.modal, 'setContent').mockImplementation()
     })
 
     it('adds a message if no tokens were found', function () {
@@ -138,7 +157,33 @@ describe('Token List', function () {
 
       tl.addToUI(tokens)
 
-      expect(container.querySelector('li').innerHTML).toBe('No tokens detected.')
+      const el = tl.modal.setContent.mock.calls[0][0]
+
+      expect(el.querySelector('p').innerHTML).toBe('No tokens detected.')
+    })
+
+    it('adds tokens to modal', function () {
+      tl.addToUI(tokens)
+
+      const el = tl.modal.setContent.mock.calls[0][0]
+      const tokenEls = el.querySelectorAll('a')
+
+      expect(tokenEls.length).toBe(2)
+      expect(tokenEls[0].href).toBe('https://scryfall.com/token-1')
+      expect(tokenEls[0].querySelector('img').src).toBe('https://img.scryfall.com/token-1')
+      expect(tokenEls[0].querySelector('img').alt).toBe('Token 1')
+      expect(tokenEls[1].href).toBe('https://scryfall.com/token-2')
+      expect(tokenEls[1].querySelector('img').src).toBe('https://img.scryfall.com/token-2')
+      expect(tokenEls[1].querySelector('img').alt).toBe('Token 2')
+    })
+
+    it('adds tokens to modal only once', function () {
+      tl.addToUI(tokens)
+      tl.addToUI(tokens)
+      tl.addToUI(tokens)
+      tl.addToUI(tokens)
+
+      expect(tl.modal.setContent).toBeCalledTimes(1)
     })
   })
 
@@ -283,62 +328,58 @@ describe('Token List', function () {
     })
   })
 
-  describe('generateTokenCollection', function () {
+  describe('getCardElements', function () {
+    let elements
+
     beforeEach(function () {
-      jest.spyOn(document, 'querySelectorAll').mockReturnValue([{
+      elements = [{
         href: 'https://scryfall.com/card/dom/102'
       }, {
         href: 'https://scryfall.com/card/kld/184'
-      }])
-      jest.spyOn(tl, 'lookupTokens').mockResolvedValue([])
-      jest.spyOn(tl, 'flattenTokenCollection').mockImplementation()
+      }]
+      jest.spyOn(document, 'querySelectorAll').mockReturnValue(elements)
     })
 
-    it('parses card data from dom and looks up tokens', async function () {
-      const tokenCollection = [[{ id: 'token' }]]
-      const result = []
-
-      tl.lookupTokens.mockResolvedValue(tokenCollection)
-      tl.flattenTokenCollection.mockReturnValue(result)
-
-      const tokens = await tl.generateTokenCollection()
+    it('looks for elements in deck entry view', function () {
+      tl.getCardElements()
 
       expect(document.querySelectorAll).toBeCalledTimes(1)
       expect(document.querySelectorAll).toBeCalledWith('.deck-list-entry .deck-list-entry-name a')
 
-      expect(tl.lookupTokens).toBeCalledTimes(1)
-      expect(tl.lookupTokens).toBeCalledWith([{
-        set: 'dom',
-        collector_number: '102'
-      }, {
-        set: 'kld',
-        collector_number: '184'
-      }])
-      expect(tl.flattenTokenCollection).toBeCalledTimes(1)
-      expect(tl.flattenTokenCollection).toBeCalledWith(tokenCollection)
-
-      expect(tokens).toBe(result)
+      expect(tl.elements).toStrictEqual(elements)
     })
 
     it('uses visual deck mode to find tokens when deck list entry comes up empty', async function () {
+      document.querySelectorAll.mockReturnValueOnce([])
+      document.querySelectorAll.mockReturnValueOnce(elements)
+
+      await tl.getCardElements()
+
+      expect(document.querySelectorAll).toBeCalledTimes(2)
+      expect(document.querySelectorAll).toBeCalledWith('.deck-list-entry .deck-list-entry-name a')
+      expect(document.querySelectorAll).toBeCalledWith('a.card-grid-item-card')
+    })
+  })
+
+  describe('generateTokenCollection', function () {
+    beforeEach(function () {
+      jest.spyOn(tl, 'lookupTokens').mockResolvedValue([])
+      jest.spyOn(tl, 'flattenTokenCollection').mockImplementation()
+      tl.elements = [{
+        href: 'https://scryfall.com/card/dom/102'
+      }, {
+        href: 'https://scryfall.com/card/kld/184'
+      }]
+    })
+
+    it('looks up tokens with elements', async function () {
       const tokenCollection = [[{ id: 'token' }]]
       const result = []
 
       tl.lookupTokens.mockResolvedValue(tokenCollection)
       tl.flattenTokenCollection.mockReturnValue(result)
 
-      document.querySelectorAll.mockReturnValueOnce([])
-      document.querySelectorAll.mockReturnValueOnce([{
-        href: 'https://scryfall.com/card/dom/102'
-      }, {
-        href: 'https://scryfall.com/card/kld/184'
-      }])
-
       const tokens = await tl.generateTokenCollection()
-
-      expect(document.querySelectorAll).toBeCalledTimes(2)
-      expect(document.querySelectorAll).toBeCalledWith('.deck-list-entry .deck-list-entry-name a')
-      expect(document.querySelectorAll).toBeCalledWith('a.card-grid-item-card')
 
       expect(tl.lookupTokens).toBeCalledTimes(1)
       expect(tl.lookupTokens).toBeCalledWith([{
@@ -355,10 +396,8 @@ describe('Token List', function () {
     })
 
     it('noops if no elements available', async function () {
-      document.querySelectorAll.mockReturnValue([])
+      tl.elements = []
       const tokens = await tl.generateTokenCollection()
-
-      expect(document.querySelectorAll).toBeCalledTimes(2)
 
       expect(tl.lookupTokens).not.toBeCalled()
       expect(tl.flattenTokenCollection).not.toBeCalled()

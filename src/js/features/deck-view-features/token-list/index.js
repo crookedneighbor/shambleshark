@@ -1,76 +1,93 @@
 import Feature from 'Feature'
-import CardTooltip from 'Ui/card-tooltip'
 import mutation from 'Lib/mutation'
 import scryfall from 'Lib/scryfall'
 import {
   sortByAttribute
 } from 'Lib/sort'
 import createElement from 'Lib/create-element'
+import Modal from 'Ui/modal'
 import {
   FEATURE_IDS as ids,
-  FEATURE_SECTIONS as sections,
-  SPINNER_GIF
+  FEATURE_SECTIONS as sections
 } from 'Constants'
 
 import './index.css'
 
+const MAX_ENTRIES_TO_AUTO_LOOKUP = 75 * 2 // 2 collection API calls
+
 class TokenList extends Feature {
-  constructor () {
-    super()
-
-    this.tooltip = new CardTooltip({
-      onMouseover: (el) => {
-        const img = el.getAttribute('data-scryfall-image')
-
-        this.tooltip.setImage(img)
-      }
-    })
-  }
-
   async run () {
-    // TODO we should lazy load this stuff if more than 100 entries
-    mutation.ready('.sidebar', async (container) => {
+    // TODO this doesn't work with current implementation of mutation.ready
+    // in that subsequent calls to ready will not work
+    mutation.ready('#shambleshark-deck-display-sidebar-toolbox', async (container) => {
       this.createUI(container)
+      this.getCardElements()
 
-      const tokens = await this.generateTokenCollection()
-
-      this.addToUI(tokens)
+      if (this.elements.length <= MAX_ENTRIES_TO_AUTO_LOOKUP) {
+        this.generateTokenCollection()
+      }
     })
   }
 
   createUI (container) {
     const section = createElement(`<div>
-      <p class="deck-details-subtitle token-list-title"><strong>Tokens</strong></p>
-      <img src="${SPINNER_GIF}" class="token-list-loading modal-dialog-spinner" aria-hidden="true">
-      <ul class="token-list-container deck-details-description"></ul>
+      <button name="button" type="button" class="button-n">
+        <b>Show Tokens</b>
+      </button>
     </div>`).firstChild
-    section.classList.add('sidebar-toolbox')
+    const button = section.querySelector('button')
+    this.modal = new Modal({
+      id: 'token-list-modal',
+      header: 'Tokens',
+      loadingMessage: 'Loading tokens from deck',
+      onOpen: async (modalInstance) => {
+        // TODO add loading message if it takes too long
+        const tokens = await this.generateTokenCollection()
 
-    this.tokenListContainer = section.querySelector('.token-list-container')
-    this.spinner = section.querySelector('.token-list-loading')
+        this.addToUI(tokens)
+
+        modalInstance.setLoading(false)
+      },
+      onClose () {
+        button.focus()
+      }
+    })
+    document.body.appendChild(this.modal.element)
+
+    button.addEventListener('click', () => {
+      this.modal.open()
+    })
 
     container.appendChild(section)
   }
 
   addToUI (tokens) {
-    this.spinner.classList.add('hidden')
+    if (this._addedToUI) {
+      return
+    }
+
+    this._addedToUI = true
 
     if (tokens.length === 0) {
-      this.tokenListContainer.appendChild(createElement('<li>No tokens detected.</li>'))
+      this.modal.setContent(createElement('<p>No tokens detected.</p>'))
 
       return
     }
 
+    const container = document.createElement('div')
+    container.classList.add('token-list-img-container')
+
     tokens.forEach(token => {
       const el = createElement(`
-        <li data-scryfall-image="${token.getImage()}">
-          <a href="${token.scryfall_uri}">${token.name}</a>
-        </li>
+        <a href="${token.scryfall_uri}">
+          <img class="token-list-img" src="${token.getImage()}" alt="${token.name}">
+        </a>
       `).firstChild
 
-      this.tooltip.addElement(el)
-      this.tokenListContainer.appendChild(el)
+      container.appendChild(el)
     })
+
+    this.modal.setContent(container)
   }
 
   lookupCardCollection (cards) {
@@ -79,20 +96,31 @@ class TokenList extends Feature {
     })
   }
 
-  async generateTokenCollection () {
-    let elements = Array.from(document.querySelectorAll('.deck-list-entry .deck-list-entry-name a'))
-    if (elements.length === 0) {
-      elements = Array.from(document.querySelectorAll('a.card-grid-item-card'))
+  getCardElements () {
+    this.elements = Array.from(document.querySelectorAll('.deck-list-entry .deck-list-entry-name a'))
+    if (this.elements.length === 0) {
+      this.elements = Array.from(document.querySelectorAll('a.card-grid-item-card'))
     }
-    if (elements.length === 0) {
+  }
+
+  async generateTokenCollection () {
+    // TODO add meta data about what cards create the tokens
+    if (this._generateTokenCollectionPromise) {
+      return this._generateTokenCollectionPromise
+    }
+
+    if (this.elements.length === 0) {
       return Promise.resolve([])
     }
 
-    const entries = elements.map(el => this.parseSetAndCollectorNumber(el.href))
+    const entries = this.elements.map(el => this.parseSetAndCollectorNumber(el.href))
 
-    const tokenCollection = await this.lookupTokens(entries)
+    this._generateTokenCollectionPromise = this.lookupTokens(entries)
+      .then(tokenCollection => {
+        return this.flattenTokenCollection(tokenCollection)
+      })
 
-    return this.flattenTokenCollection(tokenCollection)
+    return this._generateTokenCollectionPromise
   }
 
   parseSetAndCollectorNumber (url) {
@@ -139,5 +167,6 @@ TokenList.metadata = {
 TokenList.settingsDefaults = {
   enabled: true
 }
+TokenList.usesSidebar = true
 
 export default TokenList

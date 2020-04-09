@@ -1,13 +1,7 @@
-.token-list-loading.modal-dialog-spinner {
-  width: 30px;
-  height: 30px;
-  margin: 0 auto;
+.token-list-img-container {
+  text-align: center;
 }
 
-.deck-details-subtitle.token-list-title {
-  font-size: 15px;
-}
-
-.token-list-container li a {
-  color: #2B253A;
+.token-list-img {
+  max-width: 200px;
 }
