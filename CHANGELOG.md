@@ -7,7 +7,7 @@ Changelog
 * Tagger Link
   * Allow opting out of displaying tags
 * EDHRec Suggestions
-  * Display button right away in disabled, so you don't have to wonder if the feature faild to load (closes #27)
+  * Display button right away in disabled mode, so you don't have to wonder if the feature faild to load (closes #27)
 
 # 0.4.0 - Pre-release
 
