@@ -1,3 +1,5 @@
+export const link = 'chrome://extensions'
+
 export function getStorage (keys) {
   return new Promise(function (resolve) {
     chrome.storage.sync.get(keys, resolve)

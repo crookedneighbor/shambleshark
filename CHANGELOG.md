@@ -3,6 +3,7 @@ Changelog
 
 # unreleased
 
+* Add warning on contact page (#37, #36)
 * Add Token List feature (#3)
 * Tagger Link
   * Allow opting out of displaying tags

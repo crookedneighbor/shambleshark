@@ -1,4 +1,5 @@
 import modifyTagger from './tagger'
+import modifyContactPage from './contact-page'
 import modifyDeckDisplayPage from './deck-display-page'
 import modifyEditPage from './edit-page'
 import modifySearchPaage from './search-page'
@@ -21,7 +22,9 @@ export default function start () {
   const page = urlPieces[0]
 
   // TODO separate scripts for each page or jsut do it this way?
-  if (page === 'search' || page === 'sets') {
+  if (page === 'contact') {
+    modifyContactPage()
+  } else if (page === 'search' || page === 'sets') {
     modifySearchPaage()
   } else if (urlPieces[1] === 'decks' && urlPieces[2] && !urlPieces[3]) {
     modifyDeckDisplayPage()
