@@ -1,6 +1,16 @@
 import start from "Js/scryfall/tagger";
 import iframe from "Lib/iframe";
-import bus from "framebus";
+import * as bus from "framebus";
+
+interface FakeXHR {
+  onreadystatechange?: Function;
+  open: jest.Mock;
+  send: jest.Mock;
+  setRequestHeader: jest.Mock;
+  readyState: number;
+  status: number;
+  responseText: string;
+}
 
 describe("Tagger", () => {
   const mockXHR = {
@@ -15,6 +25,7 @@ describe("Tagger", () => {
       },
     }),
   };
+  const mockXHRClass = () => mockXHR as FakeXHR;
   const oldXMLHttpRequest = window.XMLHttpRequest;
 
   beforeEach(() => {
@@ -23,7 +34,7 @@ describe("Tagger", () => {
     jest.spyOn(bus, "on").mockImplementation();
     jest.spyOn(bus, "emit").mockImplementation();
 
-    window.XMLHttpRequest = jest.fn(() => mockXHR);
+    (window.XMLHttpRequest as any) = jest.fn().mockImplementation(mockXHRClass);
 
     const meta = document.createElement("meta");
     meta.setAttribute("name", "csrf-token");
@@ -37,7 +48,7 @@ describe("Tagger", () => {
   });
 
   it("does not listen for recomendations if not in an iframe", () => {
-    iframe.isInsideIframe.mockReturnValue(false);
+    (iframe.isInsideIframe as jest.Mock).mockReturnValue(false);
 
     start();
 
@@ -60,15 +71,17 @@ describe("Tagger", () => {
 
   it("requests tags", async () => {
     const replySpy = jest.fn();
-    bus.on.mockImplementation((eventName, cb) => {
-      cb(
-        {
-          set: "set",
-          number: "number",
-        },
-        replySpy
-      );
-    });
+    (bus.on as jest.Mock).mockImplementation(
+      (eventName: string, cb: Function) => {
+        cb(
+          {
+            set: "set",
+            number: "number",
+          },
+          replySpy
+        );
+      }
+    );
 
     start();
 
@@ -91,7 +104,7 @@ describe("Tagger", () => {
     expect(body.variables.set).toBe("set");
     expect(body.variables.number).toBe("number");
 
-    mockXHR.onreadystatechange();
+    ((mockXHR as FakeXHR).onreadystatechange as Function)();
 
     expect(replySpy).toBeCalledTimes(1);
     expect(replySpy).toBeCalledWith("fake-card");
