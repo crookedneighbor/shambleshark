@@ -4,8 +4,9 @@
   "version": "0.4.0",
   "description": "Unofficial browser extension to add functionality to the Scryfall website. This extension is not developed by the Scryfall team.",
   "scripts": {
-    "lint": "standard --verbose | snazzy",
-    "posttest": "npm run lint",
+    "pretty": "prettier --write .",
+    "lint": "eslint .",
+    "posttest": "npm run pretty && npm run lint",
     "test": "jest",
     "build": "npm run build:chrome && npm run build:firefox",
     "build:firefox": "BROWSER=FIREFOX node utils/build.js",
@@ -20,6 +21,9 @@
     "clean-webpack-plugin": "^3.0.0",
     "copy-webpack-plugin": "^5.1.1",
     "css-loader": "^3.4.2",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.10.1",
+    "eslint-plugin-prettier": "^3.1.2",
     "file-loader": "^6.0.0",
     "fork-ts-checker-notifier-webpack-plugin": "^2.0.0",
     "fork-ts-checker-webpack-plugin": "^4.1.3",
@@ -28,8 +32,7 @@
     "html-webpack-plugin": "3.2.0",
     "jest": "^25.1.0",
     "mini-css-extract-plugin": "^0.9.0",
-    "snazzy": "^8.0.0",
-    "standard": "^14.3.3",
+    "prettier": "^2.0.4",
     "string-replace-loader": "^2.2.0",
     "ts-jest": "^25.3.1",
     "ts-loader": "^6.2.2",
@@ -44,20 +47,5 @@
     "bulma-switch": "^2.0.0",
     "framebus": "^3.0.2",
     "scryfall-client": "^0.13.0"
-  },
-  "standard": {
-    "globals": [
-      "browser",
-      "Scryfall",
-      "ScryfallAPI",
-      "afterEach",
-      "beforeEach",
-      "chrome",
-      "describe",
-      "expect",
-      "it",
-      "jest",
-      "test"
-    ]
   }
 }

@@ -1,5 +1,3 @@
-import FutureFeatureOptIn from './future-feature-opt-in'
+import FutureFeatureOptIn from "./future-feature-opt-in";
 
-export default [
-  FutureFeatureOptIn
-]
+export default [FutureFeatureOptIn];

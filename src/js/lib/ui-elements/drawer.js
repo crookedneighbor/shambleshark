@@ -1,31 +1,29 @@
-import DialogInterface from './dialog-interface'
-import createElement from 'Lib/create-element'
-import './drawer.css'
-import {
-  SPINNER_GIF
-} from 'Constants'
+import DialogInterface from "./dialog-interface";
+import createElement from "Lib/create-element";
+import "./drawer.css";
+import { SPINNER_GIF } from "Constants";
 
 export default class Drawer extends DialogInterface {
-  open () {
-    super.open()
+  open() {
+    super.open();
 
-    this.element.classList.add('open')
+    this.element.classList.add("open");
   }
 
-  close () {
-    super.close()
+  close() {
+    super.close();
 
-    this.element.classList.remove('open')
+    this.element.classList.remove("open");
   }
 
-  getScrollableElement () {
-    return this._scrollableEl
+  getScrollableElement() {
+    return this._scrollableEl;
   }
 
-  _constructElement (options) {
-    const titleId = `drawer-title-${options.id}`
+  _constructElement(options) {
+    const titleId = `drawer-title-${options.id}`;
 
-    this.position = options.position || 'right'
+    this.position = options.position || "right";
 
     const drawer = createElement(`<div
       class="drawer-dialog-overlay modal-dialog-overlay"
@@ -37,10 +35,14 @@ export default class Drawer extends DialogInterface {
       <div class="drawer-dialog drawer-dialog-position-${this.position}">
         <h6 class="drawer-dialog-title modal-dialog-title">
           <span class="dialog-title" id="${titleId}">
-            <span class="dialog-title-symbol">${options.headerSymbol || ''}</span>
+            <span class="dialog-title-symbol">${
+              options.headerSymbol || ""
+            }</span>
             <span class="dialog-title-content"></span>
           </span>
-          <button type="button" title="${this._getCloseButtonMessage(true)}" class="dialog-close modal-dialog-close">
+          <button type="button" title="${this._getCloseButtonMessage(
+            true
+          )}" class="dialog-close modal-dialog-close">
             <span class="vh">Close this dialog</span> <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path d="M217.5 256l137.2-137.2c4.7-4.7 4.7-12.3 0-17l-8.5-8.5c-4.7-4.7-12.3-4.7-17 0L192 230.5 54.8 93.4c-4.7-4.7-12.3-4.7-17 0l-8.5 8.5c-4.7 4.7-4.7 12.3 0 17L166.5 256 29.4 393.2c-4.7 4.7-4.7 12.3 0 17l8.5 8.5c4.7 4.7 12.3 4.7 17 0L192 281.5l137.2 137.2c4.7 4.7 12.3 4.7 17 0l8.5-8.5c4.7-4.7 4.7-12.3 0-17L217.5 256z"></path></svg>
           </button>
         </h6>
@@ -50,24 +52,26 @@ export default class Drawer extends DialogInterface {
         </div>
       <!---->
         <div class="dialog-content-container drawer-dialog-stage loading">
-          <div role="alert" aria-label="${options.contentMessage || 'Dialog Loaded'}"></div>
+          <div role="alert" aria-label="${
+            options.contentMessage || "Dialog Loaded"
+          }"></div>
           <div class="dialog-content drawer-dialog-stage-content"></div>
         </div>
       </div>
-    </div>`).firstChild
+    </div>`).firstChild;
 
-    drawer.querySelector('.dialog-close').addEventListener('click', () => {
-      this.close()
-    })
+    drawer.querySelector(".dialog-close").addEventListener("click", () => {
+      this.close();
+    });
 
-    this._scrollableEl = drawer.querySelector('.drawer-dialog')
+    this._scrollableEl = drawer.querySelector(".drawer-dialog");
 
     if (options.onScroll) {
-      this._scrollableEl.addEventListener('scroll', () => {
-        this.triggerOnScroll()
-      })
+      this._scrollableEl.addEventListener("scroll", () => {
+        this.triggerOnScroll();
+      });
     }
 
-    return drawer
+    return drawer;
   }
 }

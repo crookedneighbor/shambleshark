@@ -1,3 +1,3 @@
-import setUpListeners from './set-up-listeners'
+import setUpListeners from "./set-up-listeners";
 
-setUpListeners()
+setUpListeners();

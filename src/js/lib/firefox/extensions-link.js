@@ -1,1 +1,1 @@
-export default 'about:addons'
+export default "about:addons";

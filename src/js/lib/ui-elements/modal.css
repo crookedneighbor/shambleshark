@@ -1,7 +1,7 @@
 .dialog-content-container.modal-dialog-stage.loading {
-  position:fixed;
-  left:-100%;
-  visibility:hidden
+  position: fixed;
+  left: -100%;
+  visibility: hidden;
 }
 
 .dialog-content-container.modal-dialog-stage {

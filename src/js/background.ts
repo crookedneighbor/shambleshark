@@ -1,35 +1,32 @@
-import '../img/icon-128.png'
-import '../img/icon-34.png'
+import "../img/icon-128.png";
+import "../img/icon-34.png";
 
 import {
   onInstalled,
   openOptionsPage,
-  onHeadersReceived
-} from 'Browser/runtime'
+  onHeadersReceived,
+} from "Browser/runtime";
 
 onInstalled().addListener(function (details) {
-  if (details.reason === 'install') {
-    openOptionsPage()
+  if (details.reason === "install") {
+    openOptionsPage();
   }
-})
+});
 
 // removes the headers that prevent loading Tagger in an iframe
 onHeadersReceived({
-  addListener (info) {
-    const headers = info.responseHeaders.filter(rawHeader => {
-      const header = rawHeader.name.toLowerCase()
+  addListener(info) {
+    const headers = info.responseHeaders.filter((rawHeader) => {
+      const header = rawHeader.name.toLowerCase();
 
-      return header !== 'x-frame-options' && header !== 'frame-options'
-    })
+      return header !== "x-frame-options" && header !== "frame-options";
+    });
 
-    return { responseHeaders: headers }
+    return { responseHeaders: headers };
   },
   config: {
-    urls: ['*://tagger.scryfall.com/*'],
-    types: ['sub_frame']
+    urls: ["*://tagger.scryfall.com/*"],
+    types: ["sub_frame"],
   },
-  permissions: [
-    'blocking',
-    'responseHeaders'
-  ]
-})
+  permissions: ["blocking", "responseHeaders"],
+});

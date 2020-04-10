@@ -1,1 +1,1 @@
-import './setup-page'
+import "./setup-page";

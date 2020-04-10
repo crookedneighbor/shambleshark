@@ -4,7 +4,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background: #F6F4FA;
+  background: #f6f4fa;
   overflow-y: scroll;
   transition: all 0.75s ease-in-out;
 }
@@ -30,9 +30,9 @@
 }
 
 .dialog-content-container.drawer-dialog-stage.loading {
-  position:fixed;
-  left:-100%;
-  visibility:hidden
+  position: fixed;
+  left: -100%;
+  visibility: hidden;
 }
 
 .drawer-dialog-stage-content {

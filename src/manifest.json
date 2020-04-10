@@ -8,23 +8,20 @@
   "background": {
     "page": "background.html"
   },
-  "content_scripts": [{
-    "js":      [ "scryfall.bundle.js" ],
-    "css":     [ "scryfall.css" ],
-    "matches": [
-      "*://*.scryfall.com/*"
-    ],
-    "all_frames": true
-  }, {
-    "js":      [ "edhrec.bundle.js" ],
-    "matches": [
-      "*://*.edhrec.com/*"
-    ],
-    "all_frames": true
-  }],
-  "web_accessible_resources": [
-    "scryfallEmbed.bundle.js"
+  "content_scripts": [
+    {
+      "js": ["scryfall.bundle.js"],
+      "css": ["scryfall.css"],
+      "matches": ["*://*.scryfall.com/*"],
+      "all_frames": true
+    },
+    {
+      "js": ["edhrec.bundle.js"],
+      "matches": ["*://*.edhrec.com/*"],
+      "all_frames": true
+    }
   ],
+  "web_accessible_resources": ["scryfallEmbed.bundle.js"],
   "permissions": [
     "webRequest",
     "webRequestBlocking",

@@ -21,7 +21,7 @@
   top: -50%;
   border-radius: 3px;
   border: 2px solid #7652b1;
-  box-shadow: 1px 1px 6px rgba(0,0,0,0.45);
+  box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.45);
 }
 
 .tagger-link-hover.left-aligned {
@@ -43,7 +43,8 @@
   display: none;
 }
 
-.tagger-link-hover svg, .tagger-link-hover svg path {
+.tagger-link-hover svg,
+.tagger-link-hover svg path {
   fill: #343242 !important;
 }
 
@@ -73,11 +74,11 @@
 }
 
 .icon-upside-down svg {
-  transform: scale(-1)
+  transform: scale(-1);
 }
 
 .icon-flipped svg {
-  transform: scale(-1, 1)
+  transform: scale(-1, 1);
 }
 
 .tagger-link-button:hover .tagger-link-hover {
