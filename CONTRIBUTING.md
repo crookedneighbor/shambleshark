@@ -75,8 +75,8 @@ A page where each of the features is displayed with ways to configure them.
 
 This script is responsible for a few things:
 
-* Opening the options page on initial install so the user can choose what features they want and opt out of automatically getting new features
-* Rewriting the web request headers for tagger.scryfall.com so that it can be embedded within the main Scryfall site in an iframe
+- Opening the options page on initial install so the user can choose what features they want and opt out of automatically getting new features
+- Rewriting the web request headers for tagger.scryfall.com so that it can be embedded within the main Scryfall site in an iframe
 
 ### Other Embedded Scripts
 
