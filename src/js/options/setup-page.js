@@ -157,4 +157,3 @@ Promise.all(features.map((Feature) => {
 })).then(() => {
   document.body.appendChild(page)
 })
-

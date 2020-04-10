@@ -1,6 +1,7 @@
 const path = require('path')
 
 module.exports = {
+  preset: 'ts-jest',
   setupFilesAfterEnv: ['./test/_setup.js'],
   moduleNameMapper: {
     '^Js/(.*)$': path.resolve(__dirname, 'src/js/$1'),
@@ -13,5 +14,8 @@ module.exports = {
     '^Browser/runtime$': path.resolve(__dirname, 'src/js/lib/chrome/runtime'),
     '^Browser/storage$': path.resolve(__dirname, 'src/js/lib/chrome/storage'),
     '\\.css$': '<rootDir>/test/mocks/styles.js'
+  },
+  transform: {
+    '^.+\\.[jt]s$': 'babel-jest'
   }
 }

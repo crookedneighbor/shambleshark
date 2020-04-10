@@ -7,6 +7,8 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const WriteFilePlugin = require('write-file-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const ForkTsCheckerNotifierWebpackPlugin = require('fork-ts-checker-notifier-webpack-plugin')
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 
 const BROWSER = env.BROWSER
 
@@ -34,6 +36,7 @@ if (fileSystem.existsSync(secretsPath)) {
 }
 
 var options = {
+  context: process.cwd(),
   mode: env.NODE_ENV,
   optimization: {
     // extensions don't receive a performance boost by doing this
@@ -66,8 +69,10 @@ var options = {
       },
       {
         test: /\.tsx?$/,
-        use: 'ts-loader',
-        exclude: /node_modules/
+        exclude: /node_modules/,
+        use: [
+          { loader: 'ts-loader', options: { transpileOnly: true } }
+        ]
       },
       {
         test: new RegExp('\.(' + fileExtensions.join('|') + ')$'), // eslint-disable-line
@@ -106,6 +111,10 @@ var options = {
     }),
     // expose and write the allowed env vars on the compiled bundle
     new webpack.EnvironmentPlugin(['NODE_ENV']),
+    new ForkTsCheckerWebpackPlugin({
+      eslint: true
+    }),
+    new ForkTsCheckerNotifierWebpackPlugin({ title: 'TypeScript', excludeWarnings: false }),
     new CopyWebpackPlugin([{
       from: 'src/manifest.json',
       transform: function (content, path) {
