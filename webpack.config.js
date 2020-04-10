@@ -9,9 +9,13 @@ const WriteFilePlugin = require("write-file-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const ForkTsCheckerNotifierWebpackPlugin = require("fork-ts-checker-notifier-webpack-plugin");
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
+const TsconfigPathsPlugin = require("tsconfig-paths-webpack-plugin");
 
 const BROWSER = env.BROWSER;
 
+// NOTE: whenever you add an alias here, you also need to add the
+// corresponding alias to the paths field in the tsconfig
+// TODO: should probably do that programatically
 const alias = {
   Constants: path.resolve(__dirname, "src/js/resources/constants.js"),
   Feature: path.resolve(__dirname, "src/js/features/feature.js"),
@@ -116,6 +120,13 @@ var options = {
   resolve: {
     alias: alias,
     extensions: [".ts", ".js"],
+    plugins: [
+      new TsconfigPathsPlugin({
+        // TODO: if we generate the tsconfig programtically
+        // for the path resolution, than enable this
+        /*configFile: "./path/to/tsconfig.json" */
+      }),
+    ],
   },
   plugins: [
     // clean the build folder
