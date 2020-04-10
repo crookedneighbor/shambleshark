@@ -57,7 +57,7 @@ var options = {
   entry: {
     popup: path.join(__dirname, "src", "js", "popup.ts"),
     options: path.join(__dirname, "src", "js", "options", "index.ts"),
-    background: path.join(__dirname, "src", "js", "background.ts"),
+    background: path.join(__dirname, "src", "js", "background", "index.ts"),
     scryfallEmbed: path.join(
       __dirname,
       "src",
