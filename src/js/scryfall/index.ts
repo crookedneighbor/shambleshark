@@ -7,6 +7,7 @@ import embed from "./embed-scryfall-script";
 
 export default function start() {
   const hostname = window.location.hostname;
+
   if (hostname === "tagger.scryfall.com") {
     modifyTagger();
     return;
