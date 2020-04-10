@@ -31,9 +31,9 @@ if (BROWSER === "GOOGLE_CHROME") {
   alias.Browser = path.resolve(__dirname, "src/js/lib/firefox/");
 }
 
-var secretsPath = path.join(__dirname, "secrets." + env.NODE_ENV + ".js");
+const secretsPath = path.join(__dirname, "secrets." + env.NODE_ENV + ".js");
 
-var fileExtensions = [
+const fileExtensions = [
   "jpg",
   "jpeg",
   "png",
@@ -50,7 +50,7 @@ if (fileSystem.existsSync(secretsPath)) {
   alias.secrets = secretsPath;
 }
 
-var options = {
+const options = {
   context: process.cwd(),
   mode: env.NODE_ENV,
   optimization: {
