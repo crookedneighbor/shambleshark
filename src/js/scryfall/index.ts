@@ -2,7 +2,7 @@ import modifyTagger from "./tagger";
 import modifyContactPage from "./contact-page";
 import modifyDeckDisplayPage from "./deck-display-page";
 import modifyEditPage from "./edit-page";
-import modifySearchPaage from "./search-page";
+import modifySearchPage from "./search-page";
 import embed from "./embed-scryfall-script";
 
 export default function start() {
@@ -25,7 +25,7 @@ export default function start() {
   if (page === "contact") {
     modifyContactPage();
   } else if (page === "search" || page === "sets") {
-    modifySearchPaage();
+    modifySearchPage();
   } else if (urlPieces[1] === "decks" && urlPieces[2] && !urlPieces[3]) {
     modifyDeckDisplayPage();
   } else if (urlPieces[1] === "decks" && urlPieces[3] === "build") {
