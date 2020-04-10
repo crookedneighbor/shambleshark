@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "baseUrl": ".",
+    "paths": {
+      /* These need to be duplicated from the webpack config */
+      "Browser/*": ["src/js/lib/chrome/*"],
+      "Constants": ["src/js/resources/constants.js"],
+      "Feature": ["src/js/features/feature.js"],
+      "Features/*": ["src/js/features/*"],
+      "Lib/*": ["src/js/lib/*"],
+      "Ui/*": ["src/js/lib/ui-elements/*"],
+      "Svg": ["src/js/resources/svg.js"]
+    },
+    "outDir": "./dist/",
+    "module": "commonjs",
+    "target": "es2019",
+    "lib": ["es2019", "dom"],
+    /* Remove this once conversion is complete */
+    "allowJs": true
+  },
+  "include": ["./src/**/*"]
+}

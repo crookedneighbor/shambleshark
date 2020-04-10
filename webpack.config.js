@@ -7,9 +7,15 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const WriteFilePlugin = require("write-file-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const ForkTsCheckerNotifierWebpackPlugin = require("fork-ts-checker-notifier-webpack-plugin");
+const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
+const TsconfigPathsPlugin = require("tsconfig-paths-webpack-plugin");
 
 const BROWSER = env.BROWSER;
 
+// NOTE: whenever you add an alias here, you also need to add the
+// corresponding alias to the paths field in the tsconfig
+// TODO: should probably do that programatically
 const alias = {
   Constants: path.resolve(__dirname, "src/js/resources/constants.js"),
   Feature: path.resolve(__dirname, "src/js/features/feature.js"),
@@ -25,9 +31,9 @@ if (BROWSER === "GOOGLE_CHROME") {
   alias.Browser = path.resolve(__dirname, "src/js/lib/firefox/");
 }
 
-var secretsPath = path.join(__dirname, "secrets." + env.NODE_ENV + ".js");
+const secretsPath = path.join(__dirname, "secrets." + env.NODE_ENV + ".js");
 
-var fileExtensions = [
+const fileExtensions = [
   "jpg",
   "jpeg",
   "png",
@@ -44,7 +50,8 @@ if (fileSystem.existsSync(secretsPath)) {
   alias.secrets = secretsPath;
 }
 
-var options = {
+const options = {
+  context: process.cwd(),
   mode: env.NODE_ENV,
   optimization: {
     // extensions don't receive a performance boost by doing this
@@ -52,18 +59,18 @@ var options = {
     minimize: false,
   },
   entry: {
-    popup: path.join(__dirname, "src", "js", "popup.js"),
-    options: path.join(__dirname, "src", "js", "options.js"),
-    background: path.join(__dirname, "src", "js", "background.js"),
+    popup: path.join(__dirname, "src", "js", "popup.ts"),
+    options: path.join(__dirname, "src", "js", "options", "index.ts"),
+    background: path.join(__dirname, "src", "js", "background", "index.ts"),
     scryfallEmbed: path.join(
       __dirname,
       "src",
       "js",
       "scryfall-embed",
-      "index.js"
+      "index.ts"
     ),
-    scryfall: path.join(__dirname, "src", "js", "scryfall/index.js"),
-    edhrec: path.join(__dirname, "src", "js", "edhrec/index.js"),
+    scryfall: path.join(__dirname, "src", "js", "scryfall", "index.ts"),
+    edhrec: path.join(__dirname, "src", "js", "edhrec", "index.ts"),
   },
   output: {
     path: path.join(__dirname, "build", BROWSER.toLowerCase()),
@@ -83,6 +90,11 @@ var options = {
           },
           "css-loader",
         ],
+      },
+      {
+        test: /\.tsx?$/,
+        exclude: /node_modules/,
+        use: [{ loader: "ts-loader", options: { transpileOnly: true } }],
       },
       {
         test: new RegExp(".(" + fileExtensions.join("|") + ")$"), // eslint-disable-line
@@ -107,6 +119,14 @@ var options = {
   },
   resolve: {
     alias: alias,
+    extensions: [".ts", ".js"],
+    plugins: [
+      new TsconfigPathsPlugin({
+        // TODO: if we generate the tsconfig programtically
+        // for the path resolution, than enable this
+        /*configFile: "./path/to/tsconfig.json" */
+      }),
+    ],
   },
   plugins: [
     // clean the build folder
@@ -116,6 +136,13 @@ var options = {
     }),
     // expose and write the allowed env vars on the compiled bundle
     new webpack.EnvironmentPlugin(["NODE_ENV"]),
+    new ForkTsCheckerWebpackPlugin({
+      eslint: true,
+    }),
+    new ForkTsCheckerNotifierWebpackPlugin({
+      title: "TypeScript",
+      excludeWarnings: false,
+    }),
     new CopyWebpackPlugin([
       {
         from: "src/manifest.json",
