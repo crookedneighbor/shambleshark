@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "strict": true,
     "baseUrl": ".",
     "paths": {
       /* These need to be duplicated from the webpack config */
@@ -12,7 +13,6 @@
       "Svg": ["src/js/resources/svg.js"]
     },
     "outDir": "./dist/",
-    "noImplicitAny": false,
     "module": "commonjs",
     "target": "es2019",
     "allowJs": true
