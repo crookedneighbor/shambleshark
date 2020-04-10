@@ -3,6 +3,8 @@
     "strict": true,
     "baseUrl": ".",
     "paths": {
+      /* Just for tests */
+      "Js/*": ["src/js/*"],
       /* These need to be duplicated from the webpack config */
       "Browser/*": ["src/js/lib/chrome/*"],
       "Constants": ["src/js/resources/constants.js"],

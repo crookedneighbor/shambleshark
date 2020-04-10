@@ -1,10 +1,15 @@
 const path = require("path");
 
 module.exports = {
-  preset: "ts-jest",
+  // TODO change to ts-jest when all converted over
+  preset: "ts-jest/presets/js-with-babel",
+  testEnvironment: "jsdom",
   setupFilesAfterEnv: ["./test/_setup.js"],
   moduleNameMapper: {
     "^Js/(.*)$": path.resolve(__dirname, "src/js/$1"),
+    "\\.css$": "<rootDir>/test/mocks/styles.js",
+
+    // These need to be duplicated from the webpack config
     "^Constants$": path.resolve(__dirname, "src/js/resources/constants.js"),
     "^Features/(.*)$": path.resolve(__dirname, "src/js/features/$1"),
     "^Feature$": path.resolve(__dirname, "src/js/features/feature.js"),
@@ -13,9 +18,7 @@ module.exports = {
     "^Svg$": path.resolve(__dirname, "src/js/resources/svg.js"),
     "^Browser/runtime$": path.resolve(__dirname, "src/js/lib/chrome/runtime"),
     "^Browser/storage$": path.resolve(__dirname, "src/js/lib/chrome/storage"),
-    "\\.css$": "<rootDir>/test/mocks/styles.js",
   },
-  transform: {
-    "^.+\\.[jt]s$": "babel-jest",
-  },
+  clearMocks: true,
+  moduleFileExtensions: ["ts", "js", "json", "node"],
 };
