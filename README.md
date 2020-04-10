@@ -4,24 +4,9 @@ An unofficial browser extension to add additional functionality to the Scryfall 
 
 As with many extensions, it relies on the DOM structure and JavaScript of Scryfall remaining consistent. So if something changes on Scryfall, it may result in the extension breaking. If that happens, [open an issue](https://github.com/crookedneighbor/shambleshark/issues) and we will work to fix it.
 
-## Development
+## Contributing
 
-1. Install the node dependencies:
-
-   ```sh
-   npm install
-   ```
-
-1. Start the development server:
-
-   ```sh
-   $ npm start
-   $ # use `BROWSER=FIREFOX npm start` if you prefer to develop in Firefox
-   ```
-
-1. Add the unpacked extension to Chrome. See [steps 1-3 here](https://developer.chrome.com/extensions/getstarted#manifest).
-
-1. You're done! Open up the Scryfall website. Any changes you make in the code will be built automatically, but the unpacked extension will need to be updated to get those changes. Navigate to `chrome://extensions` and select the refresh icon in the unpacked extension.
+Checkout the [contributing guide](./CONTRIBUTING.md) for info about how to contribute.
 
 ## Packing for Production
 
