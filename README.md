@@ -8,16 +8,16 @@ As with many extensions, it relies on the DOM structure and JavaScript of Scryfa
 
 1. Install the node dependencies:
 
-    ```sh
-    npm install
-    ```
+   ```sh
+   npm install
+   ```
 
 1. Start the development server:
 
-    ```sh
-    $ npm start
-    $ # use `BROWSER=FIREFOX npm start` if you prefer to develop in Firefox
-    ```
+   ```sh
+   $ npm start
+   $ # use `BROWSER=FIREFOX npm start` if you prefer to develop in Firefox
+   ```
 
 1. Add the unpacked extension to Chrome. See [steps 1-3 here](https://developer.chrome.com/extensions/getstarted#manifest).
 

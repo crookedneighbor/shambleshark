@@ -1,50 +1,50 @@
-import 'bulma/css/bulma.min.css'
-import 'bulma-switch/dist/css/bulma-switch.min.css'
-import '../css/options.css'
+import "bulma/css/bulma.min.css";
+import "bulma-switch/dist/css/bulma-switch.min.css";
+import "../css/options.css";
 
-import createElement from 'Lib/create-element'
+import createElement from "Lib/create-element";
 
-import globalFeatures from 'Features/global-features'
-import deckbuilderFeatures from 'Features/deck-builder-features'
-import deckViewFeatures from 'Features/deck-view-features'
-import searchResultsFeatures from 'Features/search-results-features'
+import globalFeatures from "Features/global-features";
+import deckbuilderFeatures from "Features/deck-builder-features";
+import deckViewFeatures from "Features/deck-view-features";
+import searchResultsFeatures from "Features/search-results-features";
 
 const features = globalFeatures
   .concat(deckbuilderFeatures)
   .concat(deckViewFeatures)
-  .concat(searchResultsFeatures)
+  .concat(searchResultsFeatures);
 
-function setupToggleListeners (element, fn) {
-  element.addEventListener('change', fn)
-  element.addEventListener('keydown', function (event) {
-    if (event.key === 'Enter') {
-      element.checked = !element.checked
-      fn()
+function setupToggleListeners(element, fn) {
+  element.addEventListener("change", fn);
+  element.addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+      element.checked = !element.checked;
+      fn();
     }
-  })
+  });
 }
 
-function createInputForType (def, inputValue, Feature) {
+function createInputForType(def, inputValue, Feature) {
   switch (def.input) {
-    case 'checkbox':
-      return createCheckbox(def, inputValue, Feature)
+    case "checkbox":
+      return createCheckbox(def, inputValue, Feature);
   }
 }
 
-function createCheckbox (def, inputValue, Feature) {
+function createCheckbox(def, inputValue, Feature) {
   const checkboxContainer = createElement(`<label
     class="checkbox"
   >
     <input type="checkbox" id="${def.id}-checkbox" />
     ${def.label}
-  </label>`).firstChild
-  const checkbox = checkboxContainer.querySelector('input')
-  checkbox.checked = inputValue
-  checkbox.addEventListener('change', () => {
-    Feature.saveSetting(def.id, checkbox.checked)
-  })
+  </label>`).firstChild;
+  const checkbox = checkboxContainer.querySelector("input");
+  checkbox.checked = inputValue;
+  checkbox.addEventListener("change", () => {
+    Feature.saveSetting(def.id, checkbox.checked);
+  });
 
-  return checkboxContainer
+  return checkboxContainer;
 }
 
 const page = createElement(`<div>
@@ -91,21 +91,22 @@ const page = createElement(`<div>
       </div>
     </div>
   </section>
-</div>`).firstChild
+</div>`).firstChild;
 
-Promise.all(features.map((Feature) => {
-  const data = Feature.metadata
-  const section = page.querySelector(`#${data.section}`)
-  const enabledSwitchId = `${data.id}-enabled-switch`
-  const isFutureFeature = data.futureFeature
+Promise.all(
+  features.map((Feature) => {
+    const data = Feature.metadata;
+    const section = page.querySelector(`#${data.section}`);
+    const enabledSwitchId = `${data.id}-enabled-switch`;
+    const isFutureFeature = data.futureFeature;
 
-  let title = data.title
+    let title = data.title;
 
-  if (isFutureFeature) {
-    title += ' (Coming Soon)'
-  }
+    if (isFutureFeature) {
+      title += " (Coming Soon)";
+    }
 
-  const container = createElement(`<fieldset
+    const container = createElement(`<fieldset
     class="field"
   >
     <div>
@@ -113,47 +114,50 @@ Promise.all(features.map((Feature) => {
       <label class="has-text-weight-bold" for="${enabledSwitchId}">${title}</label>
     </div>
     <p class="content feature-description">${data.description}</p>
-  </fieldset>`).firstChild
+  </fieldset>`).firstChild;
 
-  if (isFutureFeature) {
-    container.setAttribute('disabled', 'disabled')
-  }
-
-  section.appendChild(container)
-  // construct HTML for additioanl settings
-
-  return Feature.getSettings().then((settings) => {
-    const enabledSwitch = container.querySelector('input')
-
-    setupToggleListeners(enabledSwitch, () => {
-      if (enabledSwitch.checked) {
-        Feature.enable()
-      } else {
-        Feature.disable()
-      }
-    })
-
-    if (!isFutureFeature && settings.enabled) {
-      enabledSwitch.checked = true
+    if (isFutureFeature) {
+      container.setAttribute("disabled", "disabled");
     }
 
-    if (Feature.settingDefinitions.length) {
-      container.querySelector('.feature-description').classList.add('has-options')
-    }
+    section.appendChild(container);
+    // construct HTML for additioanl settings
 
-    Feature.settingDefinitions.forEach(def => {
-      const input = createInputForType(def, settings[def.id], Feature)
-      input.classList.add('feature-option')
+    return Feature.getSettings().then((settings) => {
+      const enabledSwitch = container.querySelector("input");
 
-      if (input) {
-        container.appendChild(input)
+      setupToggleListeners(enabledSwitch, () => {
+        if (enabledSwitch.checked) {
+          Feature.enable();
+        } else {
+          Feature.disable();
+        }
+      });
+
+      if (!isFutureFeature && settings.enabled) {
+        enabledSwitch.checked = true;
       }
-    })
 
-    const disabledOverlay = document.createElement('div')
-    disabledOverlay.classList.add('disabled-overlay')
-    container.appendChild(disabledOverlay)
+      if (Feature.settingDefinitions.length) {
+        container
+          .querySelector(".feature-description")
+          .classList.add("has-options");
+      }
+
+      Feature.settingDefinitions.forEach((def) => {
+        const input = createInputForType(def, settings[def.id], Feature);
+        input.classList.add("feature-option");
+
+        if (input) {
+          container.appendChild(input);
+        }
+      });
+
+      const disabledOverlay = document.createElement("div");
+      disabledOverlay.classList.add("disabled-overlay");
+      container.appendChild(disabledOverlay);
+    });
   })
-})).then(() => {
-  document.body.appendChild(page)
-})
+).then(() => {
+  document.body.appendChild(page);
+});

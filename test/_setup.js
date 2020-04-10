@@ -1,14 +1,14 @@
 global.MutationObserver = class {
-  disconnect () {}
+  disconnect() {}
 
-  observe () {}
-}
+  observe() {}
+};
 
-global.scrollTo = jest.fn()
+global.scrollTo = jest.fn();
 
 afterEach(() => {
   // clean up any dom manipulation between tests
-  document.getElementsByTagName('html')[0].innerHTML = ''
+  document.getElementsByTagName("html")[0].innerHTML = "";
 
-  jest.restoreAllMocks()
-})
+  jest.restoreAllMocks();
+});

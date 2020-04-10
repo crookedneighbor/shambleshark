@@ -1,14 +1,12 @@
-import DialogInterface from './dialog-interface'
-import createElement from 'Lib/create-element'
-import {
-  SPINNER_GIF
-} from 'Constants'
+import DialogInterface from "./dialog-interface";
+import createElement from "Lib/create-element";
+import { SPINNER_GIF } from "Constants";
 
-import './modal.css'
+import "./modal.css";
 
 export default class Modal extends DialogInterface {
-  _constructElement (options) {
-    const titleId = `modal-title-${options.id}`
+  _constructElement(options) {
+    const titleId = `modal-title-${options.id}`;
     const modal = createElement(`<div
       class="modal-dialog-overlay"
       aria-modal="true"
@@ -18,7 +16,9 @@ export default class Modal extends DialogInterface {
       <div class="modal-dialog">
         <h6 class="modal-dialog-title">
           <span class="dialog-title" id="${titleId}">
-            <span class="dialog-title-symbol">${options.headerSymbol || ''}</span>
+            <span class="dialog-title-symbol">${
+              options.headerSymbol || ""
+            }</span>
             <span class="dialog-title-content"></span>
           </span>
           <button type="button" title="${this._getCloseButtonMessage()}" class="dialog-close modal-dialog-close">
@@ -31,16 +31,18 @@ export default class Modal extends DialogInterface {
         </div>
       <!---->
         <div class="dialog-content-container modal-dialog-stage loading">
-          <div role="alert" aria-label="${options.contentMessage || 'Modal Loaded'}"></div>
+          <div role="alert" aria-label="${
+            options.contentMessage || "Modal Loaded"
+          }"></div>
           <div class="dialog-content modal-dialog-stage-content"></div>
         </div>
       </div>
-   </div>`).firstChild
+   </div>`).firstChild;
 
-    modal.querySelector('.dialog-close').addEventListener('click', () => {
-      this.close()
-    })
+    modal.querySelector(".dialog-close").addEventListener("click", () => {
+      this.close();
+    });
 
-    return modal
+    return modal;
   }
 }

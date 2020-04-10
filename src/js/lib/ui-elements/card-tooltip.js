@@ -1,137 +1,137 @@
-import mutation from 'Lib/mutation'
+import mutation from "Lib/mutation";
 
-let tooltipElement
+let tooltipElement;
 
 export default class CardTooltip {
-  constructor (options = {}) {
-    this.elements = []
+  constructor(options = {}) {
+    this.elements = [];
 
-    this._onMouseover = options.onMouseover
-    this._onMouseout = options.onMouseout
+    this._onMouseover = options.onMouseover;
+    this._onMouseout = options.onMouseout;
 
-    this.findTooltip()
+    this.findTooltip();
   }
 
-  static resetTooltipElement () {
-    tooltipElement = null
+  static resetTooltipElement() {
+    tooltipElement = null;
   }
 
-  findTooltip () {
+  findTooltip() {
     if (tooltipElement) {
-      this.tooltipElement = tooltipElement
+      this.tooltipElement = tooltipElement;
 
-      return
+      return;
     }
 
     // TODO it's possible to hit a race condition here if multiple
     // features on the same page are using this where the tooltip
     // element never respnds a second time
-    mutation.ready('#card-tooltip', (tooltip) => {
-      this.tooltipElement = tooltipElement = tooltip
-    })
+    mutation.ready("#card-tooltip", (tooltip) => {
+      this.tooltipElement = tooltipElement = tooltip;
+    });
   }
 
-  addElement (el) {
-    const mousemoveHandler = this.createMousemoveHandler(el)
-    const mouseoutHandler = this.createMouseoutHandler(el)
+  addElement(el) {
+    const mousemoveHandler = this.createMousemoveHandler(el);
+    const mouseoutHandler = this.createMouseoutHandler(el);
 
     this.elements.push({
       element: el,
       mousemoveHandler,
-      mouseoutHandler
-    })
+      mouseoutHandler,
+    });
 
-    el.addEventListener('mousemove', mousemoveHandler)
-    el.addEventListener('mouseout', mouseoutHandler)
+    el.addEventListener("mousemove", mousemoveHandler);
+    el.addEventListener("mouseout", mouseoutHandler);
   }
 
-  removeElement (el) {
-    const index = this.elements.findIndex(config => el === config.element)
+  removeElement(el) {
+    const index = this.elements.findIndex((config) => el === config.element);
 
     if (index === -1) {
-      return
+      return;
     }
 
-    const config = this.elements[index]
+    const config = this.elements[index];
 
-    config.element.removeEventListener('mousemove', config.mousemoveHandler)
-    config.element.removeEventListener('mouseout', config.mouseoutHandler)
+    config.element.removeEventListener("mousemove", config.mousemoveHandler);
+    config.element.removeEventListener("mouseout", config.mouseoutHandler);
 
-    this.elements.splice(index, 1)
+    this.elements.splice(index, 1);
   }
 
-  setImage (url) {
-    this.img = url
+  setImage(url) {
+    this.img = url;
   }
 
-  createMousemoveHandler (el) {
-    const self = this
+  createMousemoveHandler(el) {
+    const self = this;
 
     return (event) => {
       // largley adapted from Scryfall's site, if that changes
       // this may also need ot be updated
 
       if (!self.tooltipElement) {
-        return
+        return;
       }
 
       if (window.innerWidth < 768) {
         // window is too small to bother with presenting card image
-        return
+        return;
       }
 
-      self.triggerOnMouseover(el)
+      self.triggerOnMouseover(el);
 
       if (!self.img) {
-        return
+        return;
       }
 
-      if (self.tooltipElement.style.display !== 'block') {
-        self.tooltipElement.style.display = 'block'
+      if (self.tooltipElement.style.display !== "block") {
+        self.tooltipElement.style.display = "block";
       }
 
-      self.tooltipElement.style.left = event.pageX + 50 + 'px'
-      self.tooltipElement.style.top = event.pageY - 30 + 'px'
+      self.tooltipElement.style.left = event.pageX + 50 + "px";
+      self.tooltipElement.style.top = event.pageY - 30 + "px";
 
-      const cardToolTipImg = document.getElementById('card-tooltip-img')
+      const cardToolTipImg = document.getElementById("card-tooltip-img");
 
       if (cardToolTipImg.src !== self.img) {
-        const t = document.createElement('img')
-        t.id = 'card-tooltip-img'
-        t.className = 'card'
-        t.src = self.img
+        const t = document.createElement("img");
+        t.id = "card-tooltip-img";
+        t.className = "card";
+        t.src = self.img;
 
-        self.tooltipElement.removeChild(cardToolTipImg)
-        self.tooltipElement.appendChild(t)
+        self.tooltipElement.removeChild(cardToolTipImg);
+        self.tooltipElement.appendChild(t);
       }
-    }
+    };
   }
 
-  createMouseoutHandler (el) {
-    const self = this
+  createMouseoutHandler(el) {
+    const self = this;
 
     return () => {
       if (!self.tooltipElement) {
-        return
+        return;
       }
 
-      self.triggerOnMouseout(el)
+      self.triggerOnMouseout(el);
 
-      self.tooltipElement.style.display = 'none'
-    }
+      self.tooltipElement.style.display = "none";
+    };
   }
 
-  triggerOnMouseover (el) {
+  triggerOnMouseover(el) {
     if (!this._onMouseover) {
-      return
+      return;
     }
-    this._onMouseover(el)
+    this._onMouseover(el);
   }
 
-  triggerOnMouseout (el) {
+  triggerOnMouseout(el) {
     if (!this._onMouseout) {
-      return
+      return;
     }
-    this._onMouseout(el)
+    this._onMouseout(el);
   }
 }

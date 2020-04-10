@@ -3,7 +3,7 @@
 }
 
 .scryfall-search__hr {
-  border-bottom: 1px solid #E0DEE3;
+  border-bottom: 1px solid #e0dee3;
 }
 
 .scryfall-search__options-container {
@@ -11,8 +11,8 @@
 }
 
 .scryfall-search__external-link-icon {
-  display:inline-block;
-  width:12px;
+  display: inline-block;
+  width: 12px;
 }
 
 .scryfall-search__no-results {

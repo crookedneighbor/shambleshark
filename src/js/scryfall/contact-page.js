@@ -1,11 +1,11 @@
-import mutation from 'Lib/mutation'
-import createElement from 'Lib/create-element'
-import link from 'Browser/extensions-link'
+import mutation from "Lib/mutation";
+import createElement from "Lib/create-element";
+import link from "Browser/extensions-link";
 
-import './contact-page.css'
+import "./contact-page.css";
 
 export default function () {
-  mutation.ready('.control-panel-content', (panel) => {
+  mutation.ready(".control-panel-content", (panel) => {
     const warning = createElement(`<div class="form-n">
       <h1 class="form-n-title">IMPORTANT! Read this first!</h1>
 
@@ -20,8 +20,8 @@ export default function () {
           <b>Report an Issue with Shambleshark</b>
         </a>
       </div>
-    </div>`).firstChild
+    </div>`).firstChild;
 
-    panel.insertBefore(warning, panel.firstChild)
-  })
+    panel.insertBefore(warning, panel.firstChild);
+  });
 }

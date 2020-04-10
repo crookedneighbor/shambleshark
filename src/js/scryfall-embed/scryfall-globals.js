@@ -1,143 +1,141 @@
-import bus from 'framebus'
-import wait from 'Lib/wait'
-import url from 'Lib/url'
-import {
-  BUS_EVENTS as events
-} from 'Constants'
+import bus from "framebus";
+import wait from "Lib/wait";
+import url from "Lib/url";
+import { BUS_EVENTS as events } from "Constants";
 
-let getActiveDeckPromise = null
-let getDeckMetadataPromise = null
+let getActiveDeckPromise = null;
+let getDeckMetadataPromise = null;
 
-export function addHooksToCardManagementEvents () {
+export function addHooksToCardManagementEvents() {
   if (window.ScryfallAPI) {
     [
-      'addCard',
-      'updateEntry',
-      'replaceEntry',
-      'createEntry',
-      'destroyEntry'
-    ].forEach(method => {
-      const original = window.ScryfallAPI.decks[method]
+      "addCard",
+      "updateEntry",
+      "replaceEntry",
+      "createEntry",
+      "destroyEntry",
+    ].forEach((method) => {
+      const original = window.ScryfallAPI.decks[method];
       ScryfallAPI.decks[method] = function (deckId, payload, cb, ____) {
-        original(...arguments)
+        original(...arguments);
         bus.emit(events[`CALLED_${method.toUpperCase()}`], {
           deckId,
-          payload
-        })
-      }
-    })
+          payload,
+        });
+      };
+    });
   }
 
   if (window.Scryfall && window.Scryfall.deckbuilder) {
-    const originalCleanup = window.Scryfall.deckbuilder.cleanUp
+    const originalCleanup = window.Scryfall.deckbuilder.cleanUp;
     Scryfall.deckbuilder.cleanUp = function () {
-      originalCleanup(...arguments)
-      bus.emit(events.CALLED_CLEANUP)
-    }
+      originalCleanup(...arguments);
+      bus.emit(events.CALLED_CLEANUP);
+    };
   }
 }
 
-export function getDeckMetadata () {
+export function getDeckMetadata() {
   if (!getDeckMetadataPromise) {
-    getDeckMetadataPromise = getDeck().then(deck => {
+    getDeckMetadataPromise = getDeck().then((deck) => {
       return {
         id: deck.id,
-        sections: deck.sections
-      }
-    })
+        sections: deck.sections,
+      };
+    });
   }
 
-  return getDeckMetadataPromise
+  return getDeckMetadataPromise;
 }
 
-export function getActiveDeckId (waitTime = 300) {
+export function getActiveDeckId(waitTime = 300) {
   if (!ScryfallAPI.grantSecret) {
     return wait(waitTime).then(() => {
       // progressively wait longer and longer to try looking up the grant secret
-      return getActiveDeckId(waitTime * 2)
-    })
+      return getActiveDeckId(waitTime * 2);
+    });
   }
 
-  const deckIDFromUrl = url.getDeckId()
+  const deckIDFromUrl = url.getDeckId();
 
   if (deckIDFromUrl) {
-    return Promise.resolve(deckIDFromUrl)
+    return Promise.resolve(deckIDFromUrl);
   }
 
   if (Scryfall && Scryfall.deckbuilder && Scryfall.deckbuilder.deckId) {
-    return Promise.resolve(Scryfall.deckbuilder.deckId)
+    return Promise.resolve(Scryfall.deckbuilder.deckId);
   }
 
-  return getActiveDeck().then(({ id }) => id)
+  return getActiveDeck().then(({ id }) => id);
 }
 
-export function getActiveDeck () {
+export function getActiveDeck() {
   if (!getActiveDeckPromise) {
     getActiveDeckPromise = new Promise((resolve) => {
       ScryfallAPI.decks.active((deck) => {
-        resolve(deck)
-      })
-    })
+        resolve(deck);
+      });
+    });
   }
 
-  return getActiveDeckPromise
+  return getActiveDeckPromise;
 }
 
-export function reset () {
-  getActiveDeckPromise = null
-  getDeckMetadataPromise = null
+export function reset() {
+  getActiveDeckPromise = null;
+  getDeckMetadataPromise = null;
 }
 
-export function getDeck () {
+export function getDeck() {
   return getActiveDeckId().then((id) => {
     return new Promise((resolve) => {
       ScryfallAPI.decks.get(id, (deck) => {
-        resolve(deck)
-      })
-    })
-  })
+        resolve(deck);
+      });
+    });
+  });
 }
 
-export function addCard (cardId) {
+export function addCard(cardId) {
   return getActiveDeckId().then((id) => {
     return new Promise((resolve) => {
       ScryfallAPI.decks.addCard(id, cardId, (card) => {
-        resolve(card)
-      })
-    })
-  })
+        resolve(card);
+      });
+    });
+  });
 }
 
-export function updateEntry (cardToUpdate) {
+export function updateEntry(cardToUpdate) {
   return getActiveDeckId().then((id) => {
     return new Promise((resolve) => {
       ScryfallAPI.decks.updateEntry(id, cardToUpdate, (card) => {
-        resolve(card)
-      })
-    })
-  })
+        resolve(card);
+      });
+    });
+  });
 }
 
-export function removeEntry (cardId) {
+export function removeEntry(cardId) {
   return getActiveDeckId().then((id) => {
     return new Promise((resolve) => {
       ScryfallAPI.decks.destroyEntry(id, cardId, (card) => {
-        resolve()
-      })
-    })
-  })
+        resolve();
+      });
+    });
+  });
 }
 
-export function cleanUp () {
-  Scryfall.deckbuilder.cleanUp()
+export function cleanUp() {
+  Scryfall.deckbuilder.cleanUp();
 
-  return Promise.resolve()
+  return Promise.resolve();
 }
 
-export function pushNotification (title, message, color, type) {
-  Scryfall.pushNotification(title, message, color, type)
+export function pushNotification(title, message, color, type) {
+  Scryfall.pushNotification(title, message, color, type);
 
-  return Promise.resolve()
+  return Promise.resolve();
 }
 
 export default {
@@ -148,5 +146,5 @@ export default {
   getDeckMetadata,
   pushNotification,
   removeEntry,
-  updateEntry
-}
+  updateEntry,
+};

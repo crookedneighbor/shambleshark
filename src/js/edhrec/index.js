@@ -1,3 +1,3 @@
-import start from './ready'
+import start from "./ready";
 
-start()
+start();

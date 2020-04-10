@@ -1,19 +1,19 @@
-import wait from 'Lib/wait'
+import wait from "Lib/wait";
 
-describe('wait', function () {
-  it('wraps setTimeout in a promise', function () {
-    jest.spyOn(global, 'setTimeout')
+describe("wait", function () {
+  it("wraps setTimeout in a promise", function () {
+    jest.spyOn(global, "setTimeout");
 
     return wait(10).then(() => {
-      expect(global.setTimeout).toBeCalledWith(expect.any(Function), 10)
-    })
-  })
+      expect(global.setTimeout).toBeCalledWith(expect.any(Function), 10);
+    });
+  });
 
-  it('defautls wait time to 1', function () {
-    jest.spyOn(global, 'setTimeout')
+  it("defautls wait time to 1", function () {
+    jest.spyOn(global, "setTimeout");
 
     return wait().then(() => {
-      expect(global.setTimeout).toBeCalledWith(expect.any(Function), 1)
-    })
-  })
-})
+      expect(global.setTimeout).toBeCalledWith(expect.any(Function), 1);
+    });
+  });
+});

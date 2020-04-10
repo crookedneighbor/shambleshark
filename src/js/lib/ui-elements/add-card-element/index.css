@@ -27,7 +27,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background: #2B253A;
+  background: #2b253a;
   opacity: 0;
   color: white;
   font-size: 80px;
@@ -45,18 +45,18 @@
 }
 
 .add-card-element-container.in-deck .add-card-element-overlay {
-  opacity: .65;
+  opacity: 0.65;
 }
 
 .add-card-element-overlay:hover,
 .add-card-element-overlay:focus-within,
 .add-card-element-container.in-deck .add-card-element-overlay:hover,
 .add-card-element-container.in-deck .add-card-element-overlay:focus-within {
-  opacity: .85;
+  opacity: 0.85;
 }
 
 .add-card-element__panel {
-  opacity: .5;
+  opacity: 0.5;
   height: 50%;
 }
 

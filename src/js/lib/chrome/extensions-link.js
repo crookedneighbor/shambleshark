@@ -1,1 +1,1 @@
-export default 'chrome://extensions'
+export default "chrome://extensions";

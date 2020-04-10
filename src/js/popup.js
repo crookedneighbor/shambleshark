@@ -1,5 +1,3 @@
-import {
-  openOptionsPage
-} from 'Browser/runtime'
+import { openOptionsPage } from "Browser/runtime";
 
-openOptionsPage()
+openOptionsPage();

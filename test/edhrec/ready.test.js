@@ -1,109 +1,111 @@
-import start from 'Js/edhrec/ready'
-import iframe from 'Lib/iframe'
-import wait from 'Lib/wait'
-import bus from 'framebus'
+import start from "Js/edhrec/ready";
+import iframe from "Lib/iframe";
+import wait from "Lib/wait";
+import bus from "framebus";
 
-describe('EDHRec Ready', function () {
-  let replySpy, fetchSpy
+describe("EDHRec Ready", function () {
+  let replySpy, fetchSpy;
 
   beforeEach(function () {
-    jest.spyOn(iframe, 'isInsideIframe').mockReturnValue(true)
+    jest.spyOn(iframe, "isInsideIframe").mockReturnValue(true);
 
-    jest.spyOn(bus, 'on').mockImplementation((event, reply) => {
+    jest.spyOn(bus, "on").mockImplementation((event, reply) => {
       const response = {
-        commanders: ['Arjun, the Shifting Flame'],
-        cards: ['1 foo', '1 bar']
-      }
-      replySpy = jest.fn()
+        commanders: ["Arjun, the Shifting Flame"],
+        cards: ["1 foo", "1 bar"],
+      };
+      replySpy = jest.fn();
 
-      if (event === 'REQUEST_EDHREC_RECOMENDATIONS') {
-        reply(response, replySpy)
+      if (event === "REQUEST_EDHREC_RECOMENDATIONS") {
+        reply(response, replySpy);
       }
-    })
-    fetchSpy = jest.fn().mockResolvedValue('result')
+    });
+    fetchSpy = jest.fn().mockResolvedValue("result");
     // jest doesn't have fetch on the window
     global.fetch = jest.fn().mockResolvedValue({
-      json: fetchSpy
-    })
-  })
+      json: fetchSpy,
+    });
+  });
 
   afterEach(async function () {
     // allow pending promises to resolve
-    await wait()
-  })
+    await wait();
+  });
 
-  it('does not listen for recomendations if not in an iframe', function () {
-    iframe.isInsideIframe.mockReturnValue(false)
+  it("does not listen for recomendations if not in an iframe", function () {
+    iframe.isInsideIframe.mockReturnValue(false);
 
-    start()
+    start();
 
-    expect(bus.on).not.toBeCalled()
-  })
+    expect(bus.on).not.toBeCalled();
+  });
 
-  it('listens for recomendations', function () {
-    start()
+  it("listens for recomendations", function () {
+    start();
 
-    expect(bus.on).toBeCalledTimes(1)
-    expect(bus.on).toBeCalledWith('REQUEST_EDHREC_RECOMENDATIONS', expect.any(Function))
-  })
+    expect(bus.on).toBeCalledTimes(1);
+    expect(bus.on).toBeCalledWith(
+      "REQUEST_EDHREC_RECOMENDATIONS",
+      expect.any(Function)
+    );
+  });
 
-  it('requests recomendations from edhrec', function () {
-    start()
+  it("requests recomendations from edhrec", function () {
+    start();
 
-    expect(global.fetch).toBeCalledTimes(1)
-    expect(global.fetch).toBeCalledWith('https://edhrec.com/api/recs/', {
-      method: 'POST',
+    expect(global.fetch).toBeCalledTimes(1);
+    expect(global.fetch).toBeCalledWith("https://edhrec.com/api/recs/", {
+      method: "POST",
       body: JSON.stringify({
-        commanders: ['Arjun, the Shifting Flame'],
-        cards: ['1 foo', '1 bar'],
-        name: ''
+        commanders: ["Arjun, the Shifting Flame"],
+        cards: ["1 foo", "1 bar"],
+        name: "",
       }),
       headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-  })
+        "Content-Type": "application/json",
+      },
+    });
+  });
 
-  it('replies with response from edhrec', async function () {
-    start()
+  it("replies with response from edhrec", async function () {
+    start();
 
     // let request promise resolve
-    await wait()
+    await wait();
 
-    expect(replySpy).toBeCalledTimes(1)
-    expect(replySpy).toBeCalledWith([
-      null,
-      'result'
-    ])
-  })
+    expect(replySpy).toBeCalledTimes(1);
+    expect(replySpy).toBeCalledWith([null, "result"]);
+  });
 
-  it('sends back errors if request to edhrec resolves with errors', async function () {
+  it("sends back errors if request to edhrec resolves with errors", async function () {
     fetchSpy.mockResolvedValue({
-      errors: ['1 error', '2 error']
-    })
+      errors: ["1 error", "2 error"],
+    });
 
-    start()
-
-    // let request promise resolve
-    await wait()
-
-    expect(replySpy).toBeCalledTimes(1)
-    expect(replySpy).toBeCalledWith([{
-      errors: ['1 error', '2 error']
-    }])
-  })
-
-  it('sends back error in array if request to edhrec fails', async function () {
-    const err = new Error('fetch error')
-
-    global.fetch.mockRejectedValue(err)
-
-    start()
+    start();
 
     // let request promise resolve
-    await wait()
+    await wait();
 
-    expect(replySpy).toBeCalledTimes(1)
-    expect(replySpy).toBeCalledWith([err])
-  })
-})
+    expect(replySpy).toBeCalledTimes(1);
+    expect(replySpy).toBeCalledWith([
+      {
+        errors: ["1 error", "2 error"],
+      },
+    ]);
+  });
+
+  it("sends back error in array if request to edhrec fails", async function () {
+    const err = new Error("fetch error");
+
+    global.fetch.mockRejectedValue(err);
+
+    start();
+
+    // let request promise resolve
+    await wait();
+
+    expect(replySpy).toBeCalledTimes(1);
+    expect(replySpy).toBeCalledWith([err]);
+  });
+});

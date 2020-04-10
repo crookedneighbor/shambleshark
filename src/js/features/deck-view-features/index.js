@@ -1,8 +1,5 @@
-import DeckDisplay from './deck-display'
-import TokenList from './token-list'
-import './index.css'
+import DeckDisplay from "./deck-display";
+import TokenList from "./token-list";
+import "./index.css";
 
-export default [
-  DeckDisplay,
-  TokenList
-]
+export default [DeckDisplay, TokenList];
