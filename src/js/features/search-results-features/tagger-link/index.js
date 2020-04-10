@@ -103,7 +103,9 @@ class TaggerLink extends Feature {
     mutation.ready(".card-grid-item a.card-grid-item-card", (link) => {
       const button = this.makeButton(link.href);
 
-      link.parentNode.appendChild(button);
+      link.parentNode
+        .querySelector(".card-grid-item-card-faces")
+        .appendChild(button);
     });
   }
 

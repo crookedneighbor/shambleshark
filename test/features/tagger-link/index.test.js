@@ -105,8 +105,10 @@ describe("Tagger Link", function () {
       const tl = new TaggerLink();
       const el = document.createElement("div");
       el.classList.add("card-grid-item");
-      el.innerHTML =
-        '<a class="card-grid-item-card" href="https://scryfall.com/card/set/number"></a>';
+      el.innerHTML = `
+        <div class="card-grid-item-card-faces"></div>
+        <a class="card-grid-item-card" href="https://scryfall.com/card/set/number"></a>
+      `;
       const fakeBtn = document.createElement("button");
       fakeBtn.classList.add("tagger-link-button");
 

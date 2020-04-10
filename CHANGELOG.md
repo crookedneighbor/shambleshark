@@ -1,5 +1,10 @@
 ## Changelog
 
+# unreleased
+
+- Tagger Link
+  - Tagger button is now positioned correctly when sorting cards by spoiled date
+
 # 0.5.0 - Pre-release
 
 - Add warning on contact page (#37, #36)

@@ -1,12 +1,17 @@
+.card-grid-item:hover {
+  z-index: 9999;
+}
+
 .tagger-link-button.icon-only {
   padding: 7px !important;
   position: absolute;
   bottom: 10px;
   left: 10px;
   display: none;
+  z-index: 9999;
 }
 
-.card-grid-item:hover .tagger-link-button {
+.card-grid-item-card-faces:hover .tagger-link-button {
   display: block;
 }
 
