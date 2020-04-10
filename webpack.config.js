@@ -41,12 +41,12 @@ var options = {
     minimize: false
   },
   entry: {
-    popup: path.join(__dirname, 'src', 'js', 'popup.js'),
-    options: path.join(__dirname, 'src', 'js', 'options.js'),
-    background: path.join(__dirname, 'src', 'js', 'background.js'),
-    scryfallEmbed: path.join(__dirname, 'src', 'js', 'scryfall-embed', 'index.js'),
-    scryfall: path.join(__dirname, 'src', 'js', 'scryfall/index.js'),
-    edhrec: path.join(__dirname, 'src', 'js', 'edhrec/index.js')
+    popup: path.join(__dirname, 'src', 'js', 'popup.ts'),
+    options: path.join(__dirname, 'src', 'js', 'options', 'index.ts'),
+    background: path.join(__dirname, 'src', 'js', 'background.ts'),
+    scryfallEmbed: path.join(__dirname, 'src', 'js', 'scryfall-embed', 'index.ts'),
+    scryfall: path.join(__dirname, 'src', 'js', 'scryfall', 'index.ts'),
+    edhrec: path.join(__dirname, 'src', 'js', 'edhrec', 'index.ts')
   },
   output: {
     path: path.join(__dirname, 'build', BROWSER.toLowerCase()),
@@ -63,6 +63,11 @@ var options = {
             hmr: process.env.NODE_ENV !== 'production'
           }
         }, 'css-loader']
+      },
+      {
+        test: /\.tsx?$/,
+        use: 'ts-loader',
+        exclude: /node_modules/
       },
       {
         test: new RegExp('\.(' + fileExtensions.join('|') + ')$'), // eslint-disable-line
@@ -86,7 +91,8 @@ var options = {
     ]
   },
   resolve: {
-    alias: alias
+    alias: alias,
+    extensions: ['.ts', '.js']
   },
   plugins: [
     // clean the build folder

@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist/",
+    /* We don't actually want an implicit any, but in the interest of getting the typescript converstion started, going to go with it. Change this to true when ready to fully convert the project.*/
+    "noImplicitAny": false,
+    "module": "es6",
+    "target": "es2019",
+    "allowJs": true
+  }
+}
