@@ -1,6 +1,6 @@
 ## Changelog
 
-# unreleased
+# 0.5.0 - Pre-release
 
 - Add warning on contact page (#37, #36)
 - Add Token List feature (#3)
