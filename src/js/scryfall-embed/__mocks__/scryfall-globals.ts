@@ -10,6 +10,9 @@ export const removeEntry = jest.fn();
 export const cleanUp = jest.fn();
 export const pushNotification = jest.fn();
 
+// TODO moving to the mock style, we don't need to export a default
+// object anymore. When the code has been fully moved over, we can
+// remoe this bit
 export default {
   addCard,
   addHooksToCardManagementEvents,
