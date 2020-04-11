@@ -1,8 +1,17 @@
 import scryfall from "Js/scryfall-embed/scryfall-globals";
 import modifyCleanUp from "Js/scryfall-embed/modify-clean-up";
+import Deck from "Js/types/deck";
+import { Scryfall as ScryfallGlobal } from "Js/types/scryfall-globals";
+
+declare global {
+  interface Window {
+    Scryfall: any;
+  }
+}
 
 describe("modifyCleanUp", function () {
-  let originalCleanupFunction, fakeDeck;
+  let originalCleanupFunction: Function;
+  let fakeDeck: Deck;
 
   beforeEach(function () {
     fakeDeck = {
@@ -17,20 +26,20 @@ describe("modifyCleanUp", function () {
         maybeboard: [],
       },
     };
-    global.Scryfall = {
+    window.Scryfall = {
       deckbuilder: {
         cleanUp: jest.fn(),
       },
-    };
-    originalCleanupFunction = global.Scryfall.deckbuilder.cleanUp;
+    } as ScryfallGlobal;
+    originalCleanupFunction = window.Scryfall.deckbuilder.cleanUp;
     jest.spyOn(scryfall, "getDeck").mockResolvedValue(fakeDeck);
-    jest.spyOn(scryfall, "updateEntry").mockResolvedValue();
+    jest.spyOn(scryfall, "updateEntry").mockResolvedValue(null);
   });
 
   it("replaces the cleanup function", function () {
     modifyCleanUp();
 
-    const newCleanupFunction = global.Scryfall.deckbuilder.cleanUp;
+    const newCleanupFunction = window.Scryfall.deckbuilder.cleanUp;
 
     expect(newCleanupFunction).not.toEqual(originalCleanupFunction);
   });
@@ -71,7 +80,7 @@ describe("modifyCleanUp", function () {
       },
     ];
 
-    await global.Scryfall.deckbuilder.cleanUp();
+    await window.Scryfall.deckbuilder.cleanUp();
 
     expect(scryfall.updateEntry).toBeCalledTimes(2);
     expect(scryfall.updateEntry).toBeCalledWith({
@@ -126,7 +135,7 @@ describe("modifyCleanUp", function () {
       },
     ];
 
-    await global.Scryfall.deckbuilder.cleanUp();
+    await window.Scryfall.deckbuilder.cleanUp();
 
     expect(scryfall.updateEntry).toBeCalledTimes(2);
     expect(scryfall.updateEntry).toBeCalledWith({
@@ -174,7 +183,7 @@ describe("modifyCleanUp", function () {
       },
     ];
 
-    await global.Scryfall.deckbuilder.cleanUp();
+    await window.Scryfall.deckbuilder.cleanUp();
 
     expect(scryfall.updateEntry).toBeCalledTimes(1);
     expect(scryfall.updateEntry).toBeCalledWith({
@@ -215,7 +224,7 @@ describe("modifyCleanUp", function () {
       },
     ];
 
-    await global.Scryfall.deckbuilder.cleanUp();
+    await window.Scryfall.deckbuilder.cleanUp();
 
     expect(scryfall.updateEntry).toBeCalledTimes(0);
   });
@@ -249,7 +258,7 @@ describe("modifyCleanUp", function () {
     ];
     fakeDeck.entries.nonlands = [];
 
-    await global.Scryfall.deckbuilder.cleanUp();
+    await window.Scryfall.deckbuilder.cleanUp();
 
     expect(scryfall.updateEntry).toBeCalledTimes(0);
   });
@@ -283,7 +292,7 @@ describe("modifyCleanUp", function () {
       },
     ];
 
-    await global.Scryfall.deckbuilder.cleanUp();
+    await window.Scryfall.deckbuilder.cleanUp();
 
     expect(scryfall.updateEntry).toBeCalledTimes(1);
     expect(scryfall.updateEntry).toBeCalledWith({
@@ -338,7 +347,7 @@ describe("modifyCleanUp", function () {
     ];
     fakeDeck.entries.nonlands = [];
 
-    await global.Scryfall.deckbuilder.cleanUp();
+    await window.Scryfall.deckbuilder.cleanUp();
 
     expect(scryfall.updateEntry).toBeCalledTimes(0);
   });
@@ -386,7 +395,7 @@ describe("modifyCleanUp", function () {
       },
     ];
 
-    await global.Scryfall.deckbuilder.cleanUp();
+    await window.Scryfall.deckbuilder.cleanUp();
 
     expect(scryfall.updateEntry).toBeCalledTimes(3);
     expect(scryfall.updateEntry).toBeCalledWith({
@@ -446,7 +455,7 @@ describe("modifyCleanUp", function () {
       },
     ];
 
-    await global.Scryfall.deckbuilder.cleanUp();
+    await window.Scryfall.deckbuilder.cleanUp();
 
     expect(scryfall.updateEntry).toBeCalledTimes(0);
   });
