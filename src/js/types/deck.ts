@@ -1,8 +1,27 @@
-export default interface Deck {
+type sections =
+  | "commanders"
+  | "lands"
+  | "mainboard"
+  | "maybeboard"
+  | "nonlands"
+  | "sideboard";
+
+export interface Card {
+  id: string;
+  section: sections;
+  card_digest?: {
+    type_line: string;
+  };
+  [propName: string]: any;
+}
+
+export interface Deck {
   id: string;
   sections: {
-    primary: string[];
-    secondary: string[];
+    primary: sections[];
+    secondary: sections[];
   };
-  entries: Record<string, any[]>;
+  entries: {
+    [section in sections]?: Card[];
+  };
 }

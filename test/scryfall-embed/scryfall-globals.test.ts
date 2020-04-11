@@ -13,7 +13,11 @@ import {
   updateEntry,
 } from "Js/scryfall-embed/scryfall-globals";
 
-import Deck from "Js/types/deck";
+import { Deck } from "Js/types/deck";
+import {
+  generateScryfallGlobal,
+  generateScryfallAPIGlobal,
+} from "../mocks/scryfall-global";
 
 declare global {
   interface Window {
@@ -39,29 +43,17 @@ describe("Scryfall Globals", function () {
         maybeboard: [],
       },
     };
-    window.ScryfallAPI = {
-      grantSecret: "secret",
-      decks: {
-        active: jest.fn().mockImplementation((cb) => {
-          cb(fakeDeck);
-        }),
-        addCard: jest.fn(),
-        createEntry: jest.fn(),
-        destroyEntry: jest.fn(),
-        replaceEntry: jest.fn(),
-        get: jest.fn().mockImplementation((id, cb) => {
-          cb(fakeDeck);
-        }),
-        updateEntry: jest.fn(),
-      },
-    };
+    window.ScryfallAPI = generateScryfallAPIGlobal();
+    window.ScryfallAPI.decks.active.mockImplementation((cb: Function) => {
+      cb(fakeDeck);
+    });
+    window.ScryfallAPI.decks.get.mockImplementation(
+      (id: string, cb: Function) => {
+        cb(fakeDeck);
+      }
+    );
 
-    window.Scryfall = {
-      deckbuilder: {
-        cleanUp: jest.fn(),
-      },
-      pushNotification: jest.fn(),
-    };
+    window.Scryfall = generateScryfallGlobal();
   });
 
   describe("addHooksToCardManagementEvents", function () {

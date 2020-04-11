@@ -1,7 +1,8 @@
 import scryfall from "Js/scryfall-embed/scryfall-globals";
 import modifyCleanUp from "Js/scryfall-embed/modify-clean-up";
-import Deck from "Js/types/deck";
-import { Scryfall as ScryfallGlobal } from "Js/types/scryfall-globals";
+
+import { Deck } from "Js/types/deck";
+import { generateScryfallGlobal } from "../mocks/scryfall-global";
 
 declare global {
   interface Window {
@@ -26,11 +27,7 @@ describe("modifyCleanUp", function () {
         maybeboard: [],
       },
     };
-    window.Scryfall = {
-      deckbuilder: {
-        cleanUp: jest.fn(),
-      },
-    } as ScryfallGlobal;
+    window.Scryfall = generateScryfallGlobal();
     originalCleanupFunction = window.Scryfall.deckbuilder.cleanUp;
     jest.spyOn(scryfall, "getDeck").mockResolvedValue(fakeDeck);
     jest.spyOn(scryfall, "updateEntry").mockResolvedValue(null);
