@@ -12,8 +12,8 @@ export async function create({ src, id }) {
   });
 }
 
-export function isInsideIframe(windowContext = window) {
-  return windowContext.location !== windowContext.parent.location;
+export function isInsideIframe() {
+  return window.location !== window.parent.location;
 }
 
 export default {

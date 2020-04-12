@@ -10,6 +10,8 @@ import {
 } from "Lib/deck-parser";
 import { api as scryfall } from "Lib/scryfall";
 
+import { Deck } from "Js/types/deck";
+
 describe("Deck Parser", function () {
   describe("getCommanderColorIdentity", function () {
     beforeEach(function () {
@@ -21,7 +23,9 @@ describe("Deck Parser", function () {
         entries: {
           commanders: [
             {
-              card_digest: { oracle_id: "id-1" },
+              id: "id",
+              section: "commanders",
+              card_digest: { oracle_id: "id-1", type_line: "type" },
             },
           ],
         },
@@ -47,13 +51,19 @@ describe("Deck Parser", function () {
         entries: {
           commanders: [
             {
-              card_digest: { oracle_id: "id-1" },
+              id: "1",
+              section: "commanders",
+              card_digest: { oracle_id: "id-1", type_line: "type" },
             },
             {
-              card_digest: { oracle_id: "id-2" },
+              id: "2",
+              section: "commanders",
+              card_digest: { oracle_id: "id-2", type_line: "type" },
             },
             {
-              card_digest: { oracle_id: "id-3" },
+              id: "3",
+              section: "commanders",
+              card_digest: { oracle_id: "id-3", type_line: "type" },
             },
           ],
         },
@@ -85,7 +95,9 @@ describe("Deck Parser", function () {
         entries: {
           commanders: [
             {
-              card_digest: { oracle_id: "id-1" },
+              id: "1",
+              section: "commanders",
+              card_digest: { oracle_id: "id-1", type_line: "type" },
             },
           ],
         },
@@ -107,13 +119,19 @@ describe("Deck Parser", function () {
         entries: {
           commanders: [
             {
-              card_digest: { oracle_id: "id-1" },
+              id: "1",
+              section: "commanders",
+              card_digest: { oracle_id: "id-1", type_line: "type" },
             },
             {
+              id: "2",
+              section: "commanders",
               // no card digetst
             },
             {
-              card_digest: { oracle_id: "id-3" },
+              id: "3",
+              section: "commanders",
+              card_digest: { oracle_id: "id-3", type_line: "type" },
             },
           ],
         },
@@ -141,10 +159,12 @@ describe("Deck Parser", function () {
   describe("getSections", function () {
     it("returns a flattened array of deck sections", function () {
       const fakeDeck = {
+        id: "fake-id",
         sections: {
           primary: ["1", "2"],
           secondary: ["3", "4"],
         },
+        entries: {},
       };
 
       expect(getSections(fakeDeck)).toEqual(["1", "2", "3", "4"]);
@@ -156,6 +176,7 @@ describe("Deck Parser", function () {
       expect(
         isLandCard({
           card_digest: {
+            oracle_id: "id",
             type_line: "Enchantment",
           },
         })
@@ -166,6 +187,7 @@ describe("Deck Parser", function () {
       expect(
         isLandCard({
           card_digest: {
+            oracle_id: "id",
             type_line: "Land",
           },
         })
@@ -176,6 +198,7 @@ describe("Deck Parser", function () {
       expect(
         isLandCard({
           card_digest: {
+            oracle_id: "id",
             type_line: "Enchantment // Land",
           },
         })
@@ -186,6 +209,7 @@ describe("Deck Parser", function () {
       expect(
         isLandCard({
           card_digest: {
+            oracle_id: "id",
             type_line: "Land // Creature",
           },
         })
@@ -196,6 +220,7 @@ describe("Deck Parser", function () {
       expect(
         isLandCard({
           card_digest: {
+            oracle_id: "id",
             type_line: "Land Creature",
           },
         })
@@ -206,6 +231,7 @@ describe("Deck Parser", function () {
       expect(
         isLandCard({
           card_digest: {
+            oracle_id: "id",
             type_line: "Land // Creature",
           },
         })
@@ -238,69 +264,78 @@ describe("Deck Parser", function () {
   });
 
   describe("flattenEntries", function () {
-    let fakeDeck;
+    let fakeDeck: Deck;
 
     beforeEach(function () {
       fakeDeck = {
+        id: "fake-id",
         sections: {
-          primary: ["1", "2"],
-          secondary: ["3", "4"],
+          primary: ["commanders", "nonlands"],
+          secondary: ["lands", "maybeboard"],
         },
         entries: {
-          1: [
+          commanders: [
             {
               id: "id-1",
               raw_text: "text",
+              section: "commanders",
               count: 1,
-              card_digest: { oracle_id: "oracle-1" },
+              card_digest: { oracle_id: "oracle-1", type_line: "type" },
             },
             {
               id: "id-2",
               raw_text: "text",
+              section: "commanders",
               count: 1,
-              card_digest: { oracle_id: "oracle-2" },
+              card_digest: { oracle_id: "oracle-2", type_line: "type" },
             },
           ],
-          2: [
+          nonlands: [
             {
               id: "id-3",
               raw_text: "text",
+              section: "nonlands",
               count: 1,
-              card_digest: { oracle_id: "oracle-3" },
+              card_digest: { oracle_id: "oracle-3", type_line: "type" },
             },
             {
               id: "id-4",
               raw_text: "text",
+              section: "nonlands",
               count: 1,
-              card_digest: { oracle_id: "oracle-4" },
+              card_digest: { oracle_id: "oracle-4", type_line: "type" },
             },
           ],
-          3: [
+          lands: [
             {
               id: "id-5",
               raw_text: "text",
+              section: "lands",
               count: 1,
-              card_digest: { oracle_id: "oracle-5" },
+              card_digest: { oracle_id: "oracle-5", type_line: "type" },
             },
             {
               id: "id-6",
               raw_text: "text",
+              section: "lands",
               count: 1,
-              card_digest: { oracle_id: "oracle-6" },
+              card_digest: { oracle_id: "oracle-6", type_line: "type" },
             },
           ],
-          4: [
+          maybeboard: [
             {
               id: "id-7",
               raw_text: "text",
+              section: "maybeboard",
               count: 1,
-              card_digest: { oracle_id: "oracle-7" },
+              card_digest: { oracle_id: "oracle-7", type_line: "type" },
             },
             {
               id: "id-8",
+              section: "maybeboard",
               raw_text: "text",
               count: 1,
-              card_digest: { oracle_id: "oracle-8" },
+              card_digest: { oracle_id: "oracle-8", type_line: "type" },
             },
           ],
         },
@@ -314,61 +349,71 @@ describe("Deck Parser", function () {
       expect(entries).toContainEqual({
         id: "id-1",
         raw_text: "text",
+        section: "commanders",
         count: 1,
-        card_digest: { oracle_id: "oracle-1" },
+        card_digest: { oracle_id: "oracle-1", type_line: "type" },
       });
       expect(entries).toContainEqual({
         id: "id-2",
         raw_text: "text",
+        section: "commanders",
         count: 1,
-        card_digest: { oracle_id: "oracle-2" },
+        card_digest: { oracle_id: "oracle-2", type_line: "type" },
       });
       expect(entries).toContainEqual({
         id: "id-3",
         raw_text: "text",
+        section: "nonlands",
         count: 1,
-        card_digest: { oracle_id: "oracle-3" },
+        card_digest: { oracle_id: "oracle-3", type_line: "type" },
       });
       expect(entries).toContainEqual({
         id: "id-4",
         raw_text: "text",
+        section: "nonlands",
         count: 1,
-        card_digest: { oracle_id: "oracle-4" },
+        card_digest: { oracle_id: "oracle-4", type_line: "type" },
       });
       expect(entries).toContainEqual({
         id: "id-5",
         raw_text: "text",
+        section: "lands",
         count: 1,
-        card_digest: { oracle_id: "oracle-5" },
+        card_digest: { oracle_id: "oracle-5", type_line: "type" },
       });
       expect(entries).toContainEqual({
         id: "id-6",
         raw_text: "text",
+        section: "lands",
         count: 1,
-        card_digest: { oracle_id: "oracle-6" },
+        card_digest: { oracle_id: "oracle-6", type_line: "type" },
       });
       expect(entries).toContainEqual({
         id: "id-7",
         raw_text: "text",
+        section: "maybeboard",
         count: 1,
-        card_digest: { oracle_id: "oracle-7" },
+        card_digest: { oracle_id: "oracle-7", type_line: "type" },
       });
       expect(entries).toContainEqual({
         id: "id-8",
         raw_text: "text",
+        section: "maybeboard",
         count: 1,
-        card_digest: { oracle_id: "oracle-8" },
+        card_digest: { oracle_id: "oracle-8", type_line: "type" },
       });
     });
 
     it("by default collapses cards with the same orracle id in multiple entries in sections into one", function () {
-      fakeDeck.entries["3"] = [
+      fakeDeck.entries.lands = [
         {
           id: "id-2",
           raw_text: "text",
+          section: "lands",
           count: 2,
           card_digest: {
             oracle_id: "oracle-2",
+            type_line: "type",
           },
         },
       ];
@@ -380,48 +425,56 @@ describe("Deck Parser", function () {
         id: "id-1",
         raw_text: "text",
         count: 1,
-        card_digest: { oracle_id: "oracle-1" },
+        section: "commanders",
+        card_digest: { oracle_id: "oracle-1", type_line: "type" },
       });
       expect(entries).toContainEqual({
         id: "id-2",
         raw_text: "text",
+        section: "commanders",
         count: 3,
-        card_digest: { oracle_id: "oracle-2" },
+        card_digest: { oracle_id: "oracle-2", type_line: "type" },
       });
       expect(entries).toContainEqual({
         id: "id-3",
         raw_text: "text",
+        section: "nonlands",
         count: 1,
-        card_digest: { oracle_id: "oracle-3" },
+        card_digest: { oracle_id: "oracle-3", type_line: "type" },
       });
       expect(entries).toContainEqual({
         id: "id-4",
         raw_text: "text",
+        section: "nonlands",
         count: 1,
-        card_digest: { oracle_id: "oracle-4" },
+        card_digest: { oracle_id: "oracle-4", type_line: "type" },
       });
       expect(entries).toContainEqual({
         id: "id-7",
         raw_text: "text",
+        section: "maybeboard",
         count: 1,
-        card_digest: { oracle_id: "oracle-7" },
+        card_digest: { oracle_id: "oracle-7", type_line: "type" },
       });
       expect(entries).toContainEqual({
         id: "id-8",
         raw_text: "text",
+        section: "maybeboard",
         count: 1,
-        card_digest: { oracle_id: "oracle-8" },
+        card_digest: { oracle_id: "oracle-8", type_line: "type" },
       });
     });
 
     it("can specify to collapse by id", function () {
-      fakeDeck.entries["3"] = [
+      fakeDeck.entries.lands = [
         {
           id: "id-9",
           count: 2,
+          section: "lands",
           raw_text: "text",
           card_digest: {
             oracle_id: "oracle-2",
+            type_line: "type",
           },
         },
       ];
@@ -434,55 +487,64 @@ describe("Deck Parser", function () {
       expect(entries).toContainEqual({
         id: "id-1",
         raw_text: "text",
+        section: "commanders",
         count: 1,
-        card_digest: { oracle_id: "oracle-1" },
+        card_digest: { oracle_id: "oracle-1", type_line: "type" },
       });
       expect(entries).toContainEqual({
         id: "id-2",
         raw_text: "text",
+        section: "commanders",
         count: 1,
-        card_digest: { oracle_id: "oracle-2" },
+        card_digest: { oracle_id: "oracle-2", type_line: "type" },
       });
       expect(entries).toContainEqual({
         id: "id-9",
         raw_text: "text",
+        section: "lands",
         count: 2,
-        card_digest: { oracle_id: "oracle-2" },
+        card_digest: { oracle_id: "oracle-2", type_line: "type" },
       });
       expect(entries).toContainEqual({
         id: "id-3",
         raw_text: "text",
+        section: "nonlands",
         count: 1,
-        card_digest: { oracle_id: "oracle-3" },
+        card_digest: { oracle_id: "oracle-3", type_line: "type" },
       });
       expect(entries).toContainEqual({
         id: "id-4",
         raw_text: "text",
+        section: "nonlands",
         count: 1,
-        card_digest: { oracle_id: "oracle-4" },
+        card_digest: { oracle_id: "oracle-4", type_line: "type" },
       });
       expect(entries).toContainEqual({
         id: "id-7",
         raw_text: "text",
+        section: "maybeboard",
         count: 1,
-        card_digest: { oracle_id: "oracle-7" },
+        card_digest: { oracle_id: "oracle-7", type_line: "type" },
       });
       expect(entries).toContainEqual({
         id: "id-8",
         raw_text: "text",
+        section: "maybeboard",
         count: 1,
-        card_digest: { oracle_id: "oracle-8" },
+        card_digest: { oracle_id: "oracle-8", type_line: "type" },
       });
     });
 
     it("ignores entries without raw_text when grouping by id", function () {
-      fakeDeck.entries["3"] = [
+      fakeDeck.entries.lands = [
         {
           id: "id-9",
+          section: "lands",
           count: 2,
           raw_text: "",
           card_digest: {
             oracle_id: "oracle-2",
+            type_line: "type",
           },
         },
       ];
@@ -495,73 +557,83 @@ describe("Deck Parser", function () {
       expect(entries).toContainEqual({
         id: "id-1",
         raw_text: "text",
+        section: "commanders",
         count: 1,
-        card_digest: { oracle_id: "oracle-1" },
+        card_digest: { oracle_id: "oracle-1", type_line: "type" },
       });
       expect(entries).toContainEqual({
         id: "id-2",
         raw_text: "text",
+        section: "commanders",
         count: 1,
-        card_digest: { oracle_id: "oracle-2" },
+        card_digest: { oracle_id: "oracle-2", type_line: "type" },
       });
       expect(entries).toContainEqual({
         id: "id-3",
         raw_text: "text",
+        section: "nonlands",
         count: 1,
-        card_digest: { oracle_id: "oracle-3" },
+        card_digest: { oracle_id: "oracle-3", type_line: "type" },
       });
       expect(entries).toContainEqual({
         id: "id-4",
         raw_text: "text",
+        section: "nonlands",
         count: 1,
-        card_digest: { oracle_id: "oracle-4" },
+        card_digest: { oracle_id: "oracle-4", type_line: "type" },
       });
       expect(entries).toContainEqual({
         id: "id-7",
         raw_text: "text",
+        section: "maybeboard",
         count: 1,
-        card_digest: { oracle_id: "oracle-7" },
+        card_digest: { oracle_id: "oracle-7", type_line: "type" },
       });
       expect(entries).toContainEqual({
         id: "id-8",
         raw_text: "text",
+        section: "maybeboard",
         count: 1,
-        card_digest: { oracle_id: "oracle-8" },
+        card_digest: { oracle_id: "oracle-8", type_line: "type" },
       });
     });
 
     it("can ignore sections", function () {
       const entries = flattenEntries(fakeDeck, {
         ignoredSections: {
-          1: true,
-          3: true,
+          commanders: true,
+          lands: true,
         },
       });
 
       expect(entries.length).toBe(4);
       expect(entries).toContainEqual({
         id: "id-3",
+        section: "nonlands",
         raw_text: "text",
         count: 1,
-        card_digest: { oracle_id: "oracle-3" },
+        card_digest: { oracle_id: "oracle-3", type_line: "type" },
       });
       expect(entries).toContainEqual({
         id: "id-4",
+        section: "nonlands",
         raw_text: "text",
         count: 1,
-        card_digest: { oracle_id: "oracle-4" },
+        card_digest: { oracle_id: "oracle-4", type_line: "type" },
       });
       expect(entries).toContainEqual({
         id: "id-7",
+        section: "maybeboard",
         raw_text: "text",
         count: 1,
-        card_digest: { oracle_id: "oracle-7" },
+        card_digest: { oracle_id: "oracle-7", type_line: "type" },
       });
       expect(entries).toContainEqual({
         id: "id-8",
         raw_text: "text",
+        section: "maybeboard",
         count: 1,
-        card_digest: { oracle_id: "oracle-8" },
+        card_digest: { oracle_id: "oracle-8", type_line: "type" },
       });
     });
   });
@@ -572,7 +644,7 @@ describe("Deck Parser", function () {
     });
 
     it("returns false if deck has a commanders section, but no commanders", async function () {
-      const commanders = [];
+      const commanders: string[] = [];
 
       await expect(hasLegalCommanders(commanders)).resolves.toBe(false);
     });

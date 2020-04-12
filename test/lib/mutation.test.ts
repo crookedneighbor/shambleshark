@@ -28,11 +28,11 @@ describe("mutation", function () {
     it("only creates observer once", function () {
       const spy = jest.fn();
 
-      jest.spyOn(global.MutationObserver.prototype, "observe");
+      jest.spyOn(window.MutationObserver.prototype, "observe");
       ready(".class-name", spy);
 
-      expect(global.MutationObserver.prototype.observe).toBeCalledTimes(1);
-      expect(global.MutationObserver.prototype.observe).toBeCalledWith(
+      expect(window.MutationObserver.prototype.observe).toBeCalledTimes(1);
+      expect(window.MutationObserver.prototype.observe).toBeCalledWith(
         document.documentElement,
         {
           childList: true,
@@ -42,7 +42,7 @@ describe("mutation", function () {
 
       ready(".another-class-name", spy);
 
-      expect(global.MutationObserver.prototype.observe).toBeCalledTimes(1);
+      expect(window.MutationObserver.prototype.observe).toBeCalledTimes(1);
     });
 
     it("applies transformation to specified DOM nodes only once", function () {
@@ -106,12 +106,12 @@ describe("mutation", function () {
       node.id = "parent";
       document.body.appendChild(node);
 
-      jest.spyOn(global.MutationObserver.prototype, "observe");
+      jest.spyOn(window.MutationObserver.prototype, "observe");
 
       change("#parent", jest.fn());
 
-      expect(global.MutationObserver.prototype.observe).toBeCalledTimes(2);
-      expect(global.MutationObserver.prototype.observe).toBeCalledWith(node, {
+      expect(window.MutationObserver.prototype.observe).toBeCalledTimes(2);
+      expect(window.MutationObserver.prototype.observe).toBeCalledWith(node, {
         childList: true,
         subtree: true,
       });

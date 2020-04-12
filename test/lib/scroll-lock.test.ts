@@ -2,11 +2,11 @@ import scrollLock from "Lib/scroll-lock";
 
 describe("scrollLock", function () {
   beforeEach(function () {
-    global.scrollTo.mockClear();
+    (window.scrollTo as jest.Mock).mockClear();
   });
 
   it("freezes body to scrollY position when locked is set to true", function () {
-    global.scrollY = 13;
+    (window as any).scrollY = 13;
     expect(document.body.style.width).toEqual("");
     expect(document.body.style.position).toEqual("");
     expect(document.body.style.top).toEqual("");
@@ -28,8 +28,8 @@ describe("scrollLock", function () {
     expect(document.body.style.width).toEqual("");
     expect(document.body.style.position).toEqual("");
     expect(document.body.style.top).toEqual("");
-    expect(global.scrollTo).toBeCalledTimes(1);
-    expect(global.scrollTo).toBeCalledWith(0, 13);
+    expect(window.scrollTo).toBeCalledTimes(1);
+    expect(window.scrollTo).toBeCalledWith(0, 13);
   });
 
   it("does not scroll if body has no top attribute when locked is set to false", function () {
@@ -37,6 +37,6 @@ describe("scrollLock", function () {
 
     scrollLock(false);
 
-    expect(global.scrollTo).toBeCalledTimes(0);
+    expect(window.scrollTo).toBeCalledTimes(0);
   });
 });

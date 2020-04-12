@@ -9,7 +9,10 @@ type sections =
 export interface Card {
   id: string;
   section: sections;
+  raw_text: string;
+  count?: number;
   card_digest?: {
+    oracle_id: string;
     type_line: string;
   };
   [propName: string]: any;
