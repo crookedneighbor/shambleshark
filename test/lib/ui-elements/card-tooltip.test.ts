@@ -13,7 +13,7 @@ describe("CardTooltip", function () {
   });
 
   describe("findTooltip", function () {
-    let tooltip, fakeElement;
+    let tooltip: CardTooltip, fakeElement: HTMLElement;
 
     beforeEach(function () {
       fakeElement = document.createElement("div");
@@ -21,7 +21,7 @@ describe("CardTooltip", function () {
         cb(fakeElement);
       });
       tooltip = new CardTooltip();
-      tooltip.findTooltip.mockRestore();
+      (tooltip.findTooltip as jest.Mock).mockRestore();
     });
 
     afterEach(function () {
@@ -42,7 +42,7 @@ describe("CardTooltip", function () {
       tooltip.findTooltip();
 
       expect(mutation.ready).toBeCalledTimes(1);
-      mutation.ready.mockClear();
+      (mutation.ready as jest.Mock).mockClear();
 
       tooltip.findTooltip();
 
@@ -51,7 +51,7 @@ describe("CardTooltip", function () {
   });
 
   describe("addElement", function () {
-    let tooltip;
+    let tooltip: CardTooltip;
 
     beforeEach(function () {
       tooltip = new CardTooltip();
@@ -97,7 +97,7 @@ describe("CardTooltip", function () {
   });
 
   describe("removeElement", function () {
-    let tooltip;
+    let tooltip: CardTooltip;
 
     beforeEach(function () {
       tooltip = new CardTooltip();
@@ -161,7 +161,13 @@ describe("CardTooltip", function () {
   });
 
   describe("createMousemoveHandler", function () {
-    let tooltip, el, fakeEvent, mousemoveSpy;
+    let tooltip: CardTooltip;
+    let el: HTMLElement;
+    let fakeEvent: {
+      pageX: number;
+      pageY: number;
+    };
+    let mousemoveSpy: jest.Mock;
 
     beforeEach(function () {
       mousemoveSpy = jest.fn();
@@ -200,13 +206,19 @@ describe("CardTooltip", function () {
       const originalWidth = window.innerWidth;
       const handler = tooltip.createMousemoveHandler(el);
 
-      window.innerWidth = 600;
+      Object.defineProperty(window, "innerWidth", {
+        writable: true,
+        value: 600,
+      });
 
       handler(fakeEvent);
 
       expect(tooltip.tooltipElement.style.display).not.toBe("block");
 
-      window.innerWidth = originalWidth;
+      Object.defineProperty(window, "innerWidth", {
+        writable: true,
+        value: originalWidth,
+      });
     });
 
     it("noops when there is no img", function () {
@@ -228,9 +240,9 @@ describe("CardTooltip", function () {
       expect(tooltip.tooltipElement.style.left).toBe("150px");
       expect(tooltip.tooltipElement.style.top).toBe("70px");
 
-      expect(document.getElementById("card-tooltip-img").src).toBe(
-        "https://example.com/image.png"
-      );
+      expect(
+        (document.getElementById("card-tooltip-img") as HTMLImageElement).src
+      ).toBe("https://example.com/image.png");
     });
 
     it("calls onMousemove callback with element if provided", function () {
@@ -244,7 +256,7 @@ describe("CardTooltip", function () {
   });
 
   describe("createMouseoutHandler", function () {
-    let tooltip, el;
+    let tooltip: CardTooltip, el: HTMLElement;
 
     beforeEach(function () {
       tooltip = new CardTooltip();

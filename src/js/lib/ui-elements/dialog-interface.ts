@@ -5,8 +5,35 @@ function noop() {
   // do nothing!
 }
 
-export default class DialogInterface {
-  constructor(options = {}) {
+export type DialogInterfaceOptions = {
+  content?: string;
+  header?: string;
+  headerSymbol?: string;
+  id?: string;
+  loadingMessage?: string;
+  onClose?: Function;
+  onOpen?: Function;
+  onScroll?: Function;
+  open?: boolean;
+  resetContentOnClose?: boolean;
+};
+
+export default abstract class DialogInterface {
+  _isOpen: boolean;
+  _originalContent: string;
+  _resetContentOnClose: boolean;
+  _onClose: Function;
+  _onOpen: Function;
+  _onScroll: Function;
+  _originalHeaderText: string;
+  _contentNodeContainer: HTMLElement;
+  _contentNode: HTMLElement;
+  _loaderNode: HTMLElement;
+  _headerNode: HTMLElement;
+
+  element: HTMLElement;
+
+  constructor(options: DialogInterfaceOptions = {}) {
     this._isOpen = false;
     this._originalContent = options.content || "";
     this._resetContentOnClose = Boolean(options.resetContentOnClose);
@@ -14,7 +41,7 @@ export default class DialogInterface {
     this._onOpen = options.onOpen || noop;
     this._onScroll = options.onScroll || noop;
 
-    this._originalHeaderText = options.header;
+    this._originalHeaderText = options.header || "";
 
     this.element = this._constructElement(options);
     this.element.addEventListener("click", (evt) => {
@@ -24,22 +51,22 @@ export default class DialogInterface {
 
       this.close();
     });
-    this.element.id = options.id;
+    if (options.id) {
+      this.element.id = options.id;
+    }
     document.addEventListener("keyup", this._onEscKey.bind(this));
 
-    this._contentNodeContainer = this.element.querySelector(
-      ".dialog-content-container"
-    );
+    this._contentNodeContainer = this.$(".dialog-content-container");
     this._contentNode = this._contentNodeContainer.querySelector(
       ".dialog-content"
-    );
+    ) as HTMLElement;
     this.setContent(this._originalContent);
-    this._loaderNode = this.element.querySelector(".dialog-loader");
+    this._loaderNode = this.$(".dialog-loader");
     this._loaderNode.setAttribute(
       "aria-label",
       options.loadingMessage || "Loading"
     );
-    this._headerNode = this.element.querySelector(".dialog-title-content");
+    this._headerNode = this.$(".dialog-title-content");
     this.setHeader(this._originalHeaderText);
 
     if (!options.open) {
@@ -47,7 +74,11 @@ export default class DialogInterface {
     }
   }
 
-  setContent(content) {
+  $(selector: string) {
+    return this.element.querySelector(selector) as HTMLElement;
+  }
+
+  setContent(content: string | HTMLElement) {
     emptyElement(this._contentNode);
 
     if (typeof content === "string") {
@@ -61,12 +92,12 @@ export default class DialogInterface {
     this.setHeader(this._originalHeaderText);
   }
 
-  setHeader(value) {
+  setHeader(value: string) {
     this._headerNode.innerText = value;
   }
 
-  setLoading(state) {
-    const closeBtn = this.element.querySelector(".dialog-close");
+  setLoading(state: boolean) {
+    const closeBtn = this.$(".dialog-close");
 
     if (state) {
       this._contentNodeContainer.classList.add("loading");
@@ -89,7 +120,7 @@ export default class DialogInterface {
 
     this.triggerOnOpen();
 
-    this.element.querySelector(".dialog-close").focus();
+    this.$(".dialog-close").focus();
   }
 
   close() {
@@ -116,7 +147,7 @@ export default class DialogInterface {
     return this._onScroll(this);
   }
 
-  _onEscKey(event) {
+  _onEscKey(event: KeyboardEvent) {
     if (!this._isOpen) {
       return;
     }
@@ -128,7 +159,7 @@ export default class DialogInterface {
     }
   }
 
-  _getCloseButtonMessage(isLoading) {
+  _getCloseButtonMessage(isLoading?: boolean) {
     if (isLoading) {
       return "The dialog is loading. You may cancel this dialog by using this button.";
     } else {
@@ -136,11 +167,9 @@ export default class DialogInterface {
     }
   }
 
-  _constructElement(options) {
-    throw new Error("Not implemented");
-  }
+  abstract _constructElement(options: DialogInterfaceOptions): HTMLElement;
 
-  scrollTo(x, y) {
+  scrollTo(x: number, y: number) {
     this.element.scrollTo(x, y);
   }
 }

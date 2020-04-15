@@ -1,9 +1,36 @@
-import DialogInterface from "./dialog-interface";
+import DialogInterface, { DialogInterfaceOptions } from "./dialog-interface";
 import createElement from "Lib/create-element";
 import "./drawer.css";
 import { SPINNER_GIF } from "Constants";
 
+interface DrawerOptions extends DialogInterfaceOptions {
+  position?: string;
+  onScroll?: Function;
+  contentMessage?: string;
+}
+
 export default class Drawer extends DialogInterface {
+  _scrollableEl: HTMLElement;
+
+  position: string;
+
+  constructor(options: DrawerOptions = {}) {
+    super(options);
+
+    this.position = options.position || "right";
+    this.$(".drawer-dialog").classList.add(
+      `drawer-dialog-position-${this.position}`
+    );
+
+    this._scrollableEl = this.$(".drawer-dialog");
+
+    if (options.onScroll) {
+      this._scrollableEl.addEventListener("scroll", () => {
+        this.triggerOnScroll();
+      });
+    }
+  }
+
   open() {
     super.open();
 
@@ -20,10 +47,8 @@ export default class Drawer extends DialogInterface {
     return this._scrollableEl;
   }
 
-  _constructElement(options) {
+  _constructElement(options: DrawerOptions): HTMLElement {
     const titleId = `drawer-title-${options.id}`;
-
-    this.position = options.position || "right";
 
     const drawer = createElement(`<div
       class="drawer-dialog-overlay modal-dialog-overlay"
@@ -32,7 +57,7 @@ export default class Drawer extends DialogInterface {
       aria-labelledby="${titleId}"
     >
       <!-- sometimes modal dialog classes are used to take advantage of existing style rules on the site -->
-      <div class="drawer-dialog drawer-dialog-position-${this.position}">
+      <div class="drawer-dialog">
         <h6 class="drawer-dialog-title modal-dialog-title">
           <span class="dialog-title" id="${titleId}">
             <span class="dialog-title-symbol">${
@@ -58,19 +83,11 @@ export default class Drawer extends DialogInterface {
           <div class="dialog-content drawer-dialog-stage-content"></div>
         </div>
       </div>
-    </div>`).firstChild;
+    </div>`).firstChild as HTMLElement;
 
-    drawer.querySelector(".dialog-close").addEventListener("click", () => {
+    drawer.querySelector(".dialog-close")!.addEventListener("click", () => {
       this.close();
     });
-
-    this._scrollableEl = drawer.querySelector(".drawer-dialog");
-
-    if (options.onScroll) {
-      this._scrollableEl.addEventListener("scroll", () => {
-        this.triggerOnScroll();
-      });
-    }
 
     return drawer;
   }

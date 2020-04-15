@@ -1,12 +1,16 @@
 import DialogInterface from "Ui/dialog-interface";
 
+type DialogOptions = {
+  [propName: string]: any;
+};
+
 class ChildDialog extends DialogInterface {
-  _constructElement(options) {
+  _constructElement(options: DialogOptions): HTMLElement {
     const el = document.createElement("div");
     el.innerHTML = `
       <div class="dialog-close"></div>
       <div class="dialog-title-symbol">${options.headerSymbol}</div>
-      <div class="dialog-title-content"></div>
+      <div class="dialog-title-content">${options.header || ""}</div>
       <div class="dialog-content-container">
         <div class="dialog-loader"></div>
         <div class="dialog-content"></div>
@@ -19,19 +23,6 @@ class ChildDialog extends DialogInterface {
 }
 
 describe("DialogInterface", function () {
-  it("requires a subclass with _constructElement", function () {
-    let err;
-
-    try {
-      new DialogInterface(); // eslint-disable-line no-new
-    } catch (e) {
-      err = e;
-    }
-
-    expect(err).toBeTruthy();
-    expect(err.message).toEqual("Not implemented");
-  });
-
   describe("element", function () {
     it("hides the dialog by default", function () {
       const dialog = new ChildDialog();
@@ -60,17 +51,13 @@ describe("DialogInterface", function () {
         content: "Some content",
       });
 
-      expect(dialog.element.querySelector(".dialog-content").innerText).toBe(
-        "Some content"
-      );
+      expect(dialog.$(".dialog-content").innerText).toBe("Some content");
     });
 
     it("does not require content", function () {
       const dialog = new ChildDialog();
 
-      expect(dialog.element.querySelector(".dialog-content").innerHTML).toBe(
-        ""
-      );
+      expect(dialog.$(".dialog-content")!.innerHTML).toBe("");
     });
 
     it("can provide a header", function () {
@@ -78,9 +65,7 @@ describe("DialogInterface", function () {
         header: "Title",
       });
 
-      expect(
-        dialog.element.querySelector(".dialog-title-content").innerText
-      ).toContain("Title");
+      expect(dialog.$(".dialog-title-content").innerText).toContain("Title");
     });
 
     it("can provide a symbol to header", function () {
@@ -89,10 +74,8 @@ describe("DialogInterface", function () {
         header: "Title",
       });
 
-      expect(dialog.element.querySelector(".symbol")).toBeTruthy();
-      expect(
-        dialog.element.querySelector(".dialog-title-content").innerText
-      ).toContain("Title");
+      expect(dialog.$(".symbol")).toBeTruthy();
+      expect(dialog.$(".dialog-title-content").innerText).toContain("Title");
     });
 
     it("closes when the backdrop is clicked", function () {
@@ -114,7 +97,7 @@ describe("DialogInterface", function () {
 
       dialog.open();
 
-      dialog.element.querySelector(".dialog-content-container").click();
+      dialog.$(".dialog-content-container")!.click();
 
       expect(dialog.close).toBeCalledTimes(0);
     });
@@ -126,10 +109,8 @@ describe("DialogInterface", function () {
 
       dialog.open();
 
-      const evt = new global.KeyboardEvent("keyup", {
+      const evt = new window.KeyboardEvent("keyup", {
         key: "Escape",
-        keyCode: 27,
-        which: 27,
       });
       document.dispatchEvent(evt);
 
@@ -141,10 +122,8 @@ describe("DialogInterface", function () {
 
       jest.spyOn(dialog, "close").mockImplementation();
 
-      const evt = new global.KeyboardEvent("keyup", {
+      const evt = new window.KeyboardEvent("keyup", {
         key: "Escape",
-        keyCode: 27,
-        which: 27,
       });
       document.dispatchEvent(evt);
 
@@ -161,9 +140,7 @@ describe("DialogInterface", function () {
       dialog.setHeader("new title");
       dialog.resetHeader();
 
-      expect(
-        dialog.element.querySelector(".dialog-title-content").innerText
-      ).toBe("Some title");
+      expect(dialog.$(".dialog-title-content").innerText).toBe("Some title");
     });
   });
 
@@ -175,9 +152,7 @@ describe("DialogInterface", function () {
 
       dialog.setHeader("new title");
 
-      expect(
-        dialog.element.querySelector(".dialog-title-content").innerText
-      ).toBe("new title");
+      expect(dialog.$(".dialog-title-content").innerText).toBe("new title");
     });
   });
 
@@ -189,9 +164,7 @@ describe("DialogInterface", function () {
 
       dialog.setContent("new content");
 
-      expect(dialog.element.querySelector(".dialog-content").innerText).toBe(
-        "new content"
-      );
+      expect(dialog.$(".dialog-content").innerText).toBe("new content");
     });
 
     it("replaces content with DOM node when DOM node is provided", function () {
@@ -204,7 +177,7 @@ describe("DialogInterface", function () {
 
       dialog.setContent(node);
 
-      expect(dialog.element.querySelector(".dialog-content").innerHTML).toBe(
+      expect(dialog.$(".dialog-content").innerHTML).toBe(
         '<div id="some-id">foo</div>'
       );
     });
@@ -223,12 +196,8 @@ describe("DialogInterface", function () {
 
       dialog.setLoading(false);
 
-      expect(
-        dialog.element.querySelector(".dialog-stage").style.display
-      ).toBeFalsy();
-      expect(dialog.element.querySelector(".dialog-loader").style.display).toBe(
-        "none"
-      );
+      expect(dialog.$(".dialog-stage").style.display).toBeFalsy();
+      expect(dialog.$(".dialog-loader").style.display).toBe("none");
     });
 
     it("scrolls up to the top when setting loading to false", function () {
@@ -250,13 +219,9 @@ describe("DialogInterface", function () {
       dialog.setLoading(true);
 
       expect(
-        dialog.element
-          .querySelector(".dialog-content-container")
-          .classList.contains("loading")
+        dialog.$(".dialog-content-container").classList.contains("loading")
       ).toBe(true);
-      expect(
-        dialog.element.querySelector(".dialog-loader").style.display
-      ).toBeFalsy();
+      expect(dialog.$(".dialog-loader").style.display).toBeFalsy();
     });
   });
 
@@ -332,12 +297,12 @@ describe("DialogInterface", function () {
       const dialog = new ChildDialog();
 
       // jest doesn't know about scrollTo method on elements
-      dialog.element.scrollTo = jest.fn();
+      const spy = ((dialog.element as any).scrollTo = jest.fn());
 
       dialog.scrollTo(4, 10);
 
-      expect(dialog.element.scrollTo).toBeCalledTimes(1);
-      expect(dialog.element.scrollTo).toBeCalledWith(4, 10);
+      expect(spy).toBeCalledTimes(1);
+      expect(spy).toBeCalledWith(4, 10);
     });
   });
 

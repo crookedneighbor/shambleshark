@@ -185,7 +185,9 @@ describe("set up listeners on Scryfall page", function () {
       scryfallCard = {
         id: "id",
         section: "mainboard",
+        raw_text: "raw",
         card_digest: {
+          oracle_id: "oracle-id",
           type_line: "Creature",
         },
       };

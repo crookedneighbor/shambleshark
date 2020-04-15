@@ -11,16 +11,14 @@ describe("Modal", function () {
   it("creates a scryfall style modal", function () {
     const modal = new Modal();
 
-    expect(modal.element.querySelector(".modal-dialog")).not.toBeFalsy();
-    expect(
-      modal.element.querySelector(".modal-dialog-content")
-    ).not.toBeFalsy();
-    expect(modal.element.querySelector(".modal-dialog-close")).not.toBeFalsy();
+    expect(modal.$(".modal-dialog")).not.toBeFalsy();
+    expect(modal.$(".modal-dialog-content")).not.toBeFalsy();
+    expect(modal.$(".modal-dialog-close")).not.toBeFalsy();
   });
 
   it("closes when the close button is clicked", function () {
     const modal = new Modal();
-    const close = modal.element.querySelector(".modal-dialog-close");
+    const close = modal.$(".modal-dialog-close");
 
     jest.spyOn(modal, "close").mockImplementation();
 
@@ -32,9 +30,9 @@ describe("Modal", function () {
   it("has default loading label", function () {
     const modal = new Modal();
 
-    expect(
-      modal.element.querySelector(".dialog-loader").getAttribute("aria-label")
-    ).toBe("Loading");
+    expect(modal.$(".dialog-loader").getAttribute("aria-label")).toBe(
+      "Loading"
+    );
   });
 
   it("can provide a loading label", function () {
@@ -42,8 +40,8 @@ describe("Modal", function () {
       loadingMessage: "Custom Loading Message",
     });
 
-    expect(
-      modal.element.querySelector(".dialog-loader").getAttribute("aria-label")
-    ).toBe("Custom Loading Message");
+    expect(modal.$(".dialog-loader").getAttribute("aria-label")).toBe(
+      "Custom Loading Message"
+    );
   });
 });
