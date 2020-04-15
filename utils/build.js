@@ -1,5 +1,6 @@
-var webpack = require("webpack");
-var config = require("../webpack.config");
+/* eslint-disable @typescript-eslint/no-var-requires */
+const webpack = require("webpack");
+const config = require("../webpack.config");
 
 delete config.chromeExtensionBoilerplate;
 

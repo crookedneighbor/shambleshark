@@ -138,7 +138,6 @@ class TaggerLink extends Feature {
 
   createMouseoverHandler(button, taggerData) {
     let request;
-    const self = this;
 
     const tooltip = button.querySelector(".tagger-link-hover");
 
@@ -158,7 +157,7 @@ class TaggerLink extends Feature {
         request = new Promise((resolve) => {
           bus.emit(events.TAGGER_TAGS_REQUEST, taggerData, resolve);
         }).then((payload) => {
-          self.addTags(tooltip, payload);
+          this.addTags(tooltip, payload);
         });
       }
 

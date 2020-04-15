@@ -3,19 +3,21 @@ import scryfall from "Lib/scryfall";
 import deckParser from "Lib/deck-parser";
 import iframe from "Lib/iframe";
 
-export default async function addEDHRecIframe(button) {
-  await iframe.create({
-    // does not matter where on edhrec we open the page
-    // just need to be on the edhrec domain to access
-    // the recs JSON endpoint
-    src: "https://edhrec.com/404",
-    id: "edhrec-suggestions-iframe",
-  });
+function filterOutInvalidCards(card) {
+  return card.card_digest;
+}
 
-  const initialCommanders = await getInitialCommanderList();
-  await setDisabledState(button, initialCommanders);
+function getCardName(card) {
+  return card.card_digest.name;
+}
 
-  updateButtonStateOnCommanderChange(button, initialCommanders);
+async function getInitialCommanderList() {
+  const initialDeck = await scryfall.getDeck();
+
+  return initialDeck.entries.commanders
+    .filter(filterOutInvalidCards)
+    .map(getCardName)
+    .sort();
 }
 
 async function setDisabledState(button, commanders) {
@@ -28,15 +30,6 @@ async function setDisabledState(button, commanders) {
   } else {
     button.setAttribute("disabled", "disabled");
   }
-}
-
-async function getInitialCommanderList() {
-  const initialDeck = await scryfall.getDeck();
-
-  return initialDeck.entries.commanders
-    .filter(filterOutInvalidCards)
-    .map(getCardName)
-    .sort();
 }
 
 function updateButtonStateOnCommanderChange(button, commanders) {
@@ -88,10 +81,17 @@ function updateButtonStateOnCommanderChange(button, commanders) {
   );
 }
 
-function filterOutInvalidCards(card) {
-  return card.card_digest;
-}
+export default async function addEDHRecIframe(button) {
+  await iframe.create({
+    // does not matter where on edhrec we open the page
+    // just need to be on the edhrec domain to access
+    // the recs JSON endpoint
+    src: "https://edhrec.com/404",
+    id: "edhrec-suggestions-iframe",
+  });
 
-function getCardName(card) {
-  return card.card_digest.name;
+  const initialCommanders = await getInitialCommanderList();
+  await setDisabledState(button, initialCommanders);
+
+  updateButtonStateOnCommanderChange(button, initialCommanders);
 }

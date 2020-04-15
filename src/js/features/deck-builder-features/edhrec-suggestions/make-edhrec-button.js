@@ -20,65 +20,12 @@ const TYPES_WITH_IRREGULAR_PLURALS = {
   Sorcery: "Sorceries",
 };
 
-export default function makeEDHRecButton() {
-  const button = createElement(`<button
-    id="edhrec-suggestions"
-    aria-label="EDHRec Suggestions"
-    class="button-n tiny"
-    disabled="true"
-  >
-    ${EDHREC_SYMBOL}
-    <i>EDHRec Suggestions</i>
-</button>`).firstChild;
-  createDrawer(button);
-
-  return button;
+function filterOutInvalidCards(card) {
+  return card.card_digest;
 }
 
-function createDrawer(button) {
-  const drawer = new Drawer({
-    id: "edhrec-drawer",
-    headerSymbol: EDHREC_SYMBOL,
-    header: "EDHRec Suggestions",
-    loadingMessage: "Loading EDHRec Suggestions",
-    onClose(drawerInstance) {
-      bus.emit(events.CLEAN_UP_DECK);
-
-      // reset this in case the error state changes it
-      drawerInstance.resetHeader();
-      drawerInstance.setLoading(true);
-
-      // re-focus the EDHRec Suggestion button
-      // for accessibility navigation
-      button.focus();
-    },
-  });
-  // TODO: the drawer class should probably handle this
-  document.getElementById("deckbuilder").appendChild(drawer.element);
-
-  button.addEventListener("click", (e) => {
-    e.preventDefault();
-
-    drawer.open();
-
-    scryfall.getDeck().then((deck) => {
-      const commanders = deck.entries.commanders
-        .filter(filterOutInvalidCards)
-        .map(getCardName);
-      const cardsInDeck = getCardsInDeck(deck.entries);
-
-      bus.emit(
-        events.REQUEST_EDHREC_RECOMENDATIONS,
-        {
-          commanders,
-          cards: cardsInDeck,
-        },
-        createEDHRecResponseHandler(drawer, deck)
-      );
-    });
-  });
-
-  return drawer;
+function getCardName(card) {
+  return card.card_digest.name;
 }
 
 function getCardsInDeck(entries) {
@@ -94,6 +41,54 @@ function getCardsInDeck(entries) {
 
     return all;
   }, []);
+}
+
+function formatEDHRecSuggestions(list) {
+  return list.reduce((all, rec) => {
+    const type = rec.primary_types[0];
+    const name = rec.names.join(" // ");
+    const scryfallParts = rec.scryfall_uri.split("/card/")[1].split("/");
+
+    all[name] = {
+      name,
+      type,
+      set: scryfallParts[0],
+      collectorNumber: scryfallParts[1],
+      img: rec.images[0],
+      price: rec.price,
+      salt: rec.salt,
+      score: rec.score,
+    };
+
+    return all;
+  }, {});
+}
+
+function createErrorDrawerState(drawer, err) {
+  drawer.setHeader("Something went wrong");
+
+  const container = document.createElement("div");
+
+  if (err.errors) {
+    const errorList = document.createElement("ul");
+    err.errors.forEach((errorMessage) => {
+      const errorElement = document.createElement("li");
+      errorElement.innerText = errorMessage;
+      errorList.appendChild(errorElement);
+    });
+
+    container.appendChild(errorList);
+  } else {
+    container.appendChild(
+      createElement(`<div>
+      <p>An unknown error occurred:</p>
+      <pre><code>${err.toString()}</code></pre>
+    </div>`)
+    );
+  }
+
+  drawer.setContent(container);
+  drawer.setLoading(false);
 }
 
 function constructEDHRecSection(sectionId, cardType) {
@@ -194,58 +189,63 @@ function createEDHRecResponseHandler(drawer, deck) {
   };
 }
 
-function formatEDHRecSuggestions(list) {
-  return list.reduce((all, rec) => {
-    const type = rec.primary_types[0];
-    const name = rec.names.join(" // ");
-    const scryfallParts = rec.scryfall_uri.split("/card/")[1].split("/");
+function createDrawer(button) {
+  const drawer = new Drawer({
+    id: "edhrec-drawer",
+    headerSymbol: EDHREC_SYMBOL,
+    header: "EDHRec Suggestions",
+    loadingMessage: "Loading EDHRec Suggestions",
+    onClose(drawerInstance) {
+      bus.emit(events.CLEAN_UP_DECK);
 
-    all[name] = {
-      name,
-      type,
-      set: scryfallParts[0],
-      collectorNumber: scryfallParts[1],
-      img: rec.images[0],
-      price: rec.price,
-      salt: rec.salt,
-      score: rec.score,
-    };
+      // reset this in case the error state changes it
+      drawerInstance.resetHeader();
+      drawerInstance.setLoading(true);
 
-    return all;
-  }, {});
-}
+      // re-focus the EDHRec Suggestion button
+      // for accessibility navigation
+      button.focus();
+    },
+  });
+  // TODO: the drawer class should probably handle this
+  document.getElementById("deckbuilder").appendChild(drawer.element);
 
-function createErrorDrawerState(drawer, err) {
-  drawer.setHeader("Something went wrong");
+  button.addEventListener("click", (e) => {
+    e.preventDefault();
 
-  const container = document.createElement("div");
+    drawer.open();
 
-  if (err.errors) {
-    const errorList = document.createElement("ul");
-    err.errors.forEach((errorMessage) => {
-      const errorElement = document.createElement("li");
-      errorElement.innerText = errorMessage;
-      errorList.appendChild(errorElement);
+    scryfall.getDeck().then((deck) => {
+      const commanders = deck.entries.commanders
+        .filter(filterOutInvalidCards)
+        .map(getCardName);
+      const cardsInDeck = getCardsInDeck(deck.entries);
+
+      bus.emit(
+        events.REQUEST_EDHREC_RECOMENDATIONS,
+        {
+          commanders,
+          cards: cardsInDeck,
+        },
+        createEDHRecResponseHandler(drawer, deck)
+      );
     });
+  });
 
-    container.appendChild(errorList);
-  } else {
-    container.appendChild(
-      createElement(`<div>
-      <p>An unknown error occurred:</p>
-      <pre><code>${err.toString()}</code></pre>
-    </div>`)
-    );
-  }
-
-  drawer.setContent(container);
-  drawer.setLoading(false);
+  return drawer;
 }
 
-function filterOutInvalidCards(card) {
-  return card.card_digest;
-}
+export default function makeEDHRecButton() {
+  const button = createElement(`<button
+    id="edhrec-suggestions"
+    aria-label="EDHRec Suggestions"
+    class="button-n tiny"
+    disabled="true"
+  >
+    ${EDHREC_SYMBOL}
+    <i>EDHRec Suggestions</i>
+</button>`).firstChild;
+  createDrawer(button);
 
-function getCardName(card) {
-  return card.card_digest.name;
+  return button;
 }
