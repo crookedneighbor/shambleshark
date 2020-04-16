@@ -4,7 +4,6 @@ import * as bus from "framebus";
 import SpyInstance = jest.SpyInstance;
 
 describe("Tagger", () => {
-
   let xhrSpy: SpyInstance;
   const xhrMock: Partial<XMLHttpRequest> = {
     open: jest.fn(),
@@ -34,10 +33,6 @@ describe("Tagger", () => {
     meta.setAttribute("content", "token");
 
     document.head.appendChild(meta);
-  });
-
-  afterEach(() => {
-    xhrSpy.mockRestore();
   });
 
   it("does not listen for recomendations if not in an iframe", () => {
