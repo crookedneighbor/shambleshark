@@ -1,30 +1,37 @@
 import start from "Js/edhrec/ready";
 import iframe from "Lib/iframe";
 import wait from "Lib/wait";
-import bus from "framebus";
+import * as bus from "framebus";
 
 describe("EDHRec Ready", function () {
-  let replySpy, fetchSpy;
+  let replySpy: jest.Mock;
+  let fetchSpy: jest.Mock;
 
   beforeEach(function () {
     jest.spyOn(iframe, "isInsideIframe").mockReturnValue(true);
 
-    jest.spyOn(bus, "on").mockImplementation((event, reply) => {
-      const response = {
-        commanders: ["Arjun, the Shifting Flame"],
-        cards: ["1 foo", "1 bar"],
-      };
-      replySpy = jest.fn();
+    jest
+      .spyOn(bus, "on")
+      .mockImplementation((event: string, reply: Function) => {
+        const response = {
+          commanders: ["Arjun, the Shifting Flame"],
+          cards: ["1 foo", "1 bar"],
+        };
+        replySpy = jest.fn();
 
-      if (event === "REQUEST_EDHREC_RECOMENDATIONS") {
-        reply(response, replySpy);
-      }
-    });
+        if (event === "REQUEST_EDHREC_RECOMENDATIONS") {
+          reply(response, replySpy);
+        }
+      });
     fetchSpy = jest.fn().mockResolvedValue("result");
     // jest doesn't have fetch on the window
-    global.fetch = jest.fn().mockResolvedValue({
-      json: fetchSpy,
-    });
+    window.fetch = jest.fn().mockImplementation(
+      (): Promise<any> => {
+        return Promise.resolve({
+          json: fetchSpy,
+        });
+      }
+    );
   });
 
   afterEach(async function () {
@@ -33,7 +40,7 @@ describe("EDHRec Ready", function () {
   });
 
   it("does not listen for recomendations if not in an iframe", function () {
-    iframe.isInsideIframe.mockReturnValue(false);
+    (iframe.isInsideIframe as jest.Mock).mockReturnValue(false);
 
     start();
 
@@ -53,8 +60,8 @@ describe("EDHRec Ready", function () {
   it("requests recomendations from edhrec", function () {
     start();
 
-    expect(global.fetch).toBeCalledTimes(1);
-    expect(global.fetch).toBeCalledWith("https://edhrec.com/api/recs/", {
+    expect(window.fetch).toBeCalledTimes(1);
+    expect(window.fetch).toBeCalledWith("https://edhrec.com/api/recs/", {
       method: "POST",
       body: JSON.stringify({
         commanders: ["Arjun, the Shifting Flame"],
@@ -98,7 +105,7 @@ describe("EDHRec Ready", function () {
   it("sends back error in array if request to edhrec fails", async function () {
     const err = new Error("fetch error");
 
-    global.fetch.mockRejectedValue(err);
+    (window.fetch as jest.Mock).mockRejectedValue(err);
 
     start();
 

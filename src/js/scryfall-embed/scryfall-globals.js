@@ -16,11 +16,11 @@ export function addHooksToCardManagementEvents() {
       "destroyEntry",
     ].forEach((method) => {
       const original = window.ScryfallAPI.decks[method];
-      ScryfallAPI.decks[method] = function (deckId, payload, cb, ____) {
-        original(...arguments);
+      ScryfallAPI.decks[method] = function (...args) {
+        original(...args);
         bus.emit(events[`CALLED_${method.toUpperCase()}`], {
-          deckId,
-          payload,
+          deckId: args[0],
+          payload: args[1],
         });
       };
     });
@@ -28,24 +28,23 @@ export function addHooksToCardManagementEvents() {
 
   if (window.Scryfall && window.Scryfall.deckbuilder) {
     const originalCleanup = window.Scryfall.deckbuilder.cleanUp;
-    Scryfall.deckbuilder.cleanUp = function () {
-      originalCleanup(...arguments);
+    Scryfall.deckbuilder.cleanUp = function (...args) {
+      originalCleanup(...args);
       bus.emit(events.CALLED_CLEANUP);
     };
   }
 }
 
-export function getDeckMetadata() {
-  if (!getDeckMetadataPromise) {
-    getDeckMetadataPromise = getDeck().then((deck) => {
-      return {
-        id: deck.id,
-        sections: deck.sections,
-      };
+export function getActiveDeck() {
+  if (!getActiveDeckPromise) {
+    getActiveDeckPromise = new Promise((resolve) => {
+      ScryfallAPI.decks.active((deck) => {
+        resolve(deck);
+      });
     });
   }
 
-  return getDeckMetadataPromise;
+  return getActiveDeckPromise;
 }
 
 export function getActiveDeckId(waitTime = 300) {
@@ -69,23 +68,6 @@ export function getActiveDeckId(waitTime = 300) {
   return getActiveDeck().then(({ id }) => id);
 }
 
-export function getActiveDeck() {
-  if (!getActiveDeckPromise) {
-    getActiveDeckPromise = new Promise((resolve) => {
-      ScryfallAPI.decks.active((deck) => {
-        resolve(deck);
-      });
-    });
-  }
-
-  return getActiveDeckPromise;
-}
-
-export function reset() {
-  getActiveDeckPromise = null;
-  getDeckMetadataPromise = null;
-}
-
 export function getDeck() {
   return getActiveDeckId().then((id) => {
     return new Promise((resolve) => {
@@ -94,6 +76,24 @@ export function getDeck() {
       });
     });
   });
+}
+
+export function getDeckMetadata() {
+  if (!getDeckMetadataPromise) {
+    getDeckMetadataPromise = getDeck().then((deck) => {
+      return {
+        id: deck.id,
+        sections: deck.sections,
+      };
+    });
+  }
+
+  return getDeckMetadataPromise;
+}
+
+export function reset() {
+  getActiveDeckPromise = null;
+  getDeckMetadataPromise = null;
 }
 
 export function addCard(cardId) {

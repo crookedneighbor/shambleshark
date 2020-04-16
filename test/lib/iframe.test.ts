@@ -6,10 +6,10 @@ describe("iframe", function () {
     it("creates an iframe that resolves when it loads", async function () {
       const fakeIframe = document.createElement("iframe");
       jest
-        .spyOn(fakeIframe, "addEventListener")
+        .spyOn(fakeIframe as any, "addEventListener")
         .mockImplementation((eventName, cb) => {
           // let it happen async so iframe can be added to body
-          wait().then(cb);
+          wait().then(() => (cb as Function)());
         });
       jest.spyOn(document, "createElement").mockReturnValue(fakeIframe);
       jest.spyOn(document.body, "appendChild");
@@ -30,25 +30,21 @@ describe("iframe", function () {
 
   describe("isInsideIframe", function () {
     it("returns false when parent location is identitical to window location", function () {
-      const fakeWindow = {
-        location: "foo",
-        parent: {
-          location: "foo",
-        },
-      };
+      expect(window.location).toEqual(window.parent.location);
 
-      expect(isInsideIframe(fakeWindow)).toBe(false);
+      expect(isInsideIframe()).toBe(false);
     });
 
     it("returns true when parent location is not identitical to window location", function () {
-      const fakeWindow = {
-        location: "foo",
-        parent: {
-          location: "bar",
+      Object.defineProperty(window, "parent", {
+        writable: true,
+        value: {
+          location: {},
         },
-      };
+      });
+      expect(window.location).not.toEqual(window.parent.location);
 
-      expect(isInsideIframe(fakeWindow)).toBe(true);
+      expect(isInsideIframe()).toBe(true);
     });
   });
 });

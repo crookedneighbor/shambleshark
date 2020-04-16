@@ -24,13 +24,6 @@ function setupToggleListeners(element, fn) {
   });
 }
 
-function createInputForType(def, inputValue, Feature) {
-  switch (def.input) {
-    case "checkbox":
-      return createCheckbox(def, inputValue, Feature);
-  }
-}
-
 function createCheckbox(def, inputValue, Feature) {
   const checkboxContainer = createElement(`<label
     class="checkbox"
@@ -45,6 +38,13 @@ function createCheckbox(def, inputValue, Feature) {
   });
 
   return checkboxContainer;
+}
+
+function createInputForType(def, inputValue, Feature) {
+  switch (def.input) {
+    case "checkbox":
+      return createCheckbox(def, inputValue, Feature);
+  }
 }
 
 const page = createElement(`<div>

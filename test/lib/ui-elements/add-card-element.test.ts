@@ -1,12 +1,10 @@
-import bus from "framebus";
+import * as bus from "framebus";
 import AddCardElement from "Ui/add-card-element";
 import { PLUS_SYMBOL } from "Svg";
 
-describe("AddCardElement", function () {
-  beforeEach(function () {
-    jest.spyOn(bus, "emit").mockImplementation();
-  });
+jest.mock("framebus");
 
+describe("AddCardElement", function () {
   it("defaults card in deck status to false", async function () {
     const cardEl = new AddCardElement({
       name: "Arcane Denial",
@@ -112,10 +110,8 @@ describe("AddCardElement", function () {
       type: "Instant",
       img: "https://example.com/arcane-signet",
     });
-    const evt = new global.KeyboardEvent("keydown", {
+    const evt = new window.KeyboardEvent("keydown", {
       key: "Enter",
-      keyCode: 13,
-      which: 13,
     });
 
     jest.spyOn(cardEl, "addCardToDeck").mockImplementation();
@@ -158,10 +154,8 @@ describe("AddCardElement", function () {
       type: "Instant",
       img: "https://example.com/arcane-signet",
     });
-    const evt = new global.KeyboardEvent("keydown", {
+    const evt = new window.KeyboardEvent("keydown", {
       key: "Enter",
-      keyCode: 13,
-      which: 13,
     });
 
     jest.spyOn(cardEl, "removeCardFromDeck").mockImplementation();
@@ -185,10 +179,8 @@ describe("AddCardElement", function () {
       type: "Instant",
       img: "https://example.com/arcane-signet",
     });
-    const evt = new global.KeyboardEvent("keydown", {
+    const evt = new window.KeyboardEvent("keydown", {
       key: "Enter",
-      keyCode: 13,
-      which: 13,
     });
 
     jest.spyOn(cardEl.plusButton, "focus").mockImplementation();
@@ -209,10 +201,8 @@ describe("AddCardElement", function () {
       type: "Instant",
       img: "https://example.com/arcane-signet",
     });
-    const evt = new global.KeyboardEvent("keydown", {
+    const evt = new window.KeyboardEvent("keydown", {
       key: "Enter",
-      keyCode: 13,
-      which: 13,
     });
 
     jest.spyOn(cardEl.plusButton, "focus").mockImplementation();
@@ -448,7 +438,7 @@ describe("AddCardElement", function () {
         name: "Arcane Denial",
         id: "arcane-denial-id",
         type: "Instant",
-        onAddCard(data) {
+        onAddCard(data: { cardName: string; section: string; cardId: string }) {
           data.cardName = "foo";
           data.section = "bar";
         },

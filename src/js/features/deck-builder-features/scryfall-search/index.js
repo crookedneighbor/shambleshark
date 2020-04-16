@@ -147,7 +147,8 @@ class ScryfallSearch extends Feature {
   }
 
   createDrawer(button) {
-    const self = this;
+    // TODO find out if we can pass an arrow function here instead
+    const self = this; // eslint-disable-line @typescript-eslint/no-this-alias
     const drawer = new Drawer({
       id: "scryfall-search-drawer",
       // TODO add scryfall symbol?

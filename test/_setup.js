@@ -1,10 +1,14 @@
-global.MutationObserver = class {
-  disconnect() {}
+window.MutationObserver = class {
+  disconnect() {
+    // noop
+  }
 
-  observe() {}
+  observe() {
+    // noop
+  }
 };
 
-global.scrollTo = jest.fn();
+window.scrollTo = jest.fn();
 
 afterEach(() => {
   // clean up any dom manipulation between tests

@@ -11,24 +11,16 @@ describe("Drawer", function () {
   it("makes a drawer element", function () {
     const drawer = new Drawer();
 
-    expect(drawer.element.querySelector(".drawer-dialog")).toBeTruthy();
+    expect(drawer.$(".drawer-dialog")).toBeTruthy();
   });
 
   it("defaults position to right", function () {
     const drawer = new Drawer();
 
-    expect(
-      drawer.element.querySelector(".drawer-dialog-position-right")
-    ).toBeTruthy();
-    expect(
-      drawer.element.querySelector(".drawer-dialog-position-left")
-    ).toBeFalsy();
-    expect(
-      drawer.element.querySelector(".drawer-dialog-position-top")
-    ).toBeFalsy();
-    expect(
-      drawer.element.querySelector(".drawer-dialog-position-bottom")
-    ).toBeFalsy();
+    expect(drawer.$(".drawer-dialog-position-right")).toBeTruthy();
+    expect(drawer.$(".drawer-dialog-position-left")).toBeFalsy();
+    expect(drawer.$(".drawer-dialog-position-top")).toBeFalsy();
+    expect(drawer.$(".drawer-dialog-position-bottom")).toBeFalsy();
   });
 
   it("can set position", function () {
@@ -36,17 +28,13 @@ describe("Drawer", function () {
       position: "top",
     });
 
-    expect(
-      drawer.element.querySelector(".drawer-dialog-position-right")
-    ).toBeFalsy();
-    expect(
-      drawer.element.querySelector(".drawer-dialog-position-top")
-    ).toBeTruthy();
+    expect(drawer.$(".drawer-dialog-position-right")).toBeFalsy();
+    expect(drawer.$(".drawer-dialog-position-top")).toBeTruthy();
   });
 
   it("closes when the close button is clicked", function () {
     const drawer = new Drawer();
-    const close = drawer.element.querySelector(".dialog-close");
+    const close = drawer.$(".dialog-close");
 
     jest.spyOn(drawer, "close").mockImplementation();
 
@@ -83,8 +71,8 @@ describe("Drawer", function () {
     expect(spy).toBeCalledTimes(0);
 
     const event = document.createEvent("UIEvents");
-    event.initUIEvent("scroll", true, true, window, 1);
-    drawer.element.querySelector(".drawer-dialog").dispatchEvent(event);
+    (event as any).initUIEvent("scroll", true, true, window, 1);
+    drawer.$(".drawer-dialog").dispatchEvent(event);
 
     expect(spy).toBeCalledTimes(1);
   });

@@ -1,11 +1,10 @@
 import { api, getCollection, getDeck } from "Lib/scryfall";
-import bus from "framebus";
+import * as bus from "framebus";
+import { mocked } from "ts-jest/utils";
+
+jest.mock("framebus");
 
 describe("scryfall", function () {
-  beforeEach(function () {
-    jest.spyOn(bus, "emit");
-  });
-
   describe("getDeck", function () {
     beforeEach(function () {
       jest.useFakeTimers();
@@ -18,7 +17,7 @@ describe("scryfall", function () {
     it("requests deck from Scryfall page", async function () {
       const deck = {};
 
-      bus.emit.mockImplementation((event, cb) => {
+      mocked(bus.emit).mockImplementation((event, cb) => {
         cb(deck);
       });
 
@@ -32,10 +31,10 @@ describe("scryfall", function () {
       const firstDeck = { id: "1" };
       const secondDeck = { id: "2" };
 
-      bus.emit.mockImplementationOnce((event, cb) => {
+      mocked(bus.emit).mockImplementationOnce((event, cb) => {
         cb(firstDeck);
       });
-      bus.emit.mockImplementationOnce((event, cb) => {
+      mocked(bus.emit).mockImplementationOnce((event, cb) => {
         cb(secondDeck);
       });
 
@@ -59,7 +58,7 @@ describe("scryfall", function () {
   });
 
   describe("getCollection", function () {
-    let fakeCards;
+    let fakeCards: { id: string }[];
 
     beforeEach(function () {
       fakeCards = [{ id: "foo" }];

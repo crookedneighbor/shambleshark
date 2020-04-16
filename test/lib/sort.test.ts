@@ -1,7 +1,11 @@
 import { sortByAttribute } from "Lib/sort";
 
 describe("sort.sortByAttribute", function () {
-  let array;
+  let array: {
+    id: number;
+    name: string | number;
+    bool: boolean;
+  }[];
 
   beforeEach(function () {
     array = [

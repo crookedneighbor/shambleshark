@@ -25,6 +25,13 @@ export function isLandCard(card) {
   return Boolean(frontType.includes("Land") && !frontType.includes("Creature"));
 }
 
+export function getSections(deck) {
+  return Object.keys(deck.sections).reduce((sections, type) => {
+    deck.sections[type].forEach((section) => sections.push(section));
+    return sections;
+  }, []);
+}
+
 export function hasDedicatedLandSection(deck) {
   return getSections(deck).includes("lands");
 }
@@ -38,7 +45,7 @@ export function getCommanderColorIdentity(deck) {
     .then((colorIdentities) => {
       const colors = new Set(
         colorIdentities.reduce((id, ci) => {
-          id.push.apply(id, ci);
+          id.push(...ci);
 
           return id;
         }, [])
@@ -50,13 +57,6 @@ export function getCommanderColorIdentity(deck) {
 
       return Array.from(colors);
     });
-}
-
-export function getSections(deck) {
-  return Object.keys(deck.sections).reduce((sections, type) => {
-    deck.sections[type].forEach((section) => sections.push(section));
-    return sections;
-  }, []);
 }
 
 export function flattenEntries(deck, options = {}) {

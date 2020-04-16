@@ -65,13 +65,11 @@ export default class CardTooltip {
   }
 
   createMousemoveHandler(el) {
-    const self = this;
-
     return (event) => {
       // largley adapted from Scryfall's site, if that changes
       // this may also need ot be updated
 
-      if (!self.tooltipElement) {
+      if (!this.tooltipElement) {
         return;
       }
 
@@ -80,44 +78,42 @@ export default class CardTooltip {
         return;
       }
 
-      self.triggerOnMouseover(el);
+      this.triggerOnMouseover(el);
 
-      if (!self.img) {
+      if (!this.img) {
         return;
       }
 
-      if (self.tooltipElement.style.display !== "block") {
-        self.tooltipElement.style.display = "block";
+      if (this.tooltipElement.style.display !== "block") {
+        this.tooltipElement.style.display = "block";
       }
 
-      self.tooltipElement.style.left = event.pageX + 50 + "px";
-      self.tooltipElement.style.top = event.pageY - 30 + "px";
+      this.tooltipElement.style.left = event.pageX + 50 + "px";
+      this.tooltipElement.style.top = event.pageY - 30 + "px";
 
       const cardToolTipImg = document.getElementById("card-tooltip-img");
 
-      if (cardToolTipImg.src !== self.img) {
+      if (cardToolTipImg.src !== this.img) {
         const t = document.createElement("img");
         t.id = "card-tooltip-img";
         t.className = "card";
-        t.src = self.img;
+        t.src = this.img;
 
-        self.tooltipElement.removeChild(cardToolTipImg);
-        self.tooltipElement.appendChild(t);
+        this.tooltipElement.removeChild(cardToolTipImg);
+        this.tooltipElement.appendChild(t);
       }
     };
   }
 
   createMouseoutHandler(el) {
-    const self = this;
-
     return () => {
-      if (!self.tooltipElement) {
+      if (!this.tooltipElement) {
         return;
       }
 
-      self.triggerOnMouseout(el);
+      this.triggerOnMouseout(el);
 
-      self.tooltipElement.style.display = "none";
+      this.tooltipElement.style.display = "none";
     };
   }
 

@@ -3,21 +3,6 @@ import { FEATURE_IDS as ids } from "Constants";
 
 const notImplementedError = new Error("Method not Implemented");
 
-function createStaticProperty(propertyName, defaultValue) {
-  const privatePropertyName = `_${propertyName}`;
-
-  Object.defineProperty(Feature, propertyName, {
-    get() {
-      return this.hasOwnProperty(privatePropertyName)
-        ? this[privatePropertyName]
-        : defaultValue; // eslint-disable-line no-prototype-builtins
-    },
-    set(value) {
-      this[privatePropertyName] = value;
-    },
-  });
-}
-
 class Feature {
   async run() {
     return Promise.reject(notImplementedError);
@@ -83,6 +68,22 @@ class Feature {
   static async getData(key) {
     return storage.get(`${this.metadata.id}:${key}`);
   }
+}
+
+function createStaticProperty(propertyName, defaultValue) {
+  const privatePropertyName = `_${propertyName}`;
+
+  Object.defineProperty(Feature, propertyName, {
+    get() {
+      // eslint-disable-next-line no-prototype-builtins
+      return this.hasOwnProperty(privatePropertyName)
+        ? this[privatePropertyName]
+        : defaultValue;
+    },
+    set(value) {
+      this[privatePropertyName] = value;
+    },
+  });
 }
 
 createStaticProperty("metadata");

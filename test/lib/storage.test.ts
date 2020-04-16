@@ -1,8 +1,14 @@
 import { get, set } from "Lib/storage";
 
+declare global {
+  interface Window {
+    chrome: any;
+  }
+}
+
 describe("storage", function () {
   beforeEach(function () {
-    global.chrome = {
+    window.chrome = {
       storage: {
         sync: {
           get: jest.fn().mockImplementation((keys, callback) => {
@@ -25,8 +31,8 @@ describe("storage", function () {
       const result = await get(["foo"]);
 
       expect(result.foo).toBe("bar");
-      expect(global.chrome.storage.sync.get).toBeCalledTimes(1);
-      expect(global.chrome.storage.sync.get).toBeCalledWith(
+      expect(window.chrome.storage.sync.get).toBeCalledTimes(1);
+      expect(window.chrome.storage.sync.get).toBeCalledWith(
         ["foo"],
         expect.any(Function)
       );
@@ -36,8 +42,8 @@ describe("storage", function () {
       const result = await get("foo");
 
       expect(result).toBe("bar");
-      expect(global.chrome.storage.sync.get).toBeCalledTimes(1);
-      expect(global.chrome.storage.sync.get).toBeCalledWith(
+      expect(window.chrome.storage.sync.get).toBeCalledTimes(1);
+      expect(window.chrome.storage.sync.get).toBeCalledWith(
         ["foo"],
         expect.any(Function)
       );
@@ -50,8 +56,8 @@ describe("storage", function () {
         foo: "bar",
       });
 
-      expect(global.chrome.storage.sync.set).toBeCalledTimes(1);
-      expect(global.chrome.storage.sync.set).toBeCalledWith(
+      expect(window.chrome.storage.sync.set).toBeCalledTimes(1);
+      expect(window.chrome.storage.sync.set).toBeCalledWith(
         {
           foo: "bar",
         },
@@ -62,8 +68,8 @@ describe("storage", function () {
     it("can pass a single key name with a value as a convenience", async function () {
       await set("foo", "bar");
 
-      expect(global.chrome.storage.sync.set).toBeCalledTimes(1);
-      expect(global.chrome.storage.sync.set).toBeCalledWith(
+      expect(window.chrome.storage.sync.set).toBeCalledTimes(1);
+      expect(window.chrome.storage.sync.set).toBeCalledWith(
         {
           foo: "bar",
         },

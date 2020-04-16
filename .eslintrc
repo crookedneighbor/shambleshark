@@ -1,9 +1,32 @@
 {
-  "extends": ["plugin:prettier/recommended"],
-  "parserOptions": {
-    "sourceType": "module"
-  },
+  "parser": "@typescript-eslint/parser",
   "env": {
-    "es2020": true
+    "es2020": true,
+    "browser": true,
+    "node": true
+  },
+  "plugins": ["@typescript-eslint"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended"
+  ],
+  "globals": {
+    "jest": false,
+    "before": false,
+    "beforeEach": false,
+    "after": false,
+    "afterEach": false,
+    "expect": false,
+    "describe": false,
+    "it": false,
+    "browser": false,
+    "chrome": false,
+    "Scryfall": false,
+    "ScryfallAPI": false
+  },
+  "rules": {
+    "@typescript-eslint/camelcase": "off"
   }
 }

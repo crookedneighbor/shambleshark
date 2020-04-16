@@ -3,9 +3,13 @@ import deckParser from "Lib/deck-parser";
 
 describe("DeckSectionChooser", function () {
   beforeEach(function () {
-    jest
-      .spyOn(deckParser, "getSections")
-      .mockReturnValue(["foo", "bar", "baz"]);
+    jest.spyOn(deckParser, "getSections");
+
+    (deckParser.getSections as jest.Mock).mockReturnValue([
+      "foo",
+      "bar",
+      "baz",
+    ]);
   });
 
   it("creates a scryfall select with options for each section in a deck", async function () {
@@ -13,7 +17,7 @@ describe("DeckSectionChooser", function () {
       deck: {},
     });
 
-    const options = chooser.element.querySelectorAll("option");
+    const options = (chooser.element as HTMLElement).querySelectorAll("option");
     expect(options.length).toBe(4);
     expect(options[0].innerHTML).toBe("Section (auto)");
     expect(options[0].value).toBe("");
@@ -33,7 +37,10 @@ describe("DeckSectionChooser", function () {
 
       expect(chooser.getValue()).toBe("");
 
-      chooser.element.querySelector("select").value = "baz";
+      const select = (chooser.element as HTMLElement).querySelector(
+        "select"
+      ) as HTMLSelectElement;
+      select.value = "baz";
 
       expect(chooser.getValue()).toBe("baz");
     });

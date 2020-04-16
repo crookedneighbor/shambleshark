@@ -133,7 +133,7 @@ describe("Tagger Link", function () {
     beforeEach(() => {
       jest
         .spyOn(TaggerLink.prototype, "createMouseoverHandler")
-        .mockReturnValue(() => {});
+        .mockReturnValue(jest.fn());
     });
 
     it("creates a button link to tagger", () => {

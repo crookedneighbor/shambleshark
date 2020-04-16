@@ -2,7 +2,7 @@
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
 export function sortByAttribute({ attributes }) {
   return (a, b) => {
-    let finalResult;
+    let finalResult = 0;
 
     attributes.find((attr) => {
       let someValueIsUndefined;

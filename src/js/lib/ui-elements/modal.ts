@@ -1,11 +1,15 @@
-import DialogInterface from "./dialog-interface";
+import DialogInterface, { DialogInterfaceOptions } from "./dialog-interface";
 import createElement from "Lib/create-element";
 import { SPINNER_GIF } from "Constants";
 
 import "./modal.css";
 
+interface ModalOptions extends DialogInterfaceOptions {
+  contentMessage?: string;
+}
+
 export default class Modal extends DialogInterface {
-  _constructElement(options) {
+  _constructElement(options: ModalOptions = {}): HTMLElement {
     const titleId = `modal-title-${options.id}`;
     const modal = createElement(`<div
       class="modal-dialog-overlay"
@@ -37,9 +41,9 @@ export default class Modal extends DialogInterface {
           <div class="dialog-content modal-dialog-stage-content"></div>
         </div>
       </div>
-   </div>`).firstChild;
+   </div>`).firstChild as HTMLElement;
 
-    modal.querySelector(".dialog-close").addEventListener("click", () => {
+    modal.querySelector(".dialog-close")!.addEventListener("click", () => {
       this.close();
     });
 
