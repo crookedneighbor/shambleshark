@@ -1,4 +1,4 @@
-type sections =
+export type DeckSections =
   | "commanders"
   | "lands"
   | "mainboard"
@@ -6,9 +6,11 @@ type sections =
   | "nonlands"
   | "sideboard";
 
+export type DeckSectionKinds = "primary" | "secondary";
+
 export interface Card {
   id: string;
-  section: sections;
+  section: DeckSections;
   raw_text: string;
   count?: number;
   card_digest?: {
@@ -21,10 +23,9 @@ export interface Card {
 export interface Deck {
   id: string;
   sections: {
-    primary: sections[];
-    secondary: sections[];
+    [deckType in DeckSectionKinds]: DeckSections[];
   };
   entries: {
-    [section in sections]?: Card[];
+    [section in DeckSections]?: Card[];
   };
 }
