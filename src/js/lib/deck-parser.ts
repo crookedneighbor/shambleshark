@@ -1,9 +1,20 @@
 import { api as scryfall } from "./scryfall";
+import { Deck, Card, DeckSections, DeckSectionKinds } from "../types/deck";
+import { ScryfallAPICardListResponse } from "../types/scryfall";
 
-function getCommanders(deck) {
-  const ids = deck.entries.commanders
-    .filter((card) => card.card_digest)
-    .map((card) => `oracle_id:"${card.card_digest.oracle_id}"`)
+type IdTypes = "id" | "oracleId";
+
+type FlattenEntryOptions = {
+  idToGroupBy?: IdTypes;
+  ignoredSections?: {
+    [section in DeckSections]?: boolean;
+  };
+};
+
+function getCommanders(deck: Deck): ScryfallAPICardListResponse {
+  const ids = deck.entries
+    .commanders!.filter((card) => card.card_digest)
+    .map((card: Card) => `oracle_id:"${card.card_digest!.oracle_id}"`)
     .join(" or ");
 
   return scryfall.get("/cards/search", {
@@ -11,45 +22,48 @@ function getCommanders(deck) {
   });
 }
 
-function getIdFromEntry(entry, idType) {
+function getIdFromEntry(entry: Card, idType: IdTypes): string {
   if (idType === "id") {
     return entry.raw_text && entry.id;
-  } else if (idType === "oracleId") {
-    return entry.card_digest && entry.card_digest.oracle_id;
+  } else if (idType === "oracleId" && entry.card_digest) {
+    return entry.card_digest.oracle_id;
   }
+
+  return "";
 }
 
-export function isLandCard(card) {
-  const frontType = card.card_digest.type_line.split("//")[0].trim();
+export function isLandCard(card: Card): boolean {
+  const frontType = card.card_digest!.type_line.split("//")[0].trim();
 
   return Boolean(frontType.includes("Land") && !frontType.includes("Creature"));
 }
 
-export function getSections(deck) {
-  return Object.keys(deck.sections).reduce((sections, type) => {
-    deck.sections[type].forEach((section) => sections.push(section));
+export function getSections(deck: Deck): DeckSections[] {
+  const deckSections: DeckSections[] = [];
+
+  Object.keys(deck.sections).reduce((sections, type) => {
+    deck.sections[type as DeckSectionKinds].forEach((section) =>
+      sections.push(section)
+    );
     return sections;
-  }, []);
+  }, deckSections);
+
+  return deckSections;
 }
 
-export function hasDedicatedLandSection(deck) {
+export function hasDedicatedLandSection(deck: Deck): boolean {
   return getSections(deck).includes("lands");
 }
 
-export function getCommanderColorIdentity(deck) {
+// TODO
+export function getCommanderColorIdentity(deck: Deck): Promise<string[]> {
   return getCommanders(deck)
     .then((cards) => {
       return cards.map((c) => c.color_identity);
     })
     .catch(() => [])
     .then((colorIdentities) => {
-      const colors = new Set(
-        colorIdentities.reduce((id, ci) => {
-          id.push(...ci);
-
-          return id;
-        }, [])
-      );
+      const colors = new Set(colorIdentities.flat());
 
       if (colors.size === 0) {
         colors.add("C");
@@ -59,10 +73,13 @@ export function getCommanderColorIdentity(deck) {
     });
 }
 
-export function flattenEntries(deck, options = {}) {
+export function flattenEntries(
+  deck: Deck,
+  options: FlattenEntryOptions = {}
+): Card[] {
   const sections = getSections(deck);
-  const entries = [];
-  const ids = {};
+  const entries: Card[] = [];
+  const ids: Record<string, Card> = {};
   const idToGroupBy = options.idToGroupBy || "oracleId";
   const ignoredSections = options.ignoredSections || {};
 
@@ -70,7 +87,7 @@ export function flattenEntries(deck, options = {}) {
     if (section in ignoredSections) {
       return;
     }
-    deck.entries[section].forEach((entry) => {
+    deck.entries[section]!.forEach((entry) => {
       const id = getIdFromEntry(entry, idToGroupBy);
 
       if (id) {
@@ -88,7 +105,7 @@ export function flattenEntries(deck, options = {}) {
   return entries;
 }
 
-export function hasLegalCommanders(commanders) {
+export function hasLegalCommanders(commanders: string[]): Promise<boolean> {
   if (commanders.length === 0) {
     // no commanders in commander section
     return Promise.resolve(false);
@@ -111,11 +128,11 @@ export function hasLegalCommanders(commanders) {
     });
 }
 
-export function isCommanderLike(deck) {
+export function isCommanderLike(deck: Deck): boolean {
   return getSections(deck).includes("commanders");
 }
 
-export function isSingletonTypeDeck(deck) {
+export function isSingletonTypeDeck(deck: Deck): boolean {
   return getSections(deck).includes("nonlands") || isCommanderLike(deck);
 }
 
