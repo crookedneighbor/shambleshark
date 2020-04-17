@@ -21,6 +21,7 @@ import {
   generateScryfallGlobal,
   generateScryfallAPIGlobal,
 } from "../mocks/scryfall-global";
+import { makeFakeDeck, makeFakeCard } from "Helpers/fake";
 
 declare global {
   interface Window {
@@ -77,7 +78,7 @@ describe("set up listeners on Scryfall page", function () {
 
   describe("REQUEST_DECK", function () {
     it("replies with the active deck passed into the setup script", function () {
-      const fakeDeck = {};
+      const fakeDeck = makeFakeDeck();
       const spy = jest.fn();
 
       mocked(getDeck).mockResolvedValue(fakeDeck);
@@ -182,15 +183,14 @@ describe("set up listeners on Scryfall page", function () {
         cardName: "Rashmi, Eternities Crafter",
         cardId: "id-1",
       };
-      scryfallCard = {
+      scryfallCard = makeFakeCard({
         id: "id",
         section: "mainboard",
-        raw_text: "raw",
-        card_digest: {
+        cardDigest: {
           oracle_id: "oracle-id",
           type_line: "Creature",
         },
-      };
+      });
       (bus.on as jest.Mock).mockImplementation(
         (event: string, cb: Function) => {
           if (event === "ADD_CARD_TO_DECK") {

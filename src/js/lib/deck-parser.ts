@@ -1,5 +1,5 @@
 import { api as scryfall } from "./scryfall";
-import { Card, Deck, section } from "Js/types/deck";
+import { Card, Deck, DeckSections } from "Js/types/deck";
 import { CardQueryResult } from "scryfall-client";
 
 function getCommanders(deck: Deck): Promise<CardQueryResult> {
@@ -45,7 +45,7 @@ export function getCommanderColorIdentity(deck: Deck) {
     });
 }
 
-export function getSections(deck: Deck): section[] {
+export function getSections(deck: Deck): DeckSections[] {
   return [...deck.sections.primary, ...deck.sections.secondary];
 }
 
@@ -53,7 +53,7 @@ export type cardIdType = "id" | "oracleId";
 
 export interface FlattenEntriesOptions {
   idToGroupBy?: cardIdType;
-  ignoredSections?: section[];
+  ignoredSections?: DeckSections[];
 }
 
 export function flattenEntries(deck: Deck, options?: FlattenEntriesOptions) {

@@ -11,6 +11,7 @@ import {
 import { api as scryfall } from "Lib/scryfall";
 
 import { Deck } from "Js/types/deck";
+import { makeFakeDeck, makeFakeCard } from "Helpers/fake";
 
 describe("Deck Parser", function () {
   describe("getCommanderColorIdentity", function () {
@@ -19,17 +20,18 @@ describe("Deck Parser", function () {
     });
 
     it("returns array of color identity for commander", async function () {
-      const fakeDeck = {
+      const fakeDeck = makeFakeDeck({
         entries: {
           commanders: [
-            {
-              id: "id",
+            makeFakeCard({
               section: "commanders",
-              card_digest: { oracle_id: "id-1", type_line: "type" },
-            },
+              cardDigest: {
+                oracle_id: "id-1",
+              },
+            }),
           ],
         },
-      };
+      });
 
       scryfall.get.mockResolvedValue([
         {
@@ -47,27 +49,30 @@ describe("Deck Parser", function () {
     });
 
     it("returns array of color identity for multiple commanders", async function () {
-      const fakeDeck = {
+      const fakeDeck = makeFakeDeck({
         entries: {
           commanders: [
-            {
-              id: "1",
+            makeFakeCard({
               section: "commanders",
-              card_digest: { oracle_id: "id-1", type_line: "type" },
-            },
-            {
-              id: "2",
+              cardDigest: {
+                oracle_id: "id-1",
+              },
+            }),
+            makeFakeCard({
               section: "commanders",
-              card_digest: { oracle_id: "id-2", type_line: "type" },
-            },
-            {
-              id: "3",
+              cardDigest: {
+                oracle_id: "id-2",
+              },
+            }),
+            makeFakeCard({
               section: "commanders",
-              card_digest: { oracle_id: "id-3", type_line: "type" },
-            },
+              cardDigest: {
+                oracle_id: "id-3",
+              },
+            }),
           ],
         },
-      };
+      });
 
       scryfall.get.mockResolvedValue([
         {
@@ -91,17 +96,15 @@ describe("Deck Parser", function () {
     });
 
     it("returns array of c when color idenity is empty", async function () {
-      const fakeDeck = {
+      const fakeDeck = makeFakeDeck({
         entries: {
           commanders: [
-            {
-              id: "1",
+            makeFakeCard({
               section: "commanders",
-              card_digest: { oracle_id: "id-1", type_line: "type" },
-            },
+            }),
           ],
         },
-      };
+      });
 
       scryfall.get.mockResolvedValue([
         {
@@ -115,27 +118,28 @@ describe("Deck Parser", function () {
     });
 
     it("ignores cards without a card digeest", async function () {
-      const fakeDeck = {
+      const fakeDeck = makeFakeDeck({
         entries: {
           commanders: [
-            {
-              id: "1",
+            makeFakeCard({
               section: "commanders",
-              card_digest: { oracle_id: "id-1", type_line: "type" },
-            },
-            {
-              id: "2",
+              cardDigest: {
+                oracle_id: "id-1",
+              },
+            }),
+            makeFakeCard({
               section: "commanders",
-              // no card digetst
-            },
-            {
-              id: "3",
+              cardDigest: false,
+            }),
+            makeFakeCard({
               section: "commanders",
-              card_digest: { oracle_id: "id-3", type_line: "type" },
-            },
+              cardDigest: {
+                oracle_id: "id-3",
+              },
+            }),
           ],
         },
-      };
+      });
 
       scryfall.get.mockResolvedValue([
         {
@@ -158,83 +162,90 @@ describe("Deck Parser", function () {
 
   describe("getSections", function () {
     it("returns a flattened array of deck sections", function () {
-      const fakeDeck = {
-        id: "fake-id",
-        sections: {
-          primary: ["1", "2"],
-          secondary: ["3", "4"],
-        },
-        entries: {},
-      };
+      const fakeDeck = makeFakeDeck({
+        primarySections: ["nonlands", "lands"],
+        secondarySections: ["maybeboard", "sideboard"],
+      });
 
-      expect(getSections(fakeDeck)).toEqual(["1", "2", "3", "4"]);
+      expect(getSections(fakeDeck)).toEqual([
+        "nonlands",
+        "lands",
+        "maybeboard",
+        "sideboard",
+      ]);
     });
   });
 
   describe("isLandCard", function () {
     it("returns false if card is not a land card", function () {
       expect(
-        isLandCard({
-          card_digest: {
-            oracle_id: "id",
-            type_line: "Enchantment",
-          },
-        })
+        isLandCard(
+          makeFakeCard({
+            cardDigest: {
+              type_line: "Enchantment",
+            },
+          })
+        )
       ).toBe(false);
     });
 
     it("returns true if card is a land card", function () {
       expect(
-        isLandCard({
-          card_digest: {
-            oracle_id: "id",
-            type_line: "Land",
-          },
-        })
+        isLandCard(
+          makeFakeCard({
+            cardDigest: {
+              type_line: "Land",
+            },
+          })
+        )
       ).toBe(true);
     });
 
     it("returns false if card is land card on flip side", function () {
       expect(
-        isLandCard({
-          card_digest: {
-            oracle_id: "id",
-            type_line: "Enchantment // Land",
-          },
-        })
+        isLandCard(
+          makeFakeCard({
+            cardDigest: {
+              type_line: "Enchantment // Land",
+            },
+          })
+        )
       ).toBe(false);
     });
 
     it("returns true if card is a land card on front side", function () {
       expect(
-        isLandCard({
-          card_digest: {
-            oracle_id: "id",
-            type_line: "Land // Creature",
-          },
-        })
+        isLandCard(
+          makeFakeCard({
+            cardDigest: {
+              type_line: "Land // Creature",
+            },
+          })
+        )
       ).toBe(true);
     });
 
     it("returns false if card is a creature land", function () {
       expect(
-        isLandCard({
-          card_digest: {
-            oracle_id: "id",
-            type_line: "Land Creature",
-          },
-        })
+        isLandCard(
+          makeFakeCard({
+            cardDigest: {
+              type_line: "Land Creature",
+            },
+          })
+        )
       ).toBe(false);
     });
 
     it("returns true if card is a creature on the flipside", function () {
       expect(
-        isLandCard({
-          card_digest: {
-            oracle_id: "id",
-            type_line: "Land // Creature",
-          },
-        })
+        isLandCard(
+          makeFakeCard({
+            cardDigest: {
+              type_line: "Land // Creature",
+            },
+          })
+        )
       ).toBe(true);
     });
   });
@@ -242,23 +253,23 @@ describe("Deck Parser", function () {
   describe("hasDedicatedLandSection", function () {
     it("returns false if deck does not have a lands section", function () {
       expect(
-        hasDedicatedLandSection({
-          sections: {
-            primary: ["mainboard", "sideboard"],
-            seconday: ["maybeboard"],
-          },
-        })
+        hasDedicatedLandSection(
+          makeFakeDeck({
+            primarySections: ["mainboard", "sideboard"],
+            secondarySections: ["maybeboard"],
+          })
+        )
       ).toBe(false);
     });
 
     it("returns true if deck does have a lands section", function () {
       expect(
-        hasDedicatedLandSection({
-          sections: {
-            primary: ["mainboard", "lands"],
-            seconday: ["maybeboard"],
-          },
-        })
+        hasDedicatedLandSection(
+          makeFakeDeck({
+            primarySections: ["mainboard", "lands"],
+            secondarySections: ["maybeboard"],
+          })
+        )
       ).toBe(true);
     });
   });
@@ -267,216 +278,145 @@ describe("Deck Parser", function () {
     let fakeDeck: Deck;
 
     beforeEach(function () {
-      fakeDeck = {
-        id: "fake-id",
-        sections: {
-          primary: ["commanders", "nonlands"],
-          secondary: ["lands", "maybeboard"],
-        },
+      fakeDeck = makeFakeDeck({
+        primarySections: ["commanders", "nonlands"],
+        secondarySections: ["lands", "maybeboard"],
         entries: {
           commanders: [
-            {
+            makeFakeCard({
               id: "id-1",
-              raw_text: "text",
               section: "commanders",
-              count: 1,
-              card_digest: { oracle_id: "oracle-1", type_line: "type" },
-            },
-            {
+            }),
+            makeFakeCard({
               id: "id-2",
-              raw_text: "text",
               section: "commanders",
-              count: 1,
-              card_digest: { oracle_id: "oracle-2", type_line: "type" },
-            },
+            }),
           ],
           nonlands: [
-            {
+            makeFakeCard({
               id: "id-3",
-              raw_text: "text",
               section: "nonlands",
-              count: 1,
-              card_digest: { oracle_id: "oracle-3", type_line: "type" },
-            },
-            {
+            }),
+            makeFakeCard({
               id: "id-4",
-              raw_text: "text",
               section: "nonlands",
-              count: 1,
-              card_digest: { oracle_id: "oracle-4", type_line: "type" },
-            },
+            }),
           ],
           lands: [
-            {
+            makeFakeCard({
               id: "id-5",
-              raw_text: "text",
               section: "lands",
-              count: 1,
-              card_digest: { oracle_id: "oracle-5", type_line: "type" },
-            },
-            {
+            }),
+            makeFakeCard({
               id: "id-6",
-              raw_text: "text",
               section: "lands",
-              count: 1,
-              card_digest: { oracle_id: "oracle-6", type_line: "type" },
-            },
+            }),
           ],
           maybeboard: [
-            {
+            makeFakeCard({
               id: "id-7",
-              raw_text: "text",
               section: "maybeboard",
-              count: 1,
-              card_digest: { oracle_id: "oracle-7", type_line: "type" },
-            },
-            {
+            }),
+            makeFakeCard({
               id: "id-8",
               section: "maybeboard",
-              raw_text: "text",
-              count: 1,
-              card_digest: { oracle_id: "oracle-8", type_line: "type" },
-            },
+            }),
           ],
         },
-      };
+      });
     });
 
     it("takes deck entries and flattens them into a single list", function () {
       const entries = flattenEntries(fakeDeck);
 
       expect(entries.length).toBe(8);
-      expect(entries).toContainEqual({
+      expect(entries.find((e) => e.id === "id-1")).toMatchObject({
         id: "id-1",
-        raw_text: "text",
         section: "commanders",
-        count: 1,
-        card_digest: { oracle_id: "oracle-1", type_line: "type" },
       });
-      expect(entries).toContainEqual({
+      expect(entries.find((e) => e.id === "id-2")).toMatchObject({
         id: "id-2",
-        raw_text: "text",
         section: "commanders",
-        count: 1,
-        card_digest: { oracle_id: "oracle-2", type_line: "type" },
       });
-      expect(entries).toContainEqual({
+      expect(entries.find((e) => e.id === "id-3")).toMatchObject({
         id: "id-3",
-        raw_text: "text",
         section: "nonlands",
-        count: 1,
-        card_digest: { oracle_id: "oracle-3", type_line: "type" },
       });
-      expect(entries).toContainEqual({
+      expect(entries.find((e) => e.id === "id-4")).toMatchObject({
         id: "id-4",
-        raw_text: "text",
         section: "nonlands",
-        count: 1,
-        card_digest: { oracle_id: "oracle-4", type_line: "type" },
       });
-      expect(entries).toContainEqual({
+      expect(entries.find((e) => e.id === "id-5")).toMatchObject({
         id: "id-5",
-        raw_text: "text",
         section: "lands",
-        count: 1,
-        card_digest: { oracle_id: "oracle-5", type_line: "type" },
       });
-      expect(entries).toContainEqual({
+      expect(entries.find((e) => e.id === "id-6")).toMatchObject({
         id: "id-6",
-        raw_text: "text",
         section: "lands",
-        count: 1,
-        card_digest: { oracle_id: "oracle-6", type_line: "type" },
       });
-      expect(entries).toContainEqual({
+      expect(entries.find((e) => e.id === "id-7")).toMatchObject({
         id: "id-7",
-        raw_text: "text",
         section: "maybeboard",
-        count: 1,
-        card_digest: { oracle_id: "oracle-7", type_line: "type" },
       });
-      expect(entries).toContainEqual({
+      expect(entries.find((e) => e.id === "id-8")).toMatchObject({
         id: "id-8",
-        raw_text: "text",
         section: "maybeboard",
-        count: 1,
-        card_digest: { oracle_id: "oracle-8", type_line: "type" },
       });
     });
 
     it("by default collapses cards with the same orracle id in multiple entries in sections into one", function () {
+      fakeDeck.entries.commanders![1].card_digest!.oracle_id = "oracle-custom";
       fakeDeck.entries.lands = [
-        {
+        makeFakeCard({
           id: "id-2",
-          raw_text: "text",
           section: "lands",
           count: 2,
-          card_digest: {
-            oracle_id: "oracle-2",
-            type_line: "type",
+          cardDigest: {
+            oracle_id: "oracle-custom",
           },
-        },
+        }),
       ];
 
       const entries = flattenEntries(fakeDeck);
 
       expect(entries.length).toBe(6);
-      expect(entries).toContainEqual({
+      expect(entries.find((e) => e.id === "id-1")).toMatchObject({
         id: "id-1",
-        raw_text: "text",
         count: 1,
-        section: "commanders",
-        card_digest: { oracle_id: "oracle-1", type_line: "type" },
       });
-      expect(entries).toContainEqual({
+      expect(entries.find((e) => e.id === "id-2")).toMatchObject({
         id: "id-2",
-        raw_text: "text",
         section: "commanders",
-        count: 3,
-        card_digest: { oracle_id: "oracle-2", type_line: "type" },
       });
-      expect(entries).toContainEqual({
+      expect(entries.find((e) => e.id === "id-3")).toMatchObject({
         id: "id-3",
-        raw_text: "text",
         section: "nonlands",
-        count: 1,
-        card_digest: { oracle_id: "oracle-3", type_line: "type" },
       });
-      expect(entries).toContainEqual({
+      expect(entries.find((e) => e.id === "id-4")).toMatchObject({
         id: "id-4",
-        raw_text: "text",
         section: "nonlands",
-        count: 1,
-        card_digest: { oracle_id: "oracle-4", type_line: "type" },
       });
-      expect(entries).toContainEqual({
+      expect(entries.find((e) => e.id === "id-7")).toMatchObject({
         id: "id-7",
-        raw_text: "text",
         section: "maybeboard",
-        count: 1,
-        card_digest: { oracle_id: "oracle-7", type_line: "type" },
       });
-      expect(entries).toContainEqual({
+      expect(entries.find((e) => e.id === "id-8")).toMatchObject({
         id: "id-8",
-        raw_text: "text",
         section: "maybeboard",
-        count: 1,
-        card_digest: { oracle_id: "oracle-8", type_line: "type" },
       });
     });
 
     it("can specify to collapse by id", function () {
       fakeDeck.entries.lands = [
-        {
+        makeFakeCard({
           id: "id-9",
           count: 2,
           section: "lands",
           raw_text: "text",
-          card_digest: {
+          cardDigest: {
             oracle_id: "oracle-2",
-            type_line: "type",
           },
-        },
+        }),
       ];
 
       const entries = flattenEntries(fakeDeck, {
@@ -484,54 +424,33 @@ describe("Deck Parser", function () {
       });
 
       expect(entries.length).toBe(7);
-      expect(entries).toContainEqual({
+      expect(entries.find((e) => e.id === "id-1")).toMatchObject({
         id: "id-1",
-        raw_text: "text",
         section: "commanders",
-        count: 1,
-        card_digest: { oracle_id: "oracle-1", type_line: "type" },
       });
-      expect(entries).toContainEqual({
+      expect(entries.find((e) => e.id === "id-2")).toMatchObject({
         id: "id-2",
-        raw_text: "text",
         section: "commanders",
-        count: 1,
-        card_digest: { oracle_id: "oracle-2", type_line: "type" },
       });
-      expect(entries).toContainEqual({
+      expect(entries.find((e) => e.id === "id-9")).toMatchObject({
         id: "id-9",
-        raw_text: "text",
         section: "lands",
-        count: 2,
-        card_digest: { oracle_id: "oracle-2", type_line: "type" },
       });
-      expect(entries).toContainEqual({
+      expect(entries.find((e) => e.id === "id-3")).toMatchObject({
         id: "id-3",
-        raw_text: "text",
         section: "nonlands",
-        count: 1,
-        card_digest: { oracle_id: "oracle-3", type_line: "type" },
       });
-      expect(entries).toContainEqual({
+      expect(entries.find((e) => e.id === "id-4")).toMatchObject({
         id: "id-4",
-        raw_text: "text",
         section: "nonlands",
-        count: 1,
-        card_digest: { oracle_id: "oracle-4", type_line: "type" },
       });
-      expect(entries).toContainEqual({
+      expect(entries.find((e) => e.id === "id-7")).toMatchObject({
         id: "id-7",
-        raw_text: "text",
         section: "maybeboard",
-        count: 1,
-        card_digest: { oracle_id: "oracle-7", type_line: "type" },
       });
-      expect(entries).toContainEqual({
+      expect(entries.find((e) => e.id === "id-8")).toMatchObject({
         id: "id-8",
-        raw_text: "text",
         section: "maybeboard",
-        count: 1,
-        card_digest: { oracle_id: "oracle-8", type_line: "type" },
       });
     });
 
@@ -554,47 +473,29 @@ describe("Deck Parser", function () {
       });
 
       expect(entries.length).toBe(6);
-      expect(entries).toContainEqual({
+      expect(entries.find((e) => e.id === "id-1")).toMatchObject({
         id: "id-1",
-        raw_text: "text",
         section: "commanders",
-        count: 1,
-        card_digest: { oracle_id: "oracle-1", type_line: "type" },
       });
-      expect(entries).toContainEqual({
+      expect(entries.find((e) => e.id === "id-2")).toMatchObject({
         id: "id-2",
-        raw_text: "text",
         section: "commanders",
-        count: 1,
-        card_digest: { oracle_id: "oracle-2", type_line: "type" },
       });
-      expect(entries).toContainEqual({
+      expect(entries.find((e) => e.id === "id-3")).toMatchObject({
         id: "id-3",
-        raw_text: "text",
         section: "nonlands",
-        count: 1,
-        card_digest: { oracle_id: "oracle-3", type_line: "type" },
       });
-      expect(entries).toContainEqual({
+      expect(entries.find((e) => e.id === "id-4")).toMatchObject({
         id: "id-4",
-        raw_text: "text",
         section: "nonlands",
-        count: 1,
-        card_digest: { oracle_id: "oracle-4", type_line: "type" },
       });
-      expect(entries).toContainEqual({
+      expect(entries.find((e) => e.id === "id-7")).toMatchObject({
         id: "id-7",
-        raw_text: "text",
         section: "maybeboard",
-        count: 1,
-        card_digest: { oracle_id: "oracle-7", type_line: "type" },
       });
-      expect(entries).toContainEqual({
+      expect(entries.find((e) => e.id === "id-8")).toMatchObject({
         id: "id-8",
-        raw_text: "text",
         section: "maybeboard",
-        count: 1,
-        card_digest: { oracle_id: "oracle-8", type_line: "type" },
       });
     });
 
@@ -607,33 +508,21 @@ describe("Deck Parser", function () {
       });
 
       expect(entries.length).toBe(4);
-      expect(entries).toContainEqual({
+      expect(entries.find((e) => e.id === "id-3")).toMatchObject({
         id: "id-3",
         section: "nonlands",
-        raw_text: "text",
-        count: 1,
-        card_digest: { oracle_id: "oracle-3", type_line: "type" },
       });
-      expect(entries).toContainEqual({
+      expect(entries.find((e) => e.id === "id-4")).toMatchObject({
         id: "id-4",
         section: "nonlands",
-        raw_text: "text",
-        count: 1,
-        card_digest: { oracle_id: "oracle-4", type_line: "type" },
       });
-      expect(entries).toContainEqual({
+      expect(entries.find((e) => e.id === "id-7")).toMatchObject({
         id: "id-7",
         section: "maybeboard",
-        raw_text: "text",
-        count: 1,
-        card_digest: { oracle_id: "oracle-7", type_line: "type" },
       });
-      expect(entries).toContainEqual({
+      expect(entries.find((e) => e.id === "id-8")).toMatchObject({
         id: "id-8",
-        raw_text: "text",
         section: "maybeboard",
-        count: 1,
-        card_digest: { oracle_id: "oracle-8", type_line: "type" },
       });
     });
   });
@@ -681,25 +570,19 @@ describe("Deck Parser", function () {
 
   describe("isCommanderLike", function () {
     it("returns true when deck has a commanders section", function () {
-      const deck = {
-        sections: {
-          a: ["foo"],
-          b: ["foo", "bar", "commanders", "baz"],
-          c: ["foo"],
-        },
-      };
+      const deck = makeFakeDeck({
+        primarySections: ["mainboard"],
+        secondarySections: ["sideboard", "commanders", "maybeboard"],
+      });
 
       expect(isCommanderLike(deck)).toBe(true);
     });
 
     it("returns false when deck has no commanders", function () {
-      const deck = {
-        sections: {
-          a: ["foo"],
-          b: ["foo", "bar", "baz", "nonlands"],
-          c: ["foo"],
-        },
-      };
+      const deck = makeFakeDeck({
+        primarySections: ["mainboard"],
+        secondarySections: ["sideboard", "lands", "maybeboard"],
+      });
 
       expect(isCommanderLike(deck)).toBe(false);
     });
@@ -707,37 +590,28 @@ describe("Deck Parser", function () {
 
   describe("isSingletonTypeDeck", function () {
     it("returns true when deck has a commanders section", function () {
-      const deck = {
-        sections: {
-          a: ["foo"],
-          b: ["foo", "bar", "commanders", "baz"],
-          c: ["foo"],
-        },
-      };
+      const deck = makeFakeDeck({
+        primarySections: ["mainboard"],
+        secondarySections: ["sideboard", "lands", "commanders", "maybeboard"],
+      });
 
       expect(isSingletonTypeDeck(deck)).toBe(true);
     });
 
     it("returns true when deck has a nonlands section", function () {
-      const deck = {
-        sections: {
-          a: ["foo"],
-          b: ["foo", "bar", "nonlands", "baz"],
-          c: ["foo"],
-        },
-      };
+      const deck = makeFakeDeck({
+        primarySections: ["commanders"],
+        secondarySections: ["lands", "nonlands", "maybeboard"],
+      });
 
       expect(isSingletonTypeDeck(deck)).toBe(true);
     });
 
     it("returns false when deck has no commanders or nonlands section", function () {
-      const deck = {
-        sections: {
-          a: ["foo"],
-          b: ["foo", "bar", "baz"],
-          c: ["foo"],
-        },
-      };
+      const deck = makeFakeDeck({
+        primarySections: ["mainboard"],
+        secondarySections: ["sideboard"],
+      });
 
       expect(isSingletonTypeDeck(deck)).toBe(false);
     });

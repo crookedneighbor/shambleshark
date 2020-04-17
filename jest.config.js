@@ -5,9 +5,10 @@ module.exports = {
   // TODO change to ts-jest when all converted over
   preset: "ts-jest/presets/js-with-babel",
   testEnvironment: "jsdom",
-  setupFilesAfterEnv: ["./test/_setup.js"],
+  setupFilesAfterEnv: ["./test/helpers/setup.js"],
   moduleNameMapper: {
     "^Js/(.*)$": path.resolve(__dirname, "src/js/$1"),
+    "^Helpers/(.*)$": path.resolve(__dirname, "test/helpers/$1"),
     "\\.css$": "<rootDir>/test/mocks/styles.js",
 
     // These need to be duplicated from the webpack config

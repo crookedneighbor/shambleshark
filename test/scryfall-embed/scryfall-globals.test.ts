@@ -18,6 +18,7 @@ import {
   generateScryfallGlobal,
   generateScryfallAPIGlobal,
 } from "../mocks/scryfall-global";
+import { makeFakeDeck, makeFakeCard } from "Helpers/fake";
 
 declare global {
   interface Window {
@@ -31,18 +32,16 @@ describe("Scryfall Globals", function () {
 
   beforeEach(function () {
     jest.spyOn(bus, "emit").mockImplementation();
-    fakeDeck = {
+    fakeDeck = makeFakeDeck({
       id: "deck-id",
-      sections: {
-        primary: ["mainboard"],
-        secondary: ["sideboard", "maybeboard"],
-      },
+      primarySections: ["mainboard"],
+      secondarySections: ["sideboard", "maybeboard"],
       entries: {
         mainboard: [],
         sideboard: [],
         maybeboard: [],
       },
-    };
+    });
     window.ScryfallAPI = generateScryfallAPIGlobal();
     window.ScryfallAPI.decks.active.mockImplementation((cb: Function) => {
       cb(fakeDeck);
@@ -183,7 +182,7 @@ describe("Scryfall Globals", function () {
 
   describe("getDeck", function () {
     it("gets the active deck", function () {
-      const deck = { id: "deck-id" };
+      const deck = makeFakeDeck({ id: "deck-id" });
 
       window.ScryfallAPI.decks.get.mockImplementation(
         (id: string, cb: Function) => {
@@ -204,7 +203,11 @@ describe("Scryfall Globals", function () {
 
   describe("getDeckMetadata", function () {
     it("gets the metadata from active deck", function () {
-      const deck = { id: "deck-id", sections: {}, foo: "bar" };
+      const deck = makeFakeDeck({
+        id: "deck-id",
+        primarySections: ["mainboard"],
+        secondarySections: ["sideboard", "lands"],
+      });
 
       window.ScryfallAPI.decks.get.mockImplementation(
         (id: string, cb: Function) => {
@@ -220,7 +223,10 @@ describe("Scryfall Globals", function () {
 
         expect(meta).toEqual({
           id: "deck-id",
-          sections: {},
+          sections: {
+            primary: ["mainboard"],
+            secondary: ["sideboard", "lands"],
+          },
         });
       });
     });
@@ -228,7 +234,7 @@ describe("Scryfall Globals", function () {
 
   describe("addCard", function () {
     it("resolves with the card", function () {
-      const card = {};
+      const card = makeFakeCard();
 
       window.ScryfallAPI.decks.addCard.mockImplementation(
         (deckId: string, cardId: string, cb: Function) => {
@@ -250,8 +256,8 @@ describe("Scryfall Globals", function () {
 
   describe("updateEntry", function () {
     it("resolves with the card", function () {
-      const cardToUpdate = { id: "card-id" };
-      const card = {};
+      const cardToUpdate = makeFakeCard({ id: "card-id" });
+      const card = makeFakeCard();
 
       window.ScryfallAPI.decks.updateEntry.mockImplementation(
         (deckId: string, cardToUpdate: any, cb: Function) => {
