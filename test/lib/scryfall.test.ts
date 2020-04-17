@@ -2,6 +2,8 @@ import { api, getCollection, getDeck } from "Lib/scryfall";
 import * as bus from "framebus";
 import { mocked } from "ts-jest/utils";
 
+import { makeFakeDeck } from "Helpers/fake";
+
 jest.mock("framebus");
 
 describe("scryfall", function () {
@@ -15,7 +17,7 @@ describe("scryfall", function () {
     });
 
     it("requests deck from Scryfall page", async function () {
-      const deck = {};
+      const deck = makeFakeDeck();
 
       mocked(bus.emit).mockImplementation((event, cb) => {
         cb(deck);
@@ -28,8 +30,8 @@ describe("scryfall", function () {
     });
 
     it("caches result if request is made a second time within 2 seconds", async function () {
-      const firstDeck = { id: "1" };
-      const secondDeck = { id: "2" };
+      const firstDeck = makeFakeDeck();
+      const secondDeck = makeFakeDeck();
 
       mocked(bus.emit).mockImplementationOnce((event, cb) => {
         cb(firstDeck);
