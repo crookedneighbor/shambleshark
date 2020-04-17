@@ -1,7 +1,7 @@
 // adapted from http://ryanmorr.com/using-mutation-observers-to-watch-for-element-availability/
 
-let readyObserver;
-const listeners = [];
+let readyObserver: MutationObserver | null;
+const listeners: { selector: string; fn: Function }[] = [];
 
 export function reset() {
   readyObserver = null;
@@ -12,13 +12,13 @@ function check() {
   // Check the DOM for elements matching a stored selector
   listeners.forEach((listener) => {
     // Query for elements matching the specified selector
-    const elements = Array.from(document.querySelectorAll(listener.selector));
+    const elements = Array.of(document.querySelectorAll<HTMLElement>(listener.selector));
 
     elements.forEach((element) => {
       // Make sure the callback isn't invoked with the
       // same element more than once
-      if (!element.ready) {
-        element.ready = true;
+      if (!(element as any).ready) {
+        (element as any).ready = true;
         // Invoke the callback with the element
         listener.fn.call(element, element);
       }
@@ -26,15 +26,12 @@ function check() {
   });
 }
 
-export function ready(selector, fn) {
+export function ready(selector: string, fn: Function) {
   // Store the selector and callback to be monitored
-  listeners.push({
-    selector: selector,
-    fn: fn,
-  });
+  listeners.push({ selector, fn });
   if (!readyObserver) {
     // Watch for changes in the document
-    readyObserver = new global.MutationObserver(check);
+    readyObserver = new window.MutationObserver(check);
     readyObserver.observe(document.documentElement, {
       childList: true,
       subtree: true,
@@ -45,9 +42,9 @@ export function ready(selector, fn) {
   check();
 }
 
-export function change(parentSelector, fn) {
-  ready(parentSelector, (parentNode) => {
-    const observer = new global.MutationObserver(function () {
+export function change(parentSelector: string, fn: Function) {
+  ready(parentSelector, (parentNode: Element) => {
+    const observer = new window.MutationObserver(function () {
       fn(parentNode);
     });
     observer.observe(parentNode, {

@@ -1,35 +1,10 @@
-import DialogInterface, { DialogInterfaceOptions } from "./dialog-interface";
+import DialogInterface, { DialogOptions } from "./dialog-interface";
 import createElement from "Lib/create-element";
 import "./drawer.css";
 import { SPINNER_GIF } from "Constants";
 
-interface DrawerOptions extends DialogInterfaceOptions {
-  position?: string;
-  onScroll?: Function;
-  contentMessage?: string;
-}
-
 export default class Drawer extends DialogInterface {
-  _scrollableEl: HTMLElement;
-
-  position: string;
-
-  constructor(options: DrawerOptions = {}) {
-    super(options);
-
-    this.position = options.position || "right";
-    this.$(".drawer-dialog").classList.add(
-      `drawer-dialog-position-${this.position}`
-    );
-
-    this._scrollableEl = this.$(".drawer-dialog");
-
-    if (options.onScroll) {
-      this._scrollableEl.addEventListener("scroll", () => {
-        this.triggerOnScroll();
-      });
-    }
-  }
+  private _scrollableEl?: HTMLDivElement;
 
   open() {
     super.open();
@@ -47,7 +22,7 @@ export default class Drawer extends DialogInterface {
     return this._scrollableEl;
   }
 
-  _constructElement(options: DrawerOptions): HTMLElement {
+  _constructElement(options: DialogOptions): HTMLDialogElement {
     const titleId = `drawer-title-${options.id}`;
 
     const drawer = createElement(`<div
@@ -83,11 +58,23 @@ export default class Drawer extends DialogInterface {
           <div class="dialog-content drawer-dialog-stage-content"></div>
         </div>
       </div>
-    </div>`).firstChild as HTMLElement;
+    </div>`).firstChild as HTMLDialogElement;
 
-    drawer.querySelector(".dialog-close")!.addEventListener("click", () => {
-      this.close();
-    });
+    drawer
+      ?.querySelector<HTMLButtonElement>(".dialog-close")
+      ?.addEventListener("click", () => {
+        this.close();
+      });
+
+    this._scrollableEl = drawer.querySelector(
+      ".drawer-dialog"
+    ) as HTMLDivElement;
+
+    if (options.onScroll) {
+      this._scrollableEl?.addEventListener("scroll", async () => {
+        await this.triggerOnScroll();
+      });
+    }
 
     return drawer;
   }

@@ -1,18 +1,28 @@
-import bus from "framebus";
-import CardInputModifier from "Features/deck-builder-features/card-input-modifier";
-import deckParser from "Lib/deck-parser";
-import scryfall from "Lib/scryfall";
-import mutation from "Lib/mutation";
+import * as bus from "framebus";
+import CardInputModifier from "../../../src/js/features/deck-builder-features/card-input-modifier";
+import deckParser from "../../../src/js/lib/deck-parser";
+import scryfall from "../../../src/js/lib/scryfall";
+import mutation from "../../../src/js/lib/mutation";
 import wait from "Lib/wait";
+import SpyInstance = jest.SpyInstance;
+import { Card, Deck } from "../../../src/js/types/deck";
 
 describe("Card Input Modifier", function () {
-  let cim;
+  let cim: CardInputModifier;
+
+  let getDeckSpy: SpyInstance;
+  let flattenEntriesSpy: SpyInstance;
+  let busOnSpy: SpyInstance;
 
   beforeEach(function () {
     cim = new CardInputModifier();
-    jest.spyOn(scryfall, "getDeck").mockResolvedValue({});
-    jest.spyOn(deckParser, "flattenEntries").mockReturnValue([]);
-    jest.spyOn(bus, "on").mockImplementation();
+    getDeckSpy = jest
+      .spyOn(scryfall, "getDeck")
+      .mockResolvedValue({} as Promise<Deck>);
+    flattenEntriesSpy = jest
+      .spyOn(deckParser, "flattenEntries")
+      .mockReturnValue([]);
+    busOnSpy = jest.spyOn(bus, "on").mockImplementation();
   });
 
   it("sets tooltip image with img from image cache", function () {
@@ -42,10 +52,12 @@ describe("Card Input Modifier", function () {
   });
 
   describe("run", function () {
-    let fakeEntry;
+    let fakeEntry: HTMLElement;
+
+    let readySpy: SpyInstance;
 
     beforeEach(function () {
-      jest.spyOn(mutation, "ready").mockImplementation();
+      readySpy = jest.spyOn(mutation, "ready").mockImplementation();
 
       fakeEntry = document.createElement("div");
       fakeEntry.setAttribute("data-entry", "entry-id");
@@ -56,10 +68,10 @@ describe("Card Input Modifier", function () {
 
     it("waits for new deckbuilder entries to attach listeners", async function () {
       const secondFakeEntry = document.createElement("div");
-      mutation.ready.mockImplementation(function (name, cb) {
+      readySpy.mockImplementation((name: string, fn: Function) => {
         if (name === ".deckbuilder-entry") {
-          cb(fakeEntry);
-          cb(secondFakeEntry);
+          fn(fakeEntry);
+          fn(secondFakeEntry);
         }
       });
       jest.spyOn(cim, "attachListenersToEntry").mockImplementation();
@@ -100,7 +112,7 @@ describe("Card Input Modifier", function () {
         payload: "foo",
       };
       cim.imageCache.foo = "foo";
-      bus.on.mockImplementation((event, cb) => {
+      busOnSpy.mockImplementation((event, cb) => {
         if (event === "CALLED_DESTROYENTRY") {
           cb(payload);
         }
@@ -116,7 +128,7 @@ describe("Card Input Modifier", function () {
       async function (eventName) {
         jest.spyOn(cim, "refreshCache").mockResolvedValue();
 
-        bus.on.mockImplementation((event, cb) => {
+        busOnSpy.mockImplementation((event, cb) => {
           if (event === `CALLED_${eventName}`) {
             cb();
           }
@@ -131,7 +143,7 @@ describe("Card Input Modifier", function () {
   });
 
   describe("attachListenersToEntry", function () {
-    let entry;
+    let entry: HTMLElement;
 
     beforeEach(function () {
       entry = document.createElement("div");
@@ -192,8 +204,8 @@ describe("Card Input Modifier", function () {
           id: "1",
         },
       ];
-      scryfall.getDeck.mockResolvedValue(deck);
-      deckParser.flattenEntries.mockReturnValue(mockedEntries);
+      getDeckSpy.mockResolvedValue(deck);
+      flattenEntriesSpy.mockReturnValue(mockedEntries);
 
       const entries = await cim.getEntries();
 
@@ -235,7 +247,7 @@ describe("Card Input Modifier", function () {
     });
 
     it("looks up deck to find image", async function () {
-      deckParser.flattenEntries.mockReturnValue([
+      flattenEntriesSpy.mockReturnValue([
         {
           id: "foo",
           card_digest: {
@@ -252,7 +264,7 @@ describe("Card Input Modifier", function () {
     });
 
     it("returns nothing if entry with specific id cannot be found", async function () {
-      deckParser.flattenEntries.mockReturnValue([
+      flattenEntriesSpy.mockReturnValue([
         {
           id: "not-foo",
           card_digest: {
@@ -268,7 +280,7 @@ describe("Card Input Modifier", function () {
     });
 
     it("returns nothing if entry with specific id does not have an image", async function () {
-      deckParser.flattenEntries.mockReturnValue([
+      flattenEntriesSpy.mockReturnValue([
         {
           id: "foo",
         },
@@ -282,7 +294,7 @@ describe("Card Input Modifier", function () {
 
     it("can bust the cache to re-lookup card image", async function () {
       cim.imageCache.foo = "https://example.com/cached-foo";
-      deckParser.flattenEntries.mockReturnValue([
+      flattenEntriesSpy.mockReturnValue([
         {
           id: "foo",
           card_digest: {
@@ -317,7 +329,7 @@ describe("Card Input Modifier", function () {
         {
           id: "baz",
         },
-      ]);
+      ] as Card[]);
       cim.imageCache.foo = "https://example.com/cached-foo";
 
       jest.useFakeTimers();

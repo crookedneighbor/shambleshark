@@ -2,10 +2,14 @@ import EDHRecSuggestions from "Features/deck-builder-features/edhrec-suggestions
 import scryfall from "Lib/scryfall";
 import mutation from "Lib/mutation";
 import iframe from "Lib/iframe";
+import { Deck } from "../../../src/js/types/deck";
+import SpyInstance = jest.SpyInstance;
 
 describe("EDHRec Suggestions", function () {
   describe("run", function () {
-    let toolbar;
+    let toolbar: HTMLDivElement;
+
+    let readySpy: SpyInstance;
 
     beforeEach(function () {
       toolbar = document.createElement("div");
@@ -17,20 +21,27 @@ describe("EDHRec Suggestions", function () {
       deckbuilderElement.id = "deckbuilder";
       document.body.appendChild(deckbuilderElement);
 
-      jest.spyOn(scryfall, "getDeck").mockResolvedValue({
-        entries: {
-          commanders: [],
-        },
-      });
+      jest.spyOn(scryfall, "getDeck").mockResolvedValue(
+        new Promise<Deck>(
+          () =>
+            (({
+              entries: {
+                commanders: [],
+              },
+            } as Partial<Deck>) as Deck)
+        )
+      );
       jest.spyOn(mutation, "change").mockImplementation();
-      jest.spyOn(mutation, "ready").mockImplementation((selector, cb) => {
-        const el = document.createElement("div");
-        el.innerText = "Commander(s)";
+      readySpy = jest
+        .spyOn(mutation, "ready")
+        .mockImplementation((selector, cb) => {
+          const el = document.createElement("div");
+          el.innerText = "Commander(s)";
 
-        cb(el);
-      });
+          cb(el);
+        });
 
-      jest.spyOn(iframe, "create").mockResolvedValue();
+      jest.spyOn(iframe, "create").mockImplementation();
     });
 
     it("adds an edhrec button to the toolbar items on the page for a commander deck", async function () {
@@ -44,7 +55,7 @@ describe("EDHRec Suggestions", function () {
     it("does not add an edhrec button to the toolbar items on the page for a non-commander deck", async function () {
       const feature = new EDHRecSuggestions();
 
-      mutation.ready.mockImplementation((selector, cb) => {
+      readySpy.mockImplementation((selector, cb) => {
         const el = document.createElement("div");
         el.innerText = "Lands";
 

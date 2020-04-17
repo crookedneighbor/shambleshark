@@ -1,4 +1,4 @@
-type sections =
+export type section =
   | "commanders"
   | "lands"
   | "mainboard"
@@ -6,25 +6,29 @@ type sections =
   | "nonlands"
   | "sideboard";
 
+export type color = "W" | "U" | "B" | "R" | "G";
+
 export interface Card {
   id: string;
-  section: sections;
+  section: section;
   raw_text: string;
   count?: number;
   card_digest?: {
-    oracle_id: string;
-    type_line: string;
+    name?: string;
+    type_line?: string;
+    oracle_id?: string;
   };
+  color_identity: color[] | ["C"];
   [propName: string]: any;
 }
 
 export interface Deck {
   id: string;
   sections: {
-    primary: sections[];
-    secondary: sections[];
+    primary: section[];
+    secondary: section[];
   };
   entries: {
-    [section in sections]?: Card[];
+    [key in section]?: Card[];
   };
 }

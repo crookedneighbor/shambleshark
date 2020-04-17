@@ -1,5 +1,9 @@
-import bus from "framebus";
-import TaggerLink from "Features/search-results-features/tagger-link";
+import * as bus from "framebus";
+import TaggerLink, {
+  Relationship,
+  ShamblesharkRelationship,
+  TaggerPayload,
+} from "../../../src/js/features/search-results-features/tagger-link";
 import iframe from "Lib/iframe";
 import mutation from "Lib/mutation";
 
@@ -16,17 +20,19 @@ import {
   RELATED_TO_SYMBOL,
   SIMILAR_TO_SYMBOL,
 } from "Svg";
+import SpyInstance = jest.SpyInstance;
 
 describe("Tagger Link", function () {
   describe("run", function () {
+    let busSpy: SpyInstance;
+    let settingsSpy: SpyInstance;
+
     beforeEach(function () {
       jest.spyOn(mutation, "ready").mockImplementation();
-      jest.spyOn(bus, "on").mockImplementation((event, cb) => {
-        cb();
-      });
+      busSpy = jest.spyOn(bus, "on").mockImplementation((event, cb) => cb());
       jest.spyOn(iframe, "create").mockImplementation();
       jest.spyOn(TaggerLink.prototype, "setupButtons").mockImplementation();
-      jest.spyOn(TaggerLink, "getSettings").mockResolvedValue({
+      settingsSpy = jest.spyOn(TaggerLink, "getSettings").mockResolvedValue({
         previewTags: true,
       });
     });
@@ -40,7 +46,7 @@ describe("Tagger Link", function () {
     });
 
     it("when previewTags setting is true, waits for Tager to emit ready event", async function () {
-      bus.on.mockImplementation();
+      busSpy.mockImplementation();
 
       const tl = new TaggerLink();
 
@@ -48,7 +54,7 @@ describe("Tagger Link", function () {
 
       expect(tl.setupButtons).toBeCalledTimes(0);
 
-      const handler = bus.on.mock.calls[0][1];
+      const handler = busSpy.mock.calls[0][1];
 
       handler();
 
@@ -70,7 +76,7 @@ describe("Tagger Link", function () {
     it("when previewTags setting is false, skips setting up Tagger iframe", async function () {
       const tl = new TaggerLink();
 
-      TaggerLink.getSettings.mockResolvedValue({
+      settingsSpy.mockResolvedValue({
         previewTags: false,
       });
       await tl.run();
@@ -82,9 +88,12 @@ describe("Tagger Link", function () {
   });
 
   describe("setupButtons", function () {
+    let readySpy: SpyInstance;
+    let buttonSpy: SpyInstance;
+
     beforeEach(function () {
-      jest.spyOn(mutation, "ready").mockImplementation();
-      jest
+      readySpy = jest.spyOn(mutation, "ready").mockImplementation();
+      buttonSpy = jest
         .spyOn(TaggerLink.prototype, "makeButton")
         .mockReturnValue(document.createElement("button"));
     });
@@ -112,9 +121,9 @@ describe("Tagger Link", function () {
       const fakeBtn = document.createElement("button");
       fakeBtn.classList.add("tagger-link-button");
 
-      tl.makeButton.mockReturnValue(fakeBtn);
+      readySpy.mockReturnValue(fakeBtn);
 
-      mutation.ready.mockImplementation((cssSelector, cb) => {
+      readySpy.mockImplementation((cssSelector, cb) => {
         cb(el.querySelector("a"));
       });
 
@@ -138,14 +147,16 @@ describe("Tagger Link", function () {
 
     it("creates a button link to tagger", () => {
       const tl = new TaggerLink();
-      const btn = tl.makeButton("https://scryfall.com/card/set/number");
+      const btn = tl.makeButton(
+        "https://scryfall.com/card/set/number"
+      ) as HTMLLinkElement;
 
       expect(btn.href).toBe("https://tagger.scryfall.com/card/set/number");
     });
 
     it("when enabled to show tags, adds a mosueover event", () => {
       const tl = new TaggerLink();
-      tl._showPreview = true;
+      tl.showPreview = true;
 
       const btn = tl.makeButton("https://scryfall.com/card/set/number");
 
@@ -158,7 +169,7 @@ describe("Tagger Link", function () {
 
     it("when enabled to show tags, adds a tag display menu", () => {
       const tl = new TaggerLink();
-      tl._showPreview = true;
+      tl.showPreview = true;
 
       const btn = tl.makeButton("https://scryfall.com/card/set/number");
 
@@ -167,7 +178,7 @@ describe("Tagger Link", function () {
 
     it("when not enabled to show tags, skips the hover menu and mouseover event", () => {
       const tl = new TaggerLink();
-      tl._showPreview = false;
+      tl.showPreview = false;
 
       const btn = tl.makeButton("https://scryfall.com/card/set/number");
 
@@ -177,15 +188,17 @@ describe("Tagger Link", function () {
   });
 
   describe("createMouseoverHandler", () => {
-    let btn, fakeEvent;
+    let btn: HTMLButtonElement, fakeEvent: MouseEvent;
+
+    let emitSpy: SpyInstance;
 
     beforeEach(() => {
-      btn = document.createElement("button");
+      btn = document.createElement("button") as HTMLButtonElement;
       btn.innerHTML = '<div class="tagger-link-hover"></div>';
 
       fakeEvent = {
         pageX: 100,
-      };
+      } as MouseEvent;
 
       jest.spyOn(bus, "emit").mockImplementation();
       jest.spyOn(TaggerLink.prototype, "addTags").mockImplementation();
@@ -210,8 +223,8 @@ describe("Tagger Link", function () {
 
       handler(fakeEvent);
 
-      expect(bus.emit).toBeCalledTimes(1);
-      expect(bus.emit).toBeCalledWith(
+      expect(emitSpy).toBeCalledTimes(1);
+      expect(emitSpy).toBeCalledWith(
         "TAGGER_TAGS_REQUEST",
         {
           set: "set",
@@ -229,7 +242,7 @@ describe("Tagger Link", function () {
         number: "number",
       });
 
-      bus.emit.mockImplementation((name, data, cb) => {
+      emitSpy.mockImplementation((name, data, cb) => {
         cb(fakeData);
       });
 
@@ -244,21 +257,27 @@ describe("Tagger Link", function () {
   });
 
   describe("addTags", () => {
-    let tl, payload, tooltip;
+    let tl: TaggerLink, payload: TaggerPayload, tooltip: HTMLElement;
+
+    let collectTagsSpy: SpyInstance;
+    let collectRelationshipsSpy: SpyInstance;
+    let addTagsToMenuSpy: SpyInstance;
 
     beforeEach(() => {
       tl = new TaggerLink();
-      jest.spyOn(tl, "collectTags").mockReturnValue({
+      collectTagsSpy = jest.spyOn(tl, "collectTags").mockReturnValue({
         art: [],
         oracle: [],
         print: [],
       });
-      jest.spyOn(tl, "collectRelationships").mockReturnValue({
-        art: [],
-        oracle: [],
-      });
-      jest.spyOn(tl, "addTagsToMenu").mockImplementation();
-      payload = {};
+      collectRelationshipsSpy = jest
+        .spyOn(tl, "collectRelationships")
+        .mockReturnValue({
+          art: [],
+          oracle: [],
+        });
+      addTagsToMenuSpy = jest.spyOn(tl, "addTagsToMenu").mockImplementation();
+      payload = {} as TaggerPayload;
       tooltip = document.createElement("div");
       tooltip.innerHTML =
         '<div class="menu-container"></div><div class="modal-dialog-spinner"></div>';
@@ -267,10 +286,10 @@ describe("Tagger Link", function () {
     it("collects tags and relationships", () => {
       tl.addTags(tooltip, payload);
 
-      expect(tl.collectTags).toBeCalledTimes(1);
-      expect(tl.collectTags).toBeCalledWith(payload);
-      expect(tl.collectRelationships).toBeCalledTimes(1);
-      expect(tl.collectRelationships).toBeCalledWith(payload);
+      expect(collectTagsSpy).toBeCalledTimes(1);
+      expect(collectTagsSpy).toBeCalledWith(payload);
+      expect(collectRelationshipsSpy).toBeCalledTimes(1);
+      expect(collectRelationshipsSpy).toBeCalledWith(payload);
     });
 
     it("hides the spinner", () => {
@@ -284,13 +303,13 @@ describe("Tagger Link", function () {
     it("reports when no tags can be found", () => {
       tl.addTags(tooltip, payload);
 
-      expect(tooltip.querySelector(".menu-container").innerText).toBe(
-        "No tags found. Add some!"
-      );
+      expect(
+        tooltip.querySelector<HTMLDivElement>(".menu-container")!.innerText
+      ).toBe("No tags found. Add some!");
     });
 
     it("adds art tags when there is at least one avaialble", () => {
-      tl.collectTags.mockReturnValue({
+      collectTagsSpy.mockReturnValue({
         art: [{ name: "art-tag" }],
         print: [],
         oracle: [],
@@ -306,7 +325,7 @@ describe("Tagger Link", function () {
     });
 
     it("adds print tags when there is at least one avaialble", () => {
-      tl.collectTags.mockReturnValue({
+      collectTagsSpy.mockReturnValue({
         art: [],
         print: [{ name: "print-tag" }],
         oracle: [],
@@ -314,15 +333,15 @@ describe("Tagger Link", function () {
       tl.addTags(tooltip, payload);
 
       expect(tooltip.querySelectorAll(".menu-container ul").length).toBe(1);
-      expect(tl.addTagsToMenu).toBeCalledTimes(1);
-      expect(tl.addTagsToMenu).toBeCalledWith(
+      expect(addTagsToMenuSpy).toBeCalledTimes(1);
+      expect(addTagsToMenuSpy).toBeCalledWith(
         [{ name: "print-tag" }],
         expect.anything()
       );
     });
 
     it("oracle tags when there is at least one avaialble", () => {
-      tl.collectTags.mockReturnValue({
+      collectTagsSpy.mockReturnValue({
         art: [],
         print: [],
         oracle: [{ name: "oracle-tag" }],
@@ -330,30 +349,30 @@ describe("Tagger Link", function () {
       tl.addTags(tooltip, payload);
 
       expect(tooltip.querySelectorAll(".menu-container ul").length).toBe(1);
-      expect(tl.addTagsToMenu).toBeCalledTimes(1);
-      expect(tl.addTagsToMenu).toBeCalledWith(
+      expect(addTagsToMenuSpy).toBeCalledTimes(1);
+      expect(addTagsToMenuSpy).toBeCalledWith(
         [{ name: "oracle-tag" }],
         expect.anything()
       );
     });
 
     it("adds art relationships when there is at least one avaialble", () => {
-      tl.collectRelationships.mockReturnValue({
+      collectRelationshipsSpy.mockReturnValue({
         art: [{ name: "art-relationship" }],
         oracle: [],
       });
       tl.addTags(tooltip, payload);
 
       expect(tooltip.querySelectorAll(".menu-container ul").length).toBe(1);
-      expect(tl.addTagsToMenu).toBeCalledTimes(1);
-      expect(tl.addTagsToMenu).toBeCalledWith(
+      expect(addTagsToMenuSpy).toBeCalledTimes(1);
+      expect(addTagsToMenuSpy).toBeCalledWith(
         [{ name: "art-relationship" }],
         expect.anything()
       );
     });
 
     it("oracle relationships when there is at least one avaialble", () => {
-      tl.collectRelationships.mockReturnValue({
+      collectRelationshipsSpy.mockReturnValue({
         art: [],
         print: [],
         oracle: [{ name: "oracle-relationship" }],
@@ -361,28 +380,28 @@ describe("Tagger Link", function () {
       tl.addTags(tooltip, payload);
 
       expect(tooltip.querySelectorAll(".menu-container ul").length).toBe(1);
-      expect(tl.addTagsToMenu).toBeCalledTimes(1);
-      expect(tl.addTagsToMenu).toBeCalledWith(
+      expect(addTagsToMenuSpy).toBeCalledTimes(1);
+      expect(addTagsToMenuSpy).toBeCalledWith(
         [{ name: "oracle-relationship" }],
         expect.anything()
       );
     });
 
     it("combines art & print tags and art relationsips", () => {
-      tl.collectTags.mockReturnValue({
+      collectTagsSpy.mockReturnValue({
         art: [{ name: "art-tag" }],
         print: [{ name: "print-tag" }],
         oracle: [],
       });
-      tl.collectRelationships.mockReturnValue({
+      collectRelationshipsSpy.mockReturnValue({
         art: [{ name: "art-relationship" }],
         oracle: [],
       });
       tl.addTags(tooltip, payload);
 
       expect(tooltip.querySelectorAll(".menu-container ul").length).toBe(1);
-      expect(tl.addTagsToMenu).toBeCalledTimes(1);
-      expect(tl.addTagsToMenu).toBeCalledWith(
+      expect(addTagsToMenuSpy).toBeCalledTimes(1);
+      expect(addTagsToMenuSpy).toBeCalledWith(
         [
           { name: "art-tag" },
           { name: "print-tag" },
@@ -393,40 +412,40 @@ describe("Tagger Link", function () {
     });
 
     it("combines oracle tags and relationsips", () => {
-      tl.collectTags.mockReturnValue({
+      collectTagsSpy.mockReturnValue({
         art: [],
         print: [],
         oracle: [{ name: "oracle-tag" }],
       });
-      tl.collectRelationships.mockReturnValue({
+      collectRelationshipsSpy.mockReturnValue({
         art: [],
         oracle: [{ name: "oracle-relationship" }],
       });
       tl.addTags(tooltip, payload);
 
       expect(tooltip.querySelectorAll(".menu-container ul").length).toBe(1);
-      expect(tl.addTagsToMenu).toBeCalledTimes(1);
-      expect(tl.addTagsToMenu).toBeCalledWith(
+      expect(addTagsToMenuSpy).toBeCalledTimes(1);
+      expect(addTagsToMenuSpy).toBeCalledWith(
         [{ name: "oracle-tag" }, { name: "oracle-relationship" }],
         expect.anything()
       );
     });
 
     it("can add both art and oracle tags/relationships", () => {
-      tl.collectTags.mockReturnValue({
+      collectTagsSpy.mockReturnValue({
         art: [{ name: "art-tag" }],
         print: [{ name: "print-tag" }],
         oracle: [{ name: "oracle-tag" }],
       });
-      tl.collectRelationships.mockReturnValue({
+      collectRelationshipsSpy.mockReturnValue({
         art: [{ name: "art-relationship" }],
         oracle: [{ name: "oracle-relationship" }],
       });
       tl.addTags(tooltip, payload);
 
       expect(tooltip.querySelectorAll(".menu-container ul").length).toBe(2);
-      expect(tl.addTagsToMenu).toBeCalledTimes(2);
-      expect(tl.addTagsToMenu).nthCalledWith(
+      expect(addTagsToMenuSpy).toBeCalledTimes(2);
+      expect(addTagsToMenuSpy).nthCalledWith(
         1,
         [
           { name: "art-tag" },
@@ -435,7 +454,7 @@ describe("Tagger Link", function () {
         ],
         expect.anything()
       );
-      expect(tl.addTagsToMenu).nthCalledWith(
+      expect(addTagsToMenuSpy).nthCalledWith(
         2,
         [{ name: "oracle-tag" }, { name: "oracle-relationship" }],
         expect.anything()
@@ -452,7 +471,7 @@ describe("Tagger Link", function () {
   });
 
   describe("collectTags", () => {
-    let tl, payload;
+    let tl: TaggerLink, payload: TaggerPayload;
 
     beforeEach(() => {
       tl = new TaggerLink();
@@ -509,7 +528,7 @@ describe("Tagger Link", function () {
     });
 
     it("ignores any other types", () => {
-      payload.taggings.push({
+      payload.taggings!.push({
         tag: {
           name: "bad type",
           type: "NONE",
@@ -545,7 +564,7 @@ describe("Tagger Link", function () {
   });
 
   describe("collectRelationships", () => {
-    let tl, payload;
+    let tl: TaggerLink, payload: TaggerPayload;
 
     beforeEach(() => {
       tl = new TaggerLink();
@@ -595,8 +614,8 @@ describe("Tagger Link", function () {
     });
 
     it("ingores symbols for unknown types", () => {
-      payload.relationships[0].classifierInverse = "ASDF";
-      payload.relationships[1].classifierInverse = "JKL;";
+      payload.relationships![0].classifierInverse = "ASDF";
+      payload.relationships![1].classifierInverse = "JKL;";
       const relationships = tl.collectRelationships(payload);
 
       expect(relationships).toEqual({
@@ -636,7 +655,7 @@ describe("Tagger Link", function () {
         "WORSE_THAN",
       ];
       kinds.forEach((kind) => {
-        payload.relationships.push({
+        payload.relationships!.push({
           foreignKey: "oracleId",
           relatedId: "related-id",
           contentName: `${kind} content`,
@@ -776,8 +795,8 @@ describe("Tagger Link", function () {
     });
 
     it("skips any unknown foreign keys", () => {
-      payload.relationships.push({
-        foreignKey: "unknown",
+      payload.relationships?.push({
+        foreignKey: "illustrationId",
         relatedId: "not-oracle-id",
         contentName: "Content Name",
         relatedName: "Related Name",
@@ -806,7 +825,9 @@ describe("Tagger Link", function () {
   });
 
   describe("addTagsToMenu", () => {
-    let tl, menu, tags;
+    let tl: TaggerLink,
+      menu: HTMLUListElement,
+      tags: ShamblesharkRelationship[];
 
     beforeEach(() => {
       tl = new TaggerLink();

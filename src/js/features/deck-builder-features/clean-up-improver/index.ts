@@ -1,10 +1,10 @@
-import Feature from "Feature";
+import Feature from "Features/feature";
 import {
   FEATURE_IDS as ids,
   BUS_EVENTS as events,
   FEATURE_SECTIONS as sections,
 } from "Constants";
-import bus from "framebus";
+import * as bus from "framebus";
 
 class CleanUpImprover extends Feature {
   async run() {

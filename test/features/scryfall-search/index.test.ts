@@ -1,11 +1,11 @@
-import ScryfallSearch from "Features/deck-builder-features/scryfall-search";
+import ScryfallSearch from "../../../src/js/features/deck-builder-features/scryfall-search";
 import deckParser from "Lib/deck-parser";
 import scryfall from "Lib/scryfall";
-import bus from "framebus";
+import * as bus from "framebus";
 
 describe("Scryfall Search", function () {
   describe("run", function () {
-    let headerSearchField;
+    let headerSearchField: HTMLInputElement;
 
     beforeEach(function () {
       headerSearchField = document.createElement("input");

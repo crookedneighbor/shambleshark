@@ -1,8 +1,8 @@
-import bus from "framebus";
+import * as bus from "framebus";
 import makeEDHRecButton from "Features/deck-builder-features/edhrec-suggestions/make-edhrec-button";
 import deckParser from "Lib/deck-parser";
 import wait from "Lib/wait";
-import Drawer from "Ui/drawer";
+import Drawer from "../../../src/js/lib/ui-elements/drawer";
 import mutation from "Lib/mutation";
 import scryfall from "Lib/scryfall";
 
