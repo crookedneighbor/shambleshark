@@ -157,11 +157,7 @@ class TokenList extends Feature {
       return tokens;
     }, []);
 
-    flattenedTokens.sort(
-      sortByAttribute({
-        attributes: ["name"],
-      })
-    );
+    flattenedTokens.sort(sortByAttribute(["name"]));
 
     return flattenedTokens;
   }

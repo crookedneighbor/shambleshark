@@ -5,12 +5,14 @@ import scryfall from "Lib/scryfall";
 import mutation from "Lib/mutation";
 import wait from "Lib/wait";
 
+import { makeFakeDeck } from "Helpers/fake";
+
 describe("Card Input Modifier", function () {
   let cim;
 
   beforeEach(function () {
     cim = new CardInputModifier();
-    jest.spyOn(scryfall, "getDeck").mockResolvedValue({});
+    jest.spyOn(scryfall, "getDeck").mockResolvedValue(makeFakeDeck());
     jest.spyOn(deckParser, "flattenEntries").mockReturnValue([]);
     jest.spyOn(bus, "on").mockImplementation();
   });

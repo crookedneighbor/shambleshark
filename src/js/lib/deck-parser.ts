@@ -1,6 +1,6 @@
 import { api as scryfall } from "./scryfall";
-import { Deck, Card, DeckSections, DeckSectionKinds } from "../types/deck";
-import { ScryfallAPICardListResponse } from "../types/scryfall";
+import { Card, Deck, DeckSections } from "Js/types/deck";
+import { CardQueryResult } from "Js/types/scryfall-api-responses";
 
 type IdTypes = "id" | "oracleId";
 
@@ -11,10 +11,10 @@ type FlattenEntryOptions = {
   };
 };
 
-function getCommanders(deck: Deck): ScryfallAPICardListResponse {
+function getCommanders(deck: Deck): Promise<CardQueryResult> {
   const ids = deck.entries
-    .commanders!.filter((card) => card.card_digest)
-    .map((card: Card) => `oracle_id:"${card.card_digest!.oracle_id}"`)
+    .commanders!.filter((card: Card) => card.card_digest)
+    .map((card) => `oracle_id:"${card.card_digest?.oracle_id}"`)
     .join(" or ");
 
   return scryfall.get("/cards/search", {
@@ -23,53 +23,42 @@ function getCommanders(deck: Deck): ScryfallAPICardListResponse {
 }
 
 function getIdFromEntry(entry: Card, idType: IdTypes): string {
-  if (idType === "id") {
-    return entry.raw_text && entry.id;
-  } else if (idType === "oracleId" && entry.card_digest) {
-    return entry.card_digest.oracle_id;
+  switch (idType) {
+    case "id":
+      return entry.raw_text && entry.id;
+    case "oracleId":
+      return entry.card_digest?.oracle_id || "";
   }
-
-  return "";
 }
 
 export function isLandCard(card: Card): boolean {
-  const frontType = card.card_digest!.type_line.split("//")[0].trim();
+  const frontType = card.card_digest?.type_line?.split("//")[0].trim();
 
-  return Boolean(frontType.includes("Land") && !frontType.includes("Creature"));
+  return Boolean(
+    frontType?.includes("Land") && !frontType.includes("Creature")
+  );
 }
 
 export function getSections(deck: Deck): DeckSections[] {
-  const deckSections: DeckSections[] = [];
-
-  Object.keys(deck.sections).reduce((sections, type) => {
-    deck.sections[type as DeckSectionKinds].forEach((section) =>
-      sections.push(section)
-    );
-    return sections;
-  }, deckSections);
-
-  return deckSections;
+  // TODO is it worth hardcoding the keys for the sections
+  // it's possible that Scryfall could add or change these
+  // values in the future
+  return [...deck.sections.primary, ...deck.sections.secondary];
 }
 
 export function hasDedicatedLandSection(deck: Deck): boolean {
   return getSections(deck).includes("lands");
 }
 
-// TODO
-export function getCommanderColorIdentity(deck: Deck): Promise<string[]> {
+// TODO should be more accuate about the string array the promise resolves
+export function getCommanderColorIdentity(deck: Deck) {
   return getCommanders(deck)
-    .then((cards) => {
-      return cards.map((c) => c.color_identity);
-    })
+    .then((cards) => cards.map((card) => card.color_identity))
     .catch(() => [])
     .then((colorIdentities) => {
-      const colors = new Set(colorIdentities.flat());
+      const colorIdentity = Array.from(new Set(colorIdentities.flat()));
 
-      if (colors.size === 0) {
-        colors.add("C");
-      }
-
-      return Array.from(colors);
+      return colorIdentity.length > 0 ? colorIdentity : ["C"];
     });
 }
 
@@ -77,46 +66,38 @@ export function flattenEntries(
   deck: Deck,
   options: FlattenEntryOptions = {}
 ): Card[] {
-  const sections = getSections(deck);
-  const entries: Card[] = [];
-  const ids: Record<string, Card> = {};
-  const idToGroupBy = options.idToGroupBy || "oracleId";
-  const ignoredSections = options.ignoredSections || {};
+  const entries: { [id: string]: Card } = {};
 
-  sections.forEach((section) => {
-    if (section in ignoredSections) {
-      return;
-    }
-    deck.entries[section]!.forEach((entry) => {
-      const id = getIdFromEntry(entry, idToGroupBy);
+  getSections(deck)
+    .filter((section) => !(section in (options?.ignoredSections || [])))
+    .map((section) => deck.entries[section])
+    .flat()
+    .forEach((entry) => {
+      const id = getIdFromEntry(entry, options?.idToGroupBy || "id");
 
       if (id) {
-        if (id in ids) {
-          const original = ids[id];
-          original.count = Number(original.count) + Number(entry.count);
+        if (entries[id]) {
+          entries[id].count += entry.count;
         } else {
-          ids[id] = entry;
-          entries.push(entry);
+          entries[id] = entry;
         }
       }
     });
-  });
 
-  return entries;
+  return Object.values(entries);
 }
 
 export function hasLegalCommanders(commanders: string[]): Promise<boolean> {
   if (commanders.length === 0) {
-    // no commanders in commander section
     return Promise.resolve(false);
   }
 
   return Promise.all(
-    commanders.map((cardName) => {
-      return scryfall.get("/cards/search", {
+    commanders.map((cardName) =>
+      scryfall.get("/cards/search", {
         q: `!"${cardName}" is:commander`,
-      });
-    })
+      })
+    )
   )
     .then(() => {
       // if all promises resolve, all were commanders

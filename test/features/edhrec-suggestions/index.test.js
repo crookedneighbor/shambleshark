@@ -3,6 +3,8 @@ import scryfall from "Lib/scryfall";
 import mutation from "Lib/mutation";
 import iframe from "Lib/iframe";
 
+import { makeFakeDeck } from "Helpers/fake";
+
 describe("EDHRec Suggestions", function () {
   describe("run", function () {
     let toolbar;

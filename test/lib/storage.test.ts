@@ -28,12 +28,12 @@ describe("storage", function () {
 
   describe("get", function () {
     it("calls out to chrome get function", async function () {
-      const result = await get(["foo"]);
+      const result = await get("foo", "baz");
 
       expect(result.foo).toBe("bar");
       expect(window.chrome.storage.sync.get).toBeCalledTimes(1);
       expect(window.chrome.storage.sync.get).toBeCalledWith(
-        ["foo"],
+        ["foo", "baz"],
         expect.any(Function)
       );
     });

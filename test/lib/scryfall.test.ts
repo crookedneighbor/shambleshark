@@ -4,6 +4,7 @@ import { mocked } from "ts-jest/utils";
 
 import { makeFakeDeck } from "Helpers/fake";
 
+// TODO mock scryfall-client
 jest.mock("framebus");
 
 describe("scryfall", function () {

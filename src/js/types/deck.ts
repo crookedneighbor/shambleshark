@@ -1,3 +1,5 @@
+export type color = "W" | "U" | "B" | "R" | "G";
+
 export type DeckSections =
   | "commanders"
   | "lands"
@@ -14,8 +16,9 @@ export interface Card {
   raw_text: string;
   count?: number;
   card_digest?: {
-    oracle_id: string;
-    type_line: string;
+    name?: string;
+    type_line?: string;
+    oracle_id?: string;
   };
   [propName: string]: any;
 }

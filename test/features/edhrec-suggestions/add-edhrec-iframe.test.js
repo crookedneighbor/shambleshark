@@ -4,6 +4,8 @@ import mutation from "Lib/mutation";
 import scryfall from "Lib/scryfall";
 import iframe from "Lib/iframe";
 
+import { makeFakeDeck } from "Helpers/fake";
+
 describe("addEDHRecIframe", function () {
   let btn;
 
@@ -11,11 +13,15 @@ describe("addEDHRecIframe", function () {
     btn = document.createElement("button");
 
     jest.spyOn(scryfall.api, "get");
-    jest.spyOn(scryfall, "getDeck").mockResolvedValue({
-      entries: {
-        commanders: [],
-      },
-    });
+    jest.spyOn(scryfall, "getDeck").mockResolvedValue(
+      makeFakeDeck({
+        primarySections: ["commanders", "nonlands"],
+        secondarySections: ["lands", "maybeboard"],
+        entries: {
+          commanders: [],
+        },
+      })
+    );
     jest.spyOn(deckParser, "hasLegalCommanders").mockResolvedValue(true);
     jest
       .spyOn(deckParser, "getSections")

@@ -271,11 +271,7 @@ class TaggerLink extends Feature {
   }
 
   addTagsToMenu(tags, menu) {
-    tags.sort(
-      sortByAttribute({
-        attributes: ["isTag", "name"],
-      })
-    );
+    tags.sort(sortByAttribute(["isTag", "name"]));
 
     tags.forEach((tag) => {
       if (menu.children.length > 8) {

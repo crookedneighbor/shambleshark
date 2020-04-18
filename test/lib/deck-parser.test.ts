@@ -10,15 +10,18 @@ import {
 } from "Lib/deck-parser";
 import { api as scryfall } from "Lib/scryfall";
 
+import SpyInstance = jest.SpyInstance;
 import { Deck } from "Js/types/deck";
 import { makeFakeDeck, makeFakeCard } from "Helpers/fake";
 
 describe("Deck Parser", function () {
-  describe("getCommanderColorIdentity", function () {
-    beforeEach(function () {
-      jest.spyOn(scryfall, "get");
-    });
+  let sfGetSpy: SpyInstance;
 
+  beforeEach(function () {
+    sfGetSpy = jest.spyOn(scryfall, "get");
+  });
+
+  describe("getCommanderColorIdentity", function () {
     it("returns array of color identity for commander", async function () {
       const fakeDeck = makeFakeDeck({
         entries: {
@@ -33,7 +36,7 @@ describe("Deck Parser", function () {
         },
       });
 
-      scryfall.get.mockResolvedValue([
+      sfGetSpy.mockResolvedValue([
         {
           color_identity: ["U", "R"],
         },
@@ -42,8 +45,8 @@ describe("Deck Parser", function () {
       const colors = await getCommanderColorIdentity(fakeDeck);
 
       expect(colors).toEqual(["U", "R"]);
-      expect(scryfall.get).toBeCalledTimes(1);
-      expect(scryfall.get).toBeCalledWith("/cards/search", {
+      expect(sfGetSpy).toBeCalledTimes(1);
+      expect(sfGetSpy).toBeCalledWith("/cards/search", {
         q: 'oracle_id:"id-1"',
       });
     });
@@ -74,7 +77,7 @@ describe("Deck Parser", function () {
         },
       });
 
-      scryfall.get.mockResolvedValue([
+      sfGetSpy.mockResolvedValue([
         {
           color_identity: ["U", "R"],
         },
@@ -89,8 +92,8 @@ describe("Deck Parser", function () {
       const colors = await getCommanderColorIdentity(fakeDeck);
 
       expect(colors).toEqual(["U", "R", "B", "W"]);
-      expect(scryfall.get).toBeCalledTimes(1);
-      expect(scryfall.get).toBeCalledWith("/cards/search", {
+      expect(sfGetSpy).toBeCalledTimes(1);
+      expect(sfGetSpy).toBeCalledWith("/cards/search", {
         q: 'oracle_id:"id-1" or oracle_id:"id-2" or oracle_id:"id-3"',
       });
     });
@@ -106,7 +109,7 @@ describe("Deck Parser", function () {
         },
       });
 
-      scryfall.get.mockResolvedValue([
+      sfGetSpy.mockResolvedValue([
         {
           color_identity: [],
         },
@@ -141,7 +144,7 @@ describe("Deck Parser", function () {
         },
       });
 
-      scryfall.get.mockResolvedValue([
+      sfGetSpy.mockResolvedValue([
         {
           color_identity: ["U", "R"],
         },
@@ -153,8 +156,8 @@ describe("Deck Parser", function () {
       const colors = await getCommanderColorIdentity(fakeDeck);
 
       expect(colors).toEqual(["U", "R", "W"]);
-      expect(scryfall.get).toBeCalledTimes(1);
-      expect(scryfall.get).toBeCalledWith("/cards/search", {
+      expect(sfGetSpy).toBeCalledTimes(1);
+      expect(sfGetSpy).toBeCalledWith("/cards/search", {
         q: 'oracle_id:"id-1" or oracle_id:"id-3"',
       });
     });
@@ -456,16 +459,15 @@ describe("Deck Parser", function () {
 
     it("ignores entries without raw_text when grouping by id", function () {
       fakeDeck.entries.lands = [
-        {
-          id: "id-9",
+        makeFakeCard({
           section: "lands",
           count: 2,
-          raw_text: "",
-          card_digest: {
+          rawText: "",
+          cardDigest: {
             oracle_id: "oracle-2",
             type_line: "type",
           },
-        },
+        }),
       ];
 
       const entries = flattenEntries(fakeDeck, {
@@ -528,10 +530,6 @@ describe("Deck Parser", function () {
   });
 
   describe("hasLegalCommanders", function () {
-    beforeEach(function () {
-      jest.spyOn(scryfall, "get");
-    });
-
     it("returns false if deck has a commanders section, but no commanders", async function () {
       const commanders: string[] = [];
 
@@ -541,13 +539,13 @@ describe("Deck Parser", function () {
     it("returns true if deck has a commanders section and all cards in it are legal commanders", async function () {
       const commanders = ["Sidar Kondo of Jamuraa", "Tana the Bloodsower"];
 
-      scryfall.get.mockResolvedValue({});
+      sfGetSpy.mockResolvedValue({});
 
       await expect(hasLegalCommanders(commanders)).resolves.toBe(true);
-      expect(scryfall.get).toBeCalledWith("/cards/search", {
+      expect(sfGetSpy).toBeCalledWith("/cards/search", {
         q: '!"Sidar Kondo of Jamuraa" is:commander',
       });
-      expect(scryfall.get).toBeCalledWith("/cards/search", {
+      expect(sfGetSpy).toBeCalledWith("/cards/search", {
         q: '!"Tana the Bloodsower" is:commander',
       });
     });
@@ -555,14 +553,14 @@ describe("Deck Parser", function () {
     it("returns false if any cards in it are not legal commanders", async function () {
       const commanders = ["Tana the Bloodsower", "Craterhoof Behemoth"];
 
-      scryfall.get.mockResolvedValueOnce({});
-      scryfall.get.mockRejectedValueOnce(new Error("404"));
+      sfGetSpy.mockResolvedValueOnce({});
+      sfGetSpy.mockRejectedValueOnce(new Error("404"));
 
       await expect(hasLegalCommanders(commanders)).resolves.toBe(false);
-      expect(scryfall.get).toBeCalledWith("/cards/search", {
+      expect(sfGetSpy).toBeCalledWith("/cards/search", {
         q: '!"Tana the Bloodsower" is:commander',
       });
-      expect(scryfall.get).toBeCalledWith("/cards/search", {
+      expect(sfGetSpy).toBeCalledWith("/cards/search", {
         q: '!"Craterhoof Behemoth" is:commander',
       });
     });

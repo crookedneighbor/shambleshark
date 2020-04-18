@@ -6,16 +6,22 @@ import Drawer from "Ui/drawer";
 import mutation from "Lib/mutation";
 import scryfall from "Lib/scryfall";
 
+import { makeFakeDeck } from "Helpers/fake";
+
 describe("makeEDHRecButton", function () {
   beforeEach(function () {
     jest.spyOn(bus, "on");
     jest.spyOn(bus, "emit");
     jest.spyOn(scryfall.api, "get");
-    jest.spyOn(scryfall, "getDeck").mockResolvedValue({
-      entries: {
-        commanders: [],
-      },
-    });
+    jest.spyOn(scryfall, "getDeck").mockResolvedValue(
+      makeFakeDeck({
+        primarySections: ["commanders", "nonlands"],
+        secondarySections: ["lands", "maybeboard"],
+        entries: {
+          commanders: [],
+        },
+      })
+    );
     jest
       .spyOn(deckParser, "getSections")
       .mockReturnValue(["commanders", "lands", "nonlands", "maybeboard"]);

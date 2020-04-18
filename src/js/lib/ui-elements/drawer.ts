@@ -10,7 +10,7 @@ interface DrawerOptions extends DialogInterfaceOptions {
 }
 
 export default class Drawer extends DialogInterface {
-  _scrollableEl: HTMLElement;
+  private _scrollableEl: HTMLElement;
 
   position: string;
 
@@ -47,6 +47,8 @@ export default class Drawer extends DialogInterface {
     return this._scrollableEl;
   }
 
+  // TODO explore using an HTMLDialogElement here
+  // https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement
   _constructElement(options: DrawerOptions): HTMLElement {
     const titleId = `drawer-title-${options.id}`;
 
