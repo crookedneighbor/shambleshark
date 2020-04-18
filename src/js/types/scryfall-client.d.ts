@@ -15,7 +15,9 @@ declare module "scryfall-client" {
   }
 
   class api {
-    post: (uri: string, options: postOptions) => void;
+    // TODO thesre are not really accurate
+    // probably should just fix this in the actual client
+    post: (uri: string, options: postOptions) => Promise<any>;
     get: (uri: string, options: { q: string }) => Promise<CardQueryResult>;
   }
 

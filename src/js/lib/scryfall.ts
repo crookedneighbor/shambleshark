@@ -1,15 +1,21 @@
-import bus from "framebus";
-import ScryfallClient from "scryfall-client";
+import * as bus from "framebus";
 import { BUS_EVENTS as events } from "Constants";
+import { Deck } from "Js/types/deck";
+import ScryfallApi = require("scryfall-client");
 
 const CACHE_TIMEOUT_FOR_DECK_REQUESTS = 2000; // 2 seconds
 
-let getDeckPromise;
+let getDeckPromise: Promise<Deck> | null;
 
-export const api = new ScryfallClient();
+type CollectionEntry = {
+  set?: string;
+  collector_number?: string;
+};
 
-export async function getCollection(ids) {
-  const idsInBatches = ids.reduce((array, entry, i) => {
+export const api = new ScryfallApi();
+
+export async function getCollection(ids: CollectionEntry[]) {
+  const idBatches = ids.reduce((array: CollectionEntry[][], entry, i) => {
     if (i % 75 !== 0) {
       return array;
     }
@@ -18,10 +24,8 @@ export async function getCollection(ids) {
   }, []);
 
   const collectionResults = await Promise.all(
-    idsInBatches.map((idBatch) =>
-      api.post("/cards/collection", {
-        identifiers: idBatch,
-      })
+    idBatches.map((identifiers) =>
+      api.post("/cards/collection", { identifiers })
     )
   );
 
