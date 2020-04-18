@@ -19,11 +19,15 @@ describe("EDHRec Suggestions", function () {
       deckbuilderElement.id = "deckbuilder";
       document.body.appendChild(deckbuilderElement);
 
-      jest.spyOn(scryfall, "getDeck").mockResolvedValue({
-        entries: {
-          commanders: [],
-        },
-      });
+      jest.spyOn(scryfall, "getDeck").mockResolvedValue(
+        makeFakeDeck({
+          primarySections: ["commanders", "nonlands"],
+          secondarySections: ["lands", "maybeboard"],
+          entries: {
+            commanders: [],
+          },
+        })
+      );
       jest.spyOn(mutation, "change").mockImplementation();
       jest.spyOn(mutation, "ready").mockImplementation((selector, cb) => {
         const el = document.createElement("div");
