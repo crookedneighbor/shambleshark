@@ -18,7 +18,7 @@ function getCommanders(deck: Deck): Promise<CardQueryResult> {
     .join(" or ");
 
   return scryfall.get("/cards/search", {
-    query: ids,
+    q: ids,
   });
 }
 
