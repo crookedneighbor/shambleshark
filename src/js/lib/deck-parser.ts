@@ -1,6 +1,15 @@
 import { api as scryfall } from "./scryfall";
 import { Card, Deck, DeckSections } from "Js/types/deck";
-import { CardQueryResult } from "scryfall-client";
+import { CardQueryResult } from "Js/types/scryfall-api-responses";
+
+type IdTypes = "id" | "oracleId";
+
+type FlattenEntryOptions = {
+  idToGroupBy?: IdTypes;
+  ignoredSections?: {
+    [section in DeckSections]?: boolean;
+  };
+};
 
 function getCommanders(deck: Deck): Promise<CardQueryResult> {
   const ids = deck.entries
@@ -13,16 +22,16 @@ function getCommanders(deck: Deck): Promise<CardQueryResult> {
   });
 }
 
-function getIdFromEntry(entry: Card, idType: cardIdType) {
+function getIdFromEntry(entry: Card, idType: IdTypes): string {
   switch (idType) {
     case "id":
       return entry.raw_text && entry.id;
     case "oracleId":
-      return entry.card_digest?.oracle_id;
+      return entry.card_digest?.oracle_id || "";
   }
 }
 
-export function isLandCard(card: Card) {
+export function isLandCard(card: Card): boolean {
   const frontType = card.card_digest?.type_line?.split("//")[0].trim();
 
   return Boolean(
@@ -30,33 +39,33 @@ export function isLandCard(card: Card) {
   );
 }
 
-export function hasDedicatedLandSection(deck: Deck) {
+export function getSections(deck: Deck): DeckSections[] {
+  // TODO is it worth hardcoding the keys for the sections
+  // it's possible that Scryfall could add or change these
+  // values in the future
+  return [...deck.sections.primary, ...deck.sections.secondary];
+}
+
+export function hasDedicatedLandSection(deck: Deck): boolean {
   return getSections(deck).includes("lands");
 }
 
+// TODO should be more accuate about the string array the promise resolves
 export function getCommanderColorIdentity(deck: Deck) {
   return getCommanders(deck)
     .then((cards) => cards.map((card) => card.color_identity))
     .catch(() => [])
     .then((colorIdentities) => {
-      let colorIdentity = Array.of(new Set(colorIdentities.flat()));
+      const colorIdentity = Array.from(new Set(colorIdentities.flat()));
 
       return colorIdentity.length > 0 ? colorIdentity : ["C"];
     });
 }
 
-export function getSections(deck: Deck): DeckSections[] {
-  return [...deck.sections.primary, ...deck.sections.secondary];
-}
-
-export type cardIdType = "id" | "oracleId";
-
-export interface FlattenEntriesOptions {
-  idToGroupBy?: cardIdType;
-  ignoredSections?: DeckSections[];
-}
-
-export function flattenEntries(deck: Deck, options?: FlattenEntriesOptions) {
+export function flattenEntries(
+  deck: Deck,
+  options: FlattenEntryOptions = {}
+): Card[] {
   const entries: { [id: string]: Card } = {};
 
   getSections(deck)
@@ -78,7 +87,7 @@ export function flattenEntries(deck: Deck, options?: FlattenEntriesOptions) {
   return Object.values(entries);
 }
 
-export function hasLegalCommanders(commanders: string[]) {
+export function hasLegalCommanders(commanders: string[]): Promise<boolean> {
   if (commanders.length === 0) {
     return Promise.resolve(false);
   }
@@ -90,15 +99,21 @@ export function hasLegalCommanders(commanders: string[]) {
       })
     )
   )
-    .then(() => true)
-    .catch(() => false);
+    .then(() => {
+      // if all promises resolve, all were commanders
+      return true;
+    })
+    .catch(() => {
+      // if even one promise 404s, then not all were commanders
+      return false;
+    });
 }
 
-export function isCommanderLike(deck: Deck) {
+export function isCommanderLike(deck: Deck): boolean {
   return getSections(deck).includes("commanders");
 }
 
-export function isSingletonTypeDeck(deck: Deck) {
+export function isSingletonTypeDeck(deck: Deck): boolean {
   return getSections(deck).includes("nonlands") || isCommanderLike(deck);
 }
 

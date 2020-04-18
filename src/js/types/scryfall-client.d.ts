@@ -1,11 +1,14 @@
 declare module "scryfall-client" {
-  import { Card } from "Js/types/deck";
-
-  export type postOptions = {
-    identifiers?: string[];
+  type ScryfallAPICardResponse = {
+    color_identity: string[];
+    [propName: string]: any;
   };
 
-  export class CardQueryResult extends Array<Card> {
+  type postOptions = {
+    identifiers?: any[];
+  };
+
+  class CardQueryResult extends Array<ScryfallAPICardResponse> {
     has_more: boolean;
     total_cards: number;
     next: () => Promise<CardQueryResult>;
@@ -16,5 +19,5 @@ declare module "scryfall-client" {
     get: (uri: string, options: { query: string }) => Promise<CardQueryResult>;
   }
 
-  export default api;
+  export = api;
 }

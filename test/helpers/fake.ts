@@ -23,7 +23,7 @@ export function makeFakeCard(overrides: FakeCardOptions = {}) {
 
   return {
     id: overrides.id || "card-in-deck-id",
-    raw_text: overrides.rawText || "raw text",
+    raw_text: "rawText" in overrides ? overrides.rawText : "raw text",
     section: overrides.section || "commanders",
     count: "count" in overrides ? overrides.count : 1,
     card_digest: cardDigest,

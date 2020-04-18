@@ -1,7 +1,7 @@
 import { getStorage, setStorage } from "Browser/storage";
 
 export function get(...keys: string[]): any | any[] {
-  return getStorage(keys).then(function (result) {
+  return getStorage(keys).then((result) => {
     if (keys.length === 1) {
       return result[keys[0]];
     }

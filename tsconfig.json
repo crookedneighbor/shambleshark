@@ -22,8 +22,5 @@
     /* Remove this once conversion is complete */
     "allowJs": true
   },
-  "include": [
-    "./src/**/*",
-    "scryfall-client.d.ts"
-  ]
+  "include": ["./src/**/*"]
 }

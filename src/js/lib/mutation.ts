@@ -12,7 +12,9 @@ function check() {
   // Check the DOM for elements matching a stored selector
   listeners.forEach((listener) => {
     // Query for elements matching the specified selector
-    const elements = Array.of(document.querySelectorAll<HTMLElement>(listener.selector));
+    const elements = Array.of(
+      document.querySelectorAll<HTMLElement>(listener.selector)
+    );
 
     elements.forEach((element) => {
       // Make sure the callback isn't invoked with the

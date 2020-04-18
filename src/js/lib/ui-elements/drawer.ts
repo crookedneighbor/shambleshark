@@ -1,10 +1,35 @@
-import DialogInterface, { DialogOptions } from "./dialog-interface";
+import DialogInterface, { DialogInterfaceOptions } from "./dialog-interface";
 import createElement from "Lib/create-element";
 import "./drawer.css";
 import { SPINNER_GIF } from "Constants";
 
+interface DrawerOptions extends DialogInterfaceOptions {
+  position?: string;
+  onScroll?: Function;
+  contentMessage?: string;
+}
+
 export default class Drawer extends DialogInterface {
-  private _scrollableEl?: HTMLDivElement;
+  private _scrollableEl: HTMLElement;
+
+  position: string;
+
+  constructor(options: DrawerOptions = {}) {
+    super(options);
+
+    this.position = options.position || "right";
+    this.$(".drawer-dialog").classList.add(
+      `drawer-dialog-position-${this.position}`
+    );
+
+    this._scrollableEl = this.$(".drawer-dialog");
+
+    if (options.onScroll) {
+      this._scrollableEl.addEventListener("scroll", () => {
+        this.triggerOnScroll();
+      });
+    }
+  }
 
   open() {
     super.open();
@@ -22,7 +47,9 @@ export default class Drawer extends DialogInterface {
     return this._scrollableEl;
   }
 
-  _constructElement(options: DialogOptions): HTMLDialogElement {
+  // TODO explore using an HTMLDialogElement here
+  // https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement
+  _constructElement(options: DrawerOptions): HTMLElement {
     const titleId = `drawer-title-${options.id}`;
 
     const drawer = createElement(`<div
@@ -58,23 +85,11 @@ export default class Drawer extends DialogInterface {
           <div class="dialog-content drawer-dialog-stage-content"></div>
         </div>
       </div>
-    </div>`).firstChild as HTMLDialogElement;
+    </div>`).firstChild as HTMLElement;
 
-    drawer
-      ?.querySelector<HTMLButtonElement>(".dialog-close")
-      ?.addEventListener("click", () => {
-        this.close();
-      });
-
-    this._scrollableEl = drawer.querySelector(
-      ".drawer-dialog"
-    ) as HTMLDivElement;
-
-    if (options.onScroll) {
-      this._scrollableEl?.addEventListener("scroll", async () => {
-        await this.triggerOnScroll();
-      });
-    }
+    drawer.querySelector(".dialog-close")!.addEventListener("click", () => {
+      this.close();
+    });
 
     return drawer;
   }
