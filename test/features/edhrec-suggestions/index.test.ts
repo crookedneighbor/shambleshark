@@ -5,6 +5,8 @@ import iframe from "Lib/iframe";
 import { Deck } from "../../../src/js/types/deck";
 import SpyInstance = jest.SpyInstance;
 
+import { makeFakeDeck } from "Helpers/fake";
+
 describe("EDHRec Suggestions", function () {
   describe("run", function () {
     let toolbar: HTMLDivElement;

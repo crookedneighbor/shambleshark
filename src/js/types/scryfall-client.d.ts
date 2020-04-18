@@ -16,7 +16,7 @@ declare module "scryfall-client" {
 
   class api {
     post: (uri: string, options: postOptions) => void;
-    get: (uri: string, options: { query: string }) => Promise<CardQueryResult>;
+    get: (uri: string, options: { q: string }) => Promise<CardQueryResult>;
   }
 
   export = api;

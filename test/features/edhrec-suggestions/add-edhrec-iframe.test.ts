@@ -6,6 +6,8 @@ import iframe from "Lib/iframe";
 import { Card, Deck, section } from "../../../src/js/types/deck";
 import SpyInstance = jest.SpyInstance;
 
+import { makeFakeDeck } from "Helpers/fake";
+
 describe("addEDHRecIframe", function () {
   let btn: HTMLButtonElement;
 
@@ -18,14 +20,13 @@ describe("addEDHRecIframe", function () {
 
     jest.spyOn(scryfall.api, "get");
     getDeckSpy = jest.spyOn(scryfall, "getDeck").mockResolvedValue(
-      new Promise<Deck>(
-        () =>
-          ({
-            entries: {
-              commanders: [],
-            },
-          } as Partial<Deck>)
-      )
+      makeFakeDeck({
+        primarySections: ["commanders", "nonlands"],
+        secondarySections: ["lands", "maybeboard"],
+        entries: {
+          commanders: [],
+        },
+      })
     );
     hasLegalCommandersSpy = jest
       .spyOn(deckParser, "hasLegalCommanders")

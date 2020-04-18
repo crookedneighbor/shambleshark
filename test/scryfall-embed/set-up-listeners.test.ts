@@ -225,7 +225,8 @@ describe("set up listeners on Scryfall page", function () {
       scryfallCard.card_digest!.type_line = "Land";
       mocked(getDeckMetadata).mockResolvedValue({
         sections: {
-          mainboard: ["lands"],
+          primary: ["nonlands"],
+          secondary: ["lands"],
         },
       });
 
@@ -242,7 +243,8 @@ describe("set up listeners on Scryfall page", function () {
       scryfallCard.card_digest!.type_line = "Land";
       mocked(getDeckMetadata).mockResolvedValue({
         sections: {
-          mainboard: ["lands"],
+          primary: ["nonlands"],
+          secondary: ["lands"],
         },
       });
 

@@ -47,7 +47,7 @@ describe("Deck Parser", function () {
       expect(colors).toEqual(["U", "R"]);
       expect(sfGetSpy).toBeCalledTimes(1);
       expect(sfGetSpy).toBeCalledWith("/cards/search", {
-        query: 'oracle_id:"id-1"',
+        q: 'oracle_id:"id-1"',
       });
     });
 
@@ -94,7 +94,7 @@ describe("Deck Parser", function () {
       expect(colors).toEqual(["U", "R", "B", "W"]);
       expect(sfGetSpy).toBeCalledTimes(1);
       expect(sfGetSpy).toBeCalledWith("/cards/search", {
-        query: 'oracle_id:"id-1" or oracle_id:"id-2" or oracle_id:"id-3"',
+        q: 'oracle_id:"id-1" or oracle_id:"id-2" or oracle_id:"id-3"',
       });
     });
 
@@ -158,7 +158,7 @@ describe("Deck Parser", function () {
       expect(colors).toEqual(["U", "R", "W"]);
       expect(sfGetSpy).toBeCalledTimes(1);
       expect(sfGetSpy).toBeCalledWith("/cards/search", {
-        query: 'oracle_id:"id-1" or oracle_id:"id-3"',
+        q: 'oracle_id:"id-1" or oracle_id:"id-3"',
       });
     });
   });
@@ -543,10 +543,10 @@ describe("Deck Parser", function () {
 
       await expect(hasLegalCommanders(commanders)).resolves.toBe(true);
       expect(sfGetSpy).toBeCalledWith("/cards/search", {
-        query: '!"Sidar Kondo of Jamuraa" is:commander',
+        q: '!"Sidar Kondo of Jamuraa" is:commander',
       });
       expect(sfGetSpy).toBeCalledWith("/cards/search", {
-        query: '!"Tana the Bloodsower" is:commander',
+        q: '!"Tana the Bloodsower" is:commander',
       });
     });
 
@@ -558,10 +558,10 @@ describe("Deck Parser", function () {
 
       await expect(hasLegalCommanders(commanders)).resolves.toBe(false);
       expect(sfGetSpy).toBeCalledWith("/cards/search", {
-        query: '!"Tana the Bloodsower" is:commander',
+        q: '!"Tana the Bloodsower" is:commander',
       });
       expect(sfGetSpy).toBeCalledWith("/cards/search", {
-        query: '!"Craterhoof Behemoth" is:commander',
+        q: '!"Craterhoof Behemoth" is:commander',
       });
     });
   });

@@ -95,7 +95,7 @@ export function hasLegalCommanders(commanders: string[]): Promise<boolean> {
   return Promise.all(
     commanders.map((cardName) =>
       scryfall.get("/cards/search", {
-        query: `!"${cardName}" is:commander`,
+        q: `!"${cardName}" is:commander`,
       })
     )
   )

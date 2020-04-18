@@ -28,9 +28,7 @@ describe("sort.sortByAttribute", function () {
   });
 
   it("creates a sort handler to sort arrays of objects by specific attributes", function () {
-    const nameHandler = sortByAttribute({
-      attributes: ["name"],
-    });
+    const nameHandler = sortByAttribute(["name"]);
 
     array.sort(nameHandler);
 
@@ -38,9 +36,7 @@ describe("sort.sortByAttribute", function () {
     expect(array[1].name).toBe("B-Middle Entry");
     expect(array[2].name).toBe("C-Last Entry");
 
-    const idHandler = sortByAttribute({
-      attributes: ["id"],
-    });
+    const idHandler = sortByAttribute(["id"]);
 
     array.sort(idHandler);
 
@@ -48,9 +44,7 @@ describe("sort.sortByAttribute", function () {
     expect(array[1].name).toBe("C-Last Entry");
     expect(array[2].name).toBe("B-Middle Entry");
 
-    const boolHandler = sortByAttribute({
-      attributes: ["bool"],
-    });
+    const boolHandler = sortByAttribute(["bool"]);
 
     array.sort(boolHandler);
 
@@ -60,9 +54,7 @@ describe("sort.sortByAttribute", function () {
   });
 
   it("disregards case of string values", function () {
-    const handler = sortByAttribute({
-      attributes: ["name"],
-    });
+    const handler = sortByAttribute(["name"]);
     array[0].name = "b-middle entry";
 
     array.sort(handler);
@@ -73,9 +65,7 @@ describe("sort.sortByAttribute", function () {
   });
 
   it("can sort by multiple attributes if the current attribute is identical", function () {
-    const handler = sortByAttribute({
-      attributes: ["bool", "id", "name"],
-    });
+    const handler = sortByAttribute(["bool", "id", "name"]);
 
     array.push({
       id: 1,
@@ -92,9 +82,7 @@ describe("sort.sortByAttribute", function () {
   });
 
   it("throws an error if typeof values do not match", function () {
-    const handler = sortByAttribute({
-      attributes: ["name"],
-    });
+    const handler = sortByAttribute(["name"]);
     array[0].name = 123;
 
     expect(() => {
@@ -103,9 +91,7 @@ describe("sort.sortByAttribute", function () {
   });
 
   it("if one value is defined and the other is undefined, it does not throw and prefers the truthy value", function () {
-    const handler = sortByAttribute({
-      attributes: ["id"],
-    });
+    const handler = sortByAttribute(["id"]);
     delete array[0].id;
 
     array.sort(handler);

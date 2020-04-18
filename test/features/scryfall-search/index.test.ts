@@ -3,6 +3,8 @@ import deckParser from "Lib/deck-parser";
 import scryfall from "Lib/scryfall";
 import * as bus from "framebus";
 
+import { makeFakeDeck, makeFakeCard } from "Helpers/fake";
+
 describe("Scryfall Search", function () {
   describe("run", function () {
     let headerSearchField: HTMLInputElement;
@@ -160,10 +162,7 @@ describe("Scryfall Search", function () {
       ss.settings = {};
 
       jest.spyOn(scryfall.api, "get").mockResolvedValue([]);
-      jest.spyOn(scryfall, "getDeck").mockResolvedValue({
-        sections: {},
-        entries: {},
-      });
+      jest.spyOn(scryfall, "getDeck").mockResolvedValue(makeFakeDeck());
       jest.spyOn(ss, "addCards").mockReturnValue(null);
     });
 
@@ -259,11 +258,7 @@ describe("Scryfall Search", function () {
     });
 
     it("adds deck to instance", async function () {
-      const fakeDeck = {
-        foo: "bar",
-        sections: {},
-        entries: {},
-      };
+      const fakeDeck = makeFakeDeck();
 
       scryfall.getDeck.mockResolvedValue(fakeDeck);
 
@@ -286,21 +281,16 @@ describe("Scryfall Search", function () {
     beforeEach(function () {
       ss = new ScryfallSearch();
       ss.container = document.createElement("div");
-      ss.deck = {
-        sections: {
-          primary: ["mainboard"],
-        },
+      ss.deck = makeFakeDeck({
+        primarySections: ["mainboard"],
         entries: {
           mainboard: [
-            {
+            makeFakeCard({
               count: 3,
-              card_digest: {
-                oracle_id: "oracle-id-2",
-              },
-            },
+            }),
           ],
         },
-      };
+      });
     });
 
     it("creates card elements to add to container", function () {

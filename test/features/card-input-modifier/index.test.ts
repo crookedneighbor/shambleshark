@@ -7,6 +7,8 @@ import wait from "Lib/wait";
 import SpyInstance = jest.SpyInstance;
 import { Card, Deck } from "../../../src/js/types/deck";
 
+import { makeFakeDeck } from "Helpers/fake";
+
 describe("Card Input Modifier", function () {
   let cim: CardInputModifier;
 
@@ -18,7 +20,7 @@ describe("Card Input Modifier", function () {
     cim = new CardInputModifier();
     getDeckSpy = jest
       .spyOn(scryfall, "getDeck")
-      .mockResolvedValue({} as Promise<Deck>);
+      .mockResolvedValue(makeFakeDeck());
     flattenEntriesSpy = jest
       .spyOn(deckParser, "flattenEntries")
       .mockReturnValue([]);
