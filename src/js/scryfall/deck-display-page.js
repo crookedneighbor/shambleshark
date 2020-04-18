@@ -17,11 +17,12 @@ export default function () {
   bus.on(events.SCRYFALL_LISTENERS_READY, function () {
     Promise.all(
       deckViewFeatures.map(function (Feature) {
-        const feature = new Feature();
-
-        return feature
-          .isEnabled()
-          .then((isEnabled) => isEnabled && feature.run());
+        return Feature.isEnabled().then((isEnabled) => {
+          if (isEnabled) {
+            const feature = new Feature();
+            return feature.run();
+          }
+        });
       })
     ).then(() => {
       addContainerForSidebarFeatures();

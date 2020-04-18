@@ -7,16 +7,12 @@ import {
   settingValue,
 } from "Js/types/feature";
 
-const notImplementedError = new Error("Method not Implemented");
-
 export default abstract class Feature {
   static metadata: metadata;
   static settingsDefaults: settingsDefaults;
   static settingDefinitions: settingsDefinition[] = [];
 
-  async run(): Promise<void> {
-    return Promise.reject(notImplementedError);
-  }
+  abstract run(): Promise<void>;
 
   static isEnabled() {
     return this.getSettings().then((settings) => settings.enabled);
@@ -35,6 +31,8 @@ export default abstract class Feature {
     // of too many settings being saved at once
     const settings = await this.getSettings();
 
+    // TODO this will be taken care of by the type system once features are
+    // ported over to typescript
     if (!(property in this.settingsDefaults)) {
       return Promise.reject(
         new Error(
