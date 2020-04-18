@@ -2,10 +2,12 @@ import { api, getCollection, getDeck } from "Lib/scryfall";
 import * as bus from "framebus";
 import { mocked } from "ts-jest/utils";
 
+import SpyInstance = jest.SpyInstance;
 import { makeFakeDeck } from "Helpers/fake";
 
 // TODO mock scryfall-client
 jest.mock("framebus");
+jest.mock("scryfall-client");
 
 describe("scryfall", function () {
   describe("getDeck", function () {
@@ -62,11 +64,12 @@ describe("scryfall", function () {
 
   describe("getCollection", function () {
     let fakeCards: { id: string }[];
+    let postSpy: SpyInstance;
 
     beforeEach(function () {
       fakeCards = [{ id: "foo" }];
 
-      jest.spyOn(api, "post").mockResolvedValue(fakeCards);
+      postSpy = mocked(api.post).mockResolvedValue(fakeCards);
     });
 
     it("looks up collection endpoint", async function () {
@@ -77,8 +80,8 @@ describe("scryfall", function () {
         },
       ]);
 
-      expect(api.post).toBeCalledTimes(1);
-      expect(api.post).toBeCalledWith("/cards/collection", {
+      expect(postSpy).toBeCalledTimes(1);
+      expect(postSpy).toBeCalledWith("/cards/collection", {
         identifiers: [
           {
             set: "DOM",
@@ -104,13 +107,13 @@ describe("scryfall", function () {
 
       await getCollection(entries);
 
-      expect(api.post).toBeCalledTimes(6);
-      expect(api.post.mock.calls[0][1].identifiers.length).toBe(75);
-      expect(api.post.mock.calls[1][1].identifiers.length).toBe(75);
-      expect(api.post.mock.calls[2][1].identifiers.length).toBe(75);
-      expect(api.post.mock.calls[3][1].identifiers.length).toBe(75);
-      expect(api.post.mock.calls[4][1].identifiers.length).toBe(75);
-      expect(api.post.mock.calls[5][1].identifiers.length).toBe(25);
+      expect(postSpy).toBeCalledTimes(6);
+      expect(postSpy.mock!.calls[0][1].identifiers.length).toBe(75);
+      expect(postSpy.mock!.calls[1][1].identifiers.length).toBe(75);
+      expect(postSpy.mock!.calls[2][1].identifiers.length).toBe(75);
+      expect(postSpy.mock!.calls[3][1].identifiers.length).toBe(75);
+      expect(postSpy.mock!.calls[4][1].identifiers.length).toBe(75);
+      expect(postSpy.mock!.calls[5][1].identifiers.length).toBe(25);
     });
 
     it("resolves with flattened array of the results of each card's getTokens call", async function () {
