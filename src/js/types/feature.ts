@@ -1,4 +1,4 @@
-export type settingValue = string | number | boolean;
+export type settingValue = string | number | boolean | Record<string, string>;
 
 export interface metadata {
   id: string;
