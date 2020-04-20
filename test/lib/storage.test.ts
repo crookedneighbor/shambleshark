@@ -1,14 +1,8 @@
 import { get, set } from "Lib/storage";
 
-declare global {
-  interface Window {
-    chrome: any;
-  }
-}
-
 describe("storage", function () {
   beforeEach(function () {
-    window.chrome = {
+    (window.chrome as any) = {
       storage: {
         sync: {
           get: jest.fn().mockImplementation((keys, callback) => {
