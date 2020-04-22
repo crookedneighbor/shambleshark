@@ -27,7 +27,6 @@
     "ScryfallAPI": false
   },
   "rules": {
-    "@typescript-eslint/camelcase": "off",
-    "endOfLine ": "lf"
+    "@typescript-eslint/camelcase": "off"
   }
 }
