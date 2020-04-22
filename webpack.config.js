@@ -28,9 +28,15 @@ const alias = {
 };
 
 if (BROWSER === "GOOGLE_CHROME") {
-  alias.Browser = path.resolve(__dirname, "src/js/lib/chrome/");
+  alias.ExtensionsLink = path.resolve(
+    __dirname,
+    "src/js/lib/chrome/extensions-link.ts"
+  );
 } else if (BROWSER === "FIREFOX") {
-  alias.Browser = path.resolve(__dirname, "src/js/lib/firefox/");
+  alias.ExtensionsLink = path.resolve(
+    __dirname,
+    "src/js/lib/firefox/extensions-link.ts"
+  );
 }
 
 const secretsPath = path.join(__dirname, "secrets." + env.NODE_ENV + ".js");

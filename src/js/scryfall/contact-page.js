@@ -1,6 +1,6 @@
 import mutation from "Lib/mutation";
 import createElement from "Lib/create-element";
-import link from "Browser/extensions-link";
+import link from "ExtensionsLink";
 
 import "./contact-page.css";
 

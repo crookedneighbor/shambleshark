@@ -1,3 +1,3 @@
-import { openOptionsPage } from "Browser/runtime";
+import { browser } from "webextension-polyfill-ts";
 
-openOptionsPage();
+browser.runtime.openOptionsPage();
