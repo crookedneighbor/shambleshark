@@ -25,7 +25,7 @@ function getCommanders(deck: Deck): Promise<CardQueryResult> {
 function getIdFromEntry(entry: Card, idType: IdTypes): string {
   switch (idType) {
     case "id":
-      return entry.raw_text && entry.id;
+      return (entry.raw_text && entry.id) || "";
     case "oracleId":
       return entry.card_digest?.oracle_id || "";
   }
