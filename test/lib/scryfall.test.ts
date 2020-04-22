@@ -69,7 +69,7 @@ describe("scryfall", function () {
     beforeEach(function () {
       fakeCards = [{ id: "foo" }];
 
-      postSpy = mocked(api).post.mockImplementation();
+      postSpy = mocked(api).post.mockResolvedValue(fakeCards);
     });
 
     it("looks up collection endpoint", async function () {
