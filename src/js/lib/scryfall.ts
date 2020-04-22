@@ -1,21 +1,21 @@
 import * as bus from "framebus";
 import { BUS_EVENTS as events } from "Constants";
-import { Deck } from "Js/types/deck";
-import ScryfallApi = require("scryfall-client");
+import { Card, Deck } from "Js/types/deck";
+import ScryfallApi from "scryfall-client";
 
 const CACHE_TIMEOUT_FOR_DECK_REQUESTS = 2000; // 2 seconds
 
 let getDeckPromise: Promise<Deck> | null;
 
-type CollectionEntry = {
-  set?: string;
-  collector_number?: string;
-};
-
 export const api = new ScryfallApi();
 
-export async function getCollection(ids: CollectionEntry[]) {
-  const idBatches = ids.reduce((array: CollectionEntry[][], entry, i) => {
+export type Identifier =
+  | { id: string }
+  | { name: string }
+  | { set: string; collector_number: string };
+
+export async function getCollection(ids: Identifier[]): Promise<Card[]> {
+  const idBatches = ids.reduce((array: Identifier[][], entry, i) => {
     if (i % 75 !== 0) {
       return array;
     }
@@ -32,7 +32,7 @@ export async function getCollection(ids: CollectionEntry[]) {
   return collectionResults.flat();
 }
 
-export function getDeck() {
+export function getDeck(): Promise<Deck> {
   if (getDeckPromise) {
     return getDeckPromise;
   }

@@ -13,12 +13,14 @@
       "Features/*": ["src/js/features/*"],
       "Lib/*": ["src/js/lib/*"],
       "Ui/*": ["src/js/lib/ui-elements/*"],
-      "Svg": ["src/js/resources/svg.js"]
+      "Svg": ["src/js/resources/svg.js"],
+      "Types": ["src/js/types/*"]
     },
     "outDir": "./dist/",
     "module": "commonjs",
     "target": "es2019",
     "lib": ["es2019", "dom"],
+    "esModuleInterop": true,
     /* Remove this once conversion is complete */
     "allowJs": true
   },

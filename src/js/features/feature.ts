@@ -11,6 +11,7 @@ export default abstract class Feature {
   static metadata: metadata;
   static settingsDefaults: settingsDefaults;
   static settingDefinitions: settingsDefinition[] = [];
+  static usesSidebar: boolean;
 
   abstract run(): Promise<void>;
 

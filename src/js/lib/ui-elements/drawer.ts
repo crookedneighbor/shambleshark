@@ -10,7 +10,7 @@ interface DrawerOptions extends DialogInterfaceOptions {
 }
 
 export default class Drawer extends DialogInterface {
-  private _scrollableEl: HTMLElement;
+  _scrollableEl: HTMLElement;
 
   position: string;
 
@@ -49,7 +49,7 @@ export default class Drawer extends DialogInterface {
 
   // TODO explore using an HTMLDialogElement here
   // https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement
-  _constructElement(options: DrawerOptions): HTMLElement {
+  _constructElement(options: DrawerOptions): HTMLDivElement {
     const titleId = `drawer-title-${options.id}`;
 
     const drawer = createElement(`<div
@@ -85,7 +85,7 @@ export default class Drawer extends DialogInterface {
           <div class="dialog-content drawer-dialog-stage-content"></div>
         </div>
       </div>
-    </div>`).firstChild as HTMLElement;
+    </div>`).firstElementChild as HTMLDivElement;
 
     drawer.querySelector(".dialog-close")!.addEventListener("click", () => {
       this.close();

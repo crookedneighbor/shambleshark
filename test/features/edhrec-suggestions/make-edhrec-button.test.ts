@@ -1,12 +1,20 @@
 import * as bus from "framebus";
-import makeEDHRecButton from "Features/deck-builder-features/edhrec-suggestions/make-edhrec-button";
+import makeEDHRecButton, {
+  EDHRecResponse,
+} from "Features/deck-builder-features/edhrec-suggestions/make-edhrec-button";
 import deckParser from "Lib/deck-parser";
 import wait from "Lib/wait";
-import Drawer from "../../../src/js/lib/ui-elements/drawer";
+import Drawer from "Lib/ui-elements/drawer";
 import mutation from "Lib/mutation";
 import scryfall from "Lib/scryfall";
 
 import { makeFakeDeck } from "Helpers/fake";
+import { mocked } from "ts-jest/utils";
+import { Card, Deck, DeckSections } from "../../../src/js/types/deck";
+import {
+  CardQueryResult,
+  ScryfallAPICardResponse,
+} from "../../../src/js/types/scryfall-api-responses";
 
 describe("makeEDHRecButton", function () {
   beforeEach(function () {
@@ -52,8 +60,12 @@ describe("makeEDHRecButton", function () {
 
     button.click();
 
-    const drawer = document.querySelector("#edhrec-drawer");
-    const closeButton = drawer.querySelector(".modal-dialog-close");
+    const drawer = document.querySelector(
+      "#edhrec-drawer"
+    ) as HTMLDialogElement;
+    const closeButton = drawer.querySelector(
+      ".modal-dialog-close"
+    ) as HTMLButtonElement;
 
     closeButton.click();
 
@@ -66,8 +78,12 @@ describe("makeEDHRecButton", function () {
     jest.spyOn(button, "focus");
     button.click();
 
-    const drawer = document.querySelector("#edhrec-drawer");
-    const closeButton = drawer.querySelector(".modal-dialog-close");
+    const drawer = document.querySelector(
+      "#edhrec-drawer"
+    ) as HTMLDialogElement;
+    const closeButton = drawer.querySelector(
+      ".modal-dialog-close"
+    ) as HTMLButtonElement;
 
     closeButton.click();
 
@@ -75,10 +91,12 @@ describe("makeEDHRecButton", function () {
   });
 
   describe("when clicked", function () {
-    let fakeDeck, fakeEDHRecResponse, click;
+    let fakeDeck: Partial<Deck>,
+      fakeEDHRecResponse: EDHRecResponse,
+      click: (btn: HTMLButtonElement) => void;
 
     beforeEach(async function () {
-      click = (btn) => {
+      click = (btn: HTMLButtonElement) => {
         // https://stackoverflow.com/a/2706236/2601552
         const evObj = document.createEvent("Events");
 
@@ -90,31 +108,31 @@ describe("makeEDHRecButton", function () {
         entries: {
           commanders: [
             {
+              id: "arjun-id",
               card_digest: {
-                id: "arjun-id",
                 name: "Arjun, the Shifting Flame",
               },
             },
           ],
           lands: [
             {
+              id: "reliquary-tower",
               count: 1,
               card_digest: {
-                id: "reliquary-tower",
                 name: "Reliquary Tower",
               },
             },
           ],
           nonlands: [
             {
+              id: "obstinate-familiar",
               count: 1,
               card_digest: {
-                id: "obstinate-familiar",
                 name: "Obstinate Familiar",
               },
             },
           ],
-        },
+        } as { [section in DeckSections]: Card[] },
       };
       fakeEDHRecResponse = {
         commanders: [
@@ -194,13 +212,13 @@ describe("makeEDHRecButton", function () {
           },
         ],
       };
-      bus.emit.mockImplementation(function (eventName, payload, reply) {
+      mocked(bus).emit.mockImplementation(function (eventName, payload, reply) {
         if (eventName === "REQUEST_EDHREC_RECOMENDATIONS") {
           reply([null, fakeEDHRecResponse]);
         }
       });
 
-      scryfall.getDeck.mockResolvedValue(fakeDeck);
+      mocked(scryfall).getDeck.mockResolvedValue(fakeDeck as Deck);
     });
 
     afterEach(async function () {
@@ -209,7 +227,7 @@ describe("makeEDHRecButton", function () {
     });
 
     it("opens the drawer", function () {
-      bus.emit.mockImplementation();
+      mocked(bus).emit.mockImplementation();
       const btn = makeEDHRecButton();
 
       jest.spyOn(Drawer.prototype, "open");
@@ -220,15 +238,15 @@ describe("makeEDHRecButton", function () {
     });
 
     it("emits a request for EDHRec recomendations with deck data", async function () {
-      bus.emit.mockImplementation();
+      mocked(bus).emit.mockImplementation();
       const btn = await makeEDHRecButton();
 
       click(btn);
 
       await wait();
 
-      expect(bus.emit).toBeCalledTimes(1);
-      expect(bus.emit).toBeCalledWith(
+      expect(mocked(bus).emit).toBeCalledTimes(1);
+      expect(mocked(bus).emit).toBeCalledWith(
         "REQUEST_EDHREC_RECOMENDATIONS",
         {
           commanders: ["Arjun, the Shifting Flame"],
@@ -239,11 +257,11 @@ describe("makeEDHRecButton", function () {
     });
 
     it("attempts any number of cards in command zone", async function () {
-      bus.emit.mockImplementation();
-      fakeDeck.entries.commanders = [
+      mocked(bus).emit.mockImplementation();
+      fakeDeck.entries!.commanders = [
         {
+          id: "sidar-id",
           card_digest: {
-            id: "sidar-id",
             name: "Sidar Kondo of Jamuraa",
           },
         },
@@ -259,7 +277,7 @@ describe("makeEDHRecButton", function () {
             name: "Reyhan, Last of the Abzan",
           },
         },
-      ];
+      ] as Card[];
 
       const btn = await makeEDHRecButton();
 
@@ -283,24 +301,24 @@ describe("makeEDHRecButton", function () {
     });
 
     it("does not error when cards in deck are missing the card_digest", async function () {
-      bus.emit.mockImplementation();
-      fakeDeck.entries.lands.push(
+      mocked(bus).emit.mockImplementation();
+      fakeDeck.entries?.lands?.push(
         {
           foo: "bar",
-        },
+        } as any,
         {
           count: 5,
           card_digest: {
             name: "Island",
           },
-        }
+        } as Card
       );
-      fakeDeck.entries.nonlands.push({
+      fakeDeck.entries?.nonlands?.push({
         count: 1,
         card_digest: {
           name: "Rhystic Study",
         },
-      });
+      } as Card);
 
       const btn = await makeEDHRecButton();
 
@@ -325,7 +343,7 @@ describe("makeEDHRecButton", function () {
     });
 
     it("displays generic error when edhrec request errors", async function () {
-      bus.emit.mockImplementation(function (eventName, payload, reply) {
+      mocked(bus).emit.mockImplementation(function (eventName, payload, reply) {
         const err = new Error("network error");
 
         reply([err]);
@@ -338,13 +356,13 @@ describe("makeEDHRecButton", function () {
 
       await wait();
 
-      const body = document.querySelector("#edhrec-drawer").innerHTML;
+      const body = document.querySelector("#edhrec-drawer")?.innerHTML;
       expect(body).toContain("An unknown error occurred:");
       expect(body).toContain("network error");
     });
 
     it("displays specific error when edhrec request errors with specific errors", async function () {
-      bus.emit.mockImplementation(function (eventName, payload, reply) {
+      mocked(bus).emit.mockImplementation(function (eventName, payload, reply) {
         const err = {
           errors: ["1 error", "2 error"],
         };
@@ -359,7 +377,9 @@ describe("makeEDHRecButton", function () {
 
       await wait();
 
-      const errors = document.querySelectorAll("#edhrec-drawer li");
+      const errors = document.querySelectorAll<HTMLLIElement>(
+        "#edhrec-drawer li"
+      );
       expect(errors[0].innerText).toContain("1 error");
       expect(errors[1].innerText).toContain("2 error");
     });
@@ -383,33 +403,45 @@ describe("makeEDHRecButton", function () {
       );
 
       expect(sections.length).toBe(3);
-      expect(sections[0].querySelector("h3").innerHTML).toBe("Instants");
-      expect(sections[0].querySelector(".edhrec-suggestions img").src).toBe(
+      expect(sections[0].querySelector("h3")?.innerHTML).toBe("Instants");
+      expect(
+        sections[0].querySelector<HTMLImageElement>(".edhrec-suggestions img")
+          ?.src
+      ).toBe(
         "https://img.scryfall.com/cards/normal/front/9/d/9d1ffeb1-6c31-45f7-8140-913c397022a3.jpg?1562439019"
       );
-      expect(sections[1].querySelector("h3").innerHTML).toBe("Artifacts");
-      expect(sections[1].querySelector(".edhrec-suggestions img").src).toBe(
+      expect(sections[1].querySelector("h3")?.innerHTML).toBe("Artifacts");
+      expect(
+        sections[1].querySelector<HTMLImageElement>(".edhrec-suggestions img")
+          ?.src
+      ).toBe(
         "https://img.scryfall.com/cards/normal/front/8/4/84128e98-87d6-4c2f-909b-9435a7833e63.jpg?1567631723"
       );
-      expect(sections[2].querySelector("h3").innerHTML).toBe("Lands");
-      expect(sections[2].querySelector(".edhrec-suggestions img").src).toBe(
+      expect(sections[2].querySelector("h3")?.innerHTML).toBe("Lands");
+      expect(
+        sections[2].querySelector<HTMLImageElement>(".edhrec-suggestions img")
+          ?.src
+      ).toBe(
         "https://img.scryfall.com/cards/normal/front/f/1/f1d33afd-6f2a-43c8-ae5d-17a0674fcdd3.jpg?1562049659"
       );
     });
 
     it("looks up card in scryfall and adds it to deck when chosen", async function () {
       const btn = await makeEDHRecButton();
-      jest.spyOn(scryfall.api, "get").mockResolvedValue({
-        name: "Arcane Denial",
-        id: "arcane-denial-id",
-        type_line: "Instant",
-      });
+      mocked(scryfall.api).get.mockImplementation(
+        () =>
+          new Promise<ScryfallAPICardResponse>(() => ({
+            name: "Arcane Denial",
+            id: "arcane-denial-id",
+            type_line: "Instant",
+          }))
+      );
 
       click(btn);
 
       await wait();
 
-      const cardElement = document.querySelectorAll(
+      const cardElement = document.querySelectorAll<HTMLButtonElement>(
         "#edhrec-drawer .add-card-element-container .add-card-element__panel.plus-symbol"
       )[0];
 
@@ -428,23 +460,25 @@ describe("makeEDHRecButton", function () {
 
     it("looks up card in scryfall and adds it to particualr section in deck when chosen", async function () {
       const btn = await makeEDHRecButton();
-      jest.spyOn(scryfall.api, "get").mockResolvedValue({
-        name: "Arcane Denial",
-        id: "arcane-denial-id",
-        type_line: "Instant",
-      });
+      mocked(scryfall.api).get.mockResolvedValue(
+        new Promise<CardQueryResult>(() => ({
+          name: "Arcane Denial",
+          id: "arcane-denial-id",
+          type_line: "Instant",
+        }))
+      );
 
       click(btn);
 
       await wait();
 
-      const cardElement = document.querySelectorAll(
+      const cardElement = document.querySelectorAll<HTMLButtonElement>(
         "#edhrec-drawer .add-card-element-container .add-card-element__panel.plus-symbol"
       )[0];
 
-      document.querySelector(
+      document.querySelector<HTMLSelectElement>(
         "#edhrec-suggestions-section-chooser select"
-      ).value = "maybeboard";
+      )!.value = "maybeboard";
 
       cardElement.click();
 
@@ -535,13 +569,13 @@ describe("makeEDHRecButton", function () {
       );
 
       expect(sections.length).toBe(7);
-      expect(sections[0].querySelector("h3").innerHTML).toBe("Creatures");
-      expect(sections[1].querySelector("h3").innerHTML).toBe("Instants");
-      expect(sections[2].querySelector("h3").innerHTML).toBe("Sorceries");
-      expect(sections[3].querySelector("h3").innerHTML).toBe("Artifacts");
-      expect(sections[4].querySelector("h3").innerHTML).toBe("Enchantments");
-      expect(sections[5].querySelector("h3").innerHTML).toBe("Planeswalkers");
-      expect(sections[6].querySelector("h3").innerHTML).toBe("Lands");
+      expect(sections[0].querySelector("h3")?.innerHTML).toBe("Creatures");
+      expect(sections[1].querySelector("h3")?.innerHTML).toBe("Instants");
+      expect(sections[2].querySelector("h3")?.innerHTML).toBe("Sorceries");
+      expect(sections[3].querySelector("h3")?.innerHTML).toBe("Artifacts");
+      expect(sections[4].querySelector("h3")?.innerHTML).toBe("Enchantments");
+      expect(sections[5].querySelector("h3")?.innerHTML).toBe("Planeswalkers");
+      expect(sections[6].querySelector("h3")?.innerHTML).toBe("Lands");
     });
 
     it("ignores unknown sections", async function () {
@@ -572,9 +606,9 @@ describe("makeEDHRecButton", function () {
       );
 
       expect(sections.length).toBe(3);
-      expect(sections[0].querySelector("h3").innerHTML).toBe("Instants");
-      expect(sections[1].querySelector("h3").innerHTML).toBe("Artifacts");
-      expect(sections[2].querySelector("h3").innerHTML).toBe("Lands");
+      expect(sections[0].querySelector("h3")?.innerHTML).toBe("Instants");
+      expect(sections[1].querySelector("h3")?.innerHTML).toBe("Artifacts");
+      expect(sections[2].querySelector("h3")?.innerHTML).toBe("Lands");
     });
   });
 });

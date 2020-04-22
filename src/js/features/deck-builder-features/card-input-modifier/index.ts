@@ -46,7 +46,7 @@ class CardInputModifier extends Feature {
   }
 
   async run() {
-    bus.on(events.CALLED_DESTROYENTRY, async (data) => {
+    bus.on(events.CALLED_DESTROYENTRY, async (data: { payload: string }) => {
       // clean up our imageCache
       delete this.imageCache[data.payload];
     });
@@ -117,7 +117,7 @@ class CardInputModifier extends Feature {
 
     const entries = await this.getEntries(true);
     entries?.forEach((entry) => {
-      this.imageCache[entry.id] = (entry as any).card_digest?.image;
+      this.imageCache[entry.id] = entry.card_digest?.image || "";
     });
   }
 }

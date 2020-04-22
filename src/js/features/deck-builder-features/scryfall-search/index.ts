@@ -15,23 +15,23 @@ import emptyElement from "Lib/empty-element";
 import "./index.css";
 import { EXTERNAL_ARROW } from "Svg";
 import { settingsDefaults } from "Js/types/feature";
-import { Card, Deck, section } from "Js/types/deck";
-import { CardQueryResult } from "scryfall-client";
+import { Deck, DeckSections } from "Js/types/deck";
+import { CardQueryResult, ScryfallAPICardResponse } from "scryfall-client";
 
 // TODO saved searches
 
 class ScryfallSearch extends Feature {
-  private drawer?: Drawer;
-  private settings?: settingsDefaults;
-  private currentQuery?: string;
-  private deck?: Deck;
-  private isSingleton?: boolean;
-  private cardList?: CardQueryResult;
-  private deckSectionChooser?: DeckSectionChooser;
-  private container?: HTMLDivElement;
-  private _nextInProgress?: boolean;
+  drawer?: Drawer;
+  settings?: settingsDefaults;
+  currentQuery?: string;
+  deck?: Deck;
+  isSingleton?: boolean;
+  cardList?: CardQueryResult;
+  deckSectionChooser?: DeckSectionChooser;
+  container?: HTMLDivElement;
+  _nextInProgress?: boolean;
 
-  async run() {
+  async run(): Promise<void> {
     this.drawer = this.createDrawer();
     this.settings = await ScryfallSearch.getSettings();
 
@@ -51,7 +51,7 @@ class ScryfallSearch extends Feature {
       });
   }
 
-  async onEnter(query: string) {
+  async onEnter(query: string): Promise<void> {
     this.drawer?.open();
     this.currentQuery = query;
 
@@ -73,8 +73,8 @@ class ScryfallSearch extends Feature {
     }
 
     this.cardList = await scryfall.api
-      .get("cards/search", {
-        query: this.currentQuery,
+      .get<CardQueryResult>("cards/search", {
+        q: this.currentQuery,
       })
       .catch(() => ({} as CardQueryResult));
 
@@ -85,7 +85,7 @@ class ScryfallSearch extends Feature {
     this.drawer?.setLoading(false);
   }
 
-  addSearchOptionsElement() {
+  addSearchOptionsElement(): void {
     const totalCards = this.cardList?.total_cards;
     const el = createElement(`<div
       class="scryfall-search__options-container scryfall-search__non-card-element"
@@ -96,7 +96,7 @@ class ScryfallSearch extends Feature {
           this.currentQuery as string
         )}">${EXTERNAL_ARROW}</a>
       </div>
-    </div>`).firstChild;
+    </div>`).firstChild as HTMLDivElement;
     this.deckSectionChooser = new DeckSectionChooser({
       id: "scryfall-search__section-selection",
       deck: this.deck,
@@ -110,7 +110,7 @@ class ScryfallSearch extends Feature {
     this.container?.appendChild(hr);
   }
 
-  addCards() {
+  addCards(): void {
     if (this.cardList?.length === 0) {
       emptyElement(this.container);
       this.container?.appendChild(
@@ -123,7 +123,7 @@ class ScryfallSearch extends Feature {
     }
 
     const entries = deckParser.flattenEntries(this.deck as Deck);
-    this.cardList?.forEach((card: Card) => {
+    this.cardList?.forEach((card: ScryfallAPICardResponse) => {
       const cardInDeck = entries.find(
         (entry) =>
           entry.card_digest && entry.card_digest.oracle_id === card.oracle_id
@@ -136,7 +136,7 @@ class ScryfallSearch extends Feature {
         name: card.name,
         img: card.getImage(),
         type: card.type_line,
-        onAddCard: (payload: { section: section }) => {
+        onAddCard: (payload: { section: DeckSections }) => {
           const section = this.deckSectionChooser?.getValue();
 
           if (section) {

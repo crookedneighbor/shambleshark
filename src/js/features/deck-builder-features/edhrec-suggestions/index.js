@@ -1,5 +1,5 @@
 import Feature from "Feature";
-import makeEDHRecButton from "./make-edhrec-button";
+import makeEDHRecButton from "./make-edhrec-button.ts";
 import addEDHRecIframe from "./add-edhrec-iframe";
 import mutation from "Lib/mutation";
 import { FEATURE_IDS as ids, FEATURE_SECTIONS as sections } from "Constants";

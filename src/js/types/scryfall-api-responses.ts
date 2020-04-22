@@ -5,7 +5,7 @@ export type ScryfallAPICardResponse = {
   [propName: string]: any;
 };
 
-export class CardQueryResult extends Array<ScryfallAPICardResponse> {
+export interface CardQueryResult extends Array<ScryfallAPICardResponse> {
   has_more: boolean;
   total_cards: number;
   next: () => Promise<CardQueryResult>;

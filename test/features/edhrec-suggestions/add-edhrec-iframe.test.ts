@@ -3,7 +3,7 @@ import deckParser from "../../../src/js/lib/deck-parser";
 import mutation from "Lib/mutation";
 import scryfall from "Lib/scryfall";
 import iframe from "Lib/iframe";
-import { Card, Deck, section } from "../../../src/js/types/deck";
+import { Card, Deck } from "../../../src/js/types/deck";
 import SpyInstance = jest.SpyInstance;
 
 import { makeFakeDeck } from "Helpers/fake";
@@ -104,12 +104,12 @@ describe("addEDHRecIframe", function () {
               card_digest: {
                 name: "Arjun, the Shifting Flame",
               },
-            } as Partial<Card>) as Card,
+            } as any) as Card,
           ],
           lands: [],
           nonlands: [],
         },
-      } as Partial<Deck>) as Deck;
+      } as any) as Deck;
       commanderSection = document.createElement("div");
       commanderSection.innerHTML = `
         <div class="deckbuilder-section-title"></div>
@@ -148,7 +148,7 @@ describe("addEDHRecIframe", function () {
           card_digest: {
             name: "Food Chain",
           },
-        } as Partial<Card>) as Card,
+        } as any) as Card,
       ];
       addEntry({
         value: "1 Food Chain",
@@ -272,7 +272,7 @@ describe("addEDHRecIframe", function () {
             name: "Tana the Bloodsower",
           },
         },
-      ] as Partial<Card>[]) as Card[];
+      ] as any[]) as Card[];
       await addEDHRecIframe(btn);
       const changeHandler = mutationChangeSpy.mock.calls[0][1];
 

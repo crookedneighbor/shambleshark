@@ -69,7 +69,7 @@ describe("scryfall", function () {
     beforeEach(function () {
       fakeCards = [{ id: "foo" }];
 
-      postSpy = mocked(api.post).mockResolvedValue(fakeCards);
+      postSpy = mocked(api).post.mockImplementation();
     });
 
     it("looks up collection endpoint", async function () {
@@ -108,12 +108,12 @@ describe("scryfall", function () {
       await getCollection(entries);
 
       expect(postSpy).toBeCalledTimes(6);
-      expect(postSpy.mock!.calls[0][1].identifiers.length).toBe(75);
-      expect(postSpy.mock!.calls[1][1].identifiers.length).toBe(75);
-      expect(postSpy.mock!.calls[2][1].identifiers.length).toBe(75);
-      expect(postSpy.mock!.calls[3][1].identifiers.length).toBe(75);
-      expect(postSpy.mock!.calls[4][1].identifiers.length).toBe(75);
-      expect(postSpy.mock!.calls[5][1].identifiers.length).toBe(25);
+      expect(postSpy.mock.calls[0][1].identifiers.length).toBe(75);
+      expect(postSpy.mock.calls[1][1].identifiers.length).toBe(75);
+      expect(postSpy.mock.calls[2][1].identifiers.length).toBe(75);
+      expect(postSpy.mock.calls[3][1].identifiers.length).toBe(75);
+      expect(postSpy.mock.calls[4][1].identifiers.length).toBe(75);
+      expect(postSpy.mock.calls[5][1].identifiers.length).toBe(25);
     });
 
     it("resolves with flattened array of the results of each card's getTokens call", async function () {

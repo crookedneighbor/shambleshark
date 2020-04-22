@@ -1,13 +1,13 @@
 import * as bus from "framebus";
-import CardInputModifier from "../../../src/js/features/deck-builder-features/card-input-modifier";
-import deckParser from "../../../src/js/lib/deck-parser";
-import scryfall from "../../../src/js/lib/scryfall";
-import mutation from "../../../src/js/lib/mutation";
+import CardInputModifier from "Features/deck-builder-features/card-input-modifier";
+import deckParser from "Lib/deck-parser";
+import scryfall from "Lib/scryfall";
+import mutation from "Lib/mutation";
 import wait from "Lib/wait";
 import SpyInstance = jest.SpyInstance;
-import { Card, Deck } from "../../../src/js/types/deck";
 
 import { makeFakeDeck } from "Helpers/fake";
+import { Card } from "../../../src/js/types/deck";
 
 describe("Card Input Modifier", function () {
   let cim: CardInputModifier;
@@ -328,9 +328,9 @@ describe("Card Input Modifier", function () {
             image: "https://example.com/bar",
           },
         },
-        {
+        ({
           id: "baz",
-        },
+        } as any) as Card,
       ] as Card[]);
       cim.imageCache.foo = "https://example.com/cached-foo";
 

@@ -9,7 +9,7 @@ interface ModalOptions extends DialogInterfaceOptions {
 }
 
 export default class Modal extends DialogInterface {
-  _constructElement(options: ModalOptions = {}): HTMLElement {
+  _constructElement(options: ModalOptions = {}): HTMLDivElement {
     const titleId = `modal-title-${options.id}`;
     const modal = createElement(`<div
       class="modal-dialog-overlay"
@@ -41,7 +41,7 @@ export default class Modal extends DialogInterface {
           <div class="dialog-content modal-dialog-stage-content"></div>
         </div>
       </div>
-   </div>`).firstChild as HTMLElement;
+   </div>`).firstChild as HTMLDivElement;
 
     modal.querySelector(".dialog-close")!.addEventListener("click", () => {
       this.close();

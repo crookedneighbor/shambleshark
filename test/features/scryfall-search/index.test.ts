@@ -1,9 +1,17 @@
-import ScryfallSearch from "../../../src/js/features/deck-builder-features/scryfall-search";
+import ScryfallSearch from "Features/deck-builder-features/scryfall-search";
 import deckParser from "Lib/deck-parser";
 import scryfall from "Lib/scryfall";
 import * as bus from "framebus";
+import Drawer from "Lib/ui-elements/drawer";
 
 import { makeFakeDeck, makeFakeCard } from "Helpers/fake";
+import { mocked } from "ts-jest/utils";
+import {
+  CardQueryResult,
+  ScryfallAPICardResponse,
+} from "../../../src/js/types/scryfall-api-responses";
+import { settingsDefaults } from "../../../src/js/types/feature";
+import DialogInterface from "../../../src/js/lib/ui-elements/dialog-interface";
 
 describe("Scryfall Search", function () {
   describe("run", function () {
@@ -20,7 +28,7 @@ describe("Scryfall Search", function () {
     it("creates a drawer", async function () {
       const ss = new ScryfallSearch();
 
-      jest.spyOn(ss, "createDrawer").mockReturnValue({});
+      jest.spyOn(ss, "createDrawer").mockReturnValue({} as Drawer);
 
       await ss.run();
 
@@ -30,8 +38,8 @@ describe("Scryfall Search", function () {
     it("sets up event listener for search bar", async function () {
       const ss = new ScryfallSearch();
 
-      jest.spyOn(ss, "createDrawer").mockReturnValue({});
-      jest.spyOn(ss, "onEnter").mockReturnValue({});
+      jest.spyOn(ss, "createDrawer").mockReturnValue({} as Drawer);
+      jest.spyOn(ss, "onEnter").mockReturnValue({} as Promise<void>);
 
       await ss.run();
 
@@ -55,8 +63,8 @@ describe("Scryfall Search", function () {
     it("does not call onEnter if no value in the header search field", async function () {
       const ss = new ScryfallSearch();
 
-      jest.spyOn(ss, "createDrawer").mockReturnValue({});
-      jest.spyOn(ss, "onEnter").mockReturnValue({});
+      jest.spyOn(ss, "createDrawer").mockReturnValue({} as Drawer);
+      jest.spyOn(ss, "onEnter").mockReturnValue({} as Promise<void>);
 
       await ss.run();
 
@@ -71,7 +79,7 @@ describe("Scryfall Search", function () {
   });
 
   describe("createDrawer", function () {
-    let deckbuilderContainer, searchInput;
+    let deckbuilderContainer: HTMLDivElement, searchInput: HTMLInputElement;
 
     beforeEach(function () {
       deckbuilderContainer = document.createElement("input");
@@ -96,7 +104,7 @@ describe("Scryfall Search", function () {
       const ss = new ScryfallSearch();
       const drawer = ss.createDrawer();
 
-      jest.spyOn(bus, "emit").mockReturnValue(null);
+      jest.spyOn(bus, "emit").mockReturnValue();
 
       drawer.triggerOnClose();
 
@@ -108,22 +116,29 @@ describe("Scryfall Search", function () {
       const ss = new ScryfallSearch();
       const drawer = ss.createDrawer();
 
-      jest.spyOn(searchInput, "focus").mockReturnValue(null);
+      jest.spyOn(searchInput, "focus").mockReturnValue();
 
       drawer.triggerOnClose();
 
       expect(searchInput.focus).toBeCalledTimes(1);
     });
 
-    it("adds cards on scroll if ready for the next batch", async function () {
+    it("adds cards on scroll if ready for the next batch", async () => {
       const ss = new ScryfallSearch();
       const drawer = ss.createDrawer();
 
-      jest.spyOn(ss, "isReadyToLookupNextBatch").mockReturnValue(true);
-      jest.spyOn(ss, "addCards").mockReturnValue(null);
       ss.cardList = {
-        next: jest.fn().mockResolvedValue([]),
+        ...({} as CardQueryResult),
+        next: jest.fn().mockImplementation(
+          () =>
+            new Promise<CardQueryResult>((resolve, _reject) => {
+              resolve(ss.cardList);
+            })
+        ),
       };
+
+      jest.spyOn(ss, "isReadyToLookupNextBatch").mockReturnValue(true);
+      jest.spyOn(ss, "addCards").mockImplementation();
 
       expect(ss.addCards).toBeCalledTimes(0);
 
@@ -139,6 +154,7 @@ describe("Scryfall Search", function () {
       jest.spyOn(ss, "isReadyToLookupNextBatch").mockReturnValue(false);
       jest.spyOn(ss, "addCards");
       ss.cardList = {
+        ...({} as CardQueryResult),
         next: jest.fn().mockResolvedValue([]),
       };
 
@@ -149,27 +165,26 @@ describe("Scryfall Search", function () {
   });
 
   describe("onEnter", function () {
-    let ss;
+    let ss: ScryfallSearch;
 
     beforeEach(function () {
       ss = new ScryfallSearch();
-      ss.drawer = {
-        open: jest.fn(),
-        setHeader: jest.fn(),
-        setLoading: jest.fn(),
-      };
+      ss.drawer = mocked(new Drawer());
+      jest.spyOn(DialogInterface.prototype, "scrollTo").mockImplementation();
+      jest.spyOn(Drawer.prototype, "open");
       ss.container = document.createElement("div");
-      ss.settings = {};
+      ss.settings = {} as settingsDefaults;
 
-      jest.spyOn(scryfall.api, "get").mockResolvedValue([]);
+      mocked(scryfall.api).get.mockResolvedValue(
+        new Promise<CardQueryResult>((resolve, _reject) => resolve())
+      );
       jest.spyOn(scryfall, "getDeck").mockResolvedValue(makeFakeDeck());
-      jest.spyOn(ss, "addCards").mockReturnValue(null);
     });
 
     it("opens the drawer", async function () {
       await ss.onEnter("foo");
 
-      expect(ss.drawer.open).toBeCalledTimes(1);
+      expect(ss.drawer?.open).toBeCalledTimes(1);
     });
 
     it("queries the api", async function () {
@@ -182,7 +197,7 @@ describe("Scryfall Search", function () {
     });
 
     it("adds `not:funny` to query when restrictFunnyCards setting is active", async function () {
-      ss.settings.restrictFunnyCards = true;
+      ss.settings!.restrictFunnyCards = true;
       await ss.onEnter("foo");
 
       expect(scryfall.api.get).toBeCalledTimes(1);
@@ -192,7 +207,7 @@ describe("Scryfall Search", function () {
     });
 
     it("adds `ids` to query when restrictToCommanderColorIdentity setting is active and deck is commanderlike", async function () {
-      ss.settings.restrictToCommanderColorIdentity = true;
+      ss.settings!.restrictToCommanderColorIdentity = true;
       jest.spyOn(deckParser, "isSingletonTypeDeck").mockReturnValue(true);
       jest.spyOn(deckParser, "isCommanderLike").mockReturnValue(true);
       jest
@@ -208,7 +223,7 @@ describe("Scryfall Search", function () {
     });
 
     it("does not add `ids` to query when restrictToCommanderColorIdentity setting is active and deck is not commanderlike", async function () {
-      ss.settings.restrictToCommanderColorIdentity = true;
+      ss.settings!.restrictToCommanderColorIdentity = true;
       jest.spyOn(deckParser, "isSingletonTypeDeck").mockReturnValue(true);
       jest.spyOn(deckParser, "isCommanderLike").mockReturnValue(false);
       jest
@@ -224,8 +239,8 @@ describe("Scryfall Search", function () {
     });
 
     it("can add both `not:funny` and `ids` to query", async function () {
-      ss.settings.restrictFunnyCards = true;
-      ss.settings.restrictToCommanderColorIdentity = true;
+      ss.settings!.restrictFunnyCards = true;
+      ss.settings!.restrictToCommanderColorIdentity = true;
       jest.spyOn(deckParser, "isSingletonTypeDeck").mockReturnValue(true);
       jest.spyOn(deckParser, "isCommanderLike").mockReturnValue(true);
       jest
@@ -241,9 +256,12 @@ describe("Scryfall Search", function () {
     });
 
     it("adds cards from the api result", async function () {
-      const cards = [{}, {}];
+      const cards: CardQueryResult = ({
+        0: {} as ScryfallAPICardResponse,
+        1: {} as ScryfallAPICardResponse,
+      } as any) as CardQueryResult;
 
-      scryfall.api.get.mockResolvedValue(cards);
+      mocked(scryfall.api).get.mockResolvedValue(cards);
 
       await ss.onEnter("foo");
 
@@ -260,7 +278,7 @@ describe("Scryfall Search", function () {
     it("adds deck to instance", async function () {
       const fakeDeck = makeFakeDeck();
 
-      scryfall.getDeck.mockResolvedValue(fakeDeck);
+      mocked(scryfall).getDeck.mockResolvedValue(fakeDeck);
 
       await ss.onEnter("foo");
 
@@ -270,13 +288,13 @@ describe("Scryfall Search", function () {
     it("shows the drawer", async function () {
       await ss.onEnter("foo");
 
-      expect(ss.drawer.setLoading).toBeCalledTimes(1);
-      expect(ss.drawer.setLoading).toBeCalledWith(false);
+      expect(ss.drawer!.setLoading).toBeCalledTimes(1);
+      expect(ss.drawer!.setLoading).toBeCalledWith(false);
     });
   });
 
   describe("addCards", function () {
-    let ss;
+    let ss: ScryfallSearch;
 
     beforeEach(function () {
       ss = new ScryfallSearch();
@@ -294,9 +312,10 @@ describe("Scryfall Search", function () {
     });
 
     it("creates card elements to add to container", function () {
-      ss.cardList = [
-        {
+      ss.cardList = ({
+        0: {
           id: "id-1",
+          color_identity: ["W"],
           oracle_id: "oracle-id-1",
           name: "card 1",
           getImage() {
@@ -304,8 +323,9 @@ describe("Scryfall Search", function () {
           },
           type_line: "type 1",
         },
-        {
+        1: {
           id: "id-2",
+          color_identity: ["U"],
           oracle_id: "oracle-id-2",
           name: "card 2",
           getImage() {
@@ -313,29 +333,29 @@ describe("Scryfall Search", function () {
           },
           type_line: "type 2",
         },
-      ];
+      } as any) as CardQueryResult;
 
       ss.addCards();
 
       expect(
-        ss.container.querySelector('img[src="https://example.com/1"]')
+        ss.container?.querySelector('img[src="https://example.com/1"]')
       ).toBeTruthy();
       expect(
-        ss.container.querySelector('img[src="https://example.com/2"]')
+        ss.container?.querySelector('img[src="https://example.com/2"]')
       ).toBeTruthy();
     });
 
     it("adds an error message when no card list is available", function () {
-      ss.cardList = [];
+      ss.cardList = ({} as any) as CardQueryResult;
 
       ss.addCards();
 
-      expect(ss.container.innerHTML).toContain("No search results.");
+      expect(ss.container?.innerHTML).toContain("No search results.");
     });
   });
 
   describe("isReadyToLookupNextBatch ", function () {
-    let el;
+    let el: Element;
 
     beforeEach(function () {
       el = document.createElement("div");
@@ -352,7 +372,7 @@ describe("Scryfall Search", function () {
     it("returns false if there is no card list", function () {
       const ss = new ScryfallSearch();
 
-      ss.cardList = null;
+      ss.cardList = undefined;
 
       expect(ss.isReadyToLookupNextBatch(el)).toBe(false);
     });
@@ -360,9 +380,9 @@ describe("Scryfall Search", function () {
     it("returns false if card list has no more in list", function () {
       const ss = new ScryfallSearch();
 
-      ss.cardList = {
+      ss.cardList = ({
         has_more: false,
-      };
+      } as any) as CardQueryResult;
 
       expect(ss.isReadyToLookupNextBatch(el)).toBe(false);
     });
@@ -370,32 +390,32 @@ describe("Scryfall Search", function () {
     it("returns false if element position is beneath the scroll threshold", function () {
       const ss = new ScryfallSearch();
 
-      ss.cardList = {
+      ss.cardList = ({
         has_more: true,
-      };
+      } as any) as CardQueryResult;
 
       expect(
         ss.isReadyToLookupNextBatch({
           scrollTop: 100,
           clientHeight: 100,
           scrollHeight: 9999999,
-        })
+        } as Element)
       ).toBe(false);
     });
 
     it("returns true if element position is within the scroll threshold", function () {
       const ss = new ScryfallSearch();
 
-      ss.cardList = {
+      ss.cardList = ({
         has_more: true,
-      };
+      } as any) as CardQueryResult;
 
       expect(
         ss.isReadyToLookupNextBatch({
           scrollTop: 100,
           clientHeight: 100,
           scrollHeight: 100,
-        })
+        } as Element)
       ).toBe(true);
     });
   });

@@ -1,9 +1,8 @@
 import * as bus from "framebus";
 import TaggerLink, {
-  Relationship,
   ShamblesharkRelationship,
   TaggerPayload,
-} from "../../../src/js/features/search-results-features/tagger-link";
+} from "Features/search-results-features/tagger-link";
 import iframe from "Lib/iframe";
 import mutation from "Lib/mutation";
 
@@ -21,6 +20,7 @@ import {
   SIMILAR_TO_SYMBOL,
 } from "Svg";
 import SpyInstance = jest.SpyInstance;
+import { mocked } from "ts-jest/utils";
 
 describe("Tagger Link", function () {
   describe("run", function () {
@@ -121,10 +121,10 @@ describe("Tagger Link", function () {
       const fakeBtn = document.createElement("button");
       fakeBtn.classList.add("tagger-link-button");
 
-      readySpy.mockReturnValue(fakeBtn);
+      mocked(tl).makeButton.mockReturnValue(fakeBtn);
 
       readySpy.mockImplementation((cssSelector, cb) => {
-        cb(el.querySelector("a"));
+        cb(el.querySelector(".card-grid-item-card"));
       });
 
       await tl.setupButtons();
@@ -200,7 +200,7 @@ describe("Tagger Link", function () {
         pageX: 100,
       } as MouseEvent;
 
-      jest.spyOn(bus, "emit").mockImplementation();
+      emitSpy = jest.spyOn(bus, "emit").mockImplementation();
       jest.spyOn(TaggerLink.prototype, "addTags").mockImplementation();
     });
 
@@ -795,8 +795,9 @@ describe("Tagger Link", function () {
     });
 
     it("skips any unknown foreign keys", () => {
-      payload.relationships?.push({
-        foreignKey: "illustrationId",
+      payload.relationships!.push({
+        // @ts-ignore
+        foreignKey: "unknown",
         relatedId: "not-oracle-id",
         contentName: "Content Name",
         relatedName: "Related Name",

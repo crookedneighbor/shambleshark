@@ -31,7 +31,7 @@ export default abstract class DialogInterface {
   _loaderNode: HTMLElement;
   _headerNode: HTMLElement;
 
-  element: HTMLElement;
+  element: HTMLDivElement;
 
   constructor(options: DialogInterfaceOptions = {}) {
     this._isOpen = false;
@@ -167,7 +167,7 @@ export default abstract class DialogInterface {
     }
   }
 
-  abstract _constructElement(options: DialogInterfaceOptions): HTMLElement;
+  abstract _constructElement(options: DialogInterfaceOptions): HTMLDivElement;
 
   scrollTo(x: number, y: number) {
     this.element.scrollTo(x, y);
