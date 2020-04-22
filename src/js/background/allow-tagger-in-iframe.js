@@ -1,8 +1,9 @@
-import { onHeadersReceived } from "Browser/runtime";
+import { browser } from "webextension-polyfill-ts";
 
 export default function () {
+  // https://stackoverflow.com/a/15534822/2601552
   // removes the headers that prevent loading Tagger in an iframe
-  onHeadersReceived({
+  browser.webRequest.onHeadersReceived({
     addListener(info) {
       const headers = info.responseHeaders.filter((rawHeader) => {
         const header = rawHeader.name.toLowerCase();

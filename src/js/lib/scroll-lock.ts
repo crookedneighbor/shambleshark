@@ -1,6 +1,6 @@
 // https://css-tricks.com/prevent-page-scrolling-when-a-modal-is-open/
 
-function freezeBodyBehindDialog() {
+function freezeBodyBehindDialog(): void {
   const body = document.body;
   const calculatedScrollYPosition = `${window.scrollY}px`;
 
@@ -9,7 +9,7 @@ function freezeBodyBehindDialog() {
   body.style.top = `-${calculatedScrollYPosition}`;
 }
 
-function resetBody() {
+function resetBody(): void {
   const body = document.body;
   const scrollY = body.style.top;
 
@@ -22,6 +22,6 @@ function resetBody() {
   }
 }
 
-export default function (locked) {
+export default function (locked?: boolean): void {
   locked ? freezeBodyBehindDialog() : resetBody();
 }

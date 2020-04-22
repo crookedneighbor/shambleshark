@@ -7,7 +7,7 @@
       "Js/*": ["src/js/*"],
       "Helpers/*": ["test/helpers/*"],
       /* These need to be duplicated from the webpack config */
-      "Browser/*": ["src/js/lib/chrome/*"],
+      "ExtensionsLink": ["src/js/lib/chrome/extensions-link.ts"],
       "Constants": ["src/js/resources/constants.js"],
       "Feature": ["src/js/features/feature.js"],
       "Features/*": ["src/js/features/*"],
