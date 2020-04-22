@@ -5,7 +5,7 @@ type DialogOptions = {
 };
 
 class ChildDialog extends DialogInterface {
-  _constructElement(options: DialogOptions): HTMLElement {
+  _constructElement(options: DialogOptions): HTMLDivElement {
     const el = document.createElement("div");
     el.innerHTML = `
       <div class="dialog-close"></div>
