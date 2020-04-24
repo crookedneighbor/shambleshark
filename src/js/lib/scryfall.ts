@@ -23,7 +23,7 @@ export async function getCollection(
       return array;
     }
 
-    return array.concat(ids.slice(i, i + 75));
+    return array.concat([ids.slice(i, i + 75)]);
   }, []);
 
   const collectionResults = await Promise.all(
