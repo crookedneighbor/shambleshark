@@ -1,9 +1,11 @@
 import ScryfallSearch from "Features/deck-builder-features/scryfall-search";
 import deckParser from "Lib/deck-parser";
-import scryfall from "Lib/scryfall";
+import { getDeck, search } from "Lib/scryfall";
 import bus from "framebus";
 
 import { makeFakeDeck, makeFakeCard } from "Helpers/fake";
+
+jest.mock("Lib/scryfall");
 
 describe("Scryfall Search", function () {
   describe("run", function () {
@@ -150,6 +152,8 @@ describe("Scryfall Search", function () {
 
   describe("onEnter", function () {
     let ss;
+    let getDeckSpy;
+    let searchSpy;
 
     beforeEach(function () {
       ss = new ScryfallSearch();
@@ -161,8 +165,8 @@ describe("Scryfall Search", function () {
       ss.container = document.createElement("div");
       ss.settings = {};
 
-      jest.spyOn(scryfall.api, "get").mockResolvedValue([]);
-      jest.spyOn(scryfall, "getDeck").mockResolvedValue(makeFakeDeck());
+      searchSpy = search.mockResolvedValue([]);
+      getDeckSpy = getDeck.mockResolvedValue(makeFakeDeck());
       jest.spyOn(ss, "addCards").mockReturnValue(null);
     });
 
@@ -175,20 +179,16 @@ describe("Scryfall Search", function () {
     it("queries the api", async function () {
       await ss.onEnter("foo");
 
-      expect(scryfall.api.get).toBeCalledTimes(1);
-      expect(scryfall.api.get).toBeCalledWith("cards/search", {
-        q: "foo",
-      });
+      expect(search).toBeCalledTimes(1);
+      expect(search).toBeCalledWith("foo");
     });
 
     it("adds `not:funny` to query when restrictFunnyCards setting is active", async function () {
       ss.settings.restrictFunnyCards = true;
       await ss.onEnter("foo");
 
-      expect(scryfall.api.get).toBeCalledTimes(1);
-      expect(scryfall.api.get).toBeCalledWith("cards/search", {
-        q: "foo not:funny",
-      });
+      expect(search).toBeCalledTimes(1);
+      expect(search).toBeCalledWith("foo not:funny");
     });
 
     it("adds `ids` to query when restrictToCommanderColorIdentity setting is active and deck is commanderlike", async function () {
@@ -201,10 +201,8 @@ describe("Scryfall Search", function () {
 
       await ss.onEnter("foo");
 
-      expect(scryfall.api.get).toBeCalledTimes(1);
-      expect(scryfall.api.get).toBeCalledWith("cards/search", {
-        q: "foo ids:BG",
-      });
+      expect(searchSpy).toBeCalledTimes(1);
+      expect(searchSpy).toBeCalledWith("foo ids:BG");
     });
 
     it("does not add `ids` to query when restrictToCommanderColorIdentity setting is active and deck is not commanderlike", async function () {
@@ -217,10 +215,8 @@ describe("Scryfall Search", function () {
 
       await ss.onEnter("foo");
 
-      expect(scryfall.api.get).toBeCalledTimes(1);
-      expect(scryfall.api.get).toBeCalledWith("cards/search", {
-        q: "foo",
-      });
+      expect(searchSpy).toBeCalledTimes(1);
+      expect(searchSpy).toBeCalledWith("foo");
     });
 
     it("can add both `not:funny` and `ids` to query", async function () {
@@ -234,16 +230,14 @@ describe("Scryfall Search", function () {
 
       await ss.onEnter("foo");
 
-      expect(scryfall.api.get).toBeCalledTimes(1);
-      expect(scryfall.api.get).toBeCalledWith("cards/search", {
-        q: "foo not:funny ids:BG",
-      });
+      expect(searchSpy).toBeCalledTimes(1);
+      expect(searchSpy).toBeCalledWith("foo not:funny ids:BG");
     });
 
     it("adds cards from the api result", async function () {
       const cards = [{}, {}];
 
-      scryfall.api.get.mockResolvedValue(cards);
+      searchSpy.mockResolvedValue(cards);
 
       await ss.onEnter("foo");
 
@@ -254,13 +248,13 @@ describe("Scryfall Search", function () {
     it("fetches the current deck", async function () {
       await ss.onEnter("foo");
 
-      expect(scryfall.getDeck).toBeCalledTimes(1);
+      expect(getDeckSpy).toBeCalledTimes(1);
     });
 
     it("adds deck to instance", async function () {
       const fakeDeck = makeFakeDeck();
 
-      scryfall.getDeck.mockResolvedValue(fakeDeck);
+      getDeckSpy.mockResolvedValue(fakeDeck);
 
       await ss.onEnter("foo");
 

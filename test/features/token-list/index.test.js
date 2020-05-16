@@ -1,7 +1,9 @@
 import TokenList from "Features/deck-view-features/token-list";
 import mutation from "Lib/mutation";
-import scryfall from "Lib/scryfall";
+import { getCollection } from "Lib/scryfall";
 import wait from "Lib/wait";
+
+jest.mock("Lib/scryfall");
 
 describe("Token List", function () {
   let tl;
@@ -309,8 +311,10 @@ describe("Token List", function () {
   });
 
   describe("lookupTokens", function () {
+    let getCollectionSpy;
+
     beforeEach(function () {
-      jest.spyOn(scryfall, "getCollection").mockResolvedValue([]);
+      getCollectionSpy = getCollection.mockResolvedValue([]);
     });
 
     it("calls getCollection", async function () {
@@ -321,8 +325,8 @@ describe("Token List", function () {
         },
       ]);
 
-      expect(scryfall.getCollection).toBeCalledTimes(1);
-      expect(scryfall.getCollection).toBeCalledWith([
+      expect(getCollectionSpy).toBeCalledTimes(1);
+      expect(getCollectionSpy).toBeCalledWith([
         {
           set: "dom",
           collector_number: "102",
@@ -354,7 +358,7 @@ describe("Token List", function () {
         i++;
       }
 
-      scryfall.getCollection.mockResolvedValue(fakeResults);
+      getCollectionSpy.mockResolvedValue(fakeResults);
 
       const tokens = await tl.lookupTokens(entries);
 

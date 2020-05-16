@@ -1,19 +1,21 @@
 import addEDHRecIframe from "Features/deck-builder-features/edhrec-suggestions/add-edhrec-iframe";
 import deckParser from "Lib/deck-parser";
 import mutation from "Lib/mutation";
-import scryfall from "Lib/scryfall";
+import { getDeck } from "Lib/scryfall";
 import iframe from "Lib/iframe";
 
 import { makeFakeDeck } from "Helpers/fake";
 
+jest.mock("Lib/scryfall");
+
 describe("addEDHRecIframe", function () {
   let btn;
+  let getDeckSpy;
 
   beforeEach(function () {
     btn = document.createElement("button");
 
-    jest.spyOn(scryfall.api, "get");
-    jest.spyOn(scryfall, "getDeck").mockResolvedValue(
+    getDeckSpy = getDeck.mockResolvedValue(
       makeFakeDeck({
         primarySections: ["commanders", "nonlands"],
         secondarySections: ["lands", "maybeboard"],
@@ -110,7 +112,7 @@ describe("addEDHRecIframe", function () {
       commanderSection.querySelector(".deckbuilder-section-title").innerText =
         "Commander(s)";
 
-      scryfall.getDeck.mockResolvedValue(fakeDeck);
+      getDeckSpy.mockResolvedValue(fakeDeck);
       document.body.appendChild(commanderSection);
     });
 

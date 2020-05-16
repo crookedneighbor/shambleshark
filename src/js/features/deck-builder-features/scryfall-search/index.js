@@ -9,7 +9,7 @@ import Drawer from "Ui/drawer";
 import DeckSectionChooser from "Ui/deck-section-chooser";
 import AddCardElement from "Ui/add-card-element";
 import deckParser from "Lib/deck-parser";
-import scryfall from "Lib/scryfall";
+import { getDeck, search } from "Lib/scryfall";
 import createElement from "Lib/create-element";
 import emptyElement from "Lib/empty-element";
 import "./index.css";
@@ -45,7 +45,7 @@ class ScryfallSearch extends Feature {
       this.currentQuery += " not:funny";
     }
 
-    this.deck = await scryfall.getDeck();
+    this.deck = await getDeck();
 
     this.isSingleton = deckParser.isSingletonTypeDeck(this.deck);
 
@@ -58,14 +58,10 @@ class ScryfallSearch extends Feature {
       this.currentQuery += ` ids:${colors.join("")}`;
     }
 
-    this.cardList = await scryfall.api
-      .get("cards/search", {
-        q: this.currentQuery,
-      })
-      .catch((e) => {
-        // most likely a 404, return no results
-        return [];
-      });
+    this.cardList = await search(this.currentQuery).catch((e) => {
+      // most likely a 404, return no results
+      return [];
+    });
 
     this.addSearchOptionsElement();
 

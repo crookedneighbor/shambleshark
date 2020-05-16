@@ -1,11 +1,13 @@
-import { api, getCollection, getDeck } from "Lib/scryfall";
+import scryfall = require("scryfall-client");
+import type List from "scryfall-client/dist/models/list";
+import type Card from "scryfall-client/dist/models/card";
+import { getCollection, getDeck } from "Lib/scryfall";
 import * as bus from "framebus";
 import { mocked } from "ts-jest/utils";
 
 import SpyInstance = jest.SpyInstance;
 import { makeFakeDeck } from "Helpers/fake";
 
-// TODO mock scryfall-client
 jest.mock("framebus");
 jest.mock("scryfall-client");
 
@@ -64,12 +66,14 @@ describe("scryfall", function () {
 
   describe("getCollection", function () {
     let fakeCards: { id: string }[];
-    let postSpy: SpyInstance;
+    let getCollectionSpy: SpyInstance;
 
     beforeEach(function () {
       fakeCards = [{ id: "foo" }];
 
-      postSpy = mocked(api).post.mockResolvedValue(fakeCards);
+      getCollectionSpy = mocked(scryfall.getCollection).mockResolvedValue(
+        fakeCards as List<Card>
+      );
     });
 
     it("looks up collection endpoint", async function () {
@@ -80,15 +84,13 @@ describe("scryfall", function () {
         },
       ]);
 
-      expect(postSpy).toBeCalledTimes(1);
-      expect(postSpy).toBeCalledWith("/cards/collection", {
-        identifiers: [
-          {
-            set: "DOM",
-            collector_number: "102",
-          },
-        ],
-      });
+      expect(getCollectionSpy).toBeCalledTimes(1);
+      expect(getCollectionSpy).toBeCalledWith([
+        {
+          set: "DOM",
+          collector_number: "102",
+        },
+      ]);
 
       expect(cards).toEqual(fakeCards);
     });
@@ -107,13 +109,13 @@ describe("scryfall", function () {
 
       await getCollection(entries);
 
-      expect(postSpy).toBeCalledTimes(6);
-      expect(postSpy.mock.calls[0][1].identifiers.length).toBe(75);
-      expect(postSpy.mock.calls[1][1].identifiers.length).toBe(75);
-      expect(postSpy.mock.calls[2][1].identifiers.length).toBe(75);
-      expect(postSpy.mock.calls[3][1].identifiers.length).toBe(75);
-      expect(postSpy.mock.calls[4][1].identifiers.length).toBe(75);
-      expect(postSpy.mock.calls[5][1].identifiers.length).toBe(25);
+      expect(getCollectionSpy).toBeCalledTimes(6);
+      expect(getCollectionSpy.mock.calls[0][0].length).toBe(75);
+      expect(getCollectionSpy.mock.calls[1][0].length).toBe(75);
+      expect(getCollectionSpy.mock.calls[2][0].length).toBe(75);
+      expect(getCollectionSpy.mock.calls[3][0].length).toBe(75);
+      expect(getCollectionSpy.mock.calls[4][0].length).toBe(75);
+      expect(getCollectionSpy.mock.calls[5][0].length).toBe(25);
     });
 
     it("resolves with flattened array of the results of each card's getTokens call", async function () {
@@ -130,7 +132,7 @@ describe("scryfall", function () {
 
       const cards = await getCollection(entries);
 
-      expect(api.post).toBeCalledTimes(3);
+      expect(getCollectionSpy).toBeCalledTimes(3);
 
       cards.forEach((c) => {
         expect(Array.isArray(c)).toBe(false);

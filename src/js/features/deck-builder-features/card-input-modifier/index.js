@@ -6,7 +6,7 @@ import {
 } from "Constants";
 import bus from "framebus";
 import mutation from "Lib/mutation";
-import scryfall from "Lib/scryfall";
+import { getDeck } from "Lib/scryfall";
 import deckParser from "Lib/deck-parser";
 import wait from "Lib/wait";
 import CardTooltip from "Ui/card-tooltip";
@@ -75,7 +75,7 @@ class CardInputModifier extends Feature {
 
   getEntries(bustCache) {
     if (!this._getEntriesPromise || bustCache) {
-      this._getEntriesPromise = scryfall.getDeck().then((d) =>
+      this._getEntriesPromise = getDeck().then((d) =>
         deckParser.flattenEntries(d, {
           idToGroupBy: "id",
         })

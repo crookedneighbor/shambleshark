@@ -1,6 +1,6 @@
 import Feature from "Feature";
 import mutation from "Lib/mutation";
-import scryfall from "Lib/scryfall";
+import { getCollection } from "Lib/scryfall";
 import { sortByAttribute } from "Lib/sort";
 import createElement from "Lib/create-element";
 import Modal from "Ui/modal";
@@ -91,9 +91,7 @@ class TokenList extends Feature {
   }
 
   lookupCardCollection(cards) {
-    return scryfall.api.post("/cards/collection", {
-      identifiers: cards,
-    });
+    return getCollection(cards);
   }
 
   getCardElements() {
@@ -142,7 +140,7 @@ class TokenList extends Feature {
   }
 
   async lookupTokens(entries) {
-    const cards = await scryfall.getCollection(entries);
+    const cards = await getCollection(entries);
     const tokens = cards.map((c) => c.getTokens());
 
     return Promise.all(tokens);

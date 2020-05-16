@@ -1,6 +1,6 @@
 export type settingValue = string | number | boolean;
 
-export interface metadata {
+export interface Metadata {
   id: string;
   title: string;
   section: string; // TODO: Do it so it can only be a FEATURE_SECTIONS from Constants
@@ -8,12 +8,12 @@ export interface metadata {
   futureFeature?: boolean;
 }
 
-export interface settingsDefaults {
+export interface SettingsDefaults {
   enabled: boolean;
   [key: string]: settingValue;
 }
 
-export interface settingsDefinition {
+export interface SettingsDefinition {
   id: string;
   label: string;
   input: "checkbox";

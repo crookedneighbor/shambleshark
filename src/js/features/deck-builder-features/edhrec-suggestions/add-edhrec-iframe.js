@@ -1,5 +1,5 @@
 import mutation from "Lib/mutation";
-import scryfall from "Lib/scryfall";
+import { getDeck } from "Lib/scryfall";
 import deckParser from "Lib/deck-parser";
 import iframe from "Lib/iframe";
 
@@ -12,7 +12,7 @@ function getCardName(card) {
 }
 
 async function getInitialCommanderList() {
-  const initialDeck = await scryfall.getDeck();
+  const initialDeck = await getDeck();
 
   return initialDeck.entries.commanders
     .filter(filterOutInvalidCards)

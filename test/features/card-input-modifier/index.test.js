@@ -1,18 +1,21 @@
 import bus from "framebus";
 import CardInputModifier from "Features/deck-builder-features/card-input-modifier";
 import deckParser from "Lib/deck-parser";
-import scryfall from "Lib/scryfall";
+import { getDeck } from "Lib/scryfall";
 import mutation from "Lib/mutation";
 import wait from "Lib/wait";
 
 import { makeFakeDeck } from "Helpers/fake";
 
+jest.mock("Lib/scryfall");
+
 describe("Card Input Modifier", function () {
   let cim;
+  let getDeckSpy;
 
   beforeEach(function () {
     cim = new CardInputModifier();
-    jest.spyOn(scryfall, "getDeck").mockResolvedValue(makeFakeDeck());
+    getDeckSpy = getDeck.mockResolvedValue(makeFakeDeck());
     jest.spyOn(deckParser, "flattenEntries").mockReturnValue([]);
     jest.spyOn(bus, "on").mockImplementation();
   });
@@ -194,13 +197,13 @@ describe("Card Input Modifier", function () {
           id: "1",
         },
       ];
-      scryfall.getDeck.mockResolvedValue(deck);
+      getDeck.mockResolvedValue(deck);
       deckParser.flattenEntries.mockReturnValue(mockedEntries);
 
       const entries = await cim.getEntries();
 
       expect(entries).toBe(mockedEntries);
-      expect(scryfall.getDeck).toBeCalledTimes(1);
+      expect(getDeck).toBeCalledTimes(1);
       expect(deckParser.flattenEntries).toBeCalledTimes(1);
       expect(deckParser.flattenEntries).toBeCalledWith(deck, {
         idToGroupBy: "id",
@@ -212,7 +215,7 @@ describe("Card Input Modifier", function () {
       await cim.getEntries();
       await cim.getEntries();
 
-      expect(scryfall.getDeck).toBeCalledTimes(1);
+      expect(getDeck).toBeCalledTimes(1);
       expect(deckParser.flattenEntries).toBeCalledTimes(1);
     });
 
@@ -221,7 +224,7 @@ describe("Card Input Modifier", function () {
       await cim.getEntries(true);
       await cim.getEntries(true);
 
-      expect(scryfall.getDeck).toBeCalledTimes(3);
+      expect(getDeck).toBeCalledTimes(3);
       expect(deckParser.flattenEntries).toBeCalledTimes(3);
     });
   });
@@ -232,7 +235,7 @@ describe("Card Input Modifier", function () {
 
       const url = await cim.lookupImage("foo");
 
-      expect(scryfall.getDeck).toBeCalledTimes(0);
+      expect(getDeck).toBeCalledTimes(0);
       expect(url).toBe("https://example.com/foo");
     });
 
@@ -248,7 +251,7 @@ describe("Card Input Modifier", function () {
 
       const url = await cim.lookupImage("foo");
 
-      expect(scryfall.getDeck).toBeCalledTimes(1);
+      expect(getDeck).toBeCalledTimes(1);
       expect(url).toBe("https://example.com/foo-in-card-digest");
       expect(cim.imageCache.foo).toBe("https://example.com/foo-in-card-digest");
     });
@@ -265,7 +268,7 @@ describe("Card Input Modifier", function () {
 
       const url = await cim.lookupImage("foo");
 
-      expect(scryfall.getDeck).toBeCalledTimes(1);
+      expect(getDeck).toBeCalledTimes(1);
       expect(url).toBeFalsy();
     });
 
@@ -278,7 +281,7 @@ describe("Card Input Modifier", function () {
 
       const url = await cim.lookupImage("foo");
 
-      expect(scryfall.getDeck).toBeCalledTimes(1);
+      expect(getDeck).toBeCalledTimes(1);
       expect(url).toBeFalsy();
     });
 
@@ -295,7 +298,7 @@ describe("Card Input Modifier", function () {
 
       const url = await cim.lookupImage("foo", true);
 
-      expect(scryfall.getDeck).toBeCalledTimes(1);
+      expect(getDeck).toBeCalledTimes(1);
       expect(url).toBe("https://example.com/foo-in-card-digest");
       expect(cim.imageCache.foo).toBe("https://example.com/foo-in-card-digest");
     });

@@ -1,6 +1,7 @@
-function ScryfallClient() {}
+const getCollection = jest.fn();
+const search = jest.fn();
 
-ScryfallClient.prototype.get = jest.fn();
-ScryfallClient.prototype.post = jest.fn();
-
-export = ScryfallClient;
+export = {
+  getCollection,
+  search,
+};

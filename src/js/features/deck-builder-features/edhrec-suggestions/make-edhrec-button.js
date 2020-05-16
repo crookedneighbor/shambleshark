@@ -4,7 +4,7 @@ import createElement from "Lib/create-element";
 import DeckSectionChooser from "Ui/deck-section-chooser";
 import AddCardElement from "Ui/add-card-element";
 import Drawer from "Ui/drawer";
-import scryfall from "Lib/scryfall";
+import { getCardBySetCodeAndCollectorNumber, getDeck } from "Lib/scryfall";
 import { EDHREC_SYMBOL } from "Svg";
 
 const TYPE_ORDER = [
@@ -151,11 +151,12 @@ function createEDHRecResponseHandler(drawer, deck) {
         type: card.type,
         singleton: true,
         getScryfallId() {
-          return scryfall.api
-            .get(`/cards/${card.set}/${card.collectorNumber}`)
-            .then((cardFromScryfall) => {
-              return cardFromScryfall.id;
-            });
+          return getCardBySetCodeAndCollectorNumber(
+            card.set,
+            card.collectorNumber
+          ).then((cardFromScryfall) => {
+            return cardFromScryfall.id;
+          });
         },
         onAddCard: (payload) => {
           const section = deckSectionChooser.getValue();
@@ -215,7 +216,7 @@ function createDrawer(button) {
 
     drawer.open();
 
-    scryfall.getDeck().then((deck) => {
+    getDeck().then((deck) => {
       const commanders = deck.entries.commanders
         .filter(filterOutInvalidCards)
         .map(getCardName);
