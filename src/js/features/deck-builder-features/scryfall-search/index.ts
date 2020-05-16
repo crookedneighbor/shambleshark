@@ -9,12 +9,12 @@ import Drawer from "Ui/drawer";
 import DeckSectionChooser from "Ui/deck-section-chooser";
 import AddCardElement from "Ui/add-card-element";
 import deckParser from "Lib/deck-parser";
-import scryfall from "Lib/scryfall";
+import { getDeck, search } from "Lib/scryfall";
 import createElement from "Lib/create-element";
 import emptyElement from "Lib/empty-element";
 import "./index.css";
 import { EXTERNAL_ARROW } from "Svg";
-import { settingsDefaults } from "Js/types/feature";
+import { SettingsDefaults } from "Js/types/feature";
 import { Deck, DeckSections } from "Js/types/deck";
 import {
   CardQueryResult,
@@ -25,11 +25,11 @@ import {
 
 class ScryfallSearch extends Feature {
   drawer?: Drawer;
-  settings?: settingsDefaults;
+  settings?: SettingsDefaults;
   currentQuery?: string;
   deck?: Deck;
   isSingleton?: boolean;
-  cardList?: CardQueryResult;
+  cardList?: any; // TODO no any
   deckSectionChooser?: DeckSectionChooser;
   container?: HTMLDivElement;
   _nextInProgress?: boolean;
@@ -62,7 +62,7 @@ class ScryfallSearch extends Feature {
       this.currentQuery += " not:funny";
     }
 
-    this.deck = await scryfall.getDeck();
+    this.deck = await getDeck();
 
     this.isSingleton = deckParser.isSingletonTypeDeck(this.deck);
 
@@ -75,11 +75,10 @@ class ScryfallSearch extends Feature {
       this.currentQuery += ` ids:${colors.join("")}`;
     }
 
-    this.cardList = await scryfall.api
-      .get<CardQueryResult>("cards/search", {
-        q: this.currentQuery,
-      })
-      .catch(() => ({} as CardQueryResult));
+    this.cardList = await search(this.currentQuery).catch((e) => {
+      // most likely a 404, return no results
+      return [];
+    });
 
     this.addSearchOptionsElement();
 
@@ -115,7 +114,7 @@ class ScryfallSearch extends Feature {
 
   addCards(): void {
     if (this.cardList?.length === 0) {
-      emptyElement(this.container);
+      emptyElement(this.container as HTMLDivElement);
       this.container?.appendChild(
         createElement(
           '<div class="scryfall-search__no-results scryfall-search__non-card-element">No search results.</div>'
@@ -180,7 +179,7 @@ class ScryfallSearch extends Feature {
 
         self._nextInProgress = true;
 
-        return self.cardList?.next().then((cards) => {
+        return self.cardList?.next().then((cards: any) => {
           self.cardList = cards;
           self.addCards();
           self._nextInProgress = false;
@@ -193,7 +192,7 @@ class ScryfallSearch extends Feature {
         // reset this in case the error state changes it
         drawerInstance.setLoading(true);
         drawerInstance.resetHeader();
-        emptyElement(self.container);
+        emptyElement(self.container as HTMLDivElement);
 
         // re-focus the Scryfall Search input
         // for accessibility navigation

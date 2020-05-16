@@ -1,6 +1,5 @@
-import { api as scryfall } from "./scryfall";
+import { search } from "./scryfall";
 import { Card, Deck, DeckSections } from "Js/types/deck";
-import { CardQueryResult } from "Js/types/scryfall-api-responses";
 
 type IdTypes = "id" | "oracleId";
 
@@ -11,15 +10,13 @@ type FlattenEntryOptions = {
   };
 };
 
-function getCommanders(deck: Deck): Promise<CardQueryResult> {
+function getCommanders(deck: Deck) {
   const ids = deck.entries
     .commanders!.filter((card: Card) => card.card_digest)
     .map((card) => `oracle_id:"${card.card_digest?.oracle_id}"`)
     .join(" or ");
 
-  return scryfall.get("/cards/search", {
-    q: ids,
-  });
+  return search(ids);
 }
 
 function getIdFromEntry(entry: Card, idType: IdTypes): string {
@@ -93,11 +90,7 @@ export function hasLegalCommanders(commanders: string[]): Promise<boolean> {
   }
 
   return Promise.all(
-    commanders.map((cardName) =>
-      scryfall.get("/cards/search", {
-        q: `!"${cardName}" is:commander`,
-      })
-    )
+    commanders.map((cardName) => search(`!"${cardName}" is:commander`))
   )
     .then(() => {
       // if all promises resolve, all were commanders

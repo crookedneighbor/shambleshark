@@ -1,11 +1,13 @@
 import EDHRecSuggestions from "Features/deck-builder-features/edhrec-suggestions";
-import scryfall from "Lib/scryfall";
+import { getDeck } from "Lib/scryfall";
 import mutation from "Lib/mutation";
 import iframe from "Lib/iframe";
 import { Deck } from "../../../src/js/types/deck";
 import SpyInstance = jest.SpyInstance;
 
 import { makeFakeDeck } from "Helpers/fake";
+
+jest.mock("Lib/scryfall");
 
 describe("EDHRec Suggestions", function () {
   describe("run", function () {
@@ -23,7 +25,7 @@ describe("EDHRec Suggestions", function () {
       deckbuilderElement.id = "deckbuilder";
       document.body.appendChild(deckbuilderElement);
 
-      jest.spyOn(scryfall, "getDeck").mockResolvedValue(
+      getDeck.mockResolvedValue(
         makeFakeDeck({
           primarySections: ["commanders", "nonlands"],
           secondarySections: ["lands", "maybeboard"],

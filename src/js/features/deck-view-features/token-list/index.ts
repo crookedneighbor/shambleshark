@@ -1,6 +1,6 @@
 import Feature from "Feature";
 import mutation from "Lib/mutation";
-import scryfall, { Identifier } from "Lib/scryfall";
+import { Identifier, getCollection } from "Lib/scryfall";
 import { sortByAttribute } from "Lib/sort";
 import createElement from "Lib/create-element";
 import Modal from "Ui/modal";
@@ -150,8 +150,8 @@ class TokenList extends Feature {
     };
   }
 
-  async lookupTokens(entries: Identifier[]): Promise<Token[][]> {
-    const cards: Card[] = await scryfall.getCollection(entries);
+  async lookupTokens(entries: Identifier[]) {
+    const cards = await getCollection(entries);
     const tokens = cards.map((c) => c.getTokens());
 
     return Promise.all(tokens);

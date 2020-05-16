@@ -6,7 +6,7 @@ import deckParser from "Lib/deck-parser";
 import wait from "Lib/wait";
 import Drawer from "Lib/ui-elements/drawer";
 import mutation from "Lib/mutation";
-import scryfall from "Lib/scryfall";
+import { getCardBySetCodeAndCollectorNumber, getDeck } from "Lib/scryfall";
 
 import { makeFakeDeck } from "Helpers/fake";
 import { mocked } from "ts-jest/utils";
@@ -16,12 +16,17 @@ import {
   ScryfallAPICardResponse,
 } from "../../../src/js/types/scryfall-api-responses";
 
+jest.mock("Lib/scryfall");
+
 describe("makeEDHRecButton", function () {
+  let getCardSpy: jest.SpyInstance;
+  let getDeckSpy: jest.SpyInstance;
+
   beforeEach(function () {
     jest.spyOn(bus, "on");
     jest.spyOn(bus, "emit");
-    jest.spyOn(scryfall.api, "get");
-    jest.spyOn(scryfall, "getDeck").mockResolvedValue(
+    getCardSpy = mocked(getCardBySetCodeAndCollectorNumber);
+    getDeckSpy = mocked(getDeck).mockResolvedValue(
       makeFakeDeck({
         primarySections: ["commanders", "nonlands"],
         secondarySections: ["lands", "maybeboard"],
@@ -218,7 +223,7 @@ describe("makeEDHRecButton", function () {
         }
       });
 
-      mocked(scryfall).getDeck.mockResolvedValue(fakeDeck as Deck);
+      getDeckSpy.mockResolvedValue(fakeDeck);
     });
 
     afterEach(async function () {
@@ -428,14 +433,11 @@ describe("makeEDHRecButton", function () {
 
     it("looks up card in scryfall and adds it to deck when chosen", async function () {
       const btn = await makeEDHRecButton();
-      mocked(scryfall.api).get.mockImplementation(
-        () =>
-          new Promise<ScryfallAPICardResponse>(() => ({
-            name: "Arcane Denial",
-            id: "arcane-denial-id",
-            type_line: "Instant",
-          }))
-      );
+      getCardSpy.mockResolvedValue({
+        name: "Arcane Denial",
+        id: "arcane-denial-id",
+        type_line: "Instant",
+      });
 
       click(btn);
 
@@ -447,8 +449,8 @@ describe("makeEDHRecButton", function () {
 
       cardElement.click();
 
-      expect(scryfall.api.get).toBeCalledTimes(1);
-      expect(scryfall.api.get).toBeCalledWith("/cards/a25/41");
+      expect(getCardSpy).toBeCalledTimes(1);
+      expect(getCardSpy).toBeCalledWith("a25", "41");
 
       await wait();
 
@@ -460,13 +462,11 @@ describe("makeEDHRecButton", function () {
 
     it("looks up card in scryfall and adds it to particualr section in deck when chosen", async function () {
       const btn = await makeEDHRecButton();
-      mocked(scryfall.api).get.mockResolvedValue(
-        new Promise<CardQueryResult>(() => ({
-          name: "Arcane Denial",
-          id: "arcane-denial-id",
-          type_line: "Instant",
-        }))
-      );
+      getCardSpy.mockResolvedValue({
+        name: "Arcane Denial",
+        id: "arcane-denial-id",
+        type_line: "Instant",
+      });
 
       click(btn);
 
@@ -482,8 +482,8 @@ describe("makeEDHRecButton", function () {
 
       cardElement.click();
 
-      expect(scryfall.api.get).toBeCalledTimes(1);
-      expect(scryfall.api.get).toBeCalledWith("/cards/a25/41");
+      expect(getCardSpy).toBeCalledTimes(1);
+      expect(getCardSpy).toBeCalledWith("a25", "41");
 
       await wait();
 

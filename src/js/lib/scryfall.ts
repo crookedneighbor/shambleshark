@@ -1,23 +1,19 @@
 import * as bus from "framebus";
 import { BUS_EVENTS as events } from "Constants";
 import { Deck } from "Js/types/deck";
-import { ScryfallAPICardResponse } from "Js/types/scryfall-api-responses";
-import ScryfallApi = require("scryfall-client");
+import api = require("scryfall-client");
 
 const CACHE_TIMEOUT_FOR_DECK_REQUESTS = 2000; // 2 seconds
 
 let getDeckPromise: Promise<Deck> | null;
-
-export const api = new ScryfallApi();
 
 export type Identifier =
   | { id: string }
   | { name: string }
   | { set: string; collector_number: string };
 
-export async function getCollection(
-  ids: Identifier[]
-): Promise<ScryfallAPICardResponse[]> {
+// TODO move this logic of batching to scryfall-client
+export async function getCollection(ids: Identifier[]) {
   const idBatches = ids.reduce((array: Identifier[][], entry, i) => {
     if (i % 75 !== 0) {
       return array;
@@ -27,13 +23,16 @@ export async function getCollection(
   }, []);
 
   const collectionResults = await Promise.all(
-    idBatches.map((identifiers) =>
-      api.post("/cards/collection", { identifiers })
-    )
+    idBatches.map((identifiers) => api.getCollection(identifiers))
   );
 
   return collectionResults.flat();
 }
+
+export const getCardBySetCodeAndCollectorNumber =
+  api.getCardBySetCodeAndCollectorNumber;
+
+export const search = api.search;
 
 export function getDeck(): Promise<Deck> {
   if (getDeckPromise) {
@@ -50,9 +49,3 @@ export function getDeck(): Promise<Deck> {
 
   return getDeckPromise;
 }
-
-export default {
-  api,
-  getCollection,
-  getDeck,
-};

@@ -4,7 +4,7 @@ import createElement from "Lib/create-element";
 import DeckSectionChooser from "Ui/deck-section-chooser";
 import AddCardElement from "Ui/add-card-element";
 import Drawer from "Ui/drawer";
-import scryfall from "Lib/scryfall";
+import { getCardBySetCodeAndCollectorNumber, getDeck } from "Lib/scryfall";
 import { EDHREC_SYMBOL } from "Svg";
 import { Card, Deck, DeckSections } from "Js/types/deck";
 import { ScryfallAPICardResponse } from "Js/types/scryfall-api-responses";
@@ -194,13 +194,12 @@ function createEDHRecResponseHandler(drawer: Drawer, deck: Deck) {
         type: card.type,
         singleton: true,
         getScryfallId() {
-          return scryfall.api
-            .get<ScryfallAPICardResponse>(
-              `/cards/${card.set}/${card.collectorNumber}`
-            )
-            .then((cardFromScryfall) => {
-              return cardFromScryfall.id;
-            });
+          return getCardBySetCodeAndCollectorNumber(
+            card.set,
+            card.collectorNumber
+          ).then((cardFromScryfall) => {
+            return cardFromScryfall.id;
+          });
         },
         onAddCard: (payload: { section: any }) => {
           const section = deckSectionChooser.getValue();
@@ -262,7 +261,7 @@ function createDrawer(button: HTMLButtonElement) {
 
     drawer.open();
 
-    scryfall.getDeck().then((deck) => {
+    getDeck().then((deck) => {
       const commanders = deck.entries.commanders
         ?.filter(isValidCard)
         .map(getCardName);

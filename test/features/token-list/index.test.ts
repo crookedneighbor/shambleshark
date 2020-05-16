@@ -1,10 +1,12 @@
 import TokenList, { Token } from "Features/deck-view-features/token-list";
 import mutation from "Lib/mutation";
-import scryfall from "Lib/scryfall";
+import { getCollection } from "Lib/scryfall";
 import wait from "Lib/wait";
 import SpyInstance = jest.SpyInstance;
 import Modal from "Lib/ui-elements/modal";
 import { mocked } from "ts-jest/utils";
+
+jest.mock("Lib/scryfall");
 
 describe("Token List", function () {
   let tl: TokenList;
@@ -335,9 +337,7 @@ describe("Token List", function () {
     let getCollectionSpy: SpyInstance;
 
     beforeEach(function () {
-      getCollectionSpy = jest
-        .spyOn(scryfall, "getCollection")
-        .mockResolvedValue([]);
+      getCollectionSpy = mocked(getCollection).mockResolvedValue([]);
     });
 
     it("calls getCollection", async function () {

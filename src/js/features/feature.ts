@@ -1,16 +1,16 @@
 import storage from "Lib/storage";
 import { FEATURE_IDS as ids } from "Constants";
 import {
-  metadata,
-  settingsDefaults,
-  settingsDefinition,
+  Metadata,
+  SettingsDefaults,
+  SettingsDefinition,
   settingValue,
 } from "Js/types/feature";
 
 export default abstract class Feature {
-  static metadata: metadata;
-  static settingsDefaults: settingsDefaults;
-  static settingDefinitions: settingsDefinition[] = [];
+  static metadata: Metadata;
+  static settingsDefaults: SettingsDefaults;
+  static settingDefinitions: SettingsDefinition[] = [];
   static usesSidebar: boolean;
 
   abstract run(): Promise<void>;
