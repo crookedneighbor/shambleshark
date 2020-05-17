@@ -35,7 +35,7 @@ describe("Token List", function () {
       getCardElementsSpy = jest
         .spyOn(tl, "getCardElements")
         .mockImplementation(() => {
-          tl.elements = elements as HTMLLinkElement[];
+          tl.elements = elements as HTMLAnchorElement[];
         });
       generateTokenCollectionSpy = jest
         .spyOn(tl, "generateTokenCollection")
@@ -194,7 +194,7 @@ describe("Token List", function () {
 
       const el = setContentSpy.mock.calls[0][0];
 
-      expect(el.querySelector("p").innerHTML).toBe("No tokens detected.");
+      expect(el.innerHTML).toBe("No tokens detected.");
     });
 
     it("adds tokens to modal", function () {
@@ -397,50 +397,74 @@ describe("Token List", function () {
   });
 
   describe("getCardElements", function () {
-    let elements: Partial<NodeListOf<HTMLLinkElement>>;
+    let parentElement: HTMLDivElement;
 
     beforeEach(function () {
-      elements = {
-        0: {
-          href: "https://scryfall.com/card/dom/102",
-        } as HTMLLinkElement,
-        1: {
-          href: "https://scryfall.com/card/kld/184",
-        } as HTMLLinkElement,
+      jest.spyOn(document, "querySelectorAll");
+
+      const makeEl = (url: string) => {
+        const container = document.createElement("div");
+        container.className = "deck-list-entry-name";
+
+        const link = document.createElement("a");
+        link.href = url;
+
+        container.appendChild(link);
+
+        return container;
       };
-      mocked(document).querySelectorAll.mockReturnValue(
-        elements as NodeListOf<HTMLLinkElement>
-      );
+      parentElement = document.createElement("div");
+      parentElement.className = "deck-list-entry";
+      parentElement.appendChild(makeEl("https://scryfall.com/card/dom/102"));
+      parentElement.appendChild(makeEl("https://scryfall.com/card/kld/184"));
+
+      document.body.appendChild(parentElement);
     });
 
     it("looks for elements in deck entry view", function () {
       tl.getCardElements();
 
-      expect(mocked(document).querySelectorAll).toBeCalledTimes(1);
-      expect(mocked(document).querySelectorAll).toBeCalledWith(
+      expect(document.querySelectorAll).toBeCalledTimes(1);
+      expect(document.querySelectorAll).toBeCalledWith(
         ".deck-list-entry .deck-list-entry-name a"
       );
 
-      expect(tl.elements).toStrictEqual(elements);
+      expect(tl.elements!.length).toBe(2);
+      expect(tl.elements![0].href).toBe("https://scryfall.com/card/dom/102");
+      expect(tl.elements![1].href).toBe("https://scryfall.com/card/kld/184");
     });
 
     it("uses visual deck mode to find tokens when deck list entry comes up empty", async function () {
-      mocked(document).querySelectorAll.mockReturnValueOnce(
-        {} as NodeListOf<HTMLLinkElement>
-      );
-      mocked(document).querySelectorAll.mockReturnValueOnce(
-        elements as NodeListOf<HTMLLinkElement>
-      );
+      parentElement.className = "";
+      parentElement.querySelectorAll("a").forEach((el) => {
+        el.className = "card-grid-item-card";
+      });
 
       await tl.getCardElements();
 
-      expect(mocked(document).querySelectorAll).toBeCalledTimes(2);
-      expect(mocked(document).querySelectorAll).toBeCalledWith(
+      expect(document.querySelectorAll).toBeCalledTimes(2);
+      expect(document.querySelectorAll).toBeCalledWith(
         ".deck-list-entry .deck-list-entry-name a"
       );
-      expect(mocked(document).querySelectorAll).toBeCalledWith(
-        "a.card-grid-item-card"
+      expect(document.querySelectorAll).toBeCalledWith("a.card-grid-item-card");
+
+      expect(tl.elements!.length).toBe(2);
+      expect(tl.elements![0].href).toBe("https://scryfall.com/card/dom/102");
+      expect(tl.elements![1].href).toBe("https://scryfall.com/card/kld/184");
+    });
+
+    it("sets elements to empty array when none can be found", async function () {
+      parentElement.className = "";
+
+      await tl.getCardElements();
+
+      expect(document.querySelectorAll).toBeCalledTimes(2);
+      expect(document.querySelectorAll).toBeCalledWith(
+        ".deck-list-entry .deck-list-entry-name a"
       );
+      expect(document.querySelectorAll).toBeCalledWith("a.card-grid-item-card");
+
+      expect(tl.elements!.length).toBe(0);
     });
   });
 
@@ -460,7 +484,7 @@ describe("Token List", function () {
         {
           href: "https://scryfall.com/card/kld/184",
         },
-      ] as HTMLLinkElement[];
+      ] as HTMLAnchorElement[];
     });
 
     it("looks up tokens with elements", async function () {
@@ -486,7 +510,7 @@ describe("Token List", function () {
       expect(tl.flattenTokenCollection).toBeCalledTimes(1);
       expect(tl.flattenTokenCollection).toBeCalledWith(tokenCollection);
 
-      expect(tokens).toBe(result);
+      expect(tokens).toEqual(result);
     });
 
     it("noops if no elements available", async function () {

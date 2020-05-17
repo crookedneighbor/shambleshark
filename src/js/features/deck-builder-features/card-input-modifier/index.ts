@@ -62,7 +62,7 @@ class CardInputModifier extends Feature {
     });
   }
 
-  attachListenersToEntry(entry: Element) {
+  async attachListenersToEntry(entry: Element) {
     const id = entry.getAttribute("data-entry");
 
     if (!id) {
@@ -75,7 +75,7 @@ class CardInputModifier extends Feature {
     }
     this.listeners[id] = entry;
 
-    this.lookupImage(id).then(() => {
+    return this.lookupImage(id).then(() => {
       this.tooltip.addElement(entry);
     });
   }
@@ -92,7 +92,7 @@ class CardInputModifier extends Feature {
     return this._getEntriesPromise;
   }
 
-  async lookupImage(id: string, bustCache?: boolean) {
+  async lookupImage(id: string, bustCache?: boolean): Promise<string> {
     if (!bustCache && id in this.imageCache) {
       return Promise.resolve(this.imageCache[id]);
     }
@@ -101,7 +101,7 @@ class CardInputModifier extends Feature {
     const entry = entries && entries.find((e) => e.id === id);
 
     if (!entry) {
-      return;
+      return "";
     }
 
     const img = (entry as any).card_digest?.image;
@@ -111,7 +111,7 @@ class CardInputModifier extends Feature {
     return img;
   }
 
-  async refreshCache() {
+  async refreshCache(): Promise<void> {
     // give Scryfall enough time to load new cards
     await wait(1000);
 

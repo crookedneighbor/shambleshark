@@ -6,16 +6,18 @@ import { Deck } from "../../../src/js/types/deck";
 import SpyInstance = jest.SpyInstance;
 
 import { makeFakeDeck } from "Helpers/fake";
+import { mocked } from "ts-jest/utils";
 
 jest.mock("Lib/scryfall");
 
 describe("EDHRec Suggestions", function () {
   describe("run", function () {
     let toolbar: HTMLDivElement;
-
+    let getDeckSpy: SpyInstance;
     let readySpy: SpyInstance;
 
     beforeEach(function () {
+      getDeckSpy = mocked(getDeck);
       toolbar = document.createElement("div");
       toolbar.classList.add("deckbuilder-toolbar-items-right");
       document.body.appendChild(toolbar);
@@ -25,7 +27,7 @@ describe("EDHRec Suggestions", function () {
       deckbuilderElement.id = "deckbuilder";
       document.body.appendChild(deckbuilderElement);
 
-      getDeck.mockResolvedValue(
+      getDeckSpy.mockResolvedValue(
         makeFakeDeck({
           primarySections: ["commanders", "nonlands"],
           secondarySections: ["lands", "maybeboard"],

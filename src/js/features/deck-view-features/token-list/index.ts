@@ -20,7 +20,7 @@ export interface Token {
 }
 
 class TokenList extends Feature {
-  elements?: HTMLLinkElement[];
+  elements?: HTMLAnchorElement[];
   modal?: Modal;
   private _addedToUI?: boolean;
   private _generateTokenCollectionPromise?: Promise<Token[]>;
@@ -99,7 +99,7 @@ class TokenList extends Feature {
         token.name
       }">
         </a>
-      `).firstElementChild as HTMLLinkElement;
+      `).firstElementChild as HTMLAnchorElement;
 
       container.appendChild(el);
     });
@@ -158,7 +158,19 @@ class TokenList extends Feature {
   }
 
   flattenTokenCollection(tokenCollection: Token[][]): Token[] {
-    return [...new Set(tokenCollection.flat())].sort(sortByAttribute(["name"]));
+    const flattenedTokens = tokenCollection
+      .flat()
+      .reduce((tokens: Token[], token: Token) => {
+        if (!tokens.find((t: Token) => t.oracle_id === token.oracle_id)) {
+          tokens.push(token);
+        }
+
+        return tokens;
+      }, [] as Token[]);
+
+    flattenedTokens.sort(sortByAttribute(["name"]));
+
+    return flattenedTokens;
   }
 }
 

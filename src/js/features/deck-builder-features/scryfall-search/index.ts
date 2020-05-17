@@ -16,10 +16,6 @@ import "./index.css";
 import { EXTERNAL_ARROW } from "Svg";
 import { SettingsDefaults } from "Js/types/feature";
 import { Deck, DeckSections } from "Js/types/deck";
-import {
-  CardQueryResult,
-  ScryfallAPICardResponse,
-} from "Js/types/scryfall-api-responses";
 
 // TODO saved searches
 
@@ -125,7 +121,7 @@ class ScryfallSearch extends Feature {
     }
 
     const entries = deckParser.flattenEntries(this.deck as Deck);
-    this.cardList?.forEach((card: ScryfallAPICardResponse) => {
+    this.cardList?.forEach((card: any) => {
       const cardInDeck = entries.find(
         (entry) =>
           entry.card_digest && entry.card_digest.oracle_id === card.oracle_id

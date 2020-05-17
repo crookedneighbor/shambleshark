@@ -6,10 +6,6 @@ import Drawer from "Lib/ui-elements/drawer";
 
 import { makeFakeDeck, makeFakeCard } from "Helpers/fake";
 import { mocked } from "ts-jest/utils";
-import {
-  CardQueryResult,
-  ScryfallAPICardResponse,
-} from "../../../src/js/types/scryfall-api-responses";
 import { SettingsDefaults } from "../../../src/js/types/feature";
 import DialogInterface from "../../../src/js/lib/ui-elements/dialog-interface";
 
@@ -129,15 +125,13 @@ describe("Scryfall Search", function () {
       const ss = new ScryfallSearch();
       const drawer = ss.createDrawer();
 
-      ss.cardList = {
-        ...({} as CardQueryResult),
-        next: jest.fn().mockImplementation(
-          () =>
-            new Promise<CardQueryResult>((resolve, _reject) => {
-              resolve(ss.cardList);
-            })
-        ),
-      };
+      ss.cardList = [];
+      ss.cardList.next = jest.fn().mockImplementation(
+        () =>
+          new Promise<any[]>((resolve, _reject) => {
+            resolve(ss.cardList);
+          })
+      );
 
       jest.spyOn(ss, "isReadyToLookupNextBatch").mockReturnValue(true);
       jest.spyOn(ss, "addCards").mockImplementation();
@@ -155,10 +149,8 @@ describe("Scryfall Search", function () {
 
       jest.spyOn(ss, "isReadyToLookupNextBatch").mockReturnValue(false);
       jest.spyOn(ss, "addCards");
-      ss.cardList = {
-        ...({} as CardQueryResult),
-        next: jest.fn().mockResolvedValue([]),
-      };
+      ss.cardList = [];
+      ss.cardList.next = jest.fn().mockResolvedValue([]);
 
       await drawer.triggerOnScroll();
 
@@ -249,10 +241,7 @@ describe("Scryfall Search", function () {
     });
 
     it("adds cards from the api result", async function () {
-      const cards: CardQueryResult = ({
-        0: {} as ScryfallAPICardResponse,
-        1: {} as ScryfallAPICardResponse,
-      } as any) as CardQueryResult;
+      const cards = [{} as any, {} as any];
 
       searchSpy.mockResolvedValue(cards);
 
@@ -305,8 +294,8 @@ describe("Scryfall Search", function () {
     });
 
     it("creates card elements to add to container", function () {
-      ss.cardList = ({
-        0: {
+      ss.cardList = [
+        {
           id: "id-1",
           color_identity: ["W"],
           oracle_id: "oracle-id-1",
@@ -316,7 +305,7 @@ describe("Scryfall Search", function () {
           },
           type_line: "type 1",
         },
-        1: {
+        {
           id: "id-2",
           color_identity: ["U"],
           oracle_id: "oracle-id-2",
@@ -326,7 +315,7 @@ describe("Scryfall Search", function () {
           },
           type_line: "type 2",
         },
-      } as any) as CardQueryResult;
+      ];
 
       ss.addCards();
 
@@ -338,8 +327,8 @@ describe("Scryfall Search", function () {
       ).toBeTruthy();
     });
 
-    it("adds an error message when no card list is available", function () {
-      ss.cardList = ({} as any) as CardQueryResult;
+    it.only("adds an error message when no card list is available", function () {
+      ss.cardList = [];
 
       ss.addCards();
 
@@ -373,9 +362,8 @@ describe("Scryfall Search", function () {
     it("returns false if card list has no more in list", function () {
       const ss = new ScryfallSearch();
 
-      ss.cardList = ({
-        has_more: false,
-      } as any) as CardQueryResult;
+      ss.cardList = [];
+      ss.cardList.has_more = false;
 
       expect(ss.isReadyToLookupNextBatch(el)).toBe(false);
     });
@@ -383,9 +371,8 @@ describe("Scryfall Search", function () {
     it("returns false if element position is beneath the scroll threshold", function () {
       const ss = new ScryfallSearch();
 
-      ss.cardList = ({
-        has_more: true,
-      } as any) as CardQueryResult;
+      ss.cardList = [];
+      ss.cardList.has_more = true;
 
       expect(
         ss.isReadyToLookupNextBatch({
@@ -399,9 +386,8 @@ describe("Scryfall Search", function () {
     it("returns true if element position is within the scroll threshold", function () {
       const ss = new ScryfallSearch();
 
-      ss.cardList = ({
-        has_more: true,
-      } as any) as CardQueryResult;
+      ss.cardList = [];
+      ss.cardList.has_more = true;
 
       expect(
         ss.isReadyToLookupNextBatch({

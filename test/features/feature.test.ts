@@ -23,7 +23,9 @@ describe("Base Feature", function () {
     };
 
     it("sets enabled property for feature on storage", async function () {
-      jest.spyOn(FeatureThatEnables, "saveSetting").mockResolvedValue(null);
+      jest
+        .spyOn(FeatureThatEnables, "saveSetting")
+        .mockResolvedValue(undefined);
       await FeatureThatEnables.enable();
 
       expect(FeatureThatEnables.saveSetting).toBeCalledTimes(1);
@@ -45,7 +47,9 @@ describe("Base Feature", function () {
     };
 
     it("saves feature on storage", async function () {
-      jest.spyOn(FeatureThatDisables, "saveSetting").mockResolvedValue(null);
+      jest
+        .spyOn(FeatureThatDisables, "saveSetting")
+        .mockResolvedValue(undefined);
       await FeatureThatDisables.disable();
 
       expect(FeatureThatDisables.saveSetting).toBeCalledTimes(1);
