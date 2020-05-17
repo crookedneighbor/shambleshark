@@ -1,4 +1,4 @@
-import Feature from "Features/feature";
+import Feature, { SettingsDefaults } from "Features/feature";
 import * as bus from "framebus";
 import {
   BUS_EVENTS as events,
@@ -14,7 +14,6 @@ import createElement from "Lib/create-element";
 import emptyElement from "Lib/empty-element";
 import "./index.css";
 import { EXTERNAL_ARROW } from "Svg";
-import { SettingsDefaults } from "Js/types/feature";
 import { Deck, DeckSections } from "Js/types/deck";
 
 // TODO saved searches

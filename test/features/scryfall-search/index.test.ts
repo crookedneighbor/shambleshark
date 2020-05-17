@@ -6,7 +6,7 @@ import Drawer from "Lib/ui-elements/drawer";
 
 import { makeFakeDeck, makeFakeCard } from "Helpers/fake";
 import { mocked } from "ts-jest/utils";
-import { SettingsDefaults } from "../../../src/js/types/feature";
+import { SettingsDefaults } from "Features/feature";
 import DialogInterface from "../../../src/js/lib/ui-elements/dialog-interface";
 
 jest.mock("Lib/scryfall");

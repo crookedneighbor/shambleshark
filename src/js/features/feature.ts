@@ -1,11 +1,26 @@
 import storage from "Lib/storage";
 import { FEATURE_IDS as ids } from "Constants";
-import {
-  Metadata,
-  SettingsDefaults,
-  SettingsDefinition,
-  settingValue,
-} from "Js/types/feature";
+
+export type SettingValue = string | number | boolean | Record<string, string>;
+
+export interface Metadata {
+  id: string;
+  title: string;
+  section: string; // TODO: Do it so it can only be a FEATURE_SECTIONS from Constants
+  description: string;
+  futureFeature?: boolean;
+}
+
+export interface SettingsDefaults {
+  enabled: boolean;
+  [key: string]: SettingValue;
+}
+
+export interface SettingsDefinition {
+  id: string;
+  label: string;
+  input: "checkbox";
+}
 
 export default abstract class Feature {
   static metadata: Metadata;
@@ -27,7 +42,7 @@ export default abstract class Feature {
     return this.saveSetting("enabled", false);
   }
 
-  static async saveSetting(property: string, value: settingValue) {
+  static async saveSetting(property: string, value: SettingValue) {
     // TODO put these in a queue to avoid race conditions
     // of too many settings being saved at once
     const settings = await this.getSettings();
@@ -69,11 +84,11 @@ export default abstract class Feature {
     return { ...this.settingsDefaults, ...settings };
   }
 
-  static async saveData(key: string, value: settingValue) {
+  static async saveData(key: string, value: SettingValue) {
     return storage.set(`${this.metadata.id}:${key}`, value);
   }
 
-  static async getData(key: string): Promise<settingValue> {
+  static async getData(key: string): Promise<SettingValue> {
     return storage.get(`${this.metadata.id}:${key}`);
   }
 }
