@@ -62,7 +62,7 @@ class CardInputModifier extends Feature {
     });
   }
 
-  async attachListenersToEntry(entry: Element) {
+  attachListenersToEntry(entry: Element) {
     const id = entry.getAttribute("data-entry");
 
     if (!id) {
@@ -75,9 +75,8 @@ class CardInputModifier extends Feature {
     }
     this.listeners[id] = entry;
 
-    return this.lookupImage(id).then(() => {
-      this.tooltip.addElement(entry);
-    });
+    this.lookupImage(id);
+    this.tooltip.addElement(entry);
   }
 
   getEntries(bustCache?: boolean) {

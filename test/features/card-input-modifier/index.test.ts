@@ -155,44 +155,44 @@ describe("Card Input Modifier", function () {
       jest.spyOn(cim.tooltip, "addElement").mockImplementation();
     });
 
-    it("noops if no id is available on entry", async function () {
+    it("noops if no id is available on entry", function () {
       entry.removeAttribute("data-entry");
 
-      await cim.attachListenersToEntry(entry);
+      cim.attachListenersToEntry(entry);
 
       expect(Object.keys(cim.listeners).length).toBe(0);
       expect(cim.lookupImage).not.toBeCalled();
       expect(cim.tooltip.addElement).not.toBeCalled();
     });
 
-    it("noops if listeners already has the entry", async function () {
+    it("noops if listeners already has the entry", function () {
       cim.listeners.id = entry;
 
       expect(Object.keys(cim.listeners).length).toBe(1);
 
-      await cim.attachListenersToEntry(entry);
+      cim.attachListenersToEntry(entry);
 
       expect(Object.keys(cim.listeners).length).toBe(1);
       expect(cim.lookupImage).not.toBeCalled();
       expect(cim.tooltip.addElement).not.toBeCalled();
     });
 
-    it("adds the entry to the listeners", async function () {
-      await cim.attachListenersToEntry(entry);
+    it("adds the entry to the listeners", function () {
+      cim.attachListenersToEntry(entry);
 
       expect(Object.keys(cim.listeners).length).toBe(1);
       expect(cim.listeners.id).toBe(entry);
     });
 
-    it("looks up the image", async function () {
-      await cim.attachListenersToEntry(entry);
+    it("looks up the image", function () {
+      cim.attachListenersToEntry(entry);
 
       expect(cim.lookupImage).toBeCalledTimes(1);
       expect(cim.lookupImage).toBeCalledWith("id");
     });
 
-    it("adds the entry to tooltip", async function () {
-      await cim.attachListenersToEntry(entry);
+    it("adds the entry to tooltip", function () {
+      cim.attachListenersToEntry(entry);
 
       expect(cim.tooltip.addElement).toBeCalledTimes(1);
       expect(cim.tooltip.addElement).toBeCalledWith(entry);
