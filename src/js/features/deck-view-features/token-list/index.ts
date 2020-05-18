@@ -158,19 +158,15 @@ class TokenList extends Feature {
   }
 
   flattenTokenCollection(tokenCollection: Token[][]): Token[] {
-    const flattenedTokens = tokenCollection
-      .flat()
-      .reduce((tokens: Token[], token: Token) => {
-        if (!tokens.find((t: Token) => t.oracle_id === token.oracle_id)) {
-          tokens.push(token);
-        }
-
-        return tokens;
-      }, [] as Token[]);
-
-    flattenedTokens.sort(sortByAttribute(["name"]));
-
-    return flattenedTokens;
+    // Tokens can have the same name, but be functionally different
+    // IE: https://scryfall.com/search?q=t%3Atoken+!"Vampire"&unique=cards
+    // TODO this doesn't handle double sided tokens particularly well
+    // might be something to handle in the underlying scryfall-client module
+    return [
+      ...new Map(
+        tokenCollection.flat().map((token) => [token.oracle_id, token])
+      ).values(),
+    ].sort(sortByAttribute(["name"]));
   }
 }
 
