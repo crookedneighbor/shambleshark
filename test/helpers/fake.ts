@@ -1,5 +1,5 @@
 import shortid = require("shortid");
-import { Deck, Card, DeckSections, DeckSectionKinds } from "Js/types/deck";
+import { Deck, Card, DeckSections } from "Js/types/deck";
 
 type FakeDeckOptions = Partial<Deck> & {
   primarySections?: DeckSections[];
