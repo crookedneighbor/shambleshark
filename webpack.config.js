@@ -20,7 +20,7 @@ const BROWSER = env.BROWSER;
 // TODO: should probably do that programatically
 const alias = {
   Constants: path.resolve(__dirname, "src/js/resources/constants.js"),
-  Feature: path.resolve(__dirname, "src/js/features/feature.js"),
+  Feature: path.resolve(__dirname, "src/js/features/feature.ts"),
   Features: path.resolve(__dirname, "src/js/features/"),
   Lib: path.resolve(__dirname, "src/js/lib/"),
   Ui: path.resolve(__dirname, "src/js/lib/ui-elements/"),

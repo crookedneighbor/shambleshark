@@ -9,7 +9,7 @@
       /* These need to be duplicated from the webpack config */
       "ExtensionsLink": ["src/js/lib/chrome/extensions-link.ts"],
       "Constants": ["src/js/resources/constants.js"],
-      "Feature": ["src/js/features/feature.js"],
+      "Feature": ["src/js/features/feature.ts"],
       "Features/*": ["src/js/features/*"],
       "Lib/*": ["src/js/lib/*"],
       "Ui/*": ["src/js/lib/ui-elements/*"],
