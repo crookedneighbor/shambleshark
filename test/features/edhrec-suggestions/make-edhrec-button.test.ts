@@ -11,10 +11,6 @@ import { getCardBySetCodeAndCollectorNumber, getDeck } from "Lib/scryfall";
 import { makeFakeDeck } from "Helpers/fake";
 import { mocked } from "ts-jest/utils";
 import { Card, Deck, DeckSections } from "../../../src/js/types/deck";
-import {
-  CardQueryResult,
-  ScryfallAPICardResponse,
-} from "../../../src/js/types/scryfall-api-responses";
 
 jest.mock("Lib/scryfall");
 

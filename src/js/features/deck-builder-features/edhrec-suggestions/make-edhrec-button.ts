@@ -7,7 +7,6 @@ import Drawer from "Ui/drawer";
 import { getCardBySetCodeAndCollectorNumber, getDeck } from "Lib/scryfall";
 import { EDHREC_SYMBOL } from "Svg";
 import { Card, Deck, DeckSections } from "Js/types/deck";
-import { ScryfallAPICardResponse } from "Js/types/scryfall-api-responses";
 
 const TYPE_ORDER = [
   "creature",
