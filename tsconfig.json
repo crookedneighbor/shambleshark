@@ -24,8 +24,5 @@
     /* Remove this once conversion is complete */
     "allowJs": true
   },
-  "include": [
-    "./src/**/*",
-    "./test/**/*"
-  ]
+  "include": ["./src/**/*", "./test/**/*"]
 }
