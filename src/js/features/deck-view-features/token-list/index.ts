@@ -25,6 +25,19 @@ class TokenList extends Feature {
   private _addedToUI?: boolean;
   private _generateTokenCollectionPromise?: Promise<Token[]>;
 
+  static metadata = {
+    id: ids.TokenList,
+    title: "Token List",
+    section: sections.DECK_VIEW,
+    description: "List tokens created by cards in the deck.",
+  };
+
+  static settingsDefaults = {
+    enabled: true,
+  };
+
+  static usesSidebar = true;
+
   async run(): Promise<void> {
     // TODO this doesn't work with current implementation of mutation.ready
     // in that subsequent calls to ready will not work
@@ -169,16 +182,5 @@ class TokenList extends Feature {
     ].sort(sortByAttribute(["name"]));
   }
 }
-
-TokenList.metadata = {
-  id: ids.TokenList,
-  title: "Token List",
-  section: sections.DECK_VIEW,
-  description: "List tokens created by cards in the deck.",
-};
-TokenList.settingsDefaults = {
-  enabled: true,
-};
-TokenList.usesSidebar = true;
 
 export default TokenList;

@@ -6,7 +6,6 @@ import Drawer from "Lib/ui-elements/drawer";
 
 import { makeFakeDeck, makeFakeCard } from "Helpers/fake";
 import { mocked } from "ts-jest/utils";
-import { SettingsDefaults } from "Features/feature";
 import DialogInterface from "../../../src/js/lib/ui-elements/dialog-interface";
 
 jest.mock("Lib/scryfall");
@@ -165,11 +164,16 @@ describe("Scryfall Search", function () {
 
     beforeEach(function () {
       ss = new ScryfallSearch();
-      ss.drawer = mocked(new Drawer());
+      ss.drawer = new Drawer();
+      jest.spyOn(ss.drawer, "setLoading");
       jest.spyOn(DialogInterface.prototype, "scrollTo").mockImplementation();
       jest.spyOn(Drawer.prototype, "open");
       ss.container = document.createElement("div");
-      ss.settings = {} as SettingsDefaults;
+      ss.settings = {
+        enabled: false,
+        restrictToCommanderColorIdentity: false,
+        restrictFunnyCards: false,
+      };
 
       searchSpy = mocked(search).mockResolvedValue([] as any);
       getDeckSpy = mocked(getDeck).mockResolvedValue(makeFakeDeck());
@@ -327,7 +331,7 @@ describe("Scryfall Search", function () {
       ).toBeTruthy();
     });
 
-    it.only("adds an error message when no card list is available", function () {
+    it("adds an error message when no card list is available", function () {
       ss.cardList = [];
 
       ss.addCards();

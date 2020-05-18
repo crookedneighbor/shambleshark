@@ -11,16 +11,17 @@ const setSpy = mocked(storage.set);
 describe("Base Feature", function () {
   describe("enable", function () {
     class FeatureThatEnables extends Feature {
+      static metadata = {
+        id: "feature-that-enables",
+        title: "Sub Title",
+        section: "deck-view",
+        description: "Sub description.",
+      };
+
       run(): Promise<void> {
         return Promise.resolve();
       }
     }
-    FeatureThatEnables.metadata = {
-      id: "feature-that-enables",
-      title: "Sub Title",
-      section: "deck-view",
-      description: "Sub description.",
-    };
 
     it("sets enabled property for feature on storage", async function () {
       jest
@@ -35,16 +36,17 @@ describe("Base Feature", function () {
 
   describe("disable", function () {
     class FeatureThatDisables extends Feature {
+      static metadata = {
+        id: "feature-that-disables",
+        title: "Sub Title",
+        section: "deck-view",
+        description: "Sub description.",
+      };
+
       run(): Promise<void> {
         return Promise.resolve();
       }
     }
-    FeatureThatDisables.metadata = {
-      id: "feature-that-disables",
-      title: "Sub Title",
-      section: "deck-view",
-      description: "Sub description.",
-    };
 
     it("saves feature on storage", async function () {
       jest
@@ -59,16 +61,17 @@ describe("Base Feature", function () {
 
   describe("isEnabled", function () {
     class FeatureThatReportsIfItsEnabled extends Feature {
+      static metadata = {
+        id: "feature-that-reports",
+        title: "Sub Title",
+        section: "deck-view",
+        description: "Sub description.",
+      };
+
       run(): Promise<void> {
         return Promise.resolve();
       }
     }
-    FeatureThatReportsIfItsEnabled.metadata = {
-      id: "feature-that-reports",
-      title: "Sub Title",
-      section: "deck-view",
-      description: "Sub description.",
-    };
 
     it("resolves to true if feature is enabled", async function () {
       jest
@@ -101,33 +104,36 @@ describe("Base Feature", function () {
 
   describe("getSettings", function () {
     class FeatureWithSavedSettings extends Feature {
+      static metadata = {
+        id: "feature-with-saved",
+        title: "Sub Title",
+        section: "deck-view",
+        description: "Sub description.",
+      };
+
+      static settingsDefaults = {
+        enabled: true,
+        foo: "bar",
+        baz: "buz",
+      };
+
       run(): Promise<void> {
         return Promise.resolve();
       }
     }
-    FeatureWithSavedSettings.metadata = {
-      id: "feature-with-saved",
-      title: "Sub Title",
-      section: "deck-view",
-      description: "Sub description.",
-    };
-    FeatureWithSavedSettings.settingsDefaults = {
-      enabled: true,
-      foo: "bar",
-      baz: "buz",
-    };
     class FutureFeatureWithSavedSettings extends Feature {
+      static metadata = {
+        id: "future-feature",
+        title: "Sub Title",
+        section: "deck-view",
+        description: "Sub description.",
+        futureFeature: true,
+      };
+
       run(): Promise<void> {
         return Promise.resolve();
       }
     }
-    FutureFeatureWithSavedSettings.metadata = {
-      id: "future-feature",
-      title: "Sub Title",
-      section: "deck-view",
-      description: "Sub description.",
-      futureFeature: true,
-    };
 
     it("calls out to storage for settings", async function () {
       getSpy.mockResolvedValue({
@@ -255,20 +261,22 @@ describe("Base Feature", function () {
 
   describe("saveSetting", function () {
     class FeatureThatSavesSettings extends Feature {
+      static metadata = {
+        id: "feature-that-saves",
+        title: "Sub Title",
+        section: "deck-view",
+        description: "Sub description.",
+      };
+
+      static settingsDefaults = {
+        enabled: true,
+        foo: "bar",
+      };
+
       run(): Promise<void> {
         return Promise.resolve();
       }
     }
-    FeatureThatSavesSettings.metadata = {
-      id: "feature-that-saves",
-      title: "Sub Title",
-      section: "deck-view",
-      description: "Sub description.",
-    };
-    FeatureThatSavesSettings.settingsDefaults = {
-      enabled: true,
-      foo: "bar",
-    };
 
     it("grabs previously saved settings and overwrites the single property", async function () {
       jest.spyOn(FeatureThatSavesSettings, "getSettings").mockResolvedValue({
@@ -310,16 +318,17 @@ describe("Base Feature", function () {
 
   describe("saveData", function () {
     class SubFeature extends Feature {
+      static metadata = {
+        id: "sub-id",
+        title: "Sub Title",
+        section: "deck-view",
+        description: "Sub description.",
+      };
+
       run(): Promise<void> {
         return Promise.resolve();
       }
     }
-    SubFeature.metadata = {
-      id: "sub-id",
-      title: "Sub Title",
-      section: "deck-view",
-      description: "Sub description.",
-    };
 
     it("sets storage with metadata id", async function () {
       const data = {};
@@ -333,16 +342,17 @@ describe("Base Feature", function () {
 
   describe("getData", function () {
     class SubFeature extends Feature {
+      static metadata = {
+        id: "sub-id",
+        title: "Sub Title",
+        section: "deck-view",
+        description: "Sub description.",
+      };
+
       run(): Promise<void> {
         return Promise.resolve();
       }
     }
-    SubFeature.metadata = {
-      id: "sub-id",
-      title: "Sub Title",
-      section: "deck-view",
-      description: "Sub description.",
-    };
 
     it("gets storage with metadata id", async function () {
       await SubFeature.getData("some-id");

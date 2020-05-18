@@ -1,4 +1,4 @@
-import Feature from "Features/feature";
+import Feature from "Feature";
 import {
   BUS_EVENTS as events,
   FEATURE_IDS as ids,
@@ -20,10 +20,30 @@ const CARD_EVENTS = [
 ];
 
 class CardInputModifier extends Feature {
-  imageCache: { [key: string]: string };
-  listeners: { [key: string]: Element };
+  imageCache: Record<string, string>;
+  listeners: Record<string, Element>;
   tooltip: CardTooltip;
   _getEntriesPromise: Promise<Card[]> | undefined;
+
+  static metadata = {
+    id: ids.CardInputModifier,
+    title: "Card Input Modifier",
+    section: sections.DECK_BUILDER,
+    description: "Modifiers for the card input.",
+  };
+
+  static settingsDefaults = {
+    enabled: true,
+    showImageOnHover: true,
+  };
+
+  static settingDefinitions = [
+    {
+      id: "showImageOnHover",
+      label: "Show card image when hovering over card input",
+      input: "checkbox",
+    },
+  ];
 
   constructor() {
     super();
@@ -120,25 +140,5 @@ class CardInputModifier extends Feature {
     });
   }
 }
-
-CardInputModifier.metadata = {
-  id: ids.CardInputModifier,
-  title: "Card Input Modifier",
-  section: sections.DECK_BUILDER,
-  description: "Modifiers for the card input.",
-};
-
-CardInputModifier.settingsDefaults = {
-  enabled: true,
-  showImageOnHover: true,
-};
-
-CardInputModifier.settingDefinitions = [
-  {
-    id: "showImageOnHover",
-    label: "Show card image when hovering over card input",
-    input: "checkbox",
-  },
-];
 
 export default CardInputModifier;

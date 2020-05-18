@@ -1,4 +1,4 @@
-import Feature, { SettingsDefaults } from "Features/feature";
+import Feature, { SettingsDefaults } from "Feature";
 import * as bus from "framebus";
 import {
   BUS_EVENTS as events,
@@ -17,10 +17,14 @@ import { EXTERNAL_ARROW } from "Svg";
 import { Deck, DeckSections } from "Js/types/deck";
 
 // TODO saved searches
+interface SearchSettings extends SettingsDefaults {
+  restrictToCommanderColorIdentity: boolean;
+  restrictFunnyCards: boolean;
+}
 
 class ScryfallSearch extends Feature {
   drawer?: Drawer;
-  settings?: SettingsDefaults;
+  settings?: SearchSettings;
   currentQuery?: string;
   deck?: Deck;
   isSingleton?: boolean;
@@ -28,6 +32,35 @@ class ScryfallSearch extends Feature {
   deckSectionChooser?: DeckSectionChooser;
   container?: HTMLDivElement;
   _nextInProgress?: boolean;
+
+  static metadata = {
+    id: ids.ScryfallSearch,
+    title: "Scryfall Search",
+    section: sections.DECK_BUILDER,
+    description:
+      "Search for Scryfall cards right inside the deckbuilder! (Coming Soon: Save searches for specific decks for later)",
+  };
+
+  static settingsDefaults = {
+    enabled: true,
+    restrictToCommanderColorIdentity: true,
+    restrictFunnyCards: false,
+  };
+
+  static settingDefinitions = [
+    {
+      id: "restrictToCommanderColorIdentity",
+      label:
+        "Automatically restrict searches to commander's color identity (if applicable)",
+      input: "checkbox",
+    },
+    {
+      id: "restrictFunnyCards",
+      label:
+        "Don't include funny cards when doing searches (adds not:funny to all searches)",
+      input: "checkbox",
+    },
+  ];
 
   async run(): Promise<void> {
     this.drawer = this.createDrawer();
@@ -203,34 +236,5 @@ class ScryfallSearch extends Feature {
     return drawer;
   }
 }
-
-ScryfallSearch.metadata = {
-  id: ids.ScryfallSearch,
-  title: "Scryfall Search",
-  section: sections.DECK_BUILDER,
-  description:
-    "Search for Scryfall cards right inside the deckbuilder! (Coming Soon: Save searches for specific decks for later)",
-};
-
-ScryfallSearch.settingsDefaults = {
-  enabled: true,
-  restrictToCommanderColorIdentity: true,
-  restrictFunnyCards: false,
-};
-
-ScryfallSearch.settingDefinitions = [
-  {
-    id: "restrictToCommanderColorIdentity",
-    label:
-      "Automatically restrict searches to commander's color identity (if applicable)",
-    input: "checkbox",
-  },
-  {
-    id: "restrictFunnyCards",
-    label:
-      "Don't include funny cards when doing searches (adds not:funny to all searches)",
-    input: "checkbox",
-  },
-];
 
 export default ScryfallSearch;

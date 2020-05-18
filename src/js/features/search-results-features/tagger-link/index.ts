@@ -1,5 +1,5 @@
 import * as bus from "framebus";
-import Feature from "Features/feature";
+import Feature, { SettingsDefaults } from "Feature";
 import {
   BUS_EVENTS as events,
   FEATURE_IDS as ids,
@@ -112,6 +112,26 @@ export interface TaggerPayload {
 
 class TaggerLink extends Feature {
   showPreview?: boolean;
+
+  static metadata = {
+    id: ids.TaggerLink,
+    title: "Tagger Link",
+    section: sections.SEARCH_RESULTS,
+    description: "Provide a button to card's tagger page from search results.",
+  };
+
+  static settingsDefaults = {
+    enabled: true,
+    previewTags: true,
+  };
+
+  static settingDefinitions = [
+    {
+      id: "previewTags",
+      label: "Show preview of tags for card on hover.",
+      input: "checkbox",
+    },
+  ];
 
   async run() {
     const settings = await TaggerLink.getSettings();
@@ -337,23 +357,5 @@ class TaggerLink extends Feature {
     });
   }
 }
-
-TaggerLink.metadata = {
-  id: ids.TaggerLink,
-  title: "Tagger Link",
-  section: sections.SEARCH_RESULTS,
-  description: "Provide a button to card's tagger page from search results.",
-};
-TaggerLink.settingsDefaults = {
-  enabled: true,
-  previewTags: true,
-};
-TaggerLink.settingDefinitions = [
-  {
-    id: "previewTags",
-    label: "Show preview of tags for card on hover.",
-    input: "checkbox",
-  },
-];
 
 export default TaggerLink;

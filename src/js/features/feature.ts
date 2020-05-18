@@ -13,13 +13,12 @@ export interface Metadata {
 
 export interface SettingsDefaults {
   enabled: boolean;
-  [key: string]: SettingValue;
 }
 
 export interface SettingsDefinition {
   id: string;
   label: string;
-  input: "checkbox";
+  input: string;
 }
 
 export default abstract class Feature {
