@@ -14,7 +14,7 @@ module.exports = {
     // These need to be duplicated from the webpack config
     "^Constants$": path.resolve(__dirname, "src/js/resources/constants.js"),
     "^Features/(.*)$": path.resolve(__dirname, "src/js/features/$1"),
-    "^Feature$": path.resolve(__dirname, "src/js/features/feature.js"),
+    "^Feature$": path.resolve(__dirname, "src/js/features/feature.ts"),
     "^Lib/(.*)$": path.resolve(__dirname, "src/js/lib/$1"),
     "^Ui/(.*)$": path.resolve(__dirname, "src/js/lib/ui-elements/$1"),
     "^Svg$": path.resolve(__dirname, "src/js/resources/svg.js"),

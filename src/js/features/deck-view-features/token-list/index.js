@@ -11,6 +11,19 @@ import "./index.css";
 const MAX_ENTRIES_TO_AUTO_LOOKUP = 75 * 2; // 2 collection API calls
 
 class TokenList extends Feature {
+  static metadata = {
+    id: ids.TokenList,
+    title: "Token List",
+    section: sections.DECK_VIEW,
+    description: "List tokens created by cards in the deck.",
+  };
+
+  static settingsDefaults = {
+    enabled: true,
+  };
+
+  static usesSidebar = true;
+
   async run() {
     // TODO this doesn't work with current implementation of mutation.ready
     // in that subsequent calls to ready will not work
@@ -90,10 +103,6 @@ class TokenList extends Feature {
     this.modal.setContent(container);
   }
 
-  lookupCardCollection(cards) {
-    return getCollection(cards);
-  }
-
   getCardElements() {
     this.elements = Array.from(
       document.querySelectorAll(".deck-list-entry .deck-list-entry-name a")
@@ -147,29 +156,16 @@ class TokenList extends Feature {
   }
 
   flattenTokenCollection(tokenCollection) {
-    const flattenedTokens = tokenCollection.flat().reduce((tokens, token) => {
-      if (!tokens.find((t) => t.oracle_id === token.oracle_id)) {
-        tokens.push(token);
-      }
-
-      return tokens;
-    }, []);
-
-    flattenedTokens.sort(sortByAttribute(["name"]));
-
-    return flattenedTokens;
+    // Tokens can have the same name, but be functionally different
+    // IE: https://scryfall.com/search?q=t%3Atoken+!"Vampire"&unique=cards
+    // TODO this doesn't handle double sided tokens particularly well
+    // might be something to handle in the underlying scryfall-client module
+    return [
+      ...new Map(
+        tokenCollection.flat().map((token) => [token.oracle_id, token])
+      ).values(),
+    ].sort(sortByAttribute(["name"]));
   }
 }
-
-TokenList.metadata = {
-  id: ids.TokenList,
-  title: "Token List",
-  section: sections.DECK_VIEW,
-  description: "List tokens created by cards in the deck.",
-};
-TokenList.settingsDefaults = {
-  enabled: true,
-};
-TokenList.usesSidebar = true;
 
 export default TokenList;

@@ -9,6 +9,18 @@ import "./index.css";
 const TIMEOUT_TO_CONTINUE = 1000;
 
 class EDHRecSuggestions extends Feature {
+  static metadata = {
+    id: ids.EDHRecSuggestions,
+    title: "EDHRec Suggestions",
+    section: sections.DECK_BUILDER,
+    description:
+      "Inserts an EDHRec button on commander decks. When accessed, will display a list of card suggestions from EDHRec.",
+  };
+
+  static settingsDefaults = {
+    enabled: true,
+  };
+
   async run() {
     return new Promise(function (resolve, reject) {
       const timeout = setTimeout(reject, TIMEOUT_TO_CONTINUE);
@@ -40,16 +52,5 @@ class EDHRecSuggestions extends Feature {
     });
   }
 }
-
-EDHRecSuggestions.metadata = {
-  id: ids.EDHRecSuggestions,
-  title: "EDHRec Suggestions",
-  section: sections.DECK_BUILDER,
-  description:
-    "Inserts an EDHRec button on commander decks. When accessed, will display a list of card suggestions from EDHRec.",
-};
-EDHRecSuggestions.settingsDefaults = {
-  enabled: true,
-};
 
 export default EDHRecSuggestions;

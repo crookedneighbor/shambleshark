@@ -4,7 +4,7 @@ import {
   FEATURE_IDS as ids,
   FEATURE_SECTIONS as sections,
 } from "Constants";
-import bus from "framebus";
+import * as bus from "framebus";
 import mutation from "Lib/mutation";
 import { getDeck } from "Lib/scryfall";
 import deckParser from "Lib/deck-parser";
@@ -19,6 +19,26 @@ const CARD_EVENTS = [
 ];
 
 class CardInputModifier extends Feature {
+  static metadata = {
+    id: ids.CardInputModifier,
+    title: "Card Input Modifier",
+    section: sections.DECK_BUILDER,
+    description: "Modifiers for the card input.",
+  };
+
+  static settingsDefaults = {
+    enabled: true,
+    showImageOnHover: true,
+  };
+
+  static settingDefinitions = [
+    {
+      id: "showImageOnHover",
+      label: "Show card image when hovering over card input",
+      input: "checkbox",
+    },
+  ];
+
   constructor() {
     super();
 
@@ -114,25 +134,5 @@ class CardInputModifier extends Feature {
     });
   }
 }
-
-CardInputModifier.metadata = {
-  id: ids.CardInputModifier,
-  title: "Card Input Modifier",
-  section: sections.DECK_BUILDER,
-  description: "Modifiers for the card input.",
-};
-
-CardInputModifier.settingsDefaults = {
-  enabled: true,
-  showImageOnHover: true,
-};
-
-CardInputModifier.settingDefinitions = [
-  {
-    id: "showImageOnHover",
-    label: "Show card image when hovering over card input",
-    input: "checkbox",
-  },
-];
 
 export default CardInputModifier;

@@ -1,15 +1,36 @@
 import storage from "Lib/storage";
 import { FEATURE_IDS as ids } from "Constants";
 
-const notImplementedError = new Error("Method not Implemented");
+export type SettingValue = string | number | boolean | Record<string, string>;
 
-class Feature {
-  async run() {
-    return Promise.reject(notImplementedError);
-  }
+export interface Metadata {
+  id: string;
+  title: string;
+  section: string; // TODO: Do it so it can only be a FEATURE_SECTIONS from Constants
+  description: string;
+  futureFeature?: boolean;
+}
 
-  isEnabled() {
-    return this.constructor.getSettings().then((settings) => settings.enabled);
+export interface SettingsDefaults {
+  enabled: boolean;
+}
+
+export interface SettingsDefinition {
+  id: string;
+  label: string;
+  input: string;
+}
+
+export default abstract class Feature {
+  static metadata: Metadata;
+  static settingsDefaults: SettingsDefaults;
+  static settingDefinitions: SettingsDefinition[] = [];
+  static usesSidebar: boolean;
+
+  abstract run(): Promise<void>;
+
+  static isEnabled() {
+    return this.getSettings().then((settings) => settings.enabled);
   }
 
   static enable() {
@@ -20,7 +41,7 @@ class Feature {
     return this.saveSetting("enabled", false);
   }
 
-  static async saveSetting(property, value) {
+  static async saveSetting(property: string, value: SettingValue) {
     // TODO put these in a queue to avoid race conditions
     // of too many settings being saved at once
     const settings = await this.getSettings();
@@ -43,8 +64,7 @@ class Feature {
 
     if (!settings) {
       const futureFeatureSettings = await storage.get(ids.FutureFeatureOptIn);
-      const disableFutureFeature =
-        futureFeatureSettings && futureFeatureSettings.enabled === false;
+      const disableFutureFeature = futureFeatureSettings?.enabled === false;
 
       settings = {
         enabled: !disableFutureFeature && !this.metadata.futureFeature,
@@ -58,36 +78,14 @@ class Feature {
       }
     }
 
-    return Object.assign({}, this.settingsDefaults, settings);
+    return { ...this.settingsDefaults, ...settings };
   }
 
-  static async saveData(key, value) {
+  static async saveData(key: string, value: SettingValue) {
     return storage.set(`${this.metadata.id}:${key}`, value);
   }
 
-  static async getData(key) {
+  static async getData(key: string): Promise<SettingValue> {
     return storage.get(`${this.metadata.id}:${key}`);
   }
 }
-
-function createStaticProperty(propertyName, defaultValue) {
-  const privatePropertyName = `_${propertyName}`;
-
-  Object.defineProperty(Feature, propertyName, {
-    get() {
-      // eslint-disable-next-line no-prototype-builtins
-      return this.hasOwnProperty(privatePropertyName)
-        ? this[privatePropertyName]
-        : defaultValue;
-    },
-    set(value) {
-      this[privatePropertyName] = value;
-    },
-  });
-}
-
-createStaticProperty("metadata");
-createStaticProperty("settingsDefaults");
-createStaticProperty("settingDefinitions", []);
-
-export default Feature;

@@ -1,4 +1,4 @@
-import bus from "framebus";
+import * as bus from "framebus";
 import Feature from "Feature";
 import {
   BUS_EVENTS as events,
@@ -79,6 +79,26 @@ function convertPageLinkToTagger(data) {
 }
 
 class TaggerLink extends Feature {
+  static metadata = {
+    id: ids.TaggerLink,
+    title: "Tagger Link",
+    section: sections.SEARCH_RESULTS,
+    description: "Provide a button to card's tagger page from search results.",
+  };
+
+  static settingsDefaults = {
+    enabled: true,
+    previewTags: true,
+  };
+
+  static settingDefinitions = [
+    {
+      id: "previewTags",
+      label: "Show preview of tags for card on hover.",
+      input: "checkbox",
+    },
+  ];
+
   async run() {
     const settings = await TaggerLink.getSettings();
     this._showPreview = Boolean(settings.previewTags);
@@ -295,23 +315,5 @@ class TaggerLink extends Feature {
     });
   }
 }
-
-TaggerLink.metadata = {
-  id: ids.TaggerLink,
-  title: "Tagger Link",
-  section: sections.SEARCH_RESULTS,
-  description: "Provide a button to card's tagger page from search results.",
-};
-TaggerLink.settingsDefaults = {
-  enabled: true,
-  previewTags: true,
-};
-TaggerLink.settingDefinitions = [
-  {
-    id: "previewTags",
-    label: "Show preview of tags for card on hover.",
-    input: "checkbox",
-  },
-];
 
 export default TaggerLink;
