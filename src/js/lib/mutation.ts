@@ -1,14 +1,21 @@
 // adapted from http://ryanmorr.com/using-mutation-observers-to-watch-for-element-availability/
 
-let readyObserver: MutationObserver | null;
-const listeners: { selector: string; fn: Function }[] = [];
+type MutationHandler = (el: HTMLElement) => void;
+type Listener = {
+  elements: HTMLElement[];
+  selector: string;
+  fn: MutationHandler;
+};
 
-export function reset() {
+let readyObserver: MutationObserver | null;
+const listeners: Listener[] = [];
+
+export function reset(): void {
   readyObserver = null;
   listeners.splice(0, listeners.length);
 }
 
-function check() {
+function check(): void {
   // Check the DOM for elements matching a stored selector
   listeners.forEach((listener) => {
     // Query for elements matching the specified selector
@@ -17,20 +24,19 @@ function check() {
     );
 
     elements.forEach((element) => {
-      // Make sure the callback isn't invoked with the
-      // same element more than once
-      if (!(element as any).ready) {
-        (element as any).ready = true;
-        // Invoke the callback with the element
-        listener.fn.call(element, element);
+      // Invoke the callback with the element
+      if (!listener.elements.find((el) => el === element)) {
+        listener.elements.push(element);
+        listener.fn(element);
       }
     });
   });
 }
 
-export function ready(selector: string, fn: Function) {
+export function ready(selector: string, fn: MutationHandler): void {
   // Store the selector and callback to be monitored
-  listeners.push({ selector, fn });
+  listeners.push({ selector, fn, elements: [] });
+
   if (!readyObserver) {
     // Watch for changes in the document
     readyObserver = new window.MutationObserver(check);
@@ -44,9 +50,9 @@ export function ready(selector: string, fn: Function) {
   check();
 }
 
-export function change(parentSelector: string, fn: Function) {
-  ready(parentSelector, (parentNode: Element) => {
-    const observer = new window.MutationObserver(function () {
+export function change(parentSelector: string, fn: MutationHandler): void {
+  ready(parentSelector, (parentNode) => {
+    const observer = new window.MutationObserver(() => {
       fn(parentNode);
     });
     observer.observe(parentNode, {
