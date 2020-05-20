@@ -41,9 +41,9 @@ class TokenList extends Feature {
   async run(): Promise<void> {
     // TODO this doesn't work with current implementation of mutation.ready
     // in that subsequent calls to ready will not work
-    mutation.ready(
+    mutation.ready<HTMLDivElement>(
       "#shambleshark-deck-display-sidebar-toolbox",
-      async (container: HTMLDivElement) => {
+      async (container) => {
         this.createUI(container);
         this.getCardElements();
 

@@ -1,11 +1,11 @@
 // adapted from http://ryanmorr.com/using-mutation-observers-to-watch-for-element-availability/
 
-type MutationHandler = (el: HTMLElement) => void;
-type Listener = {
-  elements: HTMLElement[];
+type Listener<T extends Element = Element> = {
+  elements: T[];
   selector: string;
-  fn: MutationHandler;
+  fn(el: T): void;
 };
+type MutationHandler<T extends Element> = Listener<T>["fn"];
 
 let readyObserver: MutationObserver | null;
 const listeners: Listener[] = [];
@@ -19,9 +19,7 @@ function check(): void {
   // Check the DOM for elements matching a stored selector
   listeners.forEach((listener) => {
     // Query for elements matching the specified selector
-    const elements = Array.from(
-      document.querySelectorAll<HTMLElement>(listener.selector)
-    );
+    const elements = Array.from(document.querySelectorAll(listener.selector));
 
     elements.forEach((element) => {
       // Invoke the callback with the element
@@ -33,7 +31,10 @@ function check(): void {
   });
 }
 
-export function ready(selector: string, fn: MutationHandler): void {
+export function ready<T extends HTMLElement = HTMLElement>(
+  selector: string,
+  fn: MutationHandler<T>
+): void {
   // Store the selector and callback to be monitored
   listeners.push({ selector, fn, elements: [] });
 
@@ -50,8 +51,11 @@ export function ready(selector: string, fn: MutationHandler): void {
   check();
 }
 
-export function change(parentSelector: string, fn: MutationHandler): void {
-  ready(parentSelector, (parentNode) => {
+export function change<T extends HTMLElement = HTMLElement>(
+  parentSelector: string,
+  fn: MutationHandler<T>
+): void {
+  ready<T>(parentSelector, (parentNode) => {
     const observer = new window.MutationObserver(() => {
       fn(parentNode);
     });

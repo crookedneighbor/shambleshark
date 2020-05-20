@@ -154,9 +154,9 @@ class TaggerLink extends Feature {
   }
 
   setupButtons() {
-    mutation.ready(
+    mutation.ready<HTMLAnchorElement>(
       ".card-grid-item a.card-grid-item-card",
-      (link: HTMLLinkElement) => {
+      (link) => {
         const button = this.makeButton(link.href);
 
         link
