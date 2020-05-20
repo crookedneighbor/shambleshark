@@ -1,5 +1,5 @@
 import Feature from "Feature";
-import makeEDHRecButton from "./make-edhrec-button.ts";
+import makeEDHRecButton from "./make-edhrec-button";
 import addEDHRecIframe from "./add-edhrec-iframe";
 import mutation from "Lib/mutation";
 import { FEATURE_IDS as ids, FEATURE_SECTIONS as sections } from "Constants";
@@ -21,8 +21,8 @@ class EDHRecSuggestions extends Feature {
     enabled: true,
   };
 
-  async run() {
-    return new Promise(function (resolve, reject) {
+  async run(): Promise<void> {
+    return new Promise<void>(function (resolve, reject) {
       const timeout = setTimeout(reject, TIMEOUT_TO_CONTINUE);
 
       mutation.ready(".deckbuilder-section-title", async function (title) {
@@ -39,7 +39,7 @@ class EDHRecSuggestions extends Feature {
         );
 
         addEDHRecIframe(edhRecButton);
-        buttonsContainer.appendChild(edhRecButton);
+        buttonsContainer!.appendChild(edhRecButton);
 
         clearTimeout(timeout);
         resolve();
