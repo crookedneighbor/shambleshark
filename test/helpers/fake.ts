@@ -1,5 +1,7 @@
 import shortid = require("shortid");
-import { Deck, Card, DeckSections } from "Js/types/deck";
+
+import type { Deck, Card, DeckSections } from "Js/types/deck";
+import type { EDHRecSuggestion } from "Js/types/edhrec";
 
 type FakeDeckOptions = Partial<Deck> & {
   primarySections?: DeckSections[];
@@ -9,6 +11,7 @@ type FakeCardOptions = Partial<Card> & {
   rawText?: Card["raw_text"];
   cardDigest?: Partial<Card["card_digest"]> | boolean;
 };
+type FakeEDHRecSuggestionOptions = Partial<EDHRecSuggestion>;
 
 export function makeFakeCard(overrides: FakeCardOptions = {}) {
   let cardDigest: Record<string, string> | undefined;
@@ -57,4 +60,19 @@ export function makeFakeDeck(overrides: FakeDeckOptions = {}) {
   };
 
   return deck;
+}
+
+export function makeFakeEDHRecSuggestion(
+  options: FakeEDHRecSuggestionOptions = {}
+) {
+  return {
+    primary_types: ["Creature"],
+    names: ["Fake Name"],
+    scryfall_uri: "https://scryfall.com/card/set/id/fake-id",
+    images: ["fake-unknown.png"],
+    price: 19.99,
+    salt: 10,
+    score: 99,
+    ...options,
+  };
 }

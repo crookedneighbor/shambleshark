@@ -1,21 +1,28 @@
 import addEDHRecIframe from "Features/deck-builder-features/edhrec-suggestions/add-edhrec-iframe";
-import deckParser from "Lib/deck-parser";
-import mutation from "Lib/mutation";
+import deckParser from "../../../src/js/lib/deck-parser";
+import { change } from "Lib/mutation";
 import { getDeck } from "Lib/scryfall";
 import iframe from "Lib/iframe";
+import { Card, Deck } from "../../../src/js/types/deck";
+import SpyInstance = jest.SpyInstance;
 
-import { makeFakeDeck } from "Helpers/fake";
+import { makeFakeDeck, makeFakeCard } from "Helpers/fake";
+import { mocked } from "ts-jest/utils";
 
 jest.mock("Lib/scryfall");
+jest.mock("Lib/mutation");
 
 describe("addEDHRecIframe", function () {
-  let btn;
-  let getDeckSpy;
+  let btn: HTMLButtonElement;
+
+  let getDeckSpy: SpyInstance;
+  let hasLegalCommandersSpy: SpyInstance;
+  let mutationChangeSpy: SpyInstance;
 
   beforeEach(function () {
     btn = document.createElement("button");
 
-    getDeckSpy = getDeck.mockResolvedValue(
+    getDeckSpy = mocked(getDeck).mockResolvedValue(
       makeFakeDeck({
         primarySections: ["commanders", "nonlands"],
         secondarySections: ["lands", "maybeboard"],
@@ -24,21 +31,23 @@ describe("addEDHRecIframe", function () {
         },
       })
     );
-    jest.spyOn(deckParser, "hasLegalCommanders").mockResolvedValue(true);
+    hasLegalCommandersSpy = jest
+      .spyOn(deckParser, "hasLegalCommanders")
+      .mockResolvedValue(true);
     jest
       .spyOn(deckParser, "getSections")
       .mockReturnValue(["commanders", "lands", "nonlands", "maybeboard"]);
-    jest.spyOn(mutation, "change").mockImplementation();
+    mutationChangeSpy = mocked(change);
 
     const deckbuilderElement = document.createElement("div");
     deckbuilderElement.id = "deckbuilder";
     document.body.appendChild(deckbuilderElement);
 
-    jest.spyOn(iframe, "create").mockResolvedValue();
+    jest.spyOn(iframe, "create").mockImplementation();
   });
 
   it("sets button to disabled when requested deck does not have legal commanders", async function () {
-    deckParser.hasLegalCommanders.mockResolvedValue(false);
+    hasLegalCommandersSpy.mockResolvedValue(false);
 
     await addEDHRecIframe(btn);
 
@@ -46,7 +55,7 @@ describe("addEDHRecIframe", function () {
   });
 
   it("sets button to not disabled when requested has legal commanders", async function () {
-    deckParser.hasLegalCommanders.mockResolvedValue(true);
+    hasLegalCommandersSpy.mockResolvedValue(true);
 
     await addEDHRecIframe(btn);
 
@@ -64,9 +73,9 @@ describe("addEDHRecIframe", function () {
   });
 
   describe("when commander list changes", function () {
-    let fakeDeck, commanderSection;
+    let fakeDeck: Deck, commanderSection: HTMLDivElement;
 
-    function addEntry(options = {}) {
+    const addEntry = (options: Partial<HTMLOptionElement> = {}) => {
       const li = document.createElement("li");
       li.classList.add("deckbuilder-entry");
       li.innerHTML = `
@@ -80,37 +89,38 @@ describe("addEDHRecIframe", function () {
         <textarea class="deckbuilder-entry-input"></textarea>
       `;
       if (options.value) {
-        li.querySelector("textarea").value = options.value;
+        li.querySelector("textarea")!.value = options.value;
       }
       if (options.disabled) {
         Array.from(li.querySelectorAll("select option")).forEach((el) =>
           el.setAttribute("disabled", "disabled")
         );
       }
-      commanderSection.querySelector("ul").appendChild(li);
-    }
+      commanderSection.querySelector("ul")!.appendChild(li);
+    };
 
-    beforeEach(async function () {
-      fakeDeck = {
+    beforeEach(async () => {
+      fakeDeck = makeFakeDeck({
         entries: {
           commanders: [
-            {
-              card_digest: {
+            makeFakeCard({
+              cardDigest: {
                 name: "Arjun, the Shifting Flame",
               },
-            },
+            }),
           ],
           lands: [],
           nonlands: [],
         },
-      };
+      });
       commanderSection = document.createElement("div");
       commanderSection.innerHTML = `
         <div class="deckbuilder-section-title"></div>
         <ul></ul>
       `;
-      commanderSection.querySelector(".deckbuilder-section-title").innerText =
-        "Commander(s)";
+      commanderSection.querySelector<HTMLDivElement>(
+        ".deckbuilder-section-title"
+      )!.innerText = "Commander(s)";
 
       getDeckSpy.mockResolvedValue(fakeDeck);
       document.body.appendChild(commanderSection);
@@ -119,15 +129,15 @@ describe("addEDHRecIframe", function () {
     it("enables the button when all entries are commanders", async function () {
       fakeDeck.entries.commanders = [];
       addEntry();
-      deckParser.hasLegalCommanders.mockResolvedValue(false);
+      hasLegalCommandersSpy.mockResolvedValue(false);
 
       await addEDHRecIframe(btn);
       expect(btn.getAttribute("disabled")).toBeTruthy();
 
-      const changeHandler = mutation.change.mock.calls[0][1];
+      const changeHandler = mutationChangeSpy.mock.calls[0][1];
 
-      deckParser.hasLegalCommanders.mockResolvedValue(true);
-      commanderSection.querySelector("textarea").value =
+      hasLegalCommandersSpy.mockResolvedValue(true);
+      commanderSection.querySelector("textarea")!.value =
         "1 Arjun, the Shifting Flame";
 
       await changeHandler(commanderSection);
@@ -137,24 +147,24 @@ describe("addEDHRecIframe", function () {
 
     it("enables the button entry has gone from illegal state to legal state", async function () {
       fakeDeck.entries.commanders = [
-        {
+        makeFakeCard({
           card_digest: {
             name: "Food Chain",
           },
-        },
+        }),
       ];
       addEntry({
         value: "1 Food Chain",
       });
-      deckParser.hasLegalCommanders.mockResolvedValue(false);
+      hasLegalCommandersSpy.mockResolvedValue(false);
 
       await addEDHRecIframe(btn);
       expect(btn.getAttribute("disabled")).toBeTruthy();
 
-      const changeHandler = mutation.change.mock.calls[0][1];
+      const changeHandler = mutationChangeSpy.mock.calls[0][1];
 
-      deckParser.hasLegalCommanders.mockResolvedValue(true);
-      commanderSection.querySelector("textarea").value =
+      hasLegalCommandersSpy.mockResolvedValue(true);
+      commanderSection.querySelector("textarea")!.value =
         "1 Arjun, the Shifting Flame";
 
       await changeHandler(commanderSection);
@@ -168,12 +178,12 @@ describe("addEDHRecIframe", function () {
       });
 
       await addEDHRecIframe(btn);
-      const changeHandler = mutation.change.mock.calls[0][1];
+      const changeHandler = mutationChangeSpy.mock.calls[0][1];
       addEntry({
         value: "1 Rhystic Study",
       });
 
-      deckParser.hasLegalCommanders.mockResolvedValue(false);
+      hasLegalCommandersSpy.mockResolvedValue(false);
 
       expect(btn.getAttribute("disabled")).toBeFalsy();
 
@@ -184,7 +194,7 @@ describe("addEDHRecIframe", function () {
 
     it("ignores blank entries", async function () {
       await addEDHRecIframe(btn);
-      const changeHandler = mutation.change.mock.calls[0][1];
+      const changeHandler = mutationChangeSpy.mock.calls[0][1];
 
       addEntry();
       addEntry();
@@ -196,15 +206,15 @@ describe("addEDHRecIframe", function () {
 
       await changeHandler(commanderSection);
 
-      expect(deckParser.hasLegalCommanders).toBeCalledTimes(1);
-      expect(deckParser.hasLegalCommanders).toBeCalledWith([
+      expect(hasLegalCommandersSpy).toBeCalledTimes(1);
+      expect(hasLegalCommandersSpy).toBeCalledWith([
         "Arjun, the Shifting Flame",
       ]);
     });
 
     it("ignores entries that have not finished lookup", async function () {
       await addEDHRecIframe(btn);
-      const changeHandler = mutation.change.mock.calls[0][1];
+      const changeHandler = mutationChangeSpy.mock.calls[0][1];
 
       addEntry({
         value: "1 Sidar Kondo of Jamuraa",
@@ -214,18 +224,16 @@ describe("addEDHRecIframe", function () {
         disabled: true,
       });
 
-      deckParser.hasLegalCommanders.mockClear();
+      hasLegalCommandersSpy.mockClear();
       await changeHandler(commanderSection);
 
-      expect(deckParser.hasLegalCommanders).toBeCalledTimes(1);
-      expect(deckParser.hasLegalCommanders).toBeCalledWith([
-        "Sidar Kondo of Jamuraa",
-      ]);
+      expect(hasLegalCommandersSpy).toBeCalledTimes(1);
+      expect(hasLegalCommandersSpy).toBeCalledWith(["Sidar Kondo of Jamuraa"]);
     });
 
     it("ignores entries that do not match deck pattern", async function () {
       await addEDHRecIframe(btn);
-      const changeHandler = mutation.change.mock.calls[0][1];
+      const changeHandler = mutationChangeSpy.mock.calls[0][1];
 
       addEntry({
         value: "1 Sidar Kondo of Jamuraa",
@@ -234,13 +242,11 @@ describe("addEDHRecIframe", function () {
         value: "Tana the",
       });
 
-      deckParser.hasLegalCommanders.mockClear();
+      hasLegalCommandersSpy.mockClear();
       await changeHandler(commanderSection);
 
-      expect(deckParser.hasLegalCommanders).toBeCalledTimes(1);
-      expect(deckParser.hasLegalCommanders).toBeCalledWith([
-        "Sidar Kondo of Jamuraa",
-      ]);
+      expect(hasLegalCommandersSpy).toBeCalledTimes(1);
+      expect(hasLegalCommandersSpy).toBeCalledWith(["Sidar Kondo of Jamuraa"]);
     });
 
     it("does not check legality of commanders whe commander list is unchanged", async function () {
@@ -249,31 +255,31 @@ describe("addEDHRecIframe", function () {
       });
 
       await addEDHRecIframe(btn);
-      const changeHandler = mutation.change.mock.calls[0][1];
+      const changeHandler = mutationChangeSpy.mock.calls[0][1];
 
-      deckParser.hasLegalCommanders.mockClear();
+      hasLegalCommandersSpy.mockClear();
       await changeHandler(commanderSection);
 
-      expect(deckParser.hasLegalCommanders).not.toBeCalled();
+      expect(hasLegalCommandersSpy).not.toBeCalled();
     });
 
     it("does not check legality of commanders whe commander list is unchanged but in a different order", async function () {
       fakeDeck.entries.commanders = [
-        {
-          card_digest: {
+        makeFakeCard({
+          cardDigest: {
             name: "Sidar Kondo of Jamuraa",
           },
-        },
-        {
-          card_digest: {
+        }),
+        makeFakeCard({
+          cardDigest: {
             name: "Tana the Bloodsower",
           },
-        },
+        }),
       ];
       await addEDHRecIframe(btn);
-      const changeHandler = mutation.change.mock.calls[0][1];
+      const changeHandler = mutationChangeSpy.mock.calls[0][1];
 
-      deckParser.hasLegalCommanders.mockClear();
+      hasLegalCommandersSpy.mockClear();
       addEntry({
         value: "1 Tana the Bloodsower",
       });
@@ -283,7 +289,7 @@ describe("addEDHRecIframe", function () {
 
       await changeHandler(commanderSection);
 
-      expect(deckParser.hasLegalCommanders).not.toBeCalled();
+      expect(hasLegalCommandersSpy).not.toBeCalled();
     });
 
     it("does not check commanders when section is not the commander section", async function () {
@@ -295,7 +301,7 @@ describe("addEDHRecIframe", function () {
       };
 
       await addEDHRecIframe(btn);
-      const changeHandler = mutation.change.mock.calls[0][1];
+      const changeHandler = mutationChangeSpy.mock.calls[0][1];
 
       await changeHandler(fakeEl);
 

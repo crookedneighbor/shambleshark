@@ -1,17 +1,24 @@
 import EDHRecSuggestions from "Features/deck-builder-features/edhrec-suggestions";
 import { getDeck } from "Lib/scryfall";
-import mutation from "Lib/mutation";
+import { ready, change } from "Lib/mutation";
 import iframe from "Lib/iframe";
+import { Deck } from "../../../src/js/types/deck";
+import SpyInstance = jest.SpyInstance;
 
 import { makeFakeDeck } from "Helpers/fake";
+import { mocked } from "ts-jest/utils";
 
 jest.mock("Lib/scryfall");
+jest.mock("Lib/mutation");
 
 describe("EDHRec Suggestions", function () {
   describe("run", function () {
-    let toolbar;
+    let toolbar: HTMLDivElement;
+    let getDeckSpy: SpyInstance;
+    let readySpy: SpyInstance;
 
     beforeEach(function () {
+      getDeckSpy = mocked(getDeck);
       toolbar = document.createElement("div");
       toolbar.classList.add("deckbuilder-toolbar-items-right");
       document.body.appendChild(toolbar);
@@ -21,7 +28,7 @@ describe("EDHRec Suggestions", function () {
       deckbuilderElement.id = "deckbuilder";
       document.body.appendChild(deckbuilderElement);
 
-      getDeck.mockResolvedValue(
+      getDeckSpy.mockResolvedValue(
         makeFakeDeck({
           primarySections: ["commanders", "nonlands"],
           secondarySections: ["lands", "maybeboard"],
@@ -30,15 +37,14 @@ describe("EDHRec Suggestions", function () {
           },
         })
       );
-      jest.spyOn(mutation, "change").mockImplementation();
-      jest.spyOn(mutation, "ready").mockImplementation((selector, cb) => {
+      readySpy = mocked(ready).mockImplementation((selector, cb) => {
         const el = document.createElement("div");
         el.innerText = "Commander(s)";
 
         cb(el);
       });
 
-      jest.spyOn(iframe, "create").mockResolvedValue();
+      jest.spyOn(iframe, "create").mockImplementation();
     });
 
     it("adds an edhrec button to the toolbar items on the page for a commander deck", async function () {
@@ -52,7 +58,7 @@ describe("EDHRec Suggestions", function () {
     it("does not add an edhrec button to the toolbar items on the page for a non-commander deck", async function () {
       const feature = new EDHRecSuggestions();
 
-      mutation.ready.mockImplementation((selector, cb) => {
+      readySpy.mockImplementation((selector, cb) => {
         const el = document.createElement("div");
         el.innerText = "Lands";
 

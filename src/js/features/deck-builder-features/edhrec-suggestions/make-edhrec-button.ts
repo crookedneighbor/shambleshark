@@ -6,6 +6,16 @@ import AddCardElement from "Ui/add-card-element";
 import Drawer from "Ui/drawer";
 import { getCardBySetCodeAndCollectorNumber, getDeck } from "Lib/scryfall";
 import { EDHREC_SYMBOL } from "Svg";
+import type { Card, Deck, DeckSections } from "Js/types/deck";
+import type {
+  EDHRecResponse,
+  EDHRecResponseHandler,
+  EDHRecSuggestion,
+  EDHRecError,
+  Suggestions,
+  Suggestion,
+  EDHRecSection,
+} from "Js/types/edhrec";
 
 const TYPE_ORDER = [
   "creature",
@@ -16,55 +26,53 @@ const TYPE_ORDER = [
   "planeswalker",
   "land",
 ];
-const TYPES_WITH_IRREGULAR_PLURALS = {
+const TYPES_WITH_IRREGULAR_PLURALS: Record<string, string> = {
   Sorcery: "Sorceries",
 };
 
-function filterOutInvalidCards(card) {
-  return card.card_digest;
+function isValidCard(card: Card): boolean {
+  return Boolean(card.card_digest);
 }
 
-function getCardName(card) {
-  return card.card_digest.name;
+function getCardName(card: Card): string {
+  return card.card_digest?.name || "";
 }
 
-function getCardsInDeck(entries) {
-  return Object.keys(entries).reduce((all, type) => {
-    // don't add commanders to decklist
-    if (type === "commanders") {
-      return all;
-    }
-
-    entries[type].filter(filterOutInvalidCards).forEach((card) => {
-      all.push(`${card.count} ${card.card_digest.name}`);
-    });
-
-    return all;
-  }, []);
+function getCardsInDeck(entries: Deck["entries"]) {
+  return Object.entries(entries)
+    .filter((value) => value[0] != "commanders")
+    .map((value) => value[1])
+    .flat()
+    .filter(isValidCard)
+    .map((card) => `${card.count} ${getCardName(card)}`);
 }
 
-function formatEDHRecSuggestions(list) {
-  return list.reduce((all, rec) => {
+function formatEDHRecSuggestions(list: EDHRecSuggestion[]): Suggestions {
+  return list.reduce<Suggestions>((suggestions, rec) => {
     const type = rec.primary_types[0];
     const name = rec.names.join(" // ");
-    const scryfallParts = rec.scryfall_uri.split("/card/")[1].split("/");
+    const [set, collectorNumber] = rec.scryfall_uri
+      .split("/card/")[1]
+      .split("/");
+    const img = rec.images[0];
+    const { price, salt, score } = rec;
 
-    all[name] = {
+    suggestions[name] = {
       name,
       type,
-      set: scryfallParts[0],
-      collectorNumber: scryfallParts[1],
-      img: rec.images[0],
-      price: rec.price,
-      salt: rec.salt,
-      score: rec.score,
+      set,
+      collectorNumber,
+      img,
+      price,
+      salt,
+      score,
     };
 
-    return all;
+    return suggestions;
   }, {});
 }
 
-function createErrorDrawerState(drawer, err) {
+function createErrorDrawerState(drawer: Drawer, err: EDHRecError) {
   drawer.setHeader("Something went wrong");
 
   const container = document.createElement("div");
@@ -91,29 +99,32 @@ function createErrorDrawerState(drawer, err) {
   drawer.setLoading(false);
 }
 
-function constructEDHRecSection(sectionId, cardType) {
-  const section = {
-    name: cardType,
-  };
-  const sectionTitle =
-    TYPES_WITH_IRREGULAR_PLURALS[section.name] || `${section.name}s`;
+function constructEDHRecSection(
+  sectionId: string,
+  cardType: string
+): EDHRecSection {
+  const sectionTitle = TYPES_WITH_IRREGULAR_PLURALS[cardType] || `${cardType}s`;
 
-  section.element = createElement(`<div
+  const element = createElement(`<div
     id="edhrec-suggestion-${sectionId}"
     class="edhrec-suggestions-container"
     >
       <h3 class="edhrec-suggestions-section-title">${sectionTitle}</h3>
       <div class="edhrec-suggestions"></div>
-  </div>`).firstChild;
+  </div>`).firstElementChild as HTMLDivElement;
 
-  section.cards = [];
-
-  return section;
+  return {
+    name: cardType,
+    element,
+    cards: [],
+  };
 }
 
 // TODO pull out into helper function
-
-function createEDHRecResponseHandler(drawer, deck) {
+function createEDHRecResponseHandler(
+  drawer: Drawer,
+  deck: Deck
+): EDHRecResponseHandler {
   return function ([err, result]) {
     if (err) {
       createErrorDrawerState(drawer, err);
@@ -125,13 +136,15 @@ function createEDHRecResponseHandler(drawer, deck) {
     // const cuts = formatEDHRecSuggestions(result.outRecs)
 
     const container = document.createElement("div");
-    const sections = {};
+    const sections: Record<string, EDHRecSection> = {};
     container.id = "edhrec-card-suggestions";
     const deckSectionChooser = new DeckSectionChooser({
       id: "edhrec-suggestions-section-chooser",
       deck,
     });
-    container.appendChild(deckSectionChooser.element);
+    // TODO shouldn't need to type this when the deck chooser is
+    // converted to typescript
+    container.appendChild(deckSectionChooser.element as HTMLDivElement);
     container.appendChild(document.createElement("hr"));
 
     Object.values(recomendations).forEach((card) => {
@@ -158,7 +171,8 @@ function createEDHRecResponseHandler(drawer, deck) {
             return cardFromScryfall.id;
           });
         },
-        onAddCard: (payload) => {
+        // TODO no any, address this when AddCardElement is converted to TS
+        onAddCard: (payload: { section: any }) => {
           const section = deckSectionChooser.getValue();
 
           if (section) {
@@ -177,10 +191,12 @@ function createEDHRecResponseHandler(drawer, deck) {
         return;
       }
 
-      const suggestions = section.element.querySelector(".edhrec-suggestions");
+      const suggestions = section.element.querySelector(
+        ".edhrec-suggestions"
+      ) as HTMLDivElement;
 
       section.cards.forEach((card) => {
-        suggestions.appendChild(card.cardElement.element);
+        suggestions.appendChild(card.cardElement?.element);
       });
       container.appendChild(section.element);
     });
@@ -190,13 +206,14 @@ function createEDHRecResponseHandler(drawer, deck) {
   };
 }
 
-function createDrawer(button) {
+function createDrawer(button: HTMLButtonElement) {
   const drawer = new Drawer({
     id: "edhrec-drawer",
     headerSymbol: EDHREC_SYMBOL,
     header: "EDHRec Suggestions",
     loadingMessage: "Loading EDHRec Suggestions",
-    onClose(drawerInstance) {
+    // TODO fix this type in Drawer class
+    onClose(drawerInstance: Drawer) {
       bus.emit(events.CLEAN_UP_DECK);
 
       // reset this in case the error state changes it
@@ -209,7 +226,7 @@ function createDrawer(button) {
     },
   });
   // TODO: the drawer class should probably handle this
-  document.getElementById("deckbuilder").appendChild(drawer.element);
+  document.getElementById("deckbuilder")?.appendChild(drawer.element);
 
   button.addEventListener("click", (e) => {
     e.preventDefault();
@@ -218,7 +235,7 @@ function createDrawer(button) {
 
     getDeck().then((deck) => {
       const commanders = deck.entries.commanders
-        .filter(filterOutInvalidCards)
+        ?.filter(isValidCard)
         .map(getCardName);
       const cardsInDeck = getCardsInDeck(deck.entries);
 
@@ -228,7 +245,9 @@ function createDrawer(button) {
           commanders,
           cards: cardsInDeck,
         },
-        createEDHRecResponseHandler(drawer, deck)
+        // TODO no any, not sure how to handle this correctly :(
+        // does framebus need to be updated?
+        createEDHRecResponseHandler(drawer, deck) as any
       );
     });
   });
@@ -245,7 +264,7 @@ export default function makeEDHRecButton() {
   >
     ${EDHREC_SYMBOL}
     <i>EDHRec Suggestions</i>
-</button>`).firstChild;
+</button>`).firstElementChild as HTMLButtonElement;
   createDrawer(button);
 
   return button;
