@@ -34,12 +34,12 @@ class EDHRecSuggestions extends Feature {
         }
 
         const edhRecButton = makeEDHRecButton();
-        const buttonsContainer = document.querySelector(
+        const buttonsContainer = document.querySelector<HTMLDivElement>(
           ".deckbuilder-toolbar-items-right"
         );
 
         addEDHRecIframe(edhRecButton);
-        buttonsContainer!.appendChild(edhRecButton);
+        buttonsContainer?.appendChild(edhRecButton);
 
         clearTimeout(timeout);
         resolve();
