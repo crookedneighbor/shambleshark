@@ -6,7 +6,16 @@ import AddCardElement from "Ui/add-card-element";
 import Drawer from "Ui/drawer";
 import { getCardBySetCodeAndCollectorNumber, getDeck } from "Lib/scryfall";
 import { EDHREC_SYMBOL } from "Svg";
-import { Card, Deck, DeckSections } from "Js/types/deck";
+import type { Card, Deck, DeckSections } from "Js/types/deck";
+import type {
+  EDHRecResponse,
+  EDHRecResponseHandler,
+  EDHRecSuggestion,
+  EDHRecError,
+  Suggestions,
+  Suggestion,
+  EDHRecSection,
+} from "Js/types/edhrec";
 
 const TYPE_ORDER = [
   "creature",
@@ -20,49 +29,6 @@ const TYPE_ORDER = [
 const TYPES_WITH_IRREGULAR_PLURALS: Record<string, string> = {
   Sorcery: "Sorceries",
 };
-
-export interface EDHRecResponse {
-  commanders: [];
-  outRecs: EDHRecSuggestion[];
-  inRecs: EDHRecSuggestion[];
-}
-
-export interface EDHRecSuggestion {
-  primary_types: string[];
-  names: string[];
-  scryfall_uri: string;
-  images: string[];
-  price: number;
-  salt: number;
-  score: number;
-}
-
-type EDHRecError = {
-  errors?: string[];
-  toString: () => string;
-};
-
-export interface Suggestion {
-  name: string;
-  type: string;
-  set: string;
-  collectorNumber: string;
-  img: string;
-  price: number;
-  salt: number;
-  score: number;
-  cardElement?: AddCardElement;
-}
-
-export interface Suggestions {
-  [name: string]: Suggestion;
-}
-
-export interface EDHRecSection {
-  name: string;
-  element: HTMLDivElement;
-  cards: Suggestion[];
-}
 
 function isValidCard(card: Card): boolean {
   return Boolean(card.card_digest);
@@ -155,11 +121,6 @@ function constructEDHRecSection(
 }
 
 // TODO pull out into helper function
-
-type EDHRecResponseHandler = (
-  args: [EDHRecError | null, EDHRecResponse]
-) => void;
-
 function createEDHRecResponseHandler(
   drawer: Drawer,
   deck: Deck

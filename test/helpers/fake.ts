@@ -1,6 +1,7 @@
 import shortid = require("shortid");
-import { Deck, Card, DeckSections } from "Js/types/deck";
-import type { EDHRecSuggestion } from "Features/deck-builder-features/edhrec-suggestions/make-edhrec-button";
+
+import type { Deck, Card, DeckSections } from "Js/types/deck";
+import type { EDHRecSuggestion } from "Js/types/edhrec";
 
 type FakeDeckOptions = Partial<Deck> & {
   primarySections?: DeckSections[];
