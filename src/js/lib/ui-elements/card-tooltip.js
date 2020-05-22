@@ -1,4 +1,4 @@
-import mutation from "Lib/mutation";
+import { ready as elementReady } from "Lib/mutation";
 
 let tooltipElement;
 
@@ -26,7 +26,7 @@ export default class CardTooltip {
     // TODO it's possible to hit a race condition here if multiple
     // features on the same page are using this where the tooltip
     // element never respnds a second time
-    mutation.ready("#card-tooltip", (tooltip) => {
+    elementReady("#card-tooltip", (tooltip) => {
       this.tooltipElement = tooltipElement = tooltip;
     });
   }

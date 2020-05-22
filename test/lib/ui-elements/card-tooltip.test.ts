@@ -1,5 +1,9 @@
-import mutation from "Lib/mutation";
+import { ready } from "Lib/mutation";
 import CardTooltip from "Ui/card-tooltip";
+
+import { mocked } from "ts-jest/utils";
+
+jest.mock("Lib/mutation");
 
 describe("CardTooltip", function () {
   beforeEach(function () {
@@ -17,7 +21,7 @@ describe("CardTooltip", function () {
 
     beforeEach(function () {
       fakeElement = document.createElement("div");
-      jest.spyOn(mutation, "ready").mockImplementation((selector, cb) => {
+      mocked(ready).mockImplementation((selector, cb) => {
         cb(fakeElement);
       });
       tooltip = new CardTooltip();
@@ -31,22 +35,19 @@ describe("CardTooltip", function () {
     it("waits for tooltip element to be available", function () {
       tooltip.findTooltip();
 
-      expect(mutation.ready).toBeCalledTimes(1);
-      expect(mutation.ready).toBeCalledWith(
-        "#card-tooltip",
-        expect.any(Function)
-      );
+      expect(ready).toBeCalledTimes(1);
+      expect(ready).toBeCalledWith("#card-tooltip", expect.any(Function));
     });
 
     it("skips waiting for tooltip element if it is already available", function () {
       tooltip.findTooltip();
 
-      expect(mutation.ready).toBeCalledTimes(1);
-      (mutation.ready as jest.Mock).mockClear();
+      expect(ready).toBeCalledTimes(1);
+      mocked(ready).mockClear();
 
       tooltip.findTooltip();
 
-      expect(mutation.ready).not.toBeCalled();
+      expect(ready).not.toBeCalled();
     });
   });
 

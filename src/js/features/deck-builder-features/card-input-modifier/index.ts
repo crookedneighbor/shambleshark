@@ -5,11 +5,12 @@ import {
   FEATURE_SECTIONS as sections,
 } from "Constants";
 import bus from "framebus";
-import mutation from "Lib/mutation";
+import { ready as elementReady } from "Lib/mutation";
 import { getDeck } from "Lib/scryfall";
 import deckParser from "Lib/deck-parser";
 import wait from "Lib/wait";
 import CardTooltip from "Ui/card-tooltip";
+import { Card, Deck } from "Js/types/deck";
 
 const CARD_EVENTS = [
   events.CALLED_CLEANUP,
@@ -19,6 +20,11 @@ const CARD_EVENTS = [
 ];
 
 class CardInputModifier extends Feature {
+  imageCache: Record<string, string>;
+  listeners: Record<string, Element>;
+  tooltip: CardTooltip;
+  _getEntriesPromise: Promise<Card[]> | undefined;
+
   static metadata = {
     id: ids.CardInputModifier,
     title: "Card Input Modifier",
@@ -46,9 +52,10 @@ class CardInputModifier extends Feature {
     this.listeners = {};
 
     this.tooltip = new CardTooltip({
-      onMouseover: (el) => {
-        const id = el.getAttribute("data-entry");
-        const img = this.imageCache[id];
+      // TODO eventually, card tooltip will set the type of element
+      onMouseover: (element: Element) => {
+        const id = element.getAttribute("data-entry");
+        const img = id && this.imageCache[id];
 
         if (!img) {
           return;
@@ -60,9 +67,9 @@ class CardInputModifier extends Feature {
   }
 
   async run() {
-    bus.on(events.CALLED_DESTROYENTRY, async (data) => {
+    bus.on(events.CALLED_DESTROYENTRY, async ({ payload }) => {
       // clean up our imageCache
-      delete this.imageCache[data.payload];
+      delete this.imageCache[payload as string];
     });
 
     CARD_EVENTS.forEach((eventName) => {
@@ -71,12 +78,12 @@ class CardInputModifier extends Feature {
       });
     });
 
-    mutation.ready(".deckbuilder-entry", (entry) => {
+    elementReady(".deckbuilder-entry", (entry) => {
       this.attachListenersToEntry(entry);
     });
   }
 
-  attachListenersToEntry(entry) {
+  attachListenersToEntry(entry: Element) {
     const id = entry.getAttribute("data-entry");
 
     if (!id) {
@@ -93,10 +100,10 @@ class CardInputModifier extends Feature {
     this.tooltip.addElement(entry);
   }
 
-  getEntries(bustCache) {
+  getEntries(bustCache = false) {
     if (!this._getEntriesPromise || bustCache) {
-      this._getEntriesPromise = getDeck().then((d) =>
-        deckParser.flattenEntries(d, {
+      this._getEntriesPromise = getDeck().then((deck) =>
+        deckParser.flattenEntries(deck, {
           idToGroupBy: "id",
         })
       );
@@ -105,32 +112,36 @@ class CardInputModifier extends Feature {
     return this._getEntriesPromise;
   }
 
-  async lookupImage(id, bustCache) {
+  async lookupImage(id: string, bustCache = false): Promise<string> {
     if (!bustCache && id in this.imageCache) {
       return Promise.resolve(this.imageCache[id]);
     }
 
-    const entries = await this.getEntries(bustCache);
+    const entries = await this.getEntries(!bustCache);
     const entry = entries.find((e) => e.id === id);
 
     if (!entry) {
-      return;
+      return "";
     }
 
-    const img = entry.card_digest && entry.card_digest.image;
+    const img = entry.card_digest?.image;
+
+    if (!img) {
+      return "";
+    }
 
     this.imageCache[id] = img;
 
     return img;
   }
 
-  async refreshCache() {
+  async refreshCache(): Promise<void> {
     // give Scryfall enough time to load new cards
     await wait(1000);
 
     const entries = await this.getEntries(true);
-    entries.forEach((entry) => {
-      this.imageCache[entry.id] = entry.card_digest && entry.card_digest.image;
+    entries?.forEach((entry) => {
+      this.imageCache[entry.id] = entry.card_digest?.image || "";
     });
   }
 }
