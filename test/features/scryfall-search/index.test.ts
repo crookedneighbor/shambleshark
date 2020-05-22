@@ -1,7 +1,7 @@
 import ScryfallSearch from "Features/deck-builder-features/scryfall-search";
 import deckParser from "Lib/deck-parser";
 import { getDeck, search } from "Lib/scryfall";
-import * as bus from "framebus";
+import bus from "framebus";
 import Drawer from "Lib/ui-elements/drawer";
 
 import { makeFakeDeck, makeFakeCard } from "Helpers/fake";

@@ -1,4 +1,4 @@
-import * as bus from "framebus";
+import bus from "framebus";
 import TaggerLink, {
   ShamblesharkRelationship,
   TaggerPayload,

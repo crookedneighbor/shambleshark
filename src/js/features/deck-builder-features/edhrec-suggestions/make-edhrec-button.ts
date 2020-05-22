@@ -1,4 +1,4 @@
-import * as bus from "framebus";
+import bus from "framebus";
 import { BUS_EVENTS as events } from "Constants";
 import createElement from "Lib/create-element";
 import DeckSectionChooser from "Ui/deck-section-chooser";

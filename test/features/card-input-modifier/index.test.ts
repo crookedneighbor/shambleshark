@@ -1,4 +1,4 @@
-import * as bus from "framebus";
+import bus from "framebus";
 import CardInputModifier from "Features/deck-builder-features/card-input-modifier";
 import deckParser from "Lib/deck-parser";
 import { getDeck } from "Lib/scryfall";

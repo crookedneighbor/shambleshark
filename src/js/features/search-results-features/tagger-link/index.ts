@@ -1,4 +1,4 @@
-import * as bus from "framebus";
+import bus from "framebus";
 import Feature, { SettingsDefaults } from "Feature";
 import {
   BUS_EVENTS as events,

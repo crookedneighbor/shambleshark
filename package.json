@@ -53,7 +53,7 @@
   "dependencies": {
     "bulma": "^0.8.2",
     "bulma-switch": "^2.0.0",
-    "framebus": "^3.0.2",
+    "framebus": "^4.0.0",
     "scryfall-client": "^0.14.2"
   }
 }

@@ -1,5 +1,5 @@
 import Feature, { SettingsDefaults } from "Feature";
-import * as bus from "framebus";
+import bus from "framebus";
 import {
   BUS_EVENTS as events,
   FEATURE_IDS as ids,

@@ -1,5 +1,5 @@
 import CleanUpImprover from "Features/deck-builder-features/clean-up-improver";
-import * as bus from "framebus";
+import bus from "framebus";
 
 describe("Clean Up Improver", function () {
   describe("run", function () {

@@ -4,7 +4,7 @@ import {
   BUS_EVENTS as events,
   FEATURE_SECTIONS as sections,
 } from "Constants";
-import * as bus from "framebus";
+import bus from "framebus";
 
 class CleanUpImprover extends Feature {
   static metadata = {

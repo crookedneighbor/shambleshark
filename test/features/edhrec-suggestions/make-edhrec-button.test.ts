@@ -1,4 +1,4 @@
-import * as bus from "framebus";
+import bus from "framebus";
 import makeEDHRecButton, {
   EDHRecResponse,
 } from "Features/deck-builder-features/edhrec-suggestions/make-edhrec-button";

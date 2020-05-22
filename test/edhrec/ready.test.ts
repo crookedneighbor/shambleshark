@@ -1,7 +1,11 @@
 import start from "Js/edhrec/ready";
 import iframe from "Lib/iframe";
 import wait from "Lib/wait";
-import * as bus from "framebus";
+import bus from "framebus";
+
+import { mocked } from "ts-jest/utils";
+
+jest.mock("framebus");
 
 describe("EDHRec Ready", function () {
   let replySpy: jest.Mock;
@@ -10,19 +14,19 @@ describe("EDHRec Ready", function () {
   beforeEach(function () {
     jest.spyOn(iframe, "isInsideIframe").mockReturnValue(true);
 
-    jest
-      .spyOn(bus, "on")
-      .mockImplementation((event: string, reply: Function) => {
-        const response = {
-          commanders: ["Arjun, the Shifting Flame"],
-          cards: ["1 foo", "1 bar"],
-        };
-        replySpy = jest.fn();
+    mocked(bus.on).mockImplementation((event, reply) => {
+      const response = {
+        commanders: ["Arjun, the Shifting Flame"],
+        cards: ["1 foo", "1 bar"],
+      };
+      replySpy = jest.fn();
 
-        if (event === "REQUEST_EDHREC_RECOMENDATIONS") {
-          reply(response, replySpy);
-        }
-      });
+      if (event === "REQUEST_EDHREC_RECOMENDATIONS") {
+        reply(response, replySpy);
+      }
+
+      return true;
+    });
     fetchSpy = jest.fn().mockResolvedValue("result");
     // jest doesn't have fetch on the window
     window.fetch = jest.fn().mockImplementation(

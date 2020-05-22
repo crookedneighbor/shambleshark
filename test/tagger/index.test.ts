@@ -1,6 +1,6 @@
 import start from "Js/scryfall/tagger";
 import iframe from "Lib/iframe";
-import * as bus from "framebus";
+import bus from "framebus";
 import SpyInstance = jest.SpyInstance;
 
 describe("Tagger", () => {
