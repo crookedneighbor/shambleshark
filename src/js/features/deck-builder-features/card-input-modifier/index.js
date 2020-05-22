@@ -4,7 +4,7 @@ import {
   FEATURE_IDS as ids,
   FEATURE_SECTIONS as sections,
 } from "Constants";
-import * as bus from "framebus";
+import bus from "framebus";
 import mutation from "Lib/mutation";
 import { getDeck } from "Lib/scryfall";
 import deckParser from "Lib/deck-parser";

@@ -2,7 +2,7 @@ import scryfall = require("scryfall-client");
 import type List from "scryfall-client/dist/models/list";
 import type Card from "scryfall-client/dist/models/card";
 import { getCollection, getDeck } from "Lib/scryfall";
-import * as bus from "framebus";
+import bus from "framebus";
 import { mocked } from "ts-jest/utils";
 
 import SpyInstance = jest.SpyInstance;
@@ -13,18 +13,22 @@ jest.mock("scryfall-client");
 
 describe("scryfall", function () {
   describe("getDeck", function () {
+    let emitSpy: jest.SpyInstance;
+
     beforeEach(function () {
       jest.useFakeTimers();
+      emitSpy = mocked(bus.emit);
     });
 
     afterEach(function () {
       jest.runAllTimers();
+      emitSpy.mockReset();
     });
 
     it("requests deck from Scryfall page", async function () {
       const deck = makeFakeDeck();
 
-      mocked(bus.emit).mockImplementation((event, cb) => {
+      emitSpy.mockImplementation((event, cb) => {
         cb(deck);
       });
 
@@ -38,10 +42,10 @@ describe("scryfall", function () {
       const firstDeck = makeFakeDeck();
       const secondDeck = makeFakeDeck();
 
-      mocked(bus.emit).mockImplementationOnce((event, cb) => {
+      emitSpy.mockImplementationOnce((event, cb) => {
         cb(firstDeck);
       });
-      mocked(bus.emit).mockImplementationOnce((event, cb) => {
+      emitSpy.mockImplementationOnce((event, cb) => {
         cb(secondDeck);
       });
 

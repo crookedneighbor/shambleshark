@@ -1,4 +1,4 @@
-import * as bus from "framebus";
+import bus from "framebus";
 import Feature from "Feature";
 import {
   BUS_EVENTS as events,

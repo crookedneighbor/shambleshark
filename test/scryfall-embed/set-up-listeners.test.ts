@@ -12,7 +12,7 @@ import {
 } from "Js/scryfall-embed/scryfall-globals";
 import modifyCleanUp from "Js/scryfall-embed/modify-clean-up";
 import setUpListeners from "Js/scryfall-embed/set-up-listeners";
-import * as bus from "framebus";
+import bus from "framebus";
 
 jest.mock("Js/scryfall-embed/scryfall-globals");
 

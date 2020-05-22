@@ -1,4 +1,4 @@
-import * as bus from "framebus";
+import bus from "framebus";
 import { BUS_EVENTS as events } from "Constants";
 import { Deck } from "Js/types/deck";
 import api = require("scryfall-client");
@@ -40,7 +40,9 @@ export function getDeck(): Promise<Deck> {
   }
 
   getDeckPromise = new Promise((resolve) => {
-    bus.emit(events.REQUEST_DECK, resolve);
+    bus.emit(events.REQUEST_DECK, (deck) => {
+      resolve(deck as Deck);
+    });
   });
 
   setTimeout(() => {
