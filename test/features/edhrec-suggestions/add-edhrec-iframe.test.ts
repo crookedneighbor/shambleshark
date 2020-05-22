@@ -6,7 +6,7 @@ import iframe from "Lib/iframe";
 import { Card, Deck } from "../../../src/js/types/deck";
 import SpyInstance = jest.SpyInstance;
 
-import { makeFakeDeck } from "Helpers/fake";
+import { makeFakeDeck, makeFakeCard } from "Helpers/fake";
 import { mocked } from "ts-jest/utils";
 
 jest.mock("Lib/scryfall");
@@ -100,19 +100,19 @@ describe("addEDHRecIframe", function () {
     };
 
     beforeEach(async () => {
-      fakeDeck = ({
+      fakeDeck = makeFakeDeck({
         entries: {
           commanders: [
-            ({
-              card_digest: {
+            makeFakeCard({
+              cardDigest: {
                 name: "Arjun, the Shifting Flame",
               },
-            } as any) as Card,
+            }),
           ],
           lands: [],
           nonlands: [],
         },
-      } as any) as Deck;
+      });
       commanderSection = document.createElement("div");
       commanderSection.innerHTML = `
         <div class="deckbuilder-section-title"></div>
@@ -147,11 +147,11 @@ describe("addEDHRecIframe", function () {
 
     it("enables the button entry has gone from illegal state to legal state", async function () {
       fakeDeck.entries.commanders = [
-        ({
+        makeFakeCard({
           card_digest: {
             name: "Food Chain",
           },
-        } as any) as Card,
+        }),
       ];
       addEntry({
         value: "1 Food Chain",
@@ -264,18 +264,18 @@ describe("addEDHRecIframe", function () {
     });
 
     it("does not check legality of commanders whe commander list is unchanged but in a different order", async function () {
-      fakeDeck.entries.commanders = ([
-        {
-          card_digest: {
+      fakeDeck.entries.commanders = [
+        makeFakeCard({
+          cardDigest: {
             name: "Sidar Kondo of Jamuraa",
           },
-        },
-        {
-          card_digest: {
+        }),
+        makeFakeCard({
+          cardDigest: {
             name: "Tana the Bloodsower",
           },
-        },
-      ] as any[]) as Card[];
+        }),
+      ];
       await addEDHRecIframe(btn);
       const changeHandler = mutationChangeSpy.mock.calls[0][1];
 

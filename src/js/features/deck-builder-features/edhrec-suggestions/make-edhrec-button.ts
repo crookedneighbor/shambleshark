@@ -37,6 +37,11 @@ export interface EDHRecSuggestion {
   score: number;
 }
 
+type EDHRecError = {
+  errors?: string[];
+  toString: () => string;
+};
+
 export interface Suggestion {
   name: string;
   type: string;
@@ -64,10 +69,10 @@ function isValidCard(card: Card): boolean {
 }
 
 function getCardName(card: Card): string {
-  return card.card_digest?.name || "Invalid card";
+  return card.card_digest?.name || "";
 }
 
-function getCardsInDeck(entries: { [section in DeckSections]?: Card[] }) {
+function getCardsInDeck(entries: Deck["entries"]) {
   return Object.entries(entries)
     .filter((value) => value[0] != "commanders")
     .map((value) => value[1])
@@ -101,10 +106,7 @@ function formatEDHRecSuggestions(list: EDHRecSuggestion[]): Suggestions {
   }, {});
 }
 
-function createErrorDrawerState(
-  drawer: Drawer,
-  err: { errors: string[]; toString: () => string }
-) {
+function createErrorDrawerState(drawer: Drawer, err: EDHRecError) {
   drawer.setHeader("Something went wrong");
 
   const container = document.createElement("div");
@@ -154,11 +156,15 @@ function constructEDHRecSection(
 
 // TODO pull out into helper function
 
-function createEDHRecResponseHandler(drawer: Drawer, deck: Deck) {
-  return function ([err, result]: [
-    { errors: string[]; toString: () => string },
-    EDHRecResponse
-  ]) {
+type EDHRecResponseHandler = (
+  args: [EDHRecError | null, EDHRecResponse]
+) => void;
+
+function createEDHRecResponseHandler(
+  drawer: Drawer,
+  deck: Deck
+): EDHRecResponseHandler {
+  return function ([err, result]) {
     if (err) {
       createErrorDrawerState(drawer, err);
       return;
@@ -169,12 +175,14 @@ function createEDHRecResponseHandler(drawer: Drawer, deck: Deck) {
     // const cuts = formatEDHRecSuggestions(result.outRecs)
 
     const container = document.createElement("div");
-    const sections: { [id: string]: EDHRecSection } = {};
+    const sections: Record<string, EDHRecSection> = {};
     container.id = "edhrec-card-suggestions";
     const deckSectionChooser = new DeckSectionChooser({
       id: "edhrec-suggestions-section-chooser",
       deck,
     });
+    // TODO shouldn't need to type this when the deck chooser is
+    // converted to typescript
     container.appendChild(deckSectionChooser.element as HTMLDivElement);
     container.appendChild(document.createElement("hr"));
 
@@ -202,6 +210,7 @@ function createEDHRecResponseHandler(drawer: Drawer, deck: Deck) {
             return cardFromScryfall.id;
           });
         },
+        // TODO no any, address this when AddCardElement is converted to TS
         onAddCard: (payload: { section: any }) => {
           const section = deckSectionChooser.getValue();
 
@@ -242,6 +251,7 @@ function createDrawer(button: HTMLButtonElement) {
     headerSymbol: EDHREC_SYMBOL,
     header: "EDHRec Suggestions",
     loadingMessage: "Loading EDHRec Suggestions",
+    // TODO fix this type in Drawer class
     onClose(drawerInstance: Drawer) {
       bus.emit(events.CLEAN_UP_DECK);
 
@@ -274,7 +284,8 @@ function createDrawer(button: HTMLButtonElement) {
           commanders,
           cards: cardsInDeck,
         },
-        // TODO no any
+        // TODO no any, not sure how to handle this correctly :(
+        // does framebus need to be updated?
         createEDHRecResponseHandler(drawer, deck) as any
       );
     });
