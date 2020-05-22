@@ -8,7 +8,7 @@ import {
 } from "Constants";
 import iframe from "Lib/iframe";
 import createElement from "Lib/create-element";
-import mutation from "Lib/mutation";
+import { ready as elementReady } from "Lib/mutation";
 import { sortByAttribute } from "Lib/sort";
 import "./index.css";
 
@@ -154,7 +154,7 @@ class TaggerLink extends Feature {
   }
 
   setupButtons() {
-    mutation.ready<HTMLAnchorElement>(
+    elementReady<HTMLAnchorElement>(
       ".card-grid-item a.card-grid-item-card",
       (link) => {
         const button = this.makeButton(link.href);

@@ -1,7 +1,7 @@
 import Feature from "Feature";
 import makeEDHRecButton from "./make-edhrec-button";
 import addEDHRecIframe from "./add-edhrec-iframe";
-import mutation from "Lib/mutation";
+import { ready as elementReady } from "Lib/mutation";
 import { FEATURE_IDS as ids, FEATURE_SECTIONS as sections } from "Constants";
 
 import "./index.css";
@@ -25,7 +25,7 @@ class EDHRecSuggestions extends Feature {
     return new Promise<void>(function (resolve, reject) {
       const timeout = setTimeout(reject, TIMEOUT_TO_CONTINUE);
 
-      mutation.ready(".deckbuilder-section-title", async function (title) {
+      elementReady(".deckbuilder-section-title", async function (title) {
         // TODO support oathbreaker as well
         if (title.innerText.toLowerCase().indexOf("commander") === -1) {
           // only run this code once deck has loaded and we are reasonably

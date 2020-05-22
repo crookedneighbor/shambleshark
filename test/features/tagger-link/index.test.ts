@@ -4,7 +4,7 @@ import TaggerLink, {
   TaggerPayload,
 } from "Features/search-results-features/tagger-link";
 import iframe from "Lib/iframe";
-import mutation from "Lib/mutation";
+import { ready } from "Lib/mutation";
 
 import {
   ILLUSTRATION_SYMBOL,
@@ -23,6 +23,7 @@ import SpyInstance = jest.SpyInstance;
 import { mocked } from "ts-jest/utils";
 
 jest.mock("framebus");
+jest.mock("Lib/mutation");
 
 describe("Tagger Link", function () {
   describe("run", function () {
@@ -30,7 +31,6 @@ describe("Tagger Link", function () {
     let settingsSpy: SpyInstance;
 
     beforeEach(function () {
-      jest.spyOn(mutation, "ready").mockImplementation();
       busSpy = mocked(bus.on).mockImplementation((event, cb) => {
         // TODO no data is actually passed here... why does framebus typing care?
         cb({}, () => {});
@@ -99,7 +99,7 @@ describe("Tagger Link", function () {
     let buttonSpy: SpyInstance;
 
     beforeEach(function () {
-      readySpy = jest.spyOn(mutation, "ready").mockImplementation();
+      readySpy = mocked(ready);
       buttonSpy = jest
         .spyOn(TaggerLink.prototype, "makeButton")
         .mockReturnValue(document.createElement("button"));
@@ -110,8 +110,8 @@ describe("Tagger Link", function () {
 
       await tl.setupButtons();
 
-      expect(mutation.ready).toBeCalledTimes(1);
-      expect(mutation.ready).toBeCalledWith(
+      expect(ready).toBeCalledTimes(1);
+      expect(ready).toBeCalledWith(
         ".card-grid-item a.card-grid-item-card",
         expect.any(Function)
       );

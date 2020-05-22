@@ -1,6 +1,6 @@
 import addEDHRecIframe from "Features/deck-builder-features/edhrec-suggestions/add-edhrec-iframe";
 import deckParser from "../../../src/js/lib/deck-parser";
-import mutation from "Lib/mutation";
+import { change } from "Lib/mutation";
 import { getDeck } from "Lib/scryfall";
 import iframe from "Lib/iframe";
 import { Card, Deck } from "../../../src/js/types/deck";
@@ -10,6 +10,7 @@ import { makeFakeDeck } from "Helpers/fake";
 import { mocked } from "ts-jest/utils";
 
 jest.mock("Lib/scryfall");
+jest.mock("Lib/mutation");
 
 describe("addEDHRecIframe", function () {
   let btn: HTMLButtonElement;
@@ -36,7 +37,7 @@ describe("addEDHRecIframe", function () {
     jest
       .spyOn(deckParser, "getSections")
       .mockReturnValue(["commanders", "lands", "nonlands", "maybeboard"]);
-    mutationChangeSpy = jest.spyOn(mutation, "change").mockImplementation();
+    mutationChangeSpy = mocked(change);
 
     const deckbuilderElement = document.createElement("div");
     deckbuilderElement.id = "deckbuilder";

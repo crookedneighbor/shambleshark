@@ -5,7 +5,7 @@ import {
   FEATURE_SECTIONS as sections,
 } from "Constants";
 import bus from "framebus";
-import mutation from "Lib/mutation";
+import { ready as elementReady } from "Lib/mutation";
 import { getDeck } from "Lib/scryfall";
 import deckParser from "Lib/deck-parser";
 import wait from "Lib/wait";
@@ -78,7 +78,7 @@ class CardInputModifier extends Feature {
       });
     });
 
-    mutation.ready(".deckbuilder-entry", (entry: Element) => {
+    elementReady(".deckbuilder-entry", (entry) => {
       this.attachListenersToEntry(entry);
     });
   }
@@ -100,9 +100,9 @@ class CardInputModifier extends Feature {
     this.tooltip.addElement(entry);
   }
 
-  getEntries(bustCache?: boolean) {
+  getEntries(bustCache = false) {
     if (!this._getEntriesPromise || bustCache) {
-      this._getEntriesPromise = getDeck().then((deck: Deck) =>
+      this._getEntriesPromise = getDeck().then((deck) =>
         deckParser.flattenEntries(deck, {
           idToGroupBy: "id",
         })
@@ -112,19 +112,23 @@ class CardInputModifier extends Feature {
     return this._getEntriesPromise;
   }
 
-  async lookupImage(id: string, bustCache?: boolean): Promise<string> {
+  async lookupImage(id: string, bustCache = false): Promise<string> {
     if (!bustCache && id in this.imageCache) {
       return Promise.resolve(this.imageCache[id]);
     }
 
     const entries = await this.getEntries(!bustCache);
-    const entry = entries && entries.find((e) => e.id === id);
+    const entry = entries.find((e) => e.id === id);
 
     if (!entry) {
       return "";
     }
 
-    const img = (entry as any).card_digest?.image;
+    const img = entry.card_digest?.image;
+
+    if (!img) {
+      return "";
+    }
 
     this.imageCache[id] = img;
 

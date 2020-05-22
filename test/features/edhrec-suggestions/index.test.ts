@@ -1,6 +1,6 @@
 import EDHRecSuggestions from "Features/deck-builder-features/edhrec-suggestions";
 import { getDeck } from "Lib/scryfall";
-import mutation from "Lib/mutation";
+import { ready, change } from "Lib/mutation";
 import iframe from "Lib/iframe";
 import { Deck } from "../../../src/js/types/deck";
 import SpyInstance = jest.SpyInstance;
@@ -9,6 +9,7 @@ import { makeFakeDeck } from "Helpers/fake";
 import { mocked } from "ts-jest/utils";
 
 jest.mock("Lib/scryfall");
+jest.mock("Lib/mutation");
 
 describe("EDHRec Suggestions", function () {
   describe("run", function () {
@@ -36,15 +37,12 @@ describe("EDHRec Suggestions", function () {
           },
         })
       );
-      jest.spyOn(mutation, "change").mockImplementation();
-      readySpy = jest
-        .spyOn(mutation, "ready")
-        .mockImplementation((selector, cb) => {
-          const el = document.createElement("div");
-          el.innerText = "Commander(s)";
+      readySpy = mocked(ready).mockImplementation((selector, cb) => {
+        const el = document.createElement("div");
+        el.innerText = "Commander(s)";
 
-          cb(el);
-        });
+        cb(el);
+      });
 
       jest.spyOn(iframe, "create").mockImplementation();
     });

@@ -1,5 +1,5 @@
 import Feature from "Feature";
-import mutation from "Lib/mutation";
+import { ready as elementReady } from "Lib/mutation";
 import { Identifier, getCollection } from "Lib/scryfall";
 import { sortByAttribute } from "Lib/sort";
 import createElement from "Lib/create-element";
@@ -41,7 +41,7 @@ class TokenList extends Feature {
   async run(): Promise<void> {
     // TODO this doesn't work with current implementation of mutation.ready
     // in that subsequent calls to ready will not work
-    mutation.ready<HTMLDivElement>(
+    elementReady<HTMLDivElement>(
       "#shambleshark-deck-display-sidebar-toolbox",
       async (container) => {
         this.createUI(container);

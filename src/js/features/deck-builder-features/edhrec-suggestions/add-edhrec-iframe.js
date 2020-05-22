@@ -1,4 +1,4 @@
-import mutation from "Lib/mutation";
+import { change as elementChange } from "Lib/mutation";
 import { getDeck } from "Lib/scryfall";
 import deckParser from "Lib/deck-parser";
 import iframe from "Lib/iframe";
@@ -33,7 +33,7 @@ async function setDisabledState(button, commanders) {
 }
 
 function updateButtonStateOnCommanderChange(button, commanders) {
-  mutation.change(
+  elementChange(
     ".deckbuilder-editor-inner .deckbuilder-column .deckbuilder-section",
     async (el) => {
       const title = el.querySelector(".deckbuilder-section-title");

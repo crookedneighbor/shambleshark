@@ -1,11 +1,11 @@
-import mutation from "Lib/mutation";
+import { ready as elementReady } from "Lib/mutation";
 import createElement from "Lib/create-element";
 import link from "ExtensionsLink";
 
 import "./contact-page.css";
 
 export default function () {
-  mutation.ready(".control-panel-content", (panel) => {
+  elementReady(".control-panel-content", (panel) => {
     const warning = createElement(`<div class="form-n">
       <h1 class="form-n-title">IMPORTANT! Read this first!</h1>
 

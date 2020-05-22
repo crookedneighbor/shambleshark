@@ -1,6 +1,6 @@
 import bus from "framebus";
 import deckViewFeatures from "Features/deck-view-features";
-import mutation from "Lib/mutation";
+import { ready as elementReady } from "Lib/mutation";
 import createElement from "Lib/create-element";
 import { BUS_EVENTS as events } from "Constants";
 
@@ -8,7 +8,7 @@ function addContainerForSidebarFeatures() {
   const section = createElement(`<div id="shambleshark-deck-display-sidebar-toolbox" class="sidebar-toolbox">
   </div>`).firstChild;
 
-  mutation.ready(".sidebar", (container) => {
+  elementReady(".sidebar", (container) => {
     container.appendChild(section);
   });
 }

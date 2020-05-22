@@ -5,7 +5,6 @@ import makeEDHRecButton, {
 import deckParser from "Lib/deck-parser";
 import wait from "Lib/wait";
 import Drawer from "Lib/ui-elements/drawer";
-import mutation from "Lib/mutation";
 import { getCardBySetCodeAndCollectorNumber, getDeck } from "Lib/scryfall";
 
 import { makeFakeDeck } from "Helpers/fake";
@@ -13,6 +12,7 @@ import { mocked } from "ts-jest/utils";
 import { Card, Deck, DeckSections } from "../../../src/js/types/deck";
 
 jest.mock("Lib/scryfall");
+jest.mock("Lib/mutation");
 jest.mock("framebus");
 
 describe("makeEDHRecButton", function () {
@@ -33,7 +33,6 @@ describe("makeEDHRecButton", function () {
     jest
       .spyOn(deckParser, "getSections")
       .mockReturnValue(["commanders", "lands", "nonlands", "maybeboard"]);
-    jest.spyOn(mutation, "change").mockImplementation();
 
     const deckbuilderElement = document.createElement("div");
     deckbuilderElement.id = "deckbuilder";

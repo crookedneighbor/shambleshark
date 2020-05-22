@@ -1,5 +1,5 @@
 import TokenList, { Token } from "Features/deck-view-features/token-list";
-import mutation from "Lib/mutation";
+import { ready } from "Lib/mutation";
 import { getCollection } from "Lib/scryfall";
 import wait from "Lib/wait";
 import SpyInstance = jest.SpyInstance;
@@ -7,6 +7,7 @@ import Modal from "Lib/ui-elements/modal";
 import { mocked } from "ts-jest/utils";
 
 jest.mock("Lib/scryfall");
+jest.mock("Lib/mutation");
 
 describe("Token List", function () {
   let tl: TokenList;
@@ -24,11 +25,9 @@ describe("Token List", function () {
 
     beforeEach(function () {
       container = document.createElement("div") as HTMLDivElement;
-      readySpy = jest
-        .spyOn(mutation, "ready")
-        .mockImplementation((selector, cb) => {
-          cb(container);
-        });
+      readySpy = mocked(ready).mockImplementation((selector, cb) => {
+        cb(container);
+      });
       elements = [];
 
       jest.spyOn(tl, "createUI").mockImplementation();

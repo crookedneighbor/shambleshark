@@ -2,23 +2,23 @@ import bus from "framebus";
 import CardInputModifier from "Features/deck-builder-features/card-input-modifier";
 import deckParser from "Lib/deck-parser";
 import { getDeck } from "Lib/scryfall";
-import mutation from "Lib/mutation";
+import { ready } from "Lib/mutation";
 import wait from "Lib/wait";
-import SpyInstance = jest.SpyInstance;
 
 import { makeFakeDeck } from "Helpers/fake";
 import { Card } from "../../../src/js/types/deck";
 import { mocked } from "ts-jest/utils";
 
 jest.mock("Lib/scryfall");
+jest.mock("Lib/mutation");
 jest.mock("framebus");
 
 describe("Card Input Modifier", function () {
   let cim: CardInputModifier;
 
-  let getDeckSpy: SpyInstance;
-  let flattenEntriesSpy: SpyInstance;
-  let busOnSpy: SpyInstance;
+  let getDeckSpy: jest.SpyInstance;
+  let flattenEntriesSpy: jest.SpyInstance;
+  let busOnSpy: jest.SpyInstance;
 
   beforeEach(function () {
     cim = new CardInputModifier();
@@ -57,11 +57,10 @@ describe("Card Input Modifier", function () {
 
   describe("run", function () {
     let fakeEntry: HTMLElement;
-
-    let readySpy: SpyInstance;
+    let readySpy: jest.SpyInstance;
 
     beforeEach(function () {
-      readySpy = jest.spyOn(mutation, "ready").mockImplementation();
+      readySpy = mocked(ready);
 
       fakeEntry = document.createElement("div");
       fakeEntry.setAttribute("data-entry", "entry-id");
@@ -72,7 +71,7 @@ describe("Card Input Modifier", function () {
 
     it("waits for new deckbuilder entries to attach listeners", async function () {
       const secondFakeEntry = document.createElement("div");
-      readySpy.mockImplementation((name: string, fn: Function) => {
+      readySpy.mockImplementation((name, fn) => {
         if (name === ".deckbuilder-entry") {
           fn(fakeEntry);
           fn(secondFakeEntry);
@@ -82,10 +81,7 @@ describe("Card Input Modifier", function () {
 
       await cim.run();
 
-      expect(mutation.ready).toBeCalledWith(
-        ".deckbuilder-entry",
-        expect.any(Function)
-      );
+      expect(ready).toBeCalledWith(".deckbuilder-entry", expect.any(Function));
 
       await wait();
 
