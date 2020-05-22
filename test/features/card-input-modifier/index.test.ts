@@ -326,10 +326,10 @@ describe("Card Input Modifier", function () {
             image: "https://example.com/bar",
           },
         },
-        ({
+        {
           id: "baz",
-        } as any) as Card,
-      ] as Card[]);
+        },
+      ]);
       cim.imageCache.foo = "https://example.com/cached-foo";
 
       jest.useFakeTimers();
