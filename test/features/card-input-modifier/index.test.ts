@@ -11,6 +11,7 @@ import { Card } from "../../../src/js/types/deck";
 import { mocked } from "ts-jest/utils";
 
 jest.mock("Lib/scryfall");
+jest.mock("framebus");
 
 describe("Card Input Modifier", function () {
   let cim: CardInputModifier;

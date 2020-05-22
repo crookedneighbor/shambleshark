@@ -22,6 +22,8 @@ import {
 import SpyInstance = jest.SpyInstance;
 import { mocked } from "ts-jest/utils";
 
+jest.mock("framebus");
+
 describe("Tagger Link", function () {
   describe("run", function () {
     let busSpy: SpyInstance;
@@ -29,7 +31,12 @@ describe("Tagger Link", function () {
 
     beforeEach(function () {
       jest.spyOn(mutation, "ready").mockImplementation();
-      busSpy = jest.spyOn(bus, "on").mockImplementation((event, cb) => cb());
+      busSpy = mocked(bus.on).mockImplementation((event, cb) => {
+        // TODO no data is actually passed here... why does framebus typing care?
+        cb({}, () => {});
+
+        return true;
+      });
       jest.spyOn(iframe, "create").mockImplementation();
       jest.spyOn(TaggerLink.prototype, "setupButtons").mockImplementation();
       settingsSpy = jest.spyOn(TaggerLink, "getSettings").mockResolvedValue({

@@ -272,7 +272,8 @@ function createDrawer(button: HTMLButtonElement) {
           commanders,
           cards: cardsInDeck,
         },
-        createEDHRecResponseHandler(drawer, deck)
+        // TODO no any
+        createEDHRecResponseHandler(drawer, deck) as any
       );
     });
   });

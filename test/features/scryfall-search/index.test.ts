@@ -9,6 +9,7 @@ import { mocked } from "ts-jest/utils";
 import DialogInterface from "../../../src/js/lib/ui-elements/dialog-interface";
 
 jest.mock("Lib/scryfall");
+jest.mock("framebus");
 
 describe("Scryfall Search", function () {
   describe("run", function () {
@@ -100,8 +101,6 @@ describe("Scryfall Search", function () {
     it("triggers cleanup on close", function () {
       const ss = new ScryfallSearch();
       const drawer = ss.createDrawer();
-
-      jest.spyOn(bus, "emit").mockReturnValue();
 
       drawer.triggerOnClose();
 

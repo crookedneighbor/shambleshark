@@ -67,9 +67,9 @@ class CardInputModifier extends Feature {
   }
 
   async run() {
-    bus.on(events.CALLED_DESTROYENTRY, async (data: { payload: string }) => {
+    bus.on(events.CALLED_DESTROYENTRY, async ({ payload }) => {
       // clean up our imageCache
-      delete this.imageCache[data.payload];
+      delete this.imageCache[payload as string];
     });
 
     CARD_EVENTS.forEach((eventName) => {

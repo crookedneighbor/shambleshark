@@ -13,14 +13,13 @@ import { mocked } from "ts-jest/utils";
 import { Card, Deck, DeckSections } from "../../../src/js/types/deck";
 
 jest.mock("Lib/scryfall");
+jest.mock("framebus");
 
 describe("makeEDHRecButton", function () {
   let getCardSpy: jest.SpyInstance;
   let getDeckSpy: jest.SpyInstance;
 
   beforeEach(function () {
-    jest.spyOn(bus, "on");
-    jest.spyOn(bus, "emit");
     getCardSpy = mocked(getCardBySetCodeAndCollectorNumber);
     getDeckSpy = mocked(getDeck).mockResolvedValue(
       makeFakeDeck({
@@ -213,10 +212,12 @@ describe("makeEDHRecButton", function () {
           },
         ],
       };
-      mocked(bus).emit.mockImplementation(function (eventName, payload, reply) {
+      mocked(bus.emit).mockImplementation(function (eventName, payload, reply) {
         if (eventName === "REQUEST_EDHREC_RECOMENDATIONS") {
-          reply([null, fakeEDHRecResponse]);
+          reply!([null, fakeEDHRecResponse]);
         }
+
+        return true;
       });
 
       getDeckSpy.mockResolvedValue(fakeDeck);
@@ -228,7 +229,6 @@ describe("makeEDHRecButton", function () {
     });
 
     it("opens the drawer", function () {
-      mocked(bus).emit.mockImplementation();
       const btn = makeEDHRecButton();
 
       jest.spyOn(Drawer.prototype, "open");
@@ -239,15 +239,14 @@ describe("makeEDHRecButton", function () {
     });
 
     it("emits a request for EDHRec recomendations with deck data", async function () {
-      mocked(bus).emit.mockImplementation();
       const btn = await makeEDHRecButton();
 
       click(btn);
 
       await wait();
 
-      expect(mocked(bus).emit).toBeCalledTimes(1);
-      expect(mocked(bus).emit).toBeCalledWith(
+      expect(bus.emit).toBeCalledTimes(1);
+      expect(bus.emit).toBeCalledWith(
         "REQUEST_EDHREC_RECOMENDATIONS",
         {
           commanders: ["Arjun, the Shifting Flame"],
@@ -258,7 +257,6 @@ describe("makeEDHRecButton", function () {
     });
 
     it("attempts any number of cards in command zone", async function () {
-      mocked(bus).emit.mockImplementation();
       fakeDeck.entries!.commanders = [
         {
           id: "sidar-id",
@@ -302,7 +300,6 @@ describe("makeEDHRecButton", function () {
     });
 
     it("does not error when cards in deck are missing the card_digest", async function () {
-      mocked(bus).emit.mockImplementation();
       fakeDeck.entries?.lands?.push(
         {
           foo: "bar",
@@ -344,10 +341,12 @@ describe("makeEDHRecButton", function () {
     });
 
     it("displays generic error when edhrec request errors", async function () {
-      mocked(bus).emit.mockImplementation(function (eventName, payload, reply) {
+      mocked(bus.emit).mockImplementation(function (eventName, payload, reply) {
         const err = new Error("network error");
 
-        reply([err]);
+        reply!([err]);
+
+        return true;
       });
       jest.spyOn(Drawer.prototype, "setContent");
 
@@ -363,12 +362,14 @@ describe("makeEDHRecButton", function () {
     });
 
     it("displays specific error when edhrec request errors with specific errors", async function () {
-      mocked(bus).emit.mockImplementation(function (eventName, payload, reply) {
+      mocked(bus.emit).mockImplementation((eventName, payload, reply) => {
         const err = {
           errors: ["1 error", "2 error"],
         };
 
-        reply([err]);
+        reply!([err]);
+
+        return true;
       });
       jest.spyOn(Drawer.prototype, "setContent");
 
