@@ -17,7 +17,7 @@ const TYPE_ORDER = [
   "planeswalker",
   "land",
 ];
-const TYPES_WITH_IRREGULAR_PLURALS: { [name: string]: string } = {
+const TYPES_WITH_IRREGULAR_PLURALS: Record<string, string> = {
   Sorcery: "Sorceries",
 };
 
@@ -30,13 +30,11 @@ export interface EDHRecResponse {
 export interface EDHRecSuggestion {
   primary_types: string[];
   names: string[];
-  sanitized: string;
   scryfall_uri: string;
   images: string[];
   price: number;
   salt: number;
   score: number;
-  [key: string]: any;
 }
 
 export interface Suggestion {
@@ -51,17 +49,21 @@ export interface Suggestion {
   cardElement?: AddCardElement;
 }
 
+export interface Suggestions {
+  [name: string]: Suggestion;
+}
+
 export interface EDHRecSection {
   name: string;
   element: HTMLDivElement;
   cards: Suggestion[];
 }
 
-function isValidCard(card: Card) {
+function isValidCard(card: Card): boolean {
   return Boolean(card.card_digest);
 }
 
-function getCardName(card: Card) {
+function getCardName(card: Card): string {
   return card.card_digest?.name || "Invalid card";
 }
 
@@ -74,8 +76,8 @@ function getCardsInDeck(entries: { [section in DeckSections]?: Card[] }) {
     .map((card) => `${card.count} ${getCardName(card)}`);
 }
 
-function formatEDHRecSuggestions(list: EDHRecSuggestion[]) {
-  return list.reduce((suggestions: { [name: string]: Suggestion }, rec) => {
+function formatEDHRecSuggestions(list: EDHRecSuggestion[]): Suggestions {
+  return list.reduce<Suggestions>((suggestions, rec) => {
     const type = rec.primary_types[0];
     const name = rec.names.join(" // ");
     const [set, collectorNumber] = rec.scryfall_uri

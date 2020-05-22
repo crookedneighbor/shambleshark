@@ -7,7 +7,11 @@ import wait from "Lib/wait";
 import Drawer from "Lib/ui-elements/drawer";
 import { getCardBySetCodeAndCollectorNumber, getDeck } from "Lib/scryfall";
 
-import { makeFakeDeck } from "Helpers/fake";
+import {
+  makeFakeCard,
+  makeFakeDeck,
+  makeFakeEDHRecSuggestion,
+} from "Helpers/fake";
 import { mocked } from "ts-jest/utils";
 import { Card, Deck, DeckSections } from "../../../src/js/types/deck";
 
@@ -103,36 +107,38 @@ describe("makeEDHRecButton", function () {
         btn.dispatchEvent(evObj);
       };
 
-      fakeDeck = {
+      fakeDeck = makeFakeDeck({
+        primarySections: ["commanders", "nonlands"],
+        secondarySections: ["lands"],
         entries: {
           commanders: [
-            {
+            makeFakeCard({
               id: "arjun-id",
-              card_digest: {
+              cardDigest: {
                 name: "Arjun, the Shifting Flame",
               },
-            },
+            }),
           ],
           lands: [
-            {
+            makeFakeCard({
               id: "reliquary-tower",
               count: 1,
-              card_digest: {
+              cardDigest: {
                 name: "Reliquary Tower",
               },
-            },
+            }),
           ],
           nonlands: [
-            {
+            makeFakeCard({
               id: "obstinate-familiar",
               count: 1,
-              card_digest: {
+              cardDigest: {
                 name: "Obstinate Familiar",
               },
-            },
+            }),
           ],
-        } as { [section in DeckSections]: Card[] },
-      };
+        },
+      });
       fakeEDHRecResponse = {
         commanders: [
           // irrelevant
@@ -141,74 +147,33 @@ describe("makeEDHRecButton", function () {
           // TODO future improvement
         ],
         inRecs: [
-          {
-            sanitized: "arcane-signet",
+          makeFakeEDHRecSuggestion({
             scryfall_uri:
               "https://scryfall.com/card/eld/331/arcane-signet?utm_source=api",
-            type: "artifact",
-            cmc: 2,
             names: ["Arcane Signet"],
             primary_types: ["Artifact"],
-            price: 19.99,
-            color_identity: [],
-            salt: 0,
-            tcgplayer: {
-              url:
-                "https://store.tcgplayer.com/magic/throne-of-eldraine/arcane-signet?partner=EDHREC&utm_campaign=affiliate&utm_medium=EDHREC&utm_source=EDHREC",
-              name: "arcane signet",
-              price: 11.4,
-            },
             images: [
               "https://img.scryfall.com/cards/normal/front/8/4/84128e98-87d6-4c2f-909b-9435a7833e63.jpg?1567631723",
             ],
-            name: "Arcane Signet",
-            cmcs: [2],
-            color_id: [],
-            score: 73,
-          },
-          {
-            sanitized: "shivan-reef",
+          }),
+          makeFakeEDHRecSuggestion({
             scryfall_uri:
               "https://scryfall.com/card/ori/251/shivan-reef?utm_source=api",
-            type: "land",
-            cmc: 0,
             names: ["Shivan Reef"],
             primary_types: ["Land"],
-            price: 1.99,
-            color_identity: ["R", "U"],
-            salt: 0.13793103448275862,
             images: [
               "https://img.scryfall.com/cards/normal/front/f/1/f1d33afd-6f2a-43c8-ae5d-17a0674fcdd3.jpg?1562049659",
             ],
-            name: "Shivan Reef",
-            cmcs: [0],
-            color_id: ["R", "U"],
-            score: 59,
-            image:
-              "https://img.scryfall.com/cards/normal/front/f/1/f1d33afd-6f2a-43c8-ae5d-17a0674fcdd3.jpg?1562049659",
-          },
-          {
-            sanitized: "arcane-denial",
+          }),
+          makeFakeEDHRecSuggestion({
             scryfall_uri:
               "https://scryfall.com/card/a25/41/arcane-denial?utm_source=api",
-            type: "instant",
-            cmc: 2,
             names: ["Arcane Denial"],
             primary_types: ["Instant"],
-            price: 0.79,
-            color_identity: ["U"],
-            salt: 0.7719298245614035,
             images: [
               "https://img.scryfall.com/cards/normal/front/9/d/9d1ffeb1-6c31-45f7-8140-913c397022a3.jpg?1562439019",
             ],
-            url: "/cards/arcane-denial",
-            name: "Arcane Denial",
-            cmcs: [2],
-            color_id: ["U"],
-            score: 52,
-            image:
-              "https://img.scryfall.com/cards/normal/front/9/d/9d1ffeb1-6c31-45f7-8140-913c397022a3.jpg?1562439019",
-          },
+          }),
         ],
       };
       mocked(bus.emit).mockImplementation(function (eventName, payload, reply) {
@@ -257,25 +222,23 @@ describe("makeEDHRecButton", function () {
 
     it("attempts any number of cards in command zone", async function () {
       fakeDeck.entries!.commanders = [
-        {
+        makeFakeCard({
           id: "sidar-id",
-          card_digest: {
+          cardDigest: {
             name: "Sidar Kondo of Jamuraa",
           },
-        },
-        {
-          card_digest: {
-            id: "tana-id",
+        }),
+        makeFakeCard({
+          cardDigest: {
             name: "Tana, the Bloodsower",
           },
-        },
-        {
-          card_digest: {
-            id: "reyhan-id",
+        }),
+        makeFakeCard({
+          cardDigest: {
             name: "Reyhan, Last of the Abzan",
           },
-        },
-      ] as Card[];
+        }),
+      ];
 
       const btn = await makeEDHRecButton();
 
@@ -300,22 +263,24 @@ describe("makeEDHRecButton", function () {
 
     it("does not error when cards in deck are missing the card_digest", async function () {
       fakeDeck.entries?.lands?.push(
-        {
-          foo: "bar",
-        } as any,
-        {
+        makeFakeCard({
+          cardDigest: false,
+        }),
+        makeFakeCard({
           count: 5,
-          card_digest: {
+          cardDigest: {
             name: "Island",
           },
-        } as Card
+        })
       );
-      fakeDeck.entries?.nonlands?.push({
-        count: 1,
-        card_digest: {
-          name: "Rhystic Study",
-        },
-      } as Card);
+      fakeDeck.entries?.nonlands?.push(
+        makeFakeCard({
+          count: 1,
+          cardDigest: {
+            name: "Rhystic Study",
+          },
+        })
+      );
 
       const btn = await makeEDHRecButton();
 
@@ -492,66 +457,22 @@ describe("makeEDHRecButton", function () {
 
     it("organizes sections in particular order", async function () {
       fakeEDHRecResponse.inRecs.push(
-        {
-          sanitized: "fake-creature",
-          scryfall_uri: "https://scyrfall.com/card/set/id/fake-creature",
-          cmc: 2,
+        makeFakeEDHRecSuggestion({
           names: ["Fake Creature"],
           primary_types: ["Creature"],
-          price: 19.99,
-          color_identity: [],
-          salt: 0,
-          images: ["fake-creature.png"],
-          name: "Fake Creature",
-          cmcs: [2],
-          color_id: [],
-          score: 73,
-        },
-        {
-          sanitized: "fake-sorcery",
-          scryfall_uri: "https://scryfall.com/card/set/id/fake-sorcery",
-          cmc: 2,
+        }),
+        makeFakeEDHRecSuggestion({
           names: ["Fake Sorcery"],
           primary_types: ["Sorcery"],
-          price: 19.99,
-          color_identity: [],
-          salt: 0,
-          images: ["fake-sorcery.png"],
-          name: "Fake Sorcery",
-          cmcs: [2],
-          color_id: [],
-          score: 73,
-        },
-        {
-          sanitized: "fake-enchantment",
-          scryfall_uri: "https://scryfall.com/card/set/id/fake-enchantment",
-          cmc: 2,
+        }),
+        makeFakeEDHRecSuggestion({
           names: ["Fake Enchantment"],
           primary_types: ["Enchantment"],
-          price: 19.99,
-          color_identity: [],
-          salt: 0,
-          images: ["fake-enchantment.png"],
-          name: "Fake Enchantment",
-          cmcs: [2],
-          color_id: [],
-          score: 73,
-        },
-        {
-          sanitized: "fake-planeswalker",
-          scryfall_uri: "https://scryfall.com/card/set/id/fake-planeswalker",
-          cmc: 2,
+        }),
+        makeFakeEDHRecSuggestion({
           names: ["Fake Planeswalker"],
           primary_types: ["Planeswalker"],
-          price: 19.99,
-          color_identity: [],
-          salt: 0,
-          images: ["fake-planeswalker.png"],
-          name: "Fake Planeswalker",
-          cmcs: [2],
-          color_id: [],
-          score: 73,
-        }
+        })
       );
 
       const btn = await makeEDHRecButton();
@@ -575,21 +496,12 @@ describe("makeEDHRecButton", function () {
     });
 
     it("ignores unknown sections", async function () {
-      fakeEDHRecResponse.inRecs.push({
-        sanitized: "fake-unknown-type",
-        scryfall_uri: "https://scryfall.com/card/set/id/fake-unknown-type",
-        cmc: 2,
-        names: ["Fake Unknown Type"],
-        primary_types: ["Unknown Type"],
-        price: 19.99,
-        color_identity: [],
-        salt: 0,
-        images: ["fake-unknown-type.png"],
-        name: "Fake Unknown Type",
-        cmcs: [2],
-        color_id: [],
-        score: 73,
-      });
+      fakeEDHRecResponse.inRecs.push(
+        makeFakeEDHRecSuggestion({
+          names: ["Fake Unknown Type"],
+          primary_types: ["Unknown Type"],
+        })
+      );
 
       const btn = await makeEDHRecButton();
 
