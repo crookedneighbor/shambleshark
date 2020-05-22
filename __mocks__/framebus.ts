@@ -1,6 +1,6 @@
 const framebus = {
-  emit: jest.fn(),
-  on: jest.fn(),
+  emit: jest.fn().mockReturnValue(true),
+  on: jest.fn().mockReturnValue(true),
 };
 
 export = framebus;
