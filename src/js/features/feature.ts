@@ -46,8 +46,6 @@ export default abstract class Feature {
     // of too many settings being saved at once
     const settings = await this.getSettings();
 
-    // TODO this will be taken care of by the type system once features are
-    // ported over to typescript
     if (!(property in this.settingsDefaults)) {
       return Promise.reject(
         new Error(
