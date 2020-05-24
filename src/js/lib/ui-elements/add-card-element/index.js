@@ -36,7 +36,7 @@ export default class AddCardElement {
         </div>
         <div class="metadata"></div>
       </div>
-    </div>`).firstChild;
+    </div>`);
 
     this.img = this.element.querySelector("img");
     this.overlay = this.element.querySelector(".add-card-element-overlay");

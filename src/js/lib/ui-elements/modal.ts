@@ -11,7 +11,7 @@ interface ModalOptions extends DialogInterfaceOptions {
 export default class Modal extends DialogInterface {
   _constructElement(options: ModalOptions = {}): HTMLDivElement {
     const titleId = `modal-title-${options.id}`;
-    const modal = createElement(`<div
+    const modal = createElement<HTMLDivElement>(`<div
       class="modal-dialog-overlay"
       aria-modal="true"
       role="dialog")
@@ -41,7 +41,7 @@ export default class Modal extends DialogInterface {
           <div class="dialog-content modal-dialog-stage-content"></div>
         </div>
       </div>
-   </div>`).firstChild as HTMLDivElement;
+   </div>`);
 
     modal.querySelector(".dialog-close")!.addEventListener("click", () => {
       this.close();

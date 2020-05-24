@@ -117,7 +117,7 @@ class ScryfallSearch extends Feature {
 
   addSearchOptionsElement(): void {
     const totalCards = this.cardList?.total_cards;
-    const el = createElement(`<div
+    const el = createElement<HTMLDivElement>(`<div
       class="scryfall-search__options-container scryfall-search__non-card-element"
     >
       <div class="scryfall-search__search-results-counter">
@@ -126,7 +126,7 @@ class ScryfallSearch extends Feature {
           this.currentQuery as string
         )}">${EXTERNAL_ARROW}</a>
       </div>
-    </div>`).firstChild as HTMLDivElement;
+    </div>`);
     this.deckSectionChooser = new DeckSectionChooser({
       id: "scryfall-search__section-selection",
       deck: this.deck,

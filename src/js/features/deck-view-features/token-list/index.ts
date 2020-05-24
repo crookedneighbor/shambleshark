@@ -59,7 +59,7 @@ class TokenList extends Feature {
       <button name="button" type="button" class="button-n">
         <b>Show Tokens</b>
       </button>
-    </div>`).firstChild as HTMLButtonElement;
+    </div>`);
     const button = section.querySelector("button") as HTMLButtonElement;
     this.modal = new Modal({
       id: "token-list-modal",
@@ -95,8 +95,7 @@ class TokenList extends Feature {
 
     if (tokens.length === 0) {
       this.modal?.setContent(
-        createElement("<p>No tokens detected.</p>")
-          .firstElementChild as HTMLParagraphElement
+        createElement<HTMLParagraphElement>("<p>No tokens detected.</p>")
       );
 
       return;
@@ -106,13 +105,15 @@ class TokenList extends Feature {
     container.classList.add("token-list-img-container");
 
     tokens.forEach((token) => {
-      const el = createElement(`
+      const el = createElement<HTMLAnchorElement>(`
         <a href="${token.scryfall_uri}">
-          <img class="token-list-img" src="${token.getImage()}" alt="${
-        token.name
-      }">
+          <img
+            class="token-list-img"
+            src="${token.getImage()}"
+            alt="${token.name}"
+          >
         </a>
-      `).firstElementChild as HTMLAnchorElement;
+      `);
 
       container.appendChild(el);
     });

@@ -102,7 +102,7 @@ describe("Tagger Link", function () {
       readySpy = mocked(ready);
       buttonSpy = jest
         .spyOn(TaggerLink.prototype, "makeButton")
-        .mockReturnValue(document.createElement("button"));
+        .mockReturnValue(document.createElement("a"));
     });
 
     it("listens for new card grid items", async function () {
@@ -125,7 +125,7 @@ describe("Tagger Link", function () {
         <div class="card-grid-item-card-faces"></div>
         <a class="card-grid-item-card" href="https://scryfall.com/card/set/number"></a>
       `;
-      const fakeBtn = document.createElement("button");
+      const fakeBtn = document.createElement("a");
       fakeBtn.classList.add("tagger-link-button");
 
       mocked(tl).makeButton.mockReturnValue(fakeBtn);
@@ -154,9 +154,7 @@ describe("Tagger Link", function () {
 
     it("creates a button link to tagger", () => {
       const tl = new TaggerLink();
-      const btn = tl.makeButton(
-        "https://scryfall.com/card/set/number"
-      ) as HTMLLinkElement;
+      const btn = tl.makeButton("https://scryfall.com/card/set/number");
 
       expect(btn.href).toBe("https://tagger.scryfall.com/card/set/number");
     });

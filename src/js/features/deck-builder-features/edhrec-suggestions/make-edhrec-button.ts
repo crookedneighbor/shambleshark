@@ -105,13 +105,13 @@ function constructEDHRecSection(
 ): EDHRecSection {
   const sectionTitle = TYPES_WITH_IRREGULAR_PLURALS[cardType] || `${cardType}s`;
 
-  const element = createElement(`<div
+  const element = createElement<HTMLDivElement>(`<div
     id="edhrec-suggestion-${sectionId}"
     class="edhrec-suggestions-container"
     >
       <h3 class="edhrec-suggestions-section-title">${sectionTitle}</h3>
       <div class="edhrec-suggestions"></div>
-  </div>`).firstElementChild as HTMLDivElement;
+  </div>`);
 
   return {
     name: cardType,
@@ -256,7 +256,7 @@ function createDrawer(button: HTMLButtonElement) {
 }
 
 export default function makeEDHRecButton() {
-  const button = createElement(`<button
+  const button = createElement<HTMLButtonElement>(`<button
     id="edhrec-suggestions"
     aria-label="EDHRec Suggestions"
     class="button-n tiny"
@@ -264,7 +264,7 @@ export default function makeEDHRecButton() {
   >
     ${EDHREC_SYMBOL}
     <i>EDHRec Suggestions</i>
-</button>`).firstElementChild as HTMLButtonElement;
+</button>`);
   createDrawer(button);
 
   return button;

@@ -179,21 +179,21 @@ class TaggerLink extends Feature {
       taggerData.number
     );
 
-    const button = createElement(`<a
+    const button = createElement<HTMLAnchorElement>(`<a
       href="${taggerLink}"
       class="tagger-link-button button-n primary icon-only subdued"
       alt="Open in Tagger"
     >
       ${TAGGER_SYMBOL}
-    </a>`).firstElementChild as HTMLElement;
+    </a>`);
 
     if (this.showPreview) {
       const tagDisplayMenu = createElement(`<div class="tagger-link-hover">
         <div class="menu-container"></div>
         <img src="${SPINNER_GIF}" class="modal-dialog-spinner" aria-hidden="true" alt="">
-      </div>`).firstChild;
-      button!.prepend(tagDisplayMenu as Node);
-      button!.addEventListener(
+      </div>`);
+      button.prepend(tagDisplayMenu);
+      button.addEventListener(
         "mouseover",
         this.createMouseoverHandler(button, taggerData)
       );
