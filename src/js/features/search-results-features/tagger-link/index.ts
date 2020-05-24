@@ -52,6 +52,8 @@ export interface ShamblesharkRelationship {
   isTag?: boolean;
 }
 
+type RelationshipCollection = Record<string, ShamblesharkRelationship[]>;
+
 export interface TaggerPayload {
   illustrationId?: string;
   oracleId?: string;
@@ -111,6 +113,9 @@ function convertPageLinkToTagger(setCode: string, cardNumber: string) {
 }
 
 class TaggerLink extends Feature {
+  // TODO we can probably omit this with a refactor
+  // by splitting out the logic for making a button
+  // adding it to the page, and creating an iframe
   showPreview: boolean;
 
   static metadata = {
@@ -190,7 +195,7 @@ class TaggerLink extends Feature {
     if (this.showPreview) {
       const tagDisplayMenu = createElement(`<div class="tagger-link-hover">
         <div class="menu-container"></div>
-        <img src="${SPINNER_GIF}" class="modal-dialog-spinner" aria-hidden="true" alt="">
+        <img src="${SPINNER_GIF}" class="modal-dialog-spinner" aria-hidden="true">
       </div>`);
       button.prepend(tagDisplayMenu);
       button.addEventListener(
@@ -203,12 +208,14 @@ class TaggerLink extends Feature {
   }
 
   createMouseoverHandler(
-    button: Element,
+    button: HTMLAnchorElement,
     taggerData: { set: string; number: string }
   ) {
     let request: Promise<void>;
 
-    const tooltip = button!.querySelector(".tagger-link-hover") as HTMLElement;
+    const tooltip = button.querySelector(
+      ".tagger-link-hover"
+    ) as HTMLDivElement;
 
     return (event: MouseEvent) => {
       const pageWidth = document.body.clientWidth;
@@ -235,44 +242,46 @@ class TaggerLink extends Feature {
   }
 
   addTags(tooltip: HTMLElement, payload: TaggerPayload) {
-    const menuContainer = tooltip.querySelector(".menu-container");
+    const menuContainer = tooltip.querySelector(
+      ".menu-container"
+    ) as HTMLElement;
     const artMenu = document.createElement("ul");
     const cardMenu = document.createElement("ul");
-    const spinner = tooltip.querySelector(".modal-dialog-spinner");
+    const spinner = tooltip.querySelector(
+      ".modal-dialog-spinner"
+    ) as HTMLElement;
 
     const tags = this.collectTags(payload);
     const relationships = this.collectRelationships(payload);
     const artEntries = tags.art.concat(tags.print).concat(relationships.art);
     const oracleEntries = tags.oracle.concat(relationships.oracle);
 
-    spinner!.classList.add("hidden");
+    spinner.classList.add("hidden");
 
     if (artEntries.length) {
-      menuContainer!.appendChild(artMenu);
+      menuContainer.appendChild(artMenu);
       this.addTagsToMenu(artEntries, artMenu);
     }
 
     if (oracleEntries.length) {
-      menuContainer!.appendChild(cardMenu);
+      menuContainer.appendChild(cardMenu);
       this.addTagsToMenu(oracleEntries, cardMenu);
     }
 
-    if (menuContainer!.children.length === 0) {
-      (menuContainer as any).innerText = "No tags found. Add some!";
+    if (menuContainer.children.length === 0) {
+      menuContainer.innerText = "No tags found. Add some!";
     }
 
     tooltip.style.top = `-${Math.floor(tooltip.offsetHeight / 3.75)}px`;
   }
 
   collectTags(payload: TaggerPayload) {
-    const tags: {
-      [key: string]: ShamblesharkRelationship[];
-    } = {
+    const tags: RelationshipCollection = {
       art: [],
       oracle: [],
       print: [],
     };
-    const tagToCollectionMap: { [key: string]: "art" | "oracle" | "print" } = {
+    const tagToCollectionMap: Record<string, string> = {
       ILLUSTRATION_TAG: "art",
       ORACLE_CARD_TAG: "oracle",
       PRINTING_TAG: "print",
@@ -297,11 +306,11 @@ class TaggerLink extends Feature {
   }
 
   collectRelationships(payload: TaggerPayload) {
-    const relationships: { [key: string]: ShamblesharkRelationship[] } = {
+    const relationships: RelationshipCollection = {
       art: [],
       oracle: [],
     };
-    const typeToRelationshipMap: { [key: string]: string } = {
+    const typeToRelationshipMap: Record<string, string> = {
       illustrationId: "art",
       oracleId: "oracle",
     };

@@ -128,7 +128,7 @@ describe("Tagger Link", function () {
       const fakeBtn = document.createElement("a");
       fakeBtn.classList.add("tagger-link-button");
 
-      mocked(tl).makeButton.mockReturnValue(fakeBtn);
+      mocked(tl.makeButton).mockReturnValue(fakeBtn);
 
       readySpy.mockImplementation((cssSelector, cb) => {
         cb(el.querySelector(".card-grid-item-card"));
@@ -193,12 +193,12 @@ describe("Tagger Link", function () {
   });
 
   describe("createMouseoverHandler", () => {
-    let btn: HTMLButtonElement, fakeEvent: MouseEvent;
+    let btn: HTMLAnchorElement, fakeEvent: MouseEvent;
 
     let emitSpy: SpyInstance;
 
     beforeEach(() => {
-      btn = document.createElement("button") as HTMLButtonElement;
+      btn = document.createElement("a");
       btn.innerHTML = '<div class="tagger-link-hover"></div>';
 
       fakeEvent = {
@@ -282,7 +282,7 @@ describe("Tagger Link", function () {
           oracle: [],
         });
       addTagsToMenuSpy = jest.spyOn(tl, "addTagsToMenu").mockImplementation();
-      payload = {} as TaggerPayload;
+      payload = {};
       tooltip = document.createElement("div");
       tooltip.innerHTML =
         '<div class="menu-container"></div><div class="modal-dialog-spinner"></div>';
