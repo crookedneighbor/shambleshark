@@ -27,13 +27,45 @@ import {
   SIMILAR_TO_SYMBOL,
 } from "Svg";
 
-const TAG_SYMBOLS: { [name: string]: string } = {
+export interface Tagging {
+  tag: {
+    name: string;
+    type: string;
+  };
+}
+
+export interface Relationship {
+  classifierInverse: string;
+  relatedName: string;
+  classifier: string;
+  contentName: string;
+  relatedId: string;
+  foreignKey: "illustrationId" | "oracleId";
+  illustrationId?: string;
+  oracleId?: string;
+}
+
+export interface ShamblesharkRelationship {
+  name: string;
+  symbol: string;
+  liClass?: string;
+  isTag?: boolean;
+}
+
+export interface TaggerPayload {
+  illustrationId?: string;
+  oracleId?: string;
+  taggings?: Tagging[];
+  relationships?: Relationship[];
+}
+
+const TAG_SYMBOLS: Record<string, string> = {
   ILLUSTRATION_TAG: ILLUSTRATION_SYMBOL,
   ORACLE_CARD_TAG: CARD_SYMBOL,
   PRINTING_TAG: PRINTING_SYMBOL,
 };
 
-const RELATIONSHIP_SYMBOLS: { [name: string]: string } = {
+const RELATIONSHIP_SYMBOLS: Record<string, string> = {
   BETTER_THAN: BETTER_THAN_SYMBOL,
   COLORSHIFTED: COLORSHIFTED_SYMBOL,
   COMES_AFTER: SEEN_BEFORE_SYMBOL,
@@ -74,44 +106,12 @@ function getTaggerData(link: string) {
   };
 }
 
-function convertPageLinkToTagger(data: { set: string; number: string }) {
-  return `https://tagger.scryfall.com/card/${data.set}/${data.number}`;
-}
-
-export interface Tagging {
-  tag: {
-    name: string;
-    type: string;
-  };
-}
-
-export interface Relationship {
-  classifierInverse: string;
-  relatedName: string;
-  classifier: string;
-  contentName: string;
-  relatedId: string;
-  foreignKey: "illustrationId" | "oracleId";
-  illustrationId?: string;
-  oracleId?: string;
-}
-
-export interface ShamblesharkRelationship {
-  name: string;
-  symbol: string;
-  liClass?: string;
-  isTag?: boolean;
-}
-
-export interface TaggerPayload {
-  illustrationId?: string;
-  oracleId?: string;
-  taggings?: Tagging[];
-  relationships?: Relationship[];
+function convertPageLinkToTagger(setCode: string, cardNumber: string) {
+  return `https://tagger.scryfall.com/card/${setCode}/${cardNumber}`;
 }
 
 class TaggerLink extends Feature {
-  showPreview?: boolean;
+  showPreview: boolean;
 
   static metadata = {
     id: ids.TaggerLink,
@@ -132,6 +132,12 @@ class TaggerLink extends Feature {
       input: "checkbox",
     },
   ];
+
+  constructor() {
+    super();
+
+    this.showPreview = false;
+  }
 
   async run() {
     const settings = await TaggerLink.getSettings();
@@ -168,7 +174,10 @@ class TaggerLink extends Feature {
 
   makeButton(link: string) {
     const taggerData = getTaggerData(link);
-    const taggerLink = convertPageLinkToTagger(taggerData);
+    const taggerLink = convertPageLinkToTagger(
+      taggerData.set,
+      taggerData.number
+    );
 
     const button = createElement(`<a
       href="${taggerLink}"
