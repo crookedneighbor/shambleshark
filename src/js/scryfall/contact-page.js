@@ -20,7 +20,7 @@ export default function () {
           <b>Report an Issue with Shambleshark</b>
         </a>
       </div>
-    </div>`).firstChild;
+    </div>`);
 
     panel.insertBefore(warning, panel.firstChild);
   });

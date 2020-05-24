@@ -13,7 +13,7 @@ export default class DeckSectionChooser {
           <option value="" selected disabled>Section (auto)</option>
         </select>
       </div>
-    `).firstChild;
+    `);
     this.sectionSelect = this.element.querySelector("select.section-selection");
 
     deckParser

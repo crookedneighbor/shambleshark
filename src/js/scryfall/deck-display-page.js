@@ -6,7 +6,7 @@ import { BUS_EVENTS as events } from "Constants";
 
 function addContainerForSidebarFeatures() {
   const section = createElement(`<div id="shambleshark-deck-display-sidebar-toolbox" class="sidebar-toolbox">
-  </div>`).firstChild;
+  </div>`);
 
   elementReady(".sidebar", (container) => {
     container.appendChild(section);

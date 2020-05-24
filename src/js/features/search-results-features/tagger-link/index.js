@@ -139,13 +139,13 @@ class TaggerLink extends Feature {
       alt="Open in Tagger"
     >
       ${TAGGER_SYMBOL}
-    </a>`).firstChild;
+    </a>`);
 
     if (this._showPreview) {
       const tagDisplayMenu = createElement(`<div class="tagger-link-hover">
         <div class="menu-container"></div>
         <img src="${SPINNER_GIF}" class="modal-dialog-spinner" aria-hidden="true">
-      </div>`).firstChild;
+      </div>`);
       button.prepend(tagDisplayMenu);
       button.addEventListener(
         "mouseover",

@@ -52,7 +52,7 @@ export default class Drawer extends DialogInterface {
   _constructElement(options: DrawerOptions): HTMLDivElement {
     const titleId = `drawer-title-${options.id}`;
 
-    const drawer = createElement(`<div
+    const drawer = createElement<HTMLDivElement>(`<div
       class="drawer-dialog-overlay modal-dialog-overlay"
       aria-modal="true"
       role="dialog"
@@ -85,7 +85,7 @@ export default class Drawer extends DialogInterface {
           <div class="dialog-content drawer-dialog-stage-content"></div>
         </div>
       </div>
-    </div>`).firstElementChild as HTMLDivElement;
+    </div>`);
 
     drawer.querySelector(".dialog-close")!.addEventListener("click", () => {
       this.close();

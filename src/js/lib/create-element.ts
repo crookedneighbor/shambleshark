@@ -1,9 +1,9 @@
 type Container = "body" | "head";
 
-export default function createElement(
+export default function createElement<T extends Element = Element>(
   string: string,
   options?: { container: Container }
-) {
+): T {
   const container = options?.container || "body";
   const fragment = document.createDocumentFragment();
   const parser = new window.DOMParser();
@@ -12,5 +12,5 @@ export default function createElement(
 
   Array.from(elements).forEach((e) => fragment.appendChild(e));
 
-  return fragment;
+  return fragment.firstElementChild as T;
 }

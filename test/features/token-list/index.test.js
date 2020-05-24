@@ -171,7 +171,7 @@ describe("Token List", function () {
 
       const el = tl.modal.setContent.mock.calls[0][0];
 
-      expect(el.querySelector("p").innerHTML).toBe("No tokens detected.");
+      expect(el.innerHTML).toBe("No tokens detected.");
     });
 
     it("adds tokens to modal", function () {

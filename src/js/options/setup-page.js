@@ -30,7 +30,7 @@ function createCheckbox(def, inputValue, Feature) {
   >
     <input type="checkbox" id="${def.id}-checkbox" />
     ${def.label}
-  </label>`).firstChild;
+  </label>`);
   const checkbox = checkboxContainer.querySelector("input");
   checkbox.checked = inputValue;
   checkbox.addEventListener("change", () => {
@@ -91,7 +91,7 @@ const page = createElement(`<div>
       </div>
     </div>
   </section>
-</div>`).firstChild;
+</div>`);
 
 Promise.all(
   features.map((Feature) => {
@@ -114,7 +114,7 @@ Promise.all(
       <label class="has-text-weight-bold" for="${enabledSwitchId}">${title}</label>
     </div>
     <p class="content feature-description">${data.description}</p>
-  </fieldset>`).firstChild;
+  </fieldset>`);
 
     if (isFutureFeature) {
       container.setAttribute("disabled", "disabled");

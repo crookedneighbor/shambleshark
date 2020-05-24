@@ -45,7 +45,7 @@ class TokenList extends Feature {
       <button name="button" type="button" class="button-n">
         <b>Show Tokens</b>
       </button>
-    </div>`).firstChild;
+    </div>`);
     const button = section.querySelector("button");
     this.modal = new Modal({
       id: "token-list-modal",
@@ -91,11 +91,13 @@ class TokenList extends Feature {
     tokens.forEach((token) => {
       const el = createElement(`
         <a href="${token.scryfall_uri}">
-          <img class="token-list-img" src="${token.getImage()}" alt="${
-        token.name
-      }">
+          <img
+            class="token-list-img"
+            src="${token.getImage()}"
+            alt="${token.name}"
+          >
         </a>
-      `).firstChild;
+      `);
 
       container.appendChild(el);
     });

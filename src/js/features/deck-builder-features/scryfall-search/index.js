@@ -110,7 +110,7 @@ class ScryfallSearch extends Feature {
           this.currentQuery
         )}">${EXTERNAL_ARROW}</a>
       </div>
-    </div>`).firstChild;
+    </div>`);
     this.deckSectionChooser = new DeckSectionChooser({
       id: "scryfall-search__section-selection",
       deck: this.deck,
