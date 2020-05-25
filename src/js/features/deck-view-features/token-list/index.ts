@@ -13,14 +13,13 @@ const MAX_ENTRIES_TO_AUTO_LOOKUP = 75 * 2; // 2 collection API calls
 
 export interface Token {
   name: string;
-  id?: string;
-  oracle_id?: string;
-  scryfall_uri?: string;
+  oracle_id: string;
+  scryfall_uri: string;
   getImage: () => string;
 }
 
 class TokenList extends Feature {
-  elements?: HTMLAnchorElement[];
+  elements: HTMLAnchorElement[];
   modal?: Modal;
   private _addedToUI?: boolean;
   private _generateTokenCollectionPromise?: Promise<Token[]>;
@@ -38,6 +37,12 @@ class TokenList extends Feature {
 
   static usesSidebar = true;
 
+  constructor() {
+    super();
+
+    this.elements = [];
+  }
+
   async run(): Promise<void> {
     // TODO this doesn't work with current implementation of mutation.ready
     // in that subsequent calls to ready will not work
@@ -47,7 +52,7 @@ class TokenList extends Feature {
         this.createUI(container);
         this.getCardElements();
 
-        if ((this.elements?.length || 0) <= MAX_ENTRIES_TO_AUTO_LOOKUP) {
+        if ((this.elements.length || 0) <= MAX_ENTRIES_TO_AUTO_LOOKUP) {
           await this.generateTokenCollection();
         }
       }
@@ -122,12 +127,18 @@ class TokenList extends Feature {
   }
 
   getCardElements(): void {
-    this.elements = Array.from(
-      document.querySelectorAll(".deck-list-entry .deck-list-entry-name a")
+    this.elements.push(
+      ...Array.from(
+        document.querySelectorAll<HTMLAnchorElement>(
+          ".deck-list-entry .deck-list-entry-name a"
+        )
+      )
     );
     if (this.elements.length === 0) {
-      this.elements = Array.from(
-        document.querySelectorAll("a.card-grid-item-card")
+      this.elements.push(
+        ...Array.from(
+          document.querySelectorAll<HTMLAnchorElement>("a.card-grid-item-card")
+        )
       );
     }
   }
@@ -138,7 +149,7 @@ class TokenList extends Feature {
       return this._generateTokenCollectionPromise;
     }
 
-    if (this.elements?.length === 0) {
+    if (this.elements.length === 0) {
       return Promise.resolve([]);
     }
 

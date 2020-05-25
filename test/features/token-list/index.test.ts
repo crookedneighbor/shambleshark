@@ -2,13 +2,13 @@ import TokenList, { Token } from "Features/deck-view-features/token-list";
 import { ready } from "Lib/mutation";
 import { getCollection } from "Lib/scryfall";
 import wait from "Lib/wait";
-import SpyInstance = jest.SpyInstance;
 import Modal from "Lib/ui-elements/modal";
 import { mocked } from "ts-jest/utils";
 
 jest.mock("Lib/scryfall");
 jest.mock("Lib/mutation");
 
+// TODO mock modal class
 describe("Token List", function () {
   let tl: TokenList;
 
@@ -19,9 +19,9 @@ describe("Token List", function () {
   describe("run", function () {
     let elements: HTMLElement[], container: HTMLDivElement;
 
-    let readySpy: SpyInstance;
-    let getCardElementsSpy: SpyInstance;
-    let generateTokenCollectionSpy: SpyInstance;
+    let readySpy: jest.SpyInstance;
+    let getCardElementsSpy: jest.SpyInstance;
+    let generateTokenCollectionSpy: jest.SpyInstance;
 
     beforeEach(function () {
       container = document.createElement("div") as HTMLDivElement;
@@ -160,7 +160,7 @@ describe("Token List", function () {
   describe("addToUI", function () {
     let tokens: Token[];
 
-    let setContentSpy: SpyInstance;
+    let setContentSpy: jest.SpyInstance;
 
     beforeEach(function () {
       const container = document.createElement("div");
@@ -168,6 +168,7 @@ describe("Token List", function () {
         {
           name: "Token 1",
           scryfall_uri: "https://scryfall.com/token-1",
+          oracle_id: "token-1",
           getImage: jest
             .fn()
             .mockReturnValue("https://img.scryfall.com/token-1"),
@@ -175,6 +176,7 @@ describe("Token List", function () {
         {
           name: "Token 2",
           scryfall_uri: "https://scryfall.com/token-2",
+          oracle_id: "token-2",
           getImage: jest
             .fn()
             .mockReturnValue("https://img.scryfall.com/token-2"),
@@ -246,10 +248,14 @@ describe("Token List", function () {
           {
             name: "Token 1",
             oracle_id: "id-1",
+            scryfall_uri: "https://scryfall.com/code/1",
+            getImage: jest.fn(),
           },
           {
             name: "Token 2",
             oracle_id: "id-2",
+            scryfall_uri: "https://scryfall.com/code/2",
+            getImage: jest.fn(),
           },
         ],
         [],
@@ -257,27 +263,29 @@ describe("Token List", function () {
           {
             name: "Token 3",
             oracle_id: "id-3",
+            scryfall_uri: "https://scryfall.com/code/3",
+            getImage: jest.fn(),
           },
         ],
-      ] as Token[][];
+      ];
     });
 
     it("flattens multidimensional array to single array", function () {
       const tokens = tl.flattenTokenCollection(tokenCollection);
 
       expect(tokens).toEqual([
-        {
+        expect.objectContaining({
           name: "Token 1",
           oracle_id: "id-1",
-        },
-        {
+        }),
+        expect.objectContaining({
           name: "Token 2",
           oracle_id: "id-2",
-        },
-        {
+        }),
+        expect.objectContaining({
           name: "Token 3",
           oracle_id: "id-3",
-        },
+        }),
       ]);
     });
 
@@ -285,26 +293,28 @@ describe("Token List", function () {
       tokenCollection[1].push({
         oracle_id: "alpha-token-id",
         name: "Alpha Token",
-      } as Token);
+        scryfall_uri: "https://scryfall.com/code/2",
+        getImage: jest.fn(),
+      });
       const tokens = tl.flattenTokenCollection(tokenCollection);
 
       expect(tokens).toEqual([
-        {
+        expect.objectContaining({
           name: "Alpha Token",
           oracle_id: "alpha-token-id",
-        },
-        {
+        }),
+        expect.objectContaining({
           name: "Token 1",
           oracle_id: "id-1",
-        },
-        {
+        }),
+        expect.objectContaining({
           name: "Token 2",
           oracle_id: "id-2",
-        },
-        {
+        }),
+        expect.objectContaining({
           name: "Token 3",
           oracle_id: "id-3",
-        },
+        }),
       ]);
     });
 
@@ -312,28 +322,30 @@ describe("Token List", function () {
       tokenCollection[2].push({
         oracle_id: "id-1",
         name: "Token 1",
-      } as Token);
+        scryfall_uri: "https://scryfall.com/code/1",
+        getImage: jest.fn(),
+      });
       const tokens = tl.flattenTokenCollection(tokenCollection);
 
       expect(tokens).toEqual([
-        {
+        expect.objectContaining({
           name: "Token 1",
           oracle_id: "id-1",
-        },
-        {
+        }),
+        expect.objectContaining({
           name: "Token 2",
           oracle_id: "id-2",
-        },
-        {
+        }),
+        expect.objectContaining({
           name: "Token 3",
           oracle_id: "id-3",
-        },
+        }),
       ]);
     });
   });
 
   describe("lookupTokens", function () {
-    let getCollectionSpy: SpyInstance;
+    let getCollectionSpy: jest.SpyInstance;
 
     beforeEach(function () {
       getCollectionSpy = mocked(getCollection).mockResolvedValue([]);
@@ -468,8 +480,8 @@ describe("Token List", function () {
   });
 
   describe("generateTokenCollection", function () {
-    let lookupTokensSpy: SpyInstance;
-    let flattenTokenCollectionSpy: SpyInstance;
+    let lookupTokensSpy: jest.SpyInstance;
+    let flattenTokenCollectionSpy: jest.SpyInstance;
 
     beforeEach(function () {
       lookupTokensSpy = jest.spyOn(tl, "lookupTokens").mockResolvedValue([]);
