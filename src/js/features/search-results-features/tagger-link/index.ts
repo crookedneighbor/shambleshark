@@ -1,5 +1,5 @@
 import bus from "framebus";
-import Feature from "Feature";
+import Feature, { SettingsDefaults } from "Feature";
 import {
   BUS_EVENTS as events,
   FEATURE_IDS as ids,
@@ -8,7 +8,7 @@ import {
 } from "Constants";
 import iframe from "Lib/iframe";
 import createElement from "Lib/create-element";
-import mutation from "Lib/mutation";
+import { ready as elementReady } from "Lib/mutation";
 import { sortByAttribute } from "Lib/sort";
 import "./index.css";
 
@@ -27,13 +27,47 @@ import {
   SIMILAR_TO_SYMBOL,
 } from "Svg";
 
-const TAG_SYMBOLS = {
+export interface Tagging {
+  tag: {
+    name: string;
+    type: string;
+  };
+}
+
+export interface Relationship {
+  classifierInverse: string;
+  relatedName: string;
+  classifier: string;
+  contentName: string;
+  relatedId: string;
+  foreignKey: "illustrationId" | "oracleId";
+  illustrationId?: string;
+  oracleId?: string;
+}
+
+export interface ShamblesharkRelationship {
+  name: string;
+  symbol: string;
+  liClass?: string;
+  isTag?: boolean;
+}
+
+type RelationshipCollection = Record<string, ShamblesharkRelationship[]>;
+
+export interface TaggerPayload {
+  illustrationId?: string;
+  oracleId?: string;
+  taggings?: Tagging[];
+  relationships?: Relationship[];
+}
+
+const TAG_SYMBOLS: Record<string, string> = {
   ILLUSTRATION_TAG: ILLUSTRATION_SYMBOL,
   ORACLE_CARD_TAG: CARD_SYMBOL,
   PRINTING_TAG: PRINTING_SYMBOL,
 };
 
-const RELATIONSHIP_SYMBOLS = {
+const RELATIONSHIP_SYMBOLS: Record<string, string> = {
   BETTER_THAN: BETTER_THAN_SYMBOL,
   COLORSHIFTED: COLORSHIFTED_SYMBOL,
   COMES_AFTER: SEEN_BEFORE_SYMBOL,
@@ -65,7 +99,7 @@ const SYMBOLS_THAT_MUST_BE_REVERSED = {
 // * handle small screens
 // * simple animations when opening the tag menu
 
-function getTaggerData(link) {
+function getTaggerData(link: string) {
   const parts = link.split("https://scryfall.com/card/")[1].split("/");
 
   return {
@@ -74,11 +108,16 @@ function getTaggerData(link) {
   };
 }
 
-function convertPageLinkToTagger(data) {
-  return `https://tagger.scryfall.com/card/${data.set}/${data.number}`;
+function convertPageLinkToTagger(setCode: string, cardNumber: string) {
+  return `https://tagger.scryfall.com/card/${setCode}/${cardNumber}`;
 }
 
 class TaggerLink extends Feature {
+  // TODO we can probably omit this with a refactor
+  // by splitting out the logic for making a button
+  // adding it to the page, and creating an iframe
+  showPreview: boolean;
+
   static metadata = {
     id: ids.TaggerLink,
     title: "Tagger Link",
@@ -99,11 +138,17 @@ class TaggerLink extends Feature {
     },
   ];
 
+  constructor() {
+    super();
+
+    this.showPreview = false;
+  }
+
   async run() {
     const settings = await TaggerLink.getSettings();
-    this._showPreview = Boolean(settings.previewTags);
+    this.showPreview = Boolean(settings.previewTags);
 
-    if (!this._showPreview) {
+    if (!this.showPreview) {
       this.setupButtons();
 
       return;
@@ -113,27 +158,33 @@ class TaggerLink extends Feature {
       this.setupButtons();
     });
 
-    iframe.create({
+    await iframe.create({
       id: "tagger-link-tagger-iframe",
       src: "https://tagger.scryfall.com",
     });
   }
 
   setupButtons() {
-    mutation.ready(".card-grid-item a.card-grid-item-card", (link) => {
-      const button = this.makeButton(link.href);
+    elementReady<HTMLAnchorElement>(
+      ".card-grid-item a.card-grid-item-card",
+      (link) => {
+        const button = this.makeButton(link.href);
 
-      link.parentNode
-        .querySelector(".card-grid-item-card-faces")
-        .appendChild(button);
-    });
+        link
+          .parentNode!.querySelector(".card-grid-item-card-faces")!
+          .appendChild(button as Node);
+      }
+    );
   }
 
-  makeButton(link) {
+  makeButton(link: string) {
     const taggerData = getTaggerData(link);
-    const taggerLink = convertPageLinkToTagger(taggerData);
+    const taggerLink = convertPageLinkToTagger(
+      taggerData.set,
+      taggerData.number
+    );
 
-    const button = createElement(`<a
+    const button = createElement<HTMLAnchorElement>(`<a
       href="${taggerLink}"
       class="tagger-link-button button-n primary icon-only subdued"
       alt="Open in Tagger"
@@ -141,7 +192,7 @@ class TaggerLink extends Feature {
       ${TAGGER_SYMBOL}
     </a>`);
 
-    if (this._showPreview) {
+    if (this.showPreview) {
       const tagDisplayMenu = createElement(`<div class="tagger-link-hover">
         <div class="menu-container"></div>
         <img src="${SPINNER_GIF}" class="modal-dialog-spinner" aria-hidden="true">
@@ -156,12 +207,17 @@ class TaggerLink extends Feature {
     return button;
   }
 
-  createMouseoverHandler(button, taggerData) {
-    let request;
+  createMouseoverHandler(
+    button: HTMLAnchorElement,
+    taggerData: { set: string; number: string }
+  ) {
+    let request: Promise<void>;
 
-    const tooltip = button.querySelector(".tagger-link-hover");
+    const tooltip = button.querySelector(
+      ".tagger-link-hover"
+    ) as HTMLDivElement;
 
-    return (event) => {
+    return (event: MouseEvent) => {
       const pageWidth = document.body.clientWidth;
       const mousePosition = event.pageX;
 
@@ -177,7 +233,7 @@ class TaggerLink extends Feature {
         request = new Promise((resolve) => {
           bus.emit(events.TAGGER_TAGS_REQUEST, taggerData, resolve);
         }).then((payload) => {
-          this.addTags(tooltip, payload);
+          this.addTags(tooltip, payload as TaggerPayload);
         });
       }
 
@@ -185,11 +241,15 @@ class TaggerLink extends Feature {
     };
   }
 
-  addTags(tooltip, payload) {
-    const menuContainer = tooltip.querySelector(".menu-container");
+  addTags(tooltip: HTMLElement, payload: TaggerPayload) {
+    const menuContainer = tooltip.querySelector(
+      ".menu-container"
+    ) as HTMLElement;
     const artMenu = document.createElement("ul");
     const cardMenu = document.createElement("ul");
-    const spinner = tooltip.querySelector(".modal-dialog-spinner");
+    const spinner = tooltip.querySelector(
+      ".modal-dialog-spinner"
+    ) as HTMLElement;
 
     const tags = this.collectTags(payload);
     const relationships = this.collectRelationships(payload);
@@ -215,19 +275,19 @@ class TaggerLink extends Feature {
     tooltip.style.top = `-${Math.floor(tooltip.offsetHeight / 3.75)}px`;
   }
 
-  collectTags(payload) {
-    const tags = {
+  collectTags(payload: TaggerPayload) {
+    const tags: RelationshipCollection = {
       art: [],
       oracle: [],
       print: [],
     };
-    const tagToCollectionMap = {
+    const tagToCollectionMap: Record<string, string> = {
       ILLUSTRATION_TAG: "art",
       ORACLE_CARD_TAG: "oracle",
       PRINTING_TAG: "print",
     };
 
-    payload.taggings.forEach((t) => {
+    payload.taggings?.forEach((t) => {
       const type = t.tag.type;
       const key = tagToCollectionMap[type];
       const tagsByType = tags[key];
@@ -245,17 +305,17 @@ class TaggerLink extends Feature {
     return tags;
   }
 
-  collectRelationships(payload) {
-    const relationships = {
+  collectRelationships(payload: TaggerPayload) {
+    const relationships: RelationshipCollection = {
       art: [],
       oracle: [],
     };
-    const typeToRelationshipMap = {
+    const typeToRelationshipMap: Record<string, string> = {
       illustrationId: "art",
       oracleId: "oracle",
     };
 
-    payload.relationships.forEach((r) => {
+    payload.relationships?.forEach((r) => {
       let name, type;
       let liClass = "";
       const isTheRelatedTag = payload[r.foreignKey] === r.relatedId;
@@ -290,7 +350,7 @@ class TaggerLink extends Feature {
     return relationships;
   }
 
-  addTagsToMenu(tags, menu) {
+  addTagsToMenu(tags: ShamblesharkRelationship[], menu: HTMLUListElement) {
     tags.sort(sortByAttribute(["isTag", "name"]));
 
     tags.forEach((tag) => {
@@ -309,7 +369,7 @@ class TaggerLink extends Feature {
         </li>`);
 
       if (tag.liClass) {
-        li.firstChild.classList.add(tag.liClass);
+        li.firstElementChild!.classList.add(tag.liClass);
       }
       menu.appendChild(li);
     });

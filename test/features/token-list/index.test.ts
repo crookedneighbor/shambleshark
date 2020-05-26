@@ -1,49 +1,61 @@
-import TokenList from "Features/deck-view-features/token-list";
-import mutation from "Lib/mutation";
+import TokenList, { Token } from "Features/deck-view-features/token-list";
+import { ready } from "Lib/mutation";
 import { getCollection } from "Lib/scryfall";
 import wait from "Lib/wait";
+import Modal from "Lib/ui-elements/modal";
+import { mocked } from "ts-jest/utils";
 
 jest.mock("Lib/scryfall");
+jest.mock("Lib/mutation");
 
+// TODO mock modal class
 describe("Token List", function () {
-  let tl;
+  let tl: TokenList;
 
   beforeEach(function () {
     tl = new TokenList();
   });
 
   describe("run", function () {
-    let elements, container;
+    let elements: HTMLElement[], container: HTMLDivElement;
+
+    let readySpy: jest.SpyInstance;
+    let getCardElementsSpy: jest.SpyInstance;
+    let generateTokenCollectionSpy: jest.SpyInstance;
 
     beforeEach(function () {
-      container = document.createElement("div");
-      jest.spyOn(mutation, "ready").mockImplementation((selector, cb) => {
+      container = document.createElement("div") as HTMLDivElement;
+      readySpy = mocked(ready).mockImplementation((selector, cb) => {
         cb(container);
       });
       elements = [];
 
       jest.spyOn(tl, "createUI").mockImplementation();
-      jest.spyOn(tl, "getCardElements").mockImplementation(() => {
-        tl.elements = elements;
-      });
-      jest.spyOn(tl, "generateTokenCollection").mockResolvedValue([]);
+      getCardElementsSpy = jest
+        .spyOn(tl, "getCardElements")
+        .mockImplementation(() => {
+          tl.elements = elements as HTMLAnchorElement[];
+        });
+      generateTokenCollectionSpy = jest
+        .spyOn(tl, "generateTokenCollection")
+        .mockResolvedValue([]);
       jest.spyOn(tl, "addToUI").mockImplementation();
     });
 
     it("waits for shambleshark sidebar to be on the dom", async function () {
-      mutation.ready.mockImplementation();
+      readySpy.mockImplementation();
 
       await tl.run();
 
-      expect(mutation.ready).toBeCalledTimes(1);
-      expect(mutation.ready).toBeCalledWith(
+      expect(readySpy).toBeCalledTimes(1);
+      expect(readySpy).toBeCalledWith(
         "#shambleshark-deck-display-sidebar-toolbox",
         expect.any(Function)
       );
 
       expect(tl.createUI).not.toBeCalled();
 
-      mutation.ready.mock.calls[0][1](container);
+      readySpy.mock.calls[0][1](container);
 
       expect(tl.createUI).toBeCalled();
     });
@@ -53,7 +65,7 @@ describe("Token List", function () {
 
       await wait();
 
-      expect(tl.getCardElements).toBeCalledTimes(1);
+      expect(getCardElementsSpy).toBeCalledTimes(1);
     });
 
     it("prefetches tokens", async function () {
@@ -61,7 +73,7 @@ describe("Token List", function () {
 
       await wait();
 
-      expect(tl.generateTokenCollection).toBeCalledTimes(1);
+      expect(generateTokenCollectionSpy).toBeCalledTimes(1);
     });
 
     it("does not prefetch tokens if there are more than 150 elements to look up", async function () {
@@ -74,12 +86,12 @@ describe("Token List", function () {
 
       await wait();
 
-      expect(tl.generateTokenCollection).toBeCalledTimes(0);
+      expect(generateTokenCollectionSpy).toBeCalledTimes(0);
     });
   });
 
   describe("createUI", function () {
-    let container;
+    let container: HTMLDivElement;
 
     beforeEach(function () {
       container = document.createElement("div");
@@ -100,47 +112,55 @@ describe("Token List", function () {
     it("opens the modal when token list button is clicked", function () {
       tl.createUI(container);
 
-      jest.spyOn(tl.modal, "open").mockImplementation();
+      const openSpy = jest
+        .spyOn(tl.modal as Modal, "open")
+        .mockImplementation();
 
-      const btn = container.querySelector("button.button-n");
+      const btn = container.querySelector(
+        "button.button-n"
+      ) as HTMLButtonElement;
 
       btn.click();
 
-      expect(tl.modal.open).toBeCalledTimes(1);
+      expect(openSpy).toBeCalledTimes(1);
     });
 
     it("adds tokens to modal when it opens", async function () {
-      const tokens = [];
+      const tokens: Token[] = [];
 
       tl.createUI(container);
 
       jest.spyOn(tl, "generateTokenCollection").mockResolvedValue(tokens);
       jest.spyOn(tl, "addToUI").mockImplementation();
-      jest.spyOn(tl.modal, "setLoading").mockImplementation();
+      jest.spyOn(tl.modal as Modal, "setLoading").mockImplementation();
 
-      await tl.modal.triggerOnOpen();
+      await tl.modal?.triggerOnOpen();
 
       expect(tl.generateTokenCollection).toBeCalledTimes(1);
       expect(tl.addToUI).toBeCalledTimes(1);
       expect(tl.addToUI).toBeCalledWith(tokens);
-      expect(tl.modal.setLoading).toBeCalledTimes(1);
-      expect(tl.modal.setLoading).toBeCalledWith(false);
+      expect(tl.modal?.setLoading).toBeCalledTimes(1);
+      expect(tl.modal?.setLoading).toBeCalledWith(false);
     });
 
     it("refocuses button when it closes", function () {
       tl.createUI(container);
 
-      const btn = container.querySelector("button.button-n");
+      const btn = container.querySelector(
+        "button.button-n"
+      ) as HTMLButtonElement;
       jest.spyOn(btn, "focus").mockImplementation();
 
-      tl.modal.triggerOnClose();
+      tl.modal?.triggerOnClose();
 
       expect(btn.focus).toBeCalledTimes(1);
     });
   });
 
   describe("addToUI", function () {
-    let tokens;
+    let tokens: Token[];
+
+    let setContentSpy: jest.SpyInstance;
 
     beforeEach(function () {
       const container = document.createElement("div");
@@ -148,6 +168,7 @@ describe("Token List", function () {
         {
           name: "Token 1",
           scryfall_uri: "https://scryfall.com/token-1",
+          oracle_id: "token-1",
           getImage: jest
             .fn()
             .mockReturnValue("https://img.scryfall.com/token-1"),
@@ -155,13 +176,16 @@ describe("Token List", function () {
         {
           name: "Token 2",
           scryfall_uri: "https://scryfall.com/token-2",
+          oracle_id: "token-2",
           getImage: jest
             .fn()
             .mockReturnValue("https://img.scryfall.com/token-2"),
         },
       ];
       tl.createUI(container);
-      jest.spyOn(tl.modal, "setContent").mockImplementation();
+      setContentSpy = jest
+        .spyOn(tl.modal as Modal, "setContent")
+        .mockImplementation();
     });
 
     it("adds a message if no tokens were found", function () {
@@ -169,7 +193,7 @@ describe("Token List", function () {
 
       tl.addToUI(tokens);
 
-      const el = tl.modal.setContent.mock.calls[0][0];
+      const el = setContentSpy.mock.calls[0][0];
 
       expect(el.innerHTML).toBe("No tokens detected.");
     });
@@ -177,7 +201,7 @@ describe("Token List", function () {
     it("adds tokens to modal", function () {
       tl.addToUI(tokens);
 
-      const el = tl.modal.setContent.mock.calls[0][0];
+      const el = setContentSpy.mock.calls[0][0];
       const tokenEls = el.querySelectorAll("a");
 
       expect(tokenEls.length).toBe(2);
@@ -199,7 +223,7 @@ describe("Token List", function () {
       tl.addToUI(tokens);
       tl.addToUI(tokens);
 
-      expect(tl.modal.setContent).toBeCalledTimes(1);
+      expect(setContentSpy).toBeCalledTimes(1);
     });
   });
 
@@ -215,7 +239,7 @@ describe("Token List", function () {
   });
 
   describe("flattenTokenCollection", function () {
-    let tokenCollection;
+    let tokenCollection: Token[][];
 
     beforeEach(function () {
       tokenCollection = [
@@ -224,10 +248,14 @@ describe("Token List", function () {
           {
             name: "Token 1",
             oracle_id: "id-1",
+            scryfall_uri: "https://scryfall.com/code/1",
+            getImage: jest.fn(),
           },
           {
             name: "Token 2",
             oracle_id: "id-2",
+            scryfall_uri: "https://scryfall.com/code/2",
+            getImage: jest.fn(),
           },
         ],
         [],
@@ -235,6 +263,8 @@ describe("Token List", function () {
           {
             name: "Token 3",
             oracle_id: "id-3",
+            scryfall_uri: "https://scryfall.com/code/3",
+            getImage: jest.fn(),
           },
         ],
       ];
@@ -244,18 +274,18 @@ describe("Token List", function () {
       const tokens = tl.flattenTokenCollection(tokenCollection);
 
       expect(tokens).toEqual([
-        {
+        expect.objectContaining({
           name: "Token 1",
           oracle_id: "id-1",
-        },
-        {
+        }),
+        expect.objectContaining({
           name: "Token 2",
           oracle_id: "id-2",
-        },
-        {
+        }),
+        expect.objectContaining({
           name: "Token 3",
           oracle_id: "id-3",
-        },
+        }),
       ]);
     });
 
@@ -263,26 +293,28 @@ describe("Token List", function () {
       tokenCollection[1].push({
         oracle_id: "alpha-token-id",
         name: "Alpha Token",
+        scryfall_uri: "https://scryfall.com/code/2",
+        getImage: jest.fn(),
       });
       const tokens = tl.flattenTokenCollection(tokenCollection);
 
       expect(tokens).toEqual([
-        {
+        expect.objectContaining({
           name: "Alpha Token",
           oracle_id: "alpha-token-id",
-        },
-        {
+        }),
+        expect.objectContaining({
           name: "Token 1",
           oracle_id: "id-1",
-        },
-        {
+        }),
+        expect.objectContaining({
           name: "Token 2",
           oracle_id: "id-2",
-        },
-        {
+        }),
+        expect.objectContaining({
           name: "Token 3",
           oracle_id: "id-3",
-        },
+        }),
       ]);
     });
 
@@ -290,31 +322,33 @@ describe("Token List", function () {
       tokenCollection[2].push({
         oracle_id: "id-1",
         name: "Token 1",
+        scryfall_uri: "https://scryfall.com/code/1",
+        getImage: jest.fn(),
       });
       const tokens = tl.flattenTokenCollection(tokenCollection);
 
       expect(tokens).toEqual([
-        {
+        expect.objectContaining({
           name: "Token 1",
           oracle_id: "id-1",
-        },
-        {
+        }),
+        expect.objectContaining({
           name: "Token 2",
           oracle_id: "id-2",
-        },
-        {
+        }),
+        expect.objectContaining({
           name: "Token 3",
           oracle_id: "id-3",
-        },
+        }),
       ]);
     });
   });
 
   describe("lookupTokens", function () {
-    let getCollectionSpy;
+    let getCollectionSpy: jest.SpyInstance;
 
     beforeEach(function () {
-      getCollectionSpy = getCollection.mockResolvedValue([]);
+      getCollectionSpy = mocked(getCollection).mockResolvedValue([]);
     });
 
     it("calls getCollection", async function () {
@@ -374,18 +408,28 @@ describe("Token List", function () {
   });
 
   describe("getCardElements", function () {
-    let elements;
+    let parentElement: HTMLDivElement;
 
     beforeEach(function () {
-      elements = [
-        {
-          href: "https://scryfall.com/card/dom/102",
-        },
-        {
-          href: "https://scryfall.com/card/kld/184",
-        },
-      ];
-      jest.spyOn(document, "querySelectorAll").mockReturnValue(elements);
+      jest.spyOn(document, "querySelectorAll");
+
+      const makeEl = (url: string) => {
+        const container = document.createElement("div");
+        container.className = "deck-list-entry-name";
+
+        const link = document.createElement("a");
+        link.href = url;
+
+        container.appendChild(link);
+
+        return container;
+      };
+      parentElement = document.createElement("div");
+      parentElement.className = "deck-list-entry";
+      parentElement.appendChild(makeEl("https://scryfall.com/card/dom/102"));
+      parentElement.appendChild(makeEl("https://scryfall.com/card/kld/184"));
+
+      document.body.appendChild(parentElement);
     });
 
     it("looks for elements in deck entry view", function () {
@@ -396,12 +440,16 @@ describe("Token List", function () {
         ".deck-list-entry .deck-list-entry-name a"
       );
 
-      expect(tl.elements).toStrictEqual(elements);
+      expect(tl.elements!.length).toBe(2);
+      expect(tl.elements![0].href).toBe("https://scryfall.com/card/dom/102");
+      expect(tl.elements![1].href).toBe("https://scryfall.com/card/kld/184");
     });
 
     it("uses visual deck mode to find tokens when deck list entry comes up empty", async function () {
-      document.querySelectorAll.mockReturnValueOnce([]);
-      document.querySelectorAll.mockReturnValueOnce(elements);
+      parentElement.className = "";
+      parentElement.querySelectorAll("a").forEach((el) => {
+        el.className = "card-grid-item-card";
+      });
 
       await tl.getCardElements();
 
@@ -410,13 +458,36 @@ describe("Token List", function () {
         ".deck-list-entry .deck-list-entry-name a"
       );
       expect(document.querySelectorAll).toBeCalledWith("a.card-grid-item-card");
+
+      expect(tl.elements!.length).toBe(2);
+      expect(tl.elements![0].href).toBe("https://scryfall.com/card/dom/102");
+      expect(tl.elements![1].href).toBe("https://scryfall.com/card/kld/184");
+    });
+
+    it("sets elements to empty array when none can be found", async function () {
+      parentElement.className = "";
+
+      await tl.getCardElements();
+
+      expect(document.querySelectorAll).toBeCalledTimes(2);
+      expect(document.querySelectorAll).toBeCalledWith(
+        ".deck-list-entry .deck-list-entry-name a"
+      );
+      expect(document.querySelectorAll).toBeCalledWith("a.card-grid-item-card");
+
+      expect(tl.elements!.length).toBe(0);
     });
   });
 
   describe("generateTokenCollection", function () {
+    let lookupTokensSpy: jest.SpyInstance;
+    let flattenTokenCollectionSpy: jest.SpyInstance;
+
     beforeEach(function () {
-      jest.spyOn(tl, "lookupTokens").mockResolvedValue([]);
-      jest.spyOn(tl, "flattenTokenCollection").mockImplementation();
+      lookupTokensSpy = jest.spyOn(tl, "lookupTokens").mockResolvedValue([]);
+      flattenTokenCollectionSpy = jest
+        .spyOn(tl, "flattenTokenCollection")
+        .mockImplementation();
       tl.elements = [
         {
           href: "https://scryfall.com/card/dom/102",
@@ -424,15 +495,15 @@ describe("Token List", function () {
         {
           href: "https://scryfall.com/card/kld/184",
         },
-      ];
+      ] as HTMLAnchorElement[];
     });
 
     it("looks up tokens with elements", async function () {
       const tokenCollection = [[{ id: "token" }]];
-      const result = [];
+      const result: Token[] = [];
 
-      tl.lookupTokens.mockResolvedValue(tokenCollection);
-      tl.flattenTokenCollection.mockReturnValue(result);
+      lookupTokensSpy.mockResolvedValue(tokenCollection);
+      flattenTokenCollectionSpy.mockReturnValue([]);
 
       const tokens = await tl.generateTokenCollection();
 
@@ -450,7 +521,7 @@ describe("Token List", function () {
       expect(tl.flattenTokenCollection).toBeCalledTimes(1);
       expect(tl.flattenTokenCollection).toBeCalledWith(tokenCollection);
 
-      expect(tokens).toBe(result);
+      expect(tokens).toEqual(result);
     });
 
     it("noops if no elements available", async function () {
