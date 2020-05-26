@@ -8,22 +8,6 @@ window.MutationObserver = class {
   }
 };
 
-window.chrome = {
-  runtime: {
-    id: "some-id",
-  },
-  storage: {
-    sync: {
-      get() {
-        // noop
-      },
-      set() {
-        // noop
-      },
-    },
-  },
-};
-
 window.scrollTo = jest.fn();
 
 afterEach(() => {

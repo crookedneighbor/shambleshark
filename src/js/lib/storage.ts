@@ -1,7 +1,7 @@
-import { browser } from "webextension-polyfill-ts";
+import { getStorage, setStorage } from "Browser/storage";
 
 export function get(...keys: string[]): any | any[] {
-  return browser.storage.sync.get(keys).then((result) => {
+  return getStorage(keys).then((result) => {
     if (keys.length === 1) {
       return result[keys[0]];
     }
@@ -17,7 +17,7 @@ export function set(obj: string | { [key: string]: any }, value?: any) {
     };
   }
 
-  return browser.storage.sync.set(obj);
+  return setStorage(obj);
 }
 
 export default {

@@ -1,9 +1,9 @@
-import { browser } from "webextension-polyfill-ts";
+import { onInstalled, openOptionsPage } from "Browser/runtime";
 
 export default function () {
-  browser.runtime.onInstalled().addListener(function (details) {
+  onInstalled().addListener(function (details) {
     if (details.reason === "install") {
-      browser.runtime.openOptionsPage();
+      openOptionsPage();
     }
   });
 }

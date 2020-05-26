@@ -18,10 +18,8 @@ module.exports = {
     "^Lib/(.*)$": path.resolve(__dirname, "src/js/lib/$1"),
     "^Ui/(.*)$": path.resolve(__dirname, "src/js/lib/ui-elements/$1"),
     "^Svg$": path.resolve(__dirname, "src/js/resources/svg.ts"),
-    "^ExtensionsLink$": path.resolve(
-      __dirname,
-      "src/js/lib/chrome/extensions-link"
-    ),
+    "^Browser/runtime$": path.resolve(__dirname, "src/js/lib/chrome/runtime"),
+    "^Browser/storage$": path.resolve(__dirname, "src/js/lib/chrome/storage"),
   },
   clearMocks: true,
   moduleFileExtensions: ["ts", "js", "json", "node"],
