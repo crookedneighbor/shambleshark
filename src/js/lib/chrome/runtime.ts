@@ -1,3 +1,5 @@
+import type { OnHeadersReceivedOptions } from "Js/types/browser";
+
 export function openOptionsPage() {
   chrome.runtime.openOptionsPage();
 }
@@ -11,7 +13,7 @@ export function onInstalled() {
 }
 
 // https://stackoverflow.com/a/15534822/2601552
-export function onHeadersReceived(options) {
+export function onHeadersReceived(options: OnHeadersReceivedOptions) {
   return chrome.webRequest.onHeadersReceived.addListener(
     options.addListener,
     options.config,
