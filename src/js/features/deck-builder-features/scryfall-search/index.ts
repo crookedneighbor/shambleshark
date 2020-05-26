@@ -28,7 +28,8 @@ class ScryfallSearch extends Feature {
   currentQuery?: string;
   deck?: Deck;
   isSingleton?: boolean;
-  cardList?: any; // TODO no any
+  // TODO no any
+  cardList?: any;
   deckSectionChooser?: DeckSectionChooser;
   container?: HTMLDivElement;
   _nextInProgress?: boolean;

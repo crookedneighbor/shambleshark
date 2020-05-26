@@ -37,7 +37,7 @@ describe("Scryfall Search", function () {
       const ss = new ScryfallSearch();
 
       jest.spyOn(ss, "createDrawer").mockReturnValue({} as Drawer);
-      jest.spyOn(ss, "onEnter").mockReturnValue({} as Promise<void>);
+      jest.spyOn(ss, "onEnter").mockResolvedValue();
 
       await ss.run();
 
@@ -62,7 +62,7 @@ describe("Scryfall Search", function () {
       const ss = new ScryfallSearch();
 
       jest.spyOn(ss, "createDrawer").mockReturnValue({} as Drawer);
-      jest.spyOn(ss, "onEnter").mockReturnValue({} as Promise<void>);
+      jest.spyOn(ss, "onEnter").mockResolvedValue();
 
       await ss.run();
 
@@ -124,12 +124,8 @@ describe("Scryfall Search", function () {
       const drawer = ss.createDrawer();
 
       ss.cardList = [];
-      ss.cardList.next = jest.fn().mockImplementation(
-        () =>
-          new Promise<any[]>((resolve, _reject) => {
-            resolve(ss.cardList);
-          })
-      );
+
+      ss.cardList.next = jest.fn().mockResolvedValue(ss.cardList);
 
       jest.spyOn(ss, "isReadyToLookupNextBatch").mockReturnValue(true);
       jest.spyOn(ss, "addCards").mockImplementation();
@@ -174,6 +170,7 @@ describe("Scryfall Search", function () {
         restrictFunnyCards: false,
       };
 
+      // TODO no any
       searchSpy = mocked(search).mockResolvedValue([] as any);
       getDeckSpy = mocked(getDeck).mockResolvedValue(makeFakeDeck());
       jest.spyOn(ss, "addCards").mockImplementation();
@@ -244,6 +241,7 @@ describe("Scryfall Search", function () {
     });
 
     it("adds cards from the api result", async function () {
+      // TODO no any
       const cards = [{} as any, {} as any];
 
       searchSpy.mockResolvedValue(cards);
