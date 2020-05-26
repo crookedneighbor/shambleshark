@@ -12,12 +12,12 @@ module.exports = {
     "\\.css$": "<rootDir>/test/mocks/styles.js",
 
     // These need to be duplicated from the webpack config
-    "^Constants$": path.resolve(__dirname, "src/js/resources/constants.js"),
+    "^Constants$": path.resolve(__dirname, "src/js/resources/constants.ts"),
     "^Features/(.*)$": path.resolve(__dirname, "src/js/features/$1"),
     "^Feature$": path.resolve(__dirname, "src/js/features/feature.ts"),
     "^Lib/(.*)$": path.resolve(__dirname, "src/js/lib/$1"),
     "^Ui/(.*)$": path.resolve(__dirname, "src/js/lib/ui-elements/$1"),
-    "^Svg$": path.resolve(__dirname, "src/js/resources/svg.js"),
+    "^Svg$": path.resolve(__dirname, "src/js/resources/svg.ts"),
     "^ExtensionsLink$": path.resolve(
       __dirname,
       "src/js/lib/chrome/extensions-link"

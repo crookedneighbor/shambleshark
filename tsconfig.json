@@ -8,12 +8,12 @@
       "Helpers/*": ["test/helpers/*"],
       /* These need to be duplicated from the webpack config */
       "ExtensionsLink": ["src/js/lib/chrome/extensions-link.ts"],
-      "Constants": ["src/js/resources/constants.js"],
+      "Constants": ["src/js/resources/constants.ts"],
       "Feature": ["src/js/features/feature.ts"],
       "Features/*": ["src/js/features/*"],
       "Lib/*": ["src/js/lib/*"],
       "Ui/*": ["src/js/lib/ui-elements/*"],
-      "Svg": ["src/js/resources/svg.js"],
+      "Svg": ["src/js/resources/svg.ts"],
       "Types": ["src/js/types/*"]
     },
     "outDir": "./dist/",
