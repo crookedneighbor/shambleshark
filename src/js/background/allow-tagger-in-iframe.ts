@@ -4,7 +4,7 @@ export default function () {
   // removes the headers that prevent loading Tagger in an iframe
   onHeadersReceived({
     addListener(info) {
-      const headers = info.responseHeaders.filter((rawHeader) => {
+      const headers = info.responseHeaders?.filter((rawHeader) => {
         const header = rawHeader.name.toLowerCase();
 
         return header !== "x-frame-options" && header !== "frame-options";
