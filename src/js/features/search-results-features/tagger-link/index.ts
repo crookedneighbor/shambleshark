@@ -123,6 +123,7 @@ class TaggerLink extends Feature {
     title: "Tagger Link",
     section: sections.SEARCH_RESULTS,
     description: "Provide a button to card's tagger page from search results.",
+    futureFeature: false,
   };
 
   static settingsDefaults = {

@@ -40,6 +40,7 @@ class ScryfallSearch extends Feature {
     section: sections.DECK_BUILDER,
     description:
       "Search for Scryfall cards right inside the deckbuilder! (Coming Soon: Save searches for specific decks for later)",
+    futureFeature: false,
   };
 
   static settingsDefaults = {

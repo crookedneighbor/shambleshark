@@ -29,6 +29,7 @@ class TokenList extends Feature {
     title: "Token List",
     section: sections.DECK_VIEW,
     description: "List tokens created by cards in the deck.",
+    futureFeature: false,
   };
 
   static settingsDefaults = {

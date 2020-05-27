@@ -4,6 +4,7 @@ import "./options.css";
 
 import createElement from "Lib/create-element";
 
+import Feature, { SettingsDefinition } from "Feature";
 import globalFeatures from "Features/global-features";
 import deckbuilderFeatures from "Features/deck-builder-features";
 import deckViewFeatures from "Features/deck-view-features";
@@ -14,8 +15,10 @@ const features = globalFeatures
   .concat(deckViewFeatures)
   .concat(searchResultsFeatures);
 
-function setupToggleListeners(element, fn) {
-  element.addEventListener("change", fn);
+function setupToggleListeners(element: HTMLInputElement, fn: () => void) {
+  element.addEventListener("change", function () {
+    fn();
+  });
   element.addEventListener("keydown", function (event) {
     if (event.key === "Enter") {
       element.checked = !element.checked;
@@ -24,27 +27,37 @@ function setupToggleListeners(element, fn) {
   });
 }
 
-function createCheckbox(def, inputValue, Feature) {
-  const checkboxContainer = createElement(`<label
+function createCheckbox(
+  def: SettingsDefinition,
+  inputValue: boolean,
+  ChildFeature: typeof Feature
+): HTMLLabelElement {
+  const checkboxContainer = createElement<HTMLLabelElement>(`<label
     class="checkbox"
   >
     <input type="checkbox" id="${def.id}-checkbox" />
     ${def.label}
   </label>`);
-  const checkbox = checkboxContainer.querySelector("input");
+  const checkbox = checkboxContainer.querySelector("input") as HTMLInputElement;
   checkbox.checked = inputValue;
   checkbox.addEventListener("change", () => {
-    Feature.saveSetting(def.id, checkbox.checked);
+    ChildFeature.saveSetting(def.id, checkbox.checked);
   });
 
   return checkboxContainer;
 }
 
-function createInputForType(def, inputValue, Feature) {
+function createInputForType(
+  def: SettingsDefinition,
+  inputValue: boolean,
+  ChildFeature: typeof Feature
+): HTMLElement {
   switch (def.input) {
     case "checkbox":
-      return createCheckbox(def, inputValue, Feature);
+      return createCheckbox(def, inputValue, ChildFeature);
   }
+
+  return document.createElement("input");
 }
 
 const page = createElement(`<div>
@@ -96,9 +109,9 @@ const page = createElement(`<div>
 Promise.all(
   features.map((Feature) => {
     const data = Feature.metadata;
-    const section = page.querySelector(`#${data.section}`);
+    const section = page.querySelector(`#${data.section}`) as HTMLElement;
     const enabledSwitchId = `${data.id}-enabled-switch`;
-    const isFutureFeature = data.futureFeature;
+    const isFutureFeature = data.futureFeature === true;
 
     let title = data.title;
 
@@ -124,7 +137,9 @@ Promise.all(
     // construct HTML for additioanl settings
 
     return Feature.getSettings().then((settings) => {
-      const enabledSwitch = container.querySelector("input");
+      const enabledSwitch = container.querySelector(
+        "input"
+      ) as HTMLInputElement;
 
       setupToggleListeners(enabledSwitch, () => {
         if (enabledSwitch.checked) {
@@ -141,10 +156,10 @@ Promise.all(
       if (Feature.settingDefinitions.length) {
         container
           .querySelector(".feature-description")
-          .classList.add("has-options");
+          ?.classList.add("has-options");
       }
 
-      Feature.settingDefinitions.forEach((def) => {
+      Feature.settingDefinitions.forEach((def: SettingsDefinition) => {
         const input = createInputForType(def, settings[def.id], Feature);
         input.classList.add("feature-option");
 

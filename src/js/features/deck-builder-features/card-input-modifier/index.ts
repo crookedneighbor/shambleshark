@@ -30,6 +30,7 @@ class CardInputModifier extends Feature {
     title: "Card Input Modifier",
     section: sections.DECK_BUILDER,
     description: "Modifiers for the card input.",
+    futureFeature: false,
   };
 
   static settingsDefaults = {

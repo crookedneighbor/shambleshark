@@ -8,6 +8,7 @@ class FutureFeatureOptIn extends Feature {
     section: sections.GLOBAL,
     description:
       "When a new feature is added to the extension, automatically turn it on! Disabling this just means you will need to enable each new feature individually.",
+    futureFeature: false,
   };
 
   static settingsDefaults = {

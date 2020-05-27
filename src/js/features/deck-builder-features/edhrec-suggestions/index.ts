@@ -15,6 +15,7 @@ class EDHRecSuggestions extends Feature {
     section: sections.DECK_BUILDER,
     description:
       "Inserts an EDHRec button on commander decks. When accessed, will display a list of card suggestions from EDHRec.",
+    futureFeature: false,
   };
 
   static settingsDefaults = {

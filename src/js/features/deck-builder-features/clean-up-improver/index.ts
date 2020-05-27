@@ -12,6 +12,7 @@ class CleanUpImprover extends Feature {
     title: "Clean Up Improver",
     section: sections.DECK_BUILDER,
     description: "Modifies the clean up button to better organize the deck.",
+    futureFeature: false,
   };
 
   static settingsDefaults = {
