@@ -1,4 +1,4 @@
-window.MutationObserver = class {
+(window as any).MutationObserver = class {
   disconnect() {
     // noop
   }
