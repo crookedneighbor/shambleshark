@@ -3,6 +3,7 @@ export default function embed() {
   const s = document.createElement("script");
   s.src = chrome.runtime.getURL("scryfallEmbed.bundle.js");
   s.onload = function () {
+    // @ts-ignore
     this.remove();
   };
 

@@ -4,7 +4,6 @@ import bus from "framebus";
 import SpyInstance = jest.SpyInstance;
 
 describe("Tagger", () => {
-  let xhrSpy: SpyInstance;
   const xhrMock: Partial<XMLHttpRequest> = {
     open: jest.fn(),
     send: jest.fn(),
@@ -24,7 +23,7 @@ describe("Tagger", () => {
     jest.spyOn(bus, "on").mockImplementation();
     jest.spyOn(bus, "emit").mockImplementation();
 
-    xhrSpy = jest
+    jest
       .spyOn(window, "XMLHttpRequest")
       .mockImplementation(() => xhrMock as XMLHttpRequest);
 

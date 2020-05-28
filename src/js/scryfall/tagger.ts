@@ -58,9 +58,9 @@ export default function () {
     // Firefox errors with a 422 for some reason when
     // using the fetch API inside an iframe, so we must
     // use xhr for this request
-    const token = document
-      .querySelector('meta[name="csrf-token"]')
-      .getAttribute("content");
+    const token = (document.querySelector(
+      'meta[name="csrf-token"]'
+    ) as HTMLElement).getAttribute("content") as string;
     const xhr = new window.XMLHttpRequest();
 
     xhr.open("POST", "https://tagger.scryfall.com/graphql", true);
