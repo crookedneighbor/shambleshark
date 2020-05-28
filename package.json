@@ -5,7 +5,7 @@
   "description": "Unofficial browser extension to add functionality to the Scryfall website. This extension is not developed by the Scryfall team.",
   "scripts": {
     "pretty": "prettier --write .",
-    "lint": "eslint .",
+    "lint": "eslint --ext ts .",
     "posttest": "npm run pretty && npm run lint",
     "test": "jest",
     "build": "npm run build:chrome && npm run build:firefox",
