@@ -6,12 +6,6 @@ import { generateScryfallGlobal } from "../mocks/scryfall-global";
 
 import { makeFakeDeck, makeFakeCard } from "Helpers/fake";
 
-declare global {
-  interface Window {
-    Scryfall: any;
-  }
-}
-
 describe("modifyCleanUp", function () {
   let originalCleanupFunction: Function;
   let fakeDeck: Deck;
@@ -29,7 +23,7 @@ describe("modifyCleanUp", function () {
     window.Scryfall = generateScryfallGlobal();
     originalCleanupFunction = window.Scryfall.deckbuilder.cleanUp;
     jest.spyOn(scryfall, "getDeck").mockResolvedValue(fakeDeck);
-    jest.spyOn(scryfall, "updateEntry").mockResolvedValue(null);
+    jest.spyOn(scryfall, "updateEntry").mockResolvedValue(makeFakeCard());
   });
 
   it("replaces the cleanup function", function () {

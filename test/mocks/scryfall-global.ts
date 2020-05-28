@@ -1,6 +1,7 @@
 export function generateScryfallGlobal() {
   return {
     deckbuilder: {
+      deckId: "deck-id",
       cleanUp: jest.fn(),
     },
     pushNotification: jest.fn(),

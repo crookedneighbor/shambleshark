@@ -2,12 +2,21 @@ import bus from "framebus";
 import { BUS_EVENTS as events } from "Constants";
 import Scryfall from "./scryfall-globals";
 import modifyCleanUp from "./modify-clean-up";
-import { hasDedicatedLandSection, isLandCard } from "Lib/deck-parser";
+import {
+  hasDedicatedLandSection,
+  isLandCard,
+  flattenEntries,
+} from "Lib/deck-parser";
+
+import type { Card, Deck, DeckSections } from "Js/types/deck";
 
 export default function setUpListeners() {
   Scryfall.addHooksToCardManagementEvents();
 
   bus.on(events.REQUEST_DECK, function (reply) {
+    // TODO need to update bus to be a generic so
+    // you can specify what the shape of the payload is
+    // @ts-ignore
     Scryfall.getDeck().then(reply);
   });
 
@@ -17,19 +26,23 @@ export default function setUpListeners() {
     color = "purple",
     type = "deck",
   }) {
+    // TODO need to update bus to be a generic so
+    // you can specify what the shape of the payload is
+    // @ts-ignore
     Scryfall.pushNotification(header, message, color, type);
   });
 
   bus.on(events.ADD_CARD_TO_DECK, function ({ cardName, cardId, section }) {
     // adds card if it does not exist and increments
     // the card if it already exists
-    Scryfall.addCard(cardId).then(function (addedCardInfo) {
+    Scryfall.addCard(cardId as string).then(function (addedCardInfo) {
       if (section) {
-        addedCardInfo.section = section;
+        addedCardInfo.section = section as DeckSections;
         Scryfall.updateEntry(addedCardInfo);
       } else if (isLandCard(addedCardInfo)) {
+        // TODO consier getting rid of getDeckMetatdata helper
         Scryfall.getDeckMetadata().then((meta) => {
-          if (hasDedicatedLandSection(meta)) {
+          if (hasDedicatedLandSection(meta as Deck)) {
             addedCardInfo.section = "lands";
             Scryfall.updateEntry(addedCardInfo);
           }
@@ -47,28 +60,23 @@ export default function setUpListeners() {
   bus.on(events.REMOVE_CARD_FROM_DECK, function ({ cardName }) {
     Scryfall.getDeck()
       .then((deck) => {
-        const cardToRemove = Object.keys(deck.entries).reduce(
-          (match, category) => {
-            if (match) {
-              return match;
-            }
+        const entries = flattenEntries(deck);
+        const cardToRemove = entries.find((card) => {
+          if (!card.card_digest) {
+            return false;
+          }
 
-            return deck.entries[category].find((card) => {
-              if (!card.card_digest) {
-                return false;
-              }
+          return card.card_digest.name === cardName;
+        }) as Card;
 
-              return card.card_digest.name === cardName;
-            });
-          },
-          false
-        );
-
-        if (cardToRemove.count <= 1) {
+        if (cardToRemove.count! <= 1) {
           return Scryfall.removeEntry(cardToRemove.id);
         } else {
-          cardToRemove.count--;
-          return Scryfall.updateEntry(cardToRemove);
+          cardToRemove.count!--;
+          return Scryfall.updateEntry(cardToRemove).then(() => {
+            // to make this match the same return signature as removeEntry
+            return Promise.resolve();
+          });
         }
       })
       .then(() => {

@@ -23,7 +23,7 @@ export const FEATURE_IDS = {
   TaggerLink: "tagger-link",
 };
 
-export const BUS_EVENTS = {
+export const BUS_EVENTS: Record<string, string> = {
   ADD_CARD_TO_DECK: "ADD_CARD_TO_DECK",
   CALLED_DESTROYENTRY: "CALLED_DESTROYENTRY",
   CALLED_ADDCARD: "CALLED_ADDCARD",

@@ -23,13 +23,6 @@ import {
 } from "../mocks/scryfall-global";
 import { makeFakeDeck, makeFakeCard } from "Helpers/fake";
 
-declare global {
-  interface Window {
-    Scryfall: any;
-    ScryfallAPI: any;
-  }
-}
-
 describe("set up listeners on Scryfall page", function () {
   beforeEach(function () {
     window.ScryfallAPI = generateScryfallAPIGlobal();
@@ -38,13 +31,14 @@ describe("set up listeners on Scryfall page", function () {
     jest.spyOn(bus, "on").mockImplementation();
     jest.spyOn(bus, "emit").mockImplementation();
     mocked(getDeckMetadata).mockResolvedValue({
+      id: "deck-id",
       sections: {
         primary: ["mainboard"],
         secondary: ["sideboard"],
       },
     });
-    mocked(updateEntry).mockResolvedValue(null);
-    mocked(removeEntry).mockResolvedValue(null);
+    mocked(updateEntry).mockResolvedValue(makeFakeCard());
+    mocked(removeEntry).mockResolvedValue();
   });
 
   it("listens for events", function () {
@@ -224,6 +218,7 @@ describe("set up listeners on Scryfall page", function () {
       cardData.section = "sideboard";
       scryfallCard.card_digest!.type_line = "Land";
       mocked(getDeckMetadata).mockResolvedValue({
+        id: "deck-id",
         sections: {
           primary: ["nonlands"],
           secondary: ["lands"],
@@ -242,6 +237,7 @@ describe("set up listeners on Scryfall page", function () {
     it("updates lands to be put in lands section if deck has dedicated lands section and no section is specified", function () {
       scryfallCard.card_digest!.type_line = "Land";
       mocked(getDeckMetadata).mockResolvedValue({
+        id: "deck-id",
         sections: {
           primary: ["nonlands"],
           secondary: ["lands"],
@@ -304,31 +300,35 @@ describe("set up listeners on Scryfall page", function () {
           }
         }
       );
-      mocked(getDeck).mockResolvedValue({
-        entries: {
-          commanders: [
-            {
-              id: "rashmi-id",
-              count: 1,
-              card_digest: {
-                name: "Rashmi, Etrnities Crafter",
-              },
-            },
-            {
-              // empty object, no card info
-            },
-          ],
-          nonlands: [
-            {
-              id: "birds-id",
-              count: 2,
-              card_digest: {
-                name: "Birds of Paradise",
-              },
-            },
-          ],
-        },
-      });
+      mocked(getDeck).mockResolvedValue(
+        makeFakeDeck({
+          primarySections: ["commanders"],
+          secondarySections: ["nonlands"],
+          entries: {
+            commanders: [
+              makeFakeCard({
+                id: "rashmi-id",
+                count: 1,
+                cardDigest: {
+                  name: "Rashmi, Etrnities Crafter",
+                },
+              }),
+              makeFakeCard({
+                cardDigest: false,
+              }),
+            ],
+            nonlands: [
+              makeFakeCard({
+                id: "birds-id",
+                count: 2,
+                cardDigest: {
+                  name: "Birds of Paradise",
+                },
+              }),
+            ],
+          },
+        })
+      );
     });
 
     it("removes card from deck if there was only 1 left", async function () {
@@ -349,13 +349,15 @@ describe("set up listeners on Scryfall page", function () {
 
       expect(removeEntry).toBeCalledTimes(0);
       expect(updateEntry).toBeCalledTimes(1);
-      expect(updateEntry).toBeCalledWith({
-        id: "birds-id",
-        count: 1,
-        card_digest: {
-          name: "Birds of Paradise",
-        },
-      });
+      expect(updateEntry).toBeCalledWith(
+        expect.objectContaining({
+          id: "birds-id",
+          count: 1,
+          card_digest: expect.objectContaining({
+            name: "Birds of Paradise",
+          }),
+        })
+      );
     });
 
     it("sends a push notification", async function () {

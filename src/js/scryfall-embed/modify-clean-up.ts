@@ -1,16 +1,18 @@
 import scryfall from "./scryfall-globals";
 import { hasDedicatedLandSection, isLandCard } from "Lib/deck-parser";
 
-function correctLandNonLandColumns(deck) {
+import type { Deck } from "Js/types/deck";
+
+function correctLandNonLandColumns(deck: Deck) {
   if (!hasDedicatedLandSection(deck)) {
-    return Promise.resolve();
+    return Promise.resolve([]);
   }
 
-  const landsInNonLands = deck.entries.nonlands
-    .filter((c) => c.card_digest)
+  const landsInNonLands = deck.entries
+    .nonlands!.filter((c) => c.card_digest)
     .filter((c) => isLandCard(c));
-  const nonLandsInLands = deck.entries.lands
-    .filter((c) => c.card_digest)
+  const nonLandsInLands = deck.entries
+    .lands!.filter((c) => c.card_digest)
     .filter((c) => !isLandCard(c));
 
   landsInNonLands.forEach((c) => {
@@ -26,10 +28,14 @@ function correctLandNonLandColumns(deck) {
   return Promise.all(cardPromises);
 }
 
-export default function modifyCleanUp(config = {}) {
-  const oldCleanup = Scryfall.deckbuilder.cleanUp;
+type ModifyCleanupOptions = {
+  cleanUpLandsInSingleton?: boolean;
+};
 
-  Scryfall.deckbuilder.cleanUp = () => {
+export default function modifyCleanUp(config: ModifyCleanupOptions = {}) {
+  const oldCleanup = window.Scryfall.deckbuilder.cleanUp;
+
+  window.Scryfall.deckbuilder.cleanUp = () => {
     return scryfall
       .getDeck()
       .then((deck) => {

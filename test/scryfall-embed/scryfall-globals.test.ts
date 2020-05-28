@@ -20,14 +20,9 @@ import {
 } from "../mocks/scryfall-global";
 import { makeFakeDeck, makeFakeCard } from "Helpers/fake";
 
-declare global {
-  interface Window {
-    Scryfall: any;
-    ScryfallAPI: any;
-  }
-}
-
 describe("Scryfall Globals", function () {
+  let ScryfallAPISpy: any;
+  let ScryfallSpy: any;
   let fakeDeck: Deck;
 
   beforeEach(function () {
@@ -42,17 +37,15 @@ describe("Scryfall Globals", function () {
         maybeboard: [],
       },
     });
-    window.ScryfallAPI = generateScryfallAPIGlobal();
-    window.ScryfallAPI.decks.active.mockImplementation((cb: Function) => {
+    ScryfallAPISpy = window.ScryfallAPI = generateScryfallAPIGlobal();
+    ScryfallAPISpy.decks.active.mockImplementation((cb: Function) => {
       cb(fakeDeck);
     });
-    window.ScryfallAPI.decks.get.mockImplementation(
-      (id: string, cb: Function) => {
-        cb(fakeDeck);
-      }
-    );
+    ScryfallAPISpy.decks.get.mockImplementation((id: string, cb: Function) => {
+      cb(fakeDeck);
+    });
 
-    window.Scryfall = generateScryfallGlobal();
+    ScryfallSpy = window.Scryfall = generateScryfallGlobal();
   });
 
   describe("addHooksToCardManagementEvents", function () {
@@ -65,12 +58,12 @@ describe("Scryfall Globals", function () {
     ])(
       "replaces ScryfallAPI.decks.%s with a method that emits a bus event when calling the original method",
       function (s) {
-        const original = window.ScryfallAPI.decks[s];
+        const original = ScryfallAPISpy.decks[s];
 
         addHooksToCardManagementEvents();
 
-        expect(original).not.toBe(window.ScryfallAPI.decks[s]);
-        window.ScryfallAPI.decks[s]("foo", "bar");
+        expect(original).not.toBe(ScryfallAPISpy.decks[s]);
+        ScryfallAPISpy.decks[s]("foo", "bar");
 
         expect(bus.emit).toBeCalledTimes(1);
         expect(bus.emit).toBeCalledWith(`CALLED_${s.toUpperCase()}`, {
@@ -82,12 +75,12 @@ describe("Scryfall Globals", function () {
     );
 
     it("replaces Scryfall.deckbuilder.cleanUp with a method that emits a bus event when calling the original method", function () {
-      const original = window.Scryfall.deckbuilder.cleanUp;
+      const original = ScryfallSpy.deckbuilder.cleanUp;
 
       addHooksToCardManagementEvents();
 
-      expect(original).not.toBe(window.Scryfall.deckbuilder.cleanUp);
-      window.Scryfall.deckbuilder.cleanUp("foo", "bar");
+      expect(original).not.toBe(ScryfallSpy.deckbuilder.cleanUp);
+      ScryfallSpy.deckbuilder.cleanUp("foo", "bar");
 
       expect(bus.emit).toBeCalledTimes(1);
       expect(bus.emit).toBeCalledWith("CALLED_CLEANUP");
@@ -96,7 +89,7 @@ describe("Scryfall Globals", function () {
     });
 
     it("does not attempt to replace Scryfall.deckbuilder.cleanUp if Scryfall.deckbuilder global is not available", function () {
-      delete window.Scryfall.deckbuilder;
+      delete ScryfallSpy.deckbuilder;
 
       expect(() => {
         addHooksToCardManagementEvents();
@@ -122,7 +115,7 @@ describe("Scryfall Globals", function () {
     it("waits progressively longer for grant secret", async function () {
       let hasResolved = false;
       jest.useFakeTimers();
-      delete window.ScryfallAPI.grantSecret;
+      delete ScryfallAPISpy.grantSecret;
 
       const getActiveDeckIdPromise = getActiveDeckId().then(() => {
         hasResolved = true;
@@ -134,7 +127,7 @@ describe("Scryfall Globals", function () {
 
       expect(hasResolved).toBe(false);
 
-      window.ScryfallAPI.grantSecret = "secret";
+      ScryfallAPISpy.grantSecret = "secret";
 
       await Promise.resolve().then(() => jest.advanceTimersByTime(10000));
 
@@ -148,26 +141,26 @@ describe("Scryfall Globals", function () {
 
       return getActiveDeckId().then((id: string) => {
         expect(id).toBe("deck-id-from-url");
-        expect(window.ScryfallAPI.decks.active).not.toBeCalled();
+        expect(ScryfallAPISpy.decks.active).not.toBeCalled();
       });
     });
 
     it("skips api call if the deck id is available on the window", function () {
-      window.Scryfall.deckbuilder.deckId = "deck-id-from-window";
+      ScryfallSpy.deckbuilder.deckId = "deck-id-from-window";
 
       return getActiveDeckId().then((id: string) => {
         expect(id).toBe("deck-id-from-window");
-        expect(window.ScryfallAPI.decks.active).not.toBeCalled();
+        expect(ScryfallAPISpy.decks.active).not.toBeCalled();
       });
     });
 
     it("prefers deck id from url over window", function () {
       jest.spyOn(url, "getDeckId").mockReturnValue("deck-id-from-url");
-      window.Scryfall.deckbuilder.deckId = "deck-id-from-window";
+      ScryfallSpy.deckbuilder.deckId = "deck-id-from-window";
 
       return getActiveDeckId().then((id: string) => {
         expect(id).toBe("deck-id-from-url");
-        expect(window.ScryfallAPI.decks.active).not.toBeCalled();
+        expect(ScryfallAPISpy.decks.active).not.toBeCalled();
       });
     });
   });
@@ -184,14 +177,14 @@ describe("Scryfall Globals", function () {
     it("gets the active deck", function () {
       const deck = makeFakeDeck({ id: "deck-id" });
 
-      window.ScryfallAPI.decks.get.mockImplementation(
+      ScryfallAPISpy.decks.get.mockImplementation(
         (id: string, cb: Function) => {
           cb(deck);
         }
       );
 
       return getDeck().then((resolvedDeck: Deck) => {
-        expect(window.ScryfallAPI.decks.get).toBeCalledWith(
+        expect(ScryfallAPISpy.decks.get).toBeCalledWith(
           "deck-id",
           expect.any(Function)
         );
@@ -209,14 +202,14 @@ describe("Scryfall Globals", function () {
         secondarySections: ["sideboard", "lands"],
       });
 
-      window.ScryfallAPI.decks.get.mockImplementation(
+      ScryfallAPISpy.decks.get.mockImplementation(
         (id: string, cb: Function) => {
           cb(deck);
         }
       );
 
       return getDeckMetadata().then((meta: {}) => {
-        expect(window.ScryfallAPI.decks.get).toBeCalledWith(
+        expect(ScryfallAPISpy.decks.get).toBeCalledWith(
           "deck-id",
           expect.any(Function)
         );
@@ -236,14 +229,14 @@ describe("Scryfall Globals", function () {
     it("resolves with the card", function () {
       const card = makeFakeCard();
 
-      window.ScryfallAPI.decks.addCard.mockImplementation(
+      ScryfallAPISpy.decks.addCard.mockImplementation(
         (deckId: string, cardId: string, cb: Function) => {
           cb(card);
         }
       );
 
       return addCard("card-id").then((resolvedCard: {}) => {
-        expect(window.ScryfallAPI.decks.addCard).toBeCalledWith(
+        expect(ScryfallAPISpy.decks.addCard).toBeCalledWith(
           "deck-id",
           "card-id",
           expect.any(Function)
@@ -259,14 +252,14 @@ describe("Scryfall Globals", function () {
       const cardToUpdate = makeFakeCard({ id: "card-id" });
       const card = makeFakeCard();
 
-      window.ScryfallAPI.decks.updateEntry.mockImplementation(
+      ScryfallAPISpy.decks.updateEntry.mockImplementation(
         (deckId: string, cardToUpdate: any, cb: Function) => {
           cb(card);
         }
       );
 
       return updateEntry(cardToUpdate).then((resolvedCard: {}) => {
-        expect(window.ScryfallAPI.decks.updateEntry).toBeCalledWith(
+        expect(ScryfallAPISpy.decks.updateEntry).toBeCalledWith(
           "deck-id",
           cardToUpdate,
           expect.any(Function)
@@ -281,14 +274,14 @@ describe("Scryfall Globals", function () {
     it("calls destroy API", function () {
       const data = {};
 
-      window.ScryfallAPI.decks.destroyEntry.mockImplementation(
+      ScryfallAPISpy.decks.destroyEntry.mockImplementation(
         (deckId: string, cardId: string, cb: Function) => {
           cb(data);
         }
       );
 
       return removeEntry("card-id").then(() => {
-        expect(window.ScryfallAPI.decks.destroyEntry).toBeCalledWith(
+        expect(ScryfallAPISpy.decks.destroyEntry).toBeCalledWith(
           "deck-id",
           "card-id",
           expect.any(Function)
@@ -300,7 +293,7 @@ describe("Scryfall Globals", function () {
   describe("cleanUp", function () {
     it("resolves after cleaning up", function () {
       return cleanUp().then(() => {
-        expect(window.Scryfall.deckbuilder.cleanUp).toBeCalledTimes(1);
+        expect(ScryfallSpy.deckbuilder.cleanUp).toBeCalledTimes(1);
       });
     });
   });
@@ -309,8 +302,8 @@ describe("Scryfall Globals", function () {
     it("sends a push notification", function () {
       return pushNotification("Title", "message", "color", "category").then(
         function () {
-          expect(window.Scryfall.pushNotification).toBeCalledTimes(1);
-          expect(window.Scryfall.pushNotification).toBeCalledWith(
+          expect(ScryfallSpy.pushNotification).toBeCalledTimes(1);
+          expect(ScryfallSpy.pushNotification).toBeCalledWith(
             "Title",
             "message",
             "color",
