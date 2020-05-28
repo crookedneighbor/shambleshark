@@ -194,7 +194,7 @@ function createEDHRecResponseHandler(
       ) as HTMLDivElement;
 
       section.cards.forEach((card) => {
-        suggestions.appendChild(card.cardElement?.element);
+        suggestions.appendChild(card.cardElement?.element as HTMLDivElement);
       });
       container.appendChild(section.element);
     });

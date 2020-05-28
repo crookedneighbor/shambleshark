@@ -5,28 +5,61 @@ import createElement from "Lib/create-element";
 import emptyElement from "Lib/empty-element";
 import "./index.css";
 
+type GetScryfallIDFunction = () => Promise<string>;
+
+type AddCardElementOptions = {
+  quantity?: number;
+  id?: string;
+  name: string;
+  img: string;
+  type: string;
+  singleton?: boolean;
+  onAddCard?: Function;
+  getScryfallId?: GetScryfallIDFunction;
+};
+
 export default class AddCardElement {
-  constructor(options = {}) {
+  element: HTMLDivElement;
+  quantity: number;
+  id?: string;
+  name: string;
+  img: HTMLImageElement;
+  overlay: HTMLDivElement;
+  minusButton: HTMLDivElement;
+  plusButton: HTMLDivElement;
+  metadata: HTMLDivElement;
+  type: string;
+  singleton: boolean;
+  onAddCard: Function;
+  private _getScryfallId: GetScryfallIDFunction;
+
+  constructor(options: AddCardElementOptions) {
+    const imgSrc = options.img;
     this.quantity = options.quantity || 0;
-    this.id = options.id;
+    if (options.id) {
+      this.id = options.id;
+    }
     this.name = options.name;
-    this.img = options.img;
     this.type = options.type;
     this.singleton = Boolean(options.singleton);
-    this.onAddCard = options.onAddCard;
+    this.onAddCard =
+      options.onAddCard ||
+      function () {
+        // noop
+      };
 
     if (options.getScryfallId) {
       this._getScryfallId = options.getScryfallId;
     } else {
       this._getScryfallId = () => {
-        return Promise.resolve(this.id);
+        return Promise.resolve(this.id as string);
       };
     }
 
     this.element = createElement(`<div
       class="add-card-element-container"
     >
-      <img src="${this.img}"/>
+      <img src="${imgSrc}"/>
       <div class="add-card-element-overlay">
         <div role="button" tabindex="0" class="add-card-element__panel minus-symbol">
           ${MINUS_SYMBOL}
@@ -38,11 +71,17 @@ export default class AddCardElement {
       </div>
     </div>`);
 
-    this.img = this.element.querySelector("img");
-    this.overlay = this.element.querySelector(".add-card-element-overlay");
-    this.minusButton = this.overlay.querySelector(".minus-symbol");
-    this.plusButton = this.overlay.querySelector(".plus-symbol");
-    this.metadata = this.overlay.querySelector(".metadata");
+    this.img = this.element.querySelector("img") as HTMLImageElement;
+    this.overlay = this.element.querySelector(
+      ".add-card-element-overlay"
+    ) as HTMLDivElement;
+    this.minusButton = this.overlay.querySelector(
+      ".minus-symbol"
+    ) as HTMLDivElement;
+    this.plusButton = this.overlay.querySelector(
+      ".plus-symbol"
+    ) as HTMLDivElement;
+    this.metadata = this.overlay.querySelector(".metadata") as HTMLDivElement;
 
     if (this.singleton) {
       emptyElement(this.minusButton);
@@ -90,7 +129,7 @@ export default class AddCardElement {
     });
   }
 
-  setMetadata(value) {
+  setMetadata(value = "") {
     if (value) {
       emptyElement(this.metadata);
       this.metadata.appendChild(createElement(`<span>${value}</span>`));
@@ -171,7 +210,7 @@ export default class AddCardElement {
     });
   }
 
-  toggleAppearance(shouldHide) {
+  toggleAppearance(shouldHide = false) {
     this.element.classList.toggle("hidden", shouldHide);
   }
 }
