@@ -131,9 +131,9 @@ class ScryfallSearch extends Feature {
     </div>`);
     this.deckSectionChooser = new DeckSectionChooser({
       id: "scryfall-search__section-selection",
-      deck: this.deck,
+      deck: this.deck as Deck,
     });
-    el?.appendChild(this.deckSectionChooser.element as Node);
+    el?.appendChild(this.deckSectionChooser.element);
 
     const hr = document.createElement("hr");
     hr.classList.add("scryfall-search__hr");
@@ -172,7 +172,7 @@ class ScryfallSearch extends Feature {
           const section = this.deckSectionChooser?.getValue();
 
           if (section) {
-            payload.section = section;
+            payload.section = section as DeckSections;
           }
         },
       });

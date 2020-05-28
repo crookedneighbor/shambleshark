@@ -1,12 +1,22 @@
 import deckParser from "Lib/deck-parser";
 import createElement from "Lib/create-element";
 
+import type { Deck } from "Js/types/deck";
+
+type DeckSectionChooserOptions = {
+  deck: Deck;
+  id: string;
+};
+
 export default class DeckSectionChooser {
-  constructor(options = {}) {
+  element: HTMLDivElement;
+  sectionSelect: HTMLSelectElement;
+
+  constructor(options: DeckSectionChooserOptions) {
     const deck = options.deck;
     const id = options.id;
     this.element = createElement(`<div
-      ${id ? 'id="' + id + '"' : ""}
+      id="${id}"
       class="form-row-content-band"
     >
         <select class="section-selection form-input auto small-select">
@@ -14,7 +24,9 @@ export default class DeckSectionChooser {
         </select>
       </div>
     `);
-    this.sectionSelect = this.element.querySelector("select.section-selection");
+    this.sectionSelect = this.element.querySelector(
+      "select.section-selection"
+    ) as HTMLSelectElement;
 
     deckParser
       .getSections(deck)
@@ -30,7 +42,7 @@ export default class DeckSectionChooser {
       });
   }
 
-  getValue() {
+  getValue(): string {
     return this.sectionSelect.value;
   }
 }

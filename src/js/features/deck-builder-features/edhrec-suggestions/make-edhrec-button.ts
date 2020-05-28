@@ -142,9 +142,7 @@ function createEDHRecResponseHandler(
       id: "edhrec-suggestions-section-chooser",
       deck,
     });
-    // TODO shouldn't need to type this when the deck chooser is
-    // converted to typescript
-    container.appendChild(deckSectionChooser.element as HTMLDivElement);
+    container.appendChild(deckSectionChooser.element);
     container.appendChild(document.createElement("hr"));
 
     Object.values(recomendations).forEach((card) => {
