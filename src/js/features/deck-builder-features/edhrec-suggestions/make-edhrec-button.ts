@@ -43,8 +43,12 @@ function getCardsInDeck(entries: Deck["entries"]) {
     .filter((value) => value[0] != "commanders")
     .map((value) => value[1])
     .flat()
-    .filter(isValidCard)
-    .map((card) => `${card.count} ${getCardName(card)}`);
+    .filter((c) => isValidCard(c as Card))
+    .map((entry) => {
+      const card = entry as Card;
+
+      return `${card.count} ${getCardName(card)}`;
+    });
 }
 
 function formatEDHRecSuggestions(list: EDHRecSuggestion[]): Suggestions {

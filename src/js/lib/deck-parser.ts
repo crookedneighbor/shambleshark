@@ -63,20 +63,22 @@ export function flattenEntries(
   deck: Deck,
   options: FlattenEntryOptions = {}
 ): Card[] {
-  const entries: { [id: string]: Card } = {};
+  const entries: Record<string, Card> = {};
 
   getSections(deck)
     .filter((section) => !(section in (options?.ignoredSections || [])))
     .map((section) => deck.entries[section])
     .flat()
     .forEach((entry) => {
-      const id = getIdFromEntry(entry, options?.idToGroupBy || "id");
+      // TODO why do I need to do this?
+      const card = entry as Card;
+      const id = getIdFromEntry(card, options?.idToGroupBy || "id");
 
       if (id) {
         if (entries[id]) {
-          entries[id].count += entry.count;
+          entries[id].count! += card.count!;
         } else {
-          entries[id] = entry;
+          entries[id] = card;
         }
       }
     });
