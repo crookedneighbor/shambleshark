@@ -15,7 +15,7 @@ type ElementConfig = {
   mouseoutHandler: MouseHandler;
 };
 
-let tooltipElement: HTMLElement;
+let tooltipElement: HTMLElement | null;
 
 export default class CardTooltip {
   elements: ElementConfig[];
@@ -35,7 +35,6 @@ export default class CardTooltip {
   }
 
   static resetTooltipElement() {
-    // @ts-ignore
     tooltipElement = null;
   }
 

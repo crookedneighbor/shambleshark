@@ -27,8 +27,8 @@ type DeckMetadata = {
   sections: Deck["sections"];
 };
 
-let getActiveDeckPromise: Promise<Deck>;
-let getDeckMetadataPromise: Promise<DeckMetadata>;
+let getActiveDeckPromise: Promise<Deck> | null;
+let getDeckMetadataPromise: Promise<DeckMetadata> | null;
 
 export function addHooksToCardManagementEvents() {
   if (window.ScryfallAPI) {
@@ -120,10 +120,8 @@ export function getDeckMetadata(): Promise<DeckMetadata> {
 }
 
 export function reset() {
-  // @ts-ignore
-  getActiveDeckPromise = undefined;
-  // @ts-ignore
-  getDeckMetadataPromise = undefined;
+  getActiveDeckPromise = null;
+  getDeckMetadataPromise = null;
 }
 
 export function addCard(cardId: string): Promise<Card> {

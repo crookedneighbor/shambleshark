@@ -3,6 +3,8 @@ export default function embed() {
   const s = document.createElement("script");
   s.src = chrome.runtime.getURL("scryfallEmbed.bundle.js");
   s.onload = function () {
+    // Not sure why this isn't on the type, but it works so :shrug:
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
     // @ts-ignore
     this.remove();
   };
