@@ -190,39 +190,37 @@ class ScryfallSearch extends Feature {
   }
 
   createDrawer() {
-    // TODO find out if we can pass an arrow function here instead
-    const self = this;
     const drawer = new Drawer({
       id: "scryfall-search-drawer",
       // TODO add scryfall symbol?
       // headerSymbol: EDHREC_SYMBOL,
       header: "Scryfall Search",
       loadingMessage: "Loading Scryfall Search",
-      onScroll(drawerInstance: Drawer) {
+      onScroll: (drawerInstance: Drawer) => {
         if (
-          !self.isReadyToLookupNextBatch(
+          !this.isReadyToLookupNextBatch(
             drawerInstance.getScrollableElement() as Element
           )
         ) {
           return;
         }
 
-        self._nextInProgress = true;
+        this._nextInProgress = true;
 
-        return self.cardList?.next().then((cards: any) => {
-          self.cardList = cards;
-          self.addCards();
-          self._nextInProgress = false;
+        return this.cardList?.next().then((cards: any) => {
+          this.cardList = cards;
+          this.addCards();
+          this._nextInProgress = false;
         });
       },
-      onClose(drawerInstance: Drawer) {
-        self.cardList = undefined;
+      onClose: (drawerInstance: Drawer) => {
+        this.cardList = undefined;
         bus.emit(events.CLEAN_UP_DECK);
 
         // reset this in case the error state changes it
         drawerInstance.setLoading(true);
         drawerInstance.resetHeader();
-        emptyElement(self.container as HTMLDivElement);
+        emptyElement(this.container as HTMLDivElement);
 
         // re-focus the Scryfall Search input
         // for accessibility navigation
