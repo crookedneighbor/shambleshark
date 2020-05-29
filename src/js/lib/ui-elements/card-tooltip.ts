@@ -1,4 +1,5 @@
 import { ready as elementReady } from "Lib/mutation";
+import noop from "Lib/noop";
 
 type MouseHandler = (event: MouseEvent) => void;
 type OnMouseHandler = (el: HTMLElement) => void;
@@ -27,8 +28,8 @@ export default class CardTooltip {
   constructor(options: CardTooltipOptions = {}) {
     this.elements = [];
 
-    this._onMouseover = options.onMouseover || function () {};
-    this._onMouseout = options.onMouseout || function () {};
+    this._onMouseover = options.onMouseover || noop;
+    this._onMouseout = options.onMouseout || noop;
 
     this.findTooltip();
   }

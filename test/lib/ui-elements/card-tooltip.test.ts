@@ -1,5 +1,6 @@
 import { ready } from "Lib/mutation";
 import CardTooltip from "Ui/card-tooltip";
+import noop from "Lib/noop";
 
 import { mocked } from "ts-jest/utils";
 
@@ -56,8 +57,8 @@ describe("CardTooltip", function () {
 
     beforeEach(function () {
       tooltip = new CardTooltip();
-      jest.spyOn(tooltip, "createMousemoveHandler").mockReturnValue(() => {});
-      jest.spyOn(tooltip, "createMouseoutHandler").mockReturnValue(() => {});
+      jest.spyOn(tooltip, "createMousemoveHandler").mockReturnValue(noop);
+      jest.spyOn(tooltip, "createMouseoutHandler").mockReturnValue(noop);
     });
 
     it("adds an element to list of elements with handlers", function () {
@@ -102,8 +103,8 @@ describe("CardTooltip", function () {
 
     beforeEach(function () {
       tooltip = new CardTooltip();
-      jest.spyOn(tooltip, "createMousemoveHandler").mockReturnValue(() => {});
-      jest.spyOn(tooltip, "createMouseoutHandler").mockReturnValue(() => {});
+      jest.spyOn(tooltip, "createMousemoveHandler").mockReturnValue(noop);
+      jest.spyOn(tooltip, "createMouseoutHandler").mockReturnValue(noop);
     });
 
     it("ignores elements that do not exist in list", function () {

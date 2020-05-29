@@ -5,6 +5,7 @@ import TaggerLink, {
 } from "Features/search-results-features/tagger-link";
 import iframe from "Lib/iframe";
 import { ready } from "Lib/mutation";
+import noop from "Lib/noop";
 
 import {
   ILLUSTRATION_SYMBOL,
@@ -33,7 +34,7 @@ describe("Tagger Link", function () {
     beforeEach(function () {
       busSpy = mocked(bus.on).mockImplementation((event, cb) => {
         // TODO no data is actually passed here... why does framebus typing care?
-        cb({}, () => {});
+        cb({}, noop);
 
         return true;
       });
