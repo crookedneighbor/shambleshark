@@ -53,8 +53,7 @@ class CardInputModifier extends Feature {
     this.listeners = {};
 
     this.tooltip = new CardTooltip({
-      // TODO eventually, card tooltip will set the type of element
-      onMouseover: (element: Element) => {
+      onMouseover: (element) => {
         const id = element.getAttribute("data-entry");
         const img = id && this.imageCache[id];
 
@@ -84,7 +83,7 @@ class CardInputModifier extends Feature {
     });
   }
 
-  attachListenersToEntry(entry: Element) {
+  attachListenersToEntry(entry: HTMLElement) {
     const id = entry.getAttribute("data-entry");
 
     if (!id) {

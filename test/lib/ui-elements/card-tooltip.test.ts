@@ -164,10 +164,7 @@ describe("CardTooltip", function () {
   describe("createMousemoveHandler", function () {
     let tooltip: CardTooltip;
     let el: HTMLElement;
-    let fakeEvent: {
-      pageX: number;
-      pageY: number;
-    };
+    let fakeEvent: MouseEvent;
     let mousemoveSpy: jest.Mock;
 
     beforeEach(function () {
@@ -183,10 +180,7 @@ describe("CardTooltip", function () {
 
       tooltip.img = "https://example.com/image.png";
       el = document.createElement("div");
-      fakeEvent = {
-        pageX: 100,
-        pageY: 100,
-      };
+      fakeEvent = new MouseEvent("mouseout");
     });
 
     it("returns a function", function () {
@@ -199,7 +193,7 @@ describe("CardTooltip", function () {
       const handler = tooltip.createMousemoveHandler(el);
 
       expect(() => {
-        handler();
+        handler(new MouseEvent("mousemove"));
       }).not.toThrow();
     });
 
@@ -214,7 +208,7 @@ describe("CardTooltip", function () {
 
       handler(fakeEvent);
 
-      expect(tooltip.tooltipElement.style.display).not.toBe("block");
+      expect(tooltip.tooltipElement?.style.display).not.toBe("block");
 
       Object.defineProperty(window, "innerWidth", {
         writable: true,
@@ -229,17 +223,19 @@ describe("CardTooltip", function () {
 
       handler(fakeEvent);
 
-      expect(tooltip.tooltipElement.style.display).not.toBe("block");
+      expect(tooltip.tooltipElement?.style.display).not.toBe("block");
     });
 
     it("opens tooltip", function () {
       const handler = tooltip.createMousemoveHandler(el);
 
+      (fakeEvent as any).pageX = 100;
+      (fakeEvent as any).pageY = 100;
       handler(fakeEvent);
 
-      expect(tooltip.tooltipElement.style.display).toBe("block");
-      expect(tooltip.tooltipElement.style.left).toBe("150px");
-      expect(tooltip.tooltipElement.style.top).toBe("70px");
+      expect(tooltip.tooltipElement?.style.display).toBe("block");
+      expect(tooltip.tooltipElement?.style.left).toBe("150px");
+      expect(tooltip.tooltipElement?.style.top).toBe("70px");
 
       expect(
         (document.getElementById("card-tooltip-img") as HTMLImageElement).src
@@ -275,16 +271,16 @@ describe("CardTooltip", function () {
       const handler = tooltip.createMouseoutHandler(el);
 
       expect(() => {
-        handler();
+        handler(new MouseEvent("mouseout"));
       }).not.toThrow();
     });
 
     it("sets tooltip element style to `none`", function () {
       const handler = tooltip.createMouseoutHandler(el);
 
-      handler();
+      handler(new MouseEvent("mouseout"));
 
-      expect(tooltip.tooltipElement.style.display).toBe("none");
+      expect(tooltip.tooltipElement?.style.display).toBe("none");
     });
 
     it("calls onMouseout callback with element if provided", function () {
@@ -296,7 +292,7 @@ describe("CardTooltip", function () {
       tooltip.tooltipElement = document.createElement("div");
       const handler = tooltip.createMouseoutHandler(el);
 
-      handler();
+      handler(new MouseEvent("mouseout"));
 
       expect(spy).toBeCalledTimes(1);
       expect(spy).toBeCalledWith(el);

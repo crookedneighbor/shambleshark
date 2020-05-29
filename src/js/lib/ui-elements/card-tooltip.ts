@@ -1,18 +1,40 @@
 import { ready as elementReady } from "Lib/mutation";
 
-let tooltipElement;
+type MouseHandler = (event: MouseEvent) => void;
+type OnMouseHandler = (el: HTMLElement) => void;
+
+type CardTooltipOptions = {
+  onMouseover?: OnMouseHandler;
+  onMouseout?: OnMouseHandler;
+};
+
+type ElementConfig = {
+  element: HTMLElement;
+  mousemoveHandler: MouseHandler;
+  mouseoutHandler: MouseHandler;
+};
+
+let tooltipElement: HTMLElement;
 
 export default class CardTooltip {
-  constructor(options = {}) {
+  elements: ElementConfig[];
+  tooltipElement?: HTMLElement;
+  img?: string;
+
+  private _onMouseover: OnMouseHandler;
+  private _onMouseout: OnMouseHandler;
+
+  constructor(options: CardTooltipOptions = {}) {
     this.elements = [];
 
-    this._onMouseover = options.onMouseover;
-    this._onMouseout = options.onMouseout;
+    this._onMouseover = options.onMouseover || function () {};
+    this._onMouseout = options.onMouseout || function () {};
 
     this.findTooltip();
   }
 
   static resetTooltipElement() {
+    // @ts-ignore
     tooltipElement = null;
   }
 
@@ -31,7 +53,7 @@ export default class CardTooltip {
     });
   }
 
-  addElement(el) {
+  addElement(el: HTMLElement) {
     const mousemoveHandler = this.createMousemoveHandler(el);
     const mouseoutHandler = this.createMouseoutHandler(el);
 
@@ -45,7 +67,7 @@ export default class CardTooltip {
     el.addEventListener("mouseout", mouseoutHandler);
   }
 
-  removeElement(el) {
+  removeElement(el: HTMLElement) {
     const index = this.elements.findIndex((config) => el === config.element);
 
     if (index === -1) {
@@ -60,12 +82,12 @@ export default class CardTooltip {
     this.elements.splice(index, 1);
   }
 
-  setImage(url) {
+  setImage(url: string) {
     this.img = url;
   }
 
-  createMousemoveHandler(el) {
-    return (event) => {
+  createMousemoveHandler(el: HTMLElement): MouseHandler {
+    return (event: MouseEvent) => {
       // largley adapted from Scryfall's site, if that changes
       // this may also need ot be updated
 
@@ -88,10 +110,14 @@ export default class CardTooltip {
         this.tooltipElement.style.display = "block";
       }
 
+      // TODO look into using something other than pageX, as it is not
+      // fully supported
       this.tooltipElement.style.left = event.pageX + 50 + "px";
       this.tooltipElement.style.top = event.pageY - 30 + "px";
 
-      const cardToolTipImg = document.getElementById("card-tooltip-img");
+      const cardToolTipImg = document.getElementById(
+        "card-tooltip-img"
+      ) as HTMLImageElement;
 
       if (cardToolTipImg.src !== this.img) {
         const t = document.createElement("img");
@@ -105,7 +131,7 @@ export default class CardTooltip {
     };
   }
 
-  createMouseoutHandler(el) {
+  createMouseoutHandler(el: HTMLElement): MouseHandler {
     return () => {
       if (!this.tooltipElement) {
         return;
@@ -117,14 +143,14 @@ export default class CardTooltip {
     };
   }
 
-  triggerOnMouseover(el) {
+  triggerOnMouseover(el: HTMLElement) {
     if (!this._onMouseover) {
       return;
     }
     this._onMouseover(el);
   }
 
-  triggerOnMouseout(el) {
+  triggerOnMouseout(el: HTMLElement) {
     if (!this._onMouseout) {
       return;
     }
