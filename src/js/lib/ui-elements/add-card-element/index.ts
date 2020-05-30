@@ -3,9 +3,17 @@ import { CHECK_SYMBOL, MINUS_SYMBOL, PLUS_SYMBOL } from "Svg";
 import { BUS_EVENTS as events } from "Constants";
 import createElement from "Lib/create-element";
 import emptyElement from "Lib/empty-element";
+import noop from "Lib/noop";
+
 import "./index.css";
 
 type GetScryfallIDFunction = () => Promise<string>;
+type CardPayload = {
+  cardName: string;
+  cardId: string;
+  [prop: string]: unknown;
+};
+type OnAddCardFunction = (payload: CardPayload) => void;
 
 type AddCardElementOptions = {
   quantity?: number;
@@ -14,7 +22,7 @@ type AddCardElementOptions = {
   img: string;
   type: string;
   singleton?: boolean;
-  onAddCard?: Function;
+  onAddCard?: OnAddCardFunction;
   getScryfallId?: GetScryfallIDFunction;
 };
 
@@ -30,7 +38,7 @@ export default class AddCardElement {
   metadata: HTMLDivElement;
   type: string;
   singleton: boolean;
-  onAddCard: Function;
+  onAddCard: OnAddCardFunction;
   private _getScryfallId: GetScryfallIDFunction;
 
   constructor(options: AddCardElementOptions) {
@@ -42,11 +50,7 @@ export default class AddCardElement {
     this.name = options.name;
     this.type = options.type;
     this.singleton = Boolean(options.singleton);
-    this.onAddCard =
-      options.onAddCard ||
-      function () {
-        // noop
-      };
+    this.onAddCard = options.onAddCard || noop;
 
     if (options.getScryfallId) {
       this._getScryfallId = options.getScryfallId;

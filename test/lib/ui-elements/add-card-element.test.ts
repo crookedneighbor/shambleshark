@@ -438,7 +438,7 @@ describe("AddCardElement", function () {
         name: "Arcane Denial",
         id: "arcane-denial-id",
         type: "Instant",
-        onAddCard(data: { cardName: string; section: string; cardId: string }) {
+        onAddCard(data) {
           data.cardName = "foo";
           data.section = "bar";
         },

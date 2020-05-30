@@ -7,7 +7,7 @@ import { generateScryfallGlobal } from "../mocks/scryfall-global";
 import { makeFakeDeck, makeFakeCard } from "Helpers/fake";
 
 describe("modifyCleanUp", function () {
-  let originalCleanupFunction: Function;
+  let originalCleanupFunction: (...args: unknown[]) => void;
   let fakeDeck: Deck;
 
   beforeEach(function () {

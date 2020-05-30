@@ -6,10 +6,10 @@ describe("iframe", function () {
     it("creates an iframe that resolves when it loads", async function () {
       const fakeIframe = document.createElement("iframe");
       jest
-        .spyOn(fakeIframe as any, "addEventListener")
+        .spyOn(fakeIframe, "addEventListener")
         .mockImplementation((eventName, cb) => {
           // let it happen async so iframe can be added to body
-          wait().then(() => (cb as Function)());
+          wait().then(() => (cb as EventListener)(new Event("load")));
         });
       jest.spyOn(document, "createElement").mockReturnValue(fakeIframe);
       jest.spyOn(document.body, "appendChild");

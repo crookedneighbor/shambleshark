@@ -803,7 +803,7 @@ describe("Tagger Link", function () {
     it("skips any unknown foreign keys", () => {
       payload.relationships!.push({
         // Intentionally doing this to force the path for an unknown key
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         foreignKey: "unknown",
         relatedId: "not-oracle-id",

@@ -1,9 +1,10 @@
 import scrollLock from "Lib/scroll-lock";
 import emptyElement from "Lib/empty-element";
+import noop from "Lib/noop";
 
-function noop() {
-  // do nothing!
-}
+export type DialogListener<T extends DialogInterface = DialogInterface> = (
+  instance: T
+) => void;
 
 export type DialogInterfaceOptions = {
   content?: string;
@@ -11,9 +12,9 @@ export type DialogInterfaceOptions = {
   headerSymbol?: string;
   id?: string;
   loadingMessage?: string;
-  onClose?: Function;
-  onOpen?: Function;
-  onScroll?: Function;
+  onClose?: DialogListener;
+  onOpen?: DialogListener;
+  onScroll?: DialogListener;
   open?: boolean;
   resetContentOnClose?: boolean;
 };
@@ -22,9 +23,9 @@ export default abstract class DialogInterface {
   _isOpen: boolean;
   _originalContent: string;
   _resetContentOnClose: boolean;
-  _onClose: Function;
-  _onOpen: Function;
-  _onScroll: Function;
+  _onClose: DialogListener;
+  _onOpen: DialogListener;
+  _onScroll: DialogListener;
   _originalHeaderText: string;
   _contentNodeContainer: HTMLElement;
   _contentNode: HTMLElement;

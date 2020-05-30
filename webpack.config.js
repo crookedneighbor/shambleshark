@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-/* eslint-disable @typescript-eslint/camelcase */
 const webpack = require("webpack");
 const path = require("path");
 const fileSystem = require("fs");
@@ -145,36 +144,38 @@ const options = {
       title: "TypeScript",
       excludeWarnings: false,
     }),
-    new CopyWebpackPlugin([
-      {
-        from: "src/manifest.json",
-        transform: function (content, path) {
-          const json = {
-            // generates the manifest file using the package.json informations
-            description: process.env.npm_package_description,
-            version: process.env.npm_package_version,
-            content_security_policy: "script-src 'self'; object-src 'self'",
-            ...JSON.parse(content.toString()),
-          };
-          if (BROWSER === "FIREFOX") {
-            json.browser_specific_settings = {
-              gecko: {
-                id: "blade@crookedneighbor.com",
-                strict_min_version: "69.0",
-              },
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: "src/manifest.json",
+          transform: function (content, path) {
+            const json = {
+              // generates the manifest file using the package.json informations
+              description: process.env.npm_package_description,
+              version: process.env.npm_package_version,
+              content_security_policy: "script-src 'self'; object-src 'self'",
+              ...JSON.parse(content.toString()),
             };
-          }
+            if (BROWSER === "FIREFOX") {
+              json.browser_specific_settings = {
+                gecko: {
+                  id: "blade@crookedneighbor.com",
+                  strict_min_version: "69.0",
+                },
+              };
+            }
 
-          if (env.NODE_ENV !== "production") {
-            // so the background script can hot-reload
-            json.content_security_policy =
-              "script-src 'self' 'unsafe-eval'; object-src 'self'";
-          }
+            if (env.NODE_ENV !== "production") {
+              // so the background script can hot-reload
+              json.content_security_policy =
+                "script-src 'self' 'unsafe-eval'; object-src 'self'";
+            }
 
-          return Buffer.from(JSON.stringify(json));
+            return Buffer.from(JSON.stringify(json));
+          },
         },
-      },
-    ]),
+      ],
+    }),
     new HtmlWebpackPlugin({
       template: path.join(__dirname, "src", "popup.html"),
       filename: "popup.html",

@@ -16,7 +16,7 @@ export default function setUpListeners() {
   bus.on(events.REQUEST_DECK, function (reply) {
     // TODO need to update bus to be a generic so
     // you can specify what the shape of the payload is
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     Scryfall.getDeck().then(reply);
   });
@@ -29,7 +29,7 @@ export default function setUpListeners() {
   }) {
     // TODO need to update bus to be a generic so
     // you can specify what the shape of the payload is
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     Scryfall.pushNotification(header, message, color, type);
   });

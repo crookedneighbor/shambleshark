@@ -4,20 +4,20 @@ import url from "Lib/url";
 import { BUS_EVENTS as events } from "Constants";
 import type { Deck, Card } from "Js/types/deck";
 
+type ScryfallFunction = (...args: unknown[]) => void;
+
 declare global {
   interface Window {
     Scryfall: {
       deckbuilder: {
         deckId: string;
-        cleanUp: Function;
+        cleanUp: ScryfallFunction;
       };
-      pushNotification: Function;
+      pushNotification: ScryfallFunction;
     };
     ScryfallAPI: {
       grantSecret: string;
-      decks: {
-        [prop: string]: Function;
-      };
+      decks: Record<string, ScryfallFunction>;
     };
   }
 }

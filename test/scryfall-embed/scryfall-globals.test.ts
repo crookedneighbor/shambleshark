@@ -38,12 +38,16 @@ describe("Scryfall Globals", function () {
       },
     });
     ScryfallAPISpy = window.ScryfallAPI = generateScryfallAPIGlobal();
-    ScryfallAPISpy.decks.active.mockImplementation((cb: Function) => {
-      cb(fakeDeck);
-    });
-    ScryfallAPISpy.decks.get.mockImplementation((id: string, cb: Function) => {
-      cb(fakeDeck);
-    });
+    ScryfallAPISpy.decks.active.mockImplementation(
+      (cb: (deck: Deck) => void) => {
+        cb(fakeDeck);
+      }
+    );
+    ScryfallAPISpy.decks.get.mockImplementation(
+      (id: string, cb: (deck: Deck) => void) => {
+        cb(fakeDeck);
+      }
+    );
 
     ScryfallSpy = window.Scryfall = generateScryfallGlobal();
   });
@@ -177,11 +181,9 @@ describe("Scryfall Globals", function () {
     it("gets the active deck", function () {
       const deck = makeFakeDeck({ id: "deck-id" });
 
-      ScryfallAPISpy.decks.get.mockImplementation(
-        (id: string, cb: Function) => {
-          cb(deck);
-        }
-      );
+      (ScryfallAPISpy.decks.get as jest.Mock).mockImplementation((id, cb) => {
+        cb(deck);
+      });
 
       return getDeck().then((resolvedDeck: Deck) => {
         expect(ScryfallAPISpy.decks.get).toBeCalledWith(
@@ -202,13 +204,11 @@ describe("Scryfall Globals", function () {
         secondarySections: ["sideboard", "lands"],
       });
 
-      ScryfallAPISpy.decks.get.mockImplementation(
-        (id: string, cb: Function) => {
-          cb(deck);
-        }
-      );
+      (ScryfallAPISpy.decks.get as jest.Mock).mockImplementation((id, cb) => {
+        cb(deck);
+      });
 
-      return getDeckMetadata().then((meta: {}) => {
+      return getDeckMetadata().then((meta) => {
         expect(ScryfallAPISpy.decks.get).toBeCalledWith(
           "deck-id",
           expect.any(Function)
@@ -229,13 +229,13 @@ describe("Scryfall Globals", function () {
     it("resolves with the card", function () {
       const card = makeFakeCard();
 
-      ScryfallAPISpy.decks.addCard.mockImplementation(
-        (deckId: string, cardId: string, cb: Function) => {
+      (ScryfallAPISpy.decks.addCard as jest.Mock).mockImplementation(
+        (deckId, cardId, cb) => {
           cb(card);
         }
       );
 
-      return addCard("card-id").then((resolvedCard: {}) => {
+      return addCard("card-id").then((resolvedCard) => {
         expect(ScryfallAPISpy.decks.addCard).toBeCalledWith(
           "deck-id",
           "card-id",
@@ -252,13 +252,13 @@ describe("Scryfall Globals", function () {
       const cardToUpdate = makeFakeCard({ id: "card-id" });
       const card = makeFakeCard();
 
-      ScryfallAPISpy.decks.updateEntry.mockImplementation(
-        (deckId: string, cardToUpdate: any, cb: Function) => {
+      (ScryfallAPISpy.decks.updateEntry as jest.Mock).mockImplementation(
+        (deckId, cardToUpdate, cb) => {
           cb(card);
         }
       );
 
-      return updateEntry(cardToUpdate).then((resolvedCard: {}) => {
+      return updateEntry(cardToUpdate).then((resolvedCard) => {
         expect(ScryfallAPISpy.decks.updateEntry).toBeCalledWith(
           "deck-id",
           cardToUpdate,
@@ -274,8 +274,8 @@ describe("Scryfall Globals", function () {
     it("calls destroy API", function () {
       const data = {};
 
-      ScryfallAPISpy.decks.destroyEntry.mockImplementation(
-        (deckId: string, cardId: string, cb: Function) => {
+      (ScryfallAPISpy.decks.destroyEntry as jest.Mock).mockImplementation(
+        (deckId, cardId, cb) => {
           cb(data);
         }
       );

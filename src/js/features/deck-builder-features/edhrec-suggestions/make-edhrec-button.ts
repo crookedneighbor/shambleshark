@@ -173,8 +173,7 @@ function createEDHRecResponseHandler(
             return cardFromScryfall.id;
           });
         },
-        // TODO no any, address this when AddCardElement is converted to TS
-        onAddCard: (payload: { section: any }) => {
+        onAddCard: (payload) => {
           const section = deckSectionChooser.getValue();
 
           if (section) {
@@ -214,8 +213,7 @@ function createDrawer(button: HTMLButtonElement) {
     headerSymbol: EDHREC_SYMBOL,
     header: "EDHRec Suggestions",
     loadingMessage: "Loading EDHRec Suggestions",
-    // TODO fix this type in Drawer class
-    onClose(drawerInstance: Drawer) {
+    onClose(drawerInstance) {
       bus.emit(events.CLEAN_UP_DECK);
 
       // reset this in case the error state changes it

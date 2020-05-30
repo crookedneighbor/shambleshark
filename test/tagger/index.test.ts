@@ -1,7 +1,6 @@
 import start from "Js/scryfall/tagger";
 import iframe from "Lib/iframe";
 import bus from "framebus";
-import SpyInstance = jest.SpyInstance;
 
 describe("Tagger", () => {
   const xhrMock: Partial<XMLHttpRequest> = {
@@ -58,17 +57,15 @@ describe("Tagger", () => {
 
   it("requests tags", async () => {
     const replySpy = jest.fn();
-    (bus.on as jest.Mock).mockImplementation(
-      (eventName: string, cb: Function) => {
-        cb(
-          {
-            set: "set",
-            number: "number",
-          },
-          replySpy
-        );
-      }
-    );
+    (bus.on as jest.Mock).mockImplementation((eventName, cb) => {
+      cb(
+        {
+          set: "set",
+          number: "number",
+        },
+        replySpy
+      );
+    });
 
     start();
 
@@ -91,7 +88,7 @@ describe("Tagger", () => {
     expect(body.variables.set).toBe("set");
     expect(body.variables.number).toBe("number");
 
-    (xhrMock.onreadystatechange as Function)();
+    (xhrMock.onreadystatechange as EventListener)(new Event("load"));
 
     expect(replySpy).toBeCalledTimes(1);
     expect(replySpy).toBeCalledWith("fake-card");

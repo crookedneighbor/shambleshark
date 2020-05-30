@@ -168,7 +168,7 @@ class ScryfallSearch extends Feature {
         name: card.name,
         img: card.getImage(),
         type: card.type_line,
-        onAddCard: (payload: { section: DeckSections }) => {
+        onAddCard: (payload) => {
           const section = this.deckSectionChooser?.getValue();
 
           if (section) {
@@ -196,10 +196,10 @@ class ScryfallSearch extends Feature {
       // headerSymbol: EDHREC_SYMBOL,
       header: "Scryfall Search",
       loadingMessage: "Loading Scryfall Search",
-      onScroll: (drawerInstance: Drawer) => {
+      onScroll: (drawerInstance) => {
         if (
           !this.isReadyToLookupNextBatch(
-            drawerInstance.getScrollableElement() as Element
+            (drawerInstance as Drawer).getScrollableElement() as Element
           )
         ) {
           return;
@@ -213,7 +213,7 @@ class ScryfallSearch extends Feature {
           this._nextInProgress = false;
         });
       },
-      onClose: (drawerInstance: Drawer) => {
+      onClose: (drawerInstance) => {
         this.cardList = undefined;
         bus.emit(events.CLEAN_UP_DECK);
 

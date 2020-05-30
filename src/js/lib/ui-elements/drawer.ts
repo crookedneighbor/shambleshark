@@ -1,11 +1,13 @@
-import DialogInterface, { DialogInterfaceOptions } from "./dialog-interface";
+import DialogInterface, {
+  DialogInterfaceOptions,
+  DialogListener,
+} from "./dialog-interface";
 import createElement from "Lib/create-element";
 import "./drawer.css";
 import { SPINNER_GIF } from "Constants";
 
 interface DrawerOptions extends DialogInterfaceOptions {
   position?: string;
-  onScroll?: Function;
   contentMessage?: string;
 }
 
