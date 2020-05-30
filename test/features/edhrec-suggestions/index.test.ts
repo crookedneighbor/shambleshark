@@ -1,8 +1,7 @@
 import EDHRecSuggestions from "Features/deck-builder-features/edhrec-suggestions";
 import { getDeck } from "Lib/scryfall";
-import { ready, change } from "Lib/mutation";
+import { ready } from "Lib/mutation";
 import iframe from "Lib/iframe";
-import { Deck } from "../../../src/js/types/deck";
 import SpyInstance = jest.SpyInstance;
 
 import { makeFakeDeck } from "Helpers/fake";

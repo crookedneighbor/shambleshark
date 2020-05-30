@@ -170,8 +170,7 @@ describe("Scryfall Search", function () {
         restrictFunnyCards: false,
       };
 
-      // TODO no any
-      searchSpy = mocked(search).mockResolvedValue([] as any);
+      searchSpy = mocked(search as jest.Mock).mockResolvedValue([]);
       getDeckSpy = mocked(getDeck).mockResolvedValue(makeFakeDeck());
       jest.spyOn(ss, "addCards").mockImplementation();
     });
@@ -241,8 +240,7 @@ describe("Scryfall Search", function () {
     });
 
     it("adds cards from the api result", async function () {
-      // TODO no any
-      const cards = [{} as any, {} as any];
+      const cards = [{}, {}];
 
       searchSpy.mockResolvedValue(cards);
 

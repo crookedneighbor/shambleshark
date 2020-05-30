@@ -1,3 +1,5 @@
+// TODO probably better way to do this
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 (window as any).MutationObserver = class {
   disconnect() {
     // noop

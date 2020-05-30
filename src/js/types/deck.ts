@@ -19,7 +19,6 @@ export interface Card {
     oracle_id?: string;
     image?: string;
   };
-  [propName: string]: any;
 }
 
 export interface Deck {

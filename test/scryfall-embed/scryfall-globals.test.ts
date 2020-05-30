@@ -11,6 +11,8 @@ import {
   pushNotification,
   removeEntry,
   updateEntry,
+  ScryfallGlobal,
+  ScryfallAPIGlobal,
 } from "Js/scryfall-embed/scryfall-globals";
 
 import { Deck } from "Js/types/deck";
@@ -21,8 +23,8 @@ import {
 import { makeFakeDeck, makeFakeCard } from "Helpers/fake";
 
 describe("Scryfall Globals", function () {
-  let ScryfallAPISpy: any;
-  let ScryfallSpy: any;
+  let ScryfallAPISpy: ScryfallAPIGlobal;
+  let ScryfallSpy: ScryfallGlobal;
   let fakeDeck: Deck;
 
   beforeEach(function () {
@@ -38,12 +40,12 @@ describe("Scryfall Globals", function () {
       },
     });
     ScryfallAPISpy = window.ScryfallAPI = generateScryfallAPIGlobal();
-    ScryfallAPISpy.decks.active.mockImplementation(
+    (ScryfallAPISpy.decks.active as jest.Mock).mockImplementation(
       (cb: (deck: Deck) => void) => {
         cb(fakeDeck);
       }
     );
-    ScryfallAPISpy.decks.get.mockImplementation(
+    (ScryfallAPISpy.decks.get as jest.Mock).mockImplementation(
       (id: string, cb: (deck: Deck) => void) => {
         cb(fakeDeck);
       }

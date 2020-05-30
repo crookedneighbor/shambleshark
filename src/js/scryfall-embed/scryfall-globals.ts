@@ -6,19 +6,23 @@ import type { Deck, Card } from "Js/types/deck";
 
 type ScryfallFunction = (...args: unknown[]) => void;
 
+export type ScryfallGlobal = {
+  deckbuilder: {
+    deckId: string;
+    cleanUp: ScryfallFunction;
+  };
+  pushNotification: ScryfallFunction;
+};
+
+export type ScryfallAPIGlobal = {
+  grantSecret: string;
+  decks: Record<string, ScryfallFunction>;
+};
+
 declare global {
   interface Window {
-    Scryfall: {
-      deckbuilder: {
-        deckId: string;
-        cleanUp: ScryfallFunction;
-      };
-      pushNotification: ScryfallFunction;
-    };
-    ScryfallAPI: {
-      grantSecret: string;
-      decks: Record<string, ScryfallFunction>;
-    };
+    Scryfall: ScryfallGlobal;
+    ScryfallAPI: ScryfallAPIGlobal;
   }
 }
 

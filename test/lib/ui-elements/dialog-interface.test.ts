@@ -1,11 +1,7 @@
-import DialogInterface from "Ui/dialog-interface";
-
-type DialogOptions = {
-  [propName: string]: any;
-};
+import DialogInterface, { DialogInterfaceOptions } from "Ui/dialog-interface";
 
 class ChildDialog extends DialogInterface {
-  _constructElement(options: DialogOptions): HTMLDivElement {
+  _constructElement(options: DialogInterfaceOptions): HTMLDivElement {
     const el = document.createElement("div");
     el.innerHTML = `
       <div class="dialog-close"></div>
@@ -296,13 +292,12 @@ describe("DialogInterface", function () {
     it("calls scrollTo on the element", function () {
       const dialog = new ChildDialog();
 
-      // jest doesn't know about scrollTo method on elements
-      const spy = ((dialog.element as any).scrollTo = jest.fn());
+      dialog.element.scrollTo = jest.fn();
 
       dialog.scrollTo(4, 10);
 
-      expect(spy).toBeCalledTimes(1);
-      expect(spy).toBeCalledWith(4, 10);
+      expect(dialog.element.scrollTo).toBeCalledTimes(1);
+      expect(dialog.element.scrollTo).toBeCalledWith(4, 10);
     });
   });
 

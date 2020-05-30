@@ -3,7 +3,7 @@ import deckParser from "../../../src/js/lib/deck-parser";
 import { change } from "Lib/mutation";
 import { getDeck } from "Lib/scryfall";
 import iframe from "Lib/iframe";
-import { Card, Deck } from "../../../src/js/types/deck";
+import { Deck } from "../../../src/js/types/deck";
 import SpyInstance = jest.SpyInstance;
 
 import { makeFakeDeck, makeFakeCard } from "Helpers/fake";

@@ -13,7 +13,7 @@ type FakeCardOptions = Partial<Card> & {
 };
 type FakeEDHRecSuggestionOptions = Partial<EDHRecSuggestion>;
 
-export function makeFakeCard(overrides: FakeCardOptions = {}) {
+export function makeFakeCard(overrides: FakeCardOptions = {}): Card {
   let cardDigest: Record<string, string> | undefined;
   const defaultCardDigest: Record<string, string> = {
     oracle_id: `oracle-id-${shortid.generate()}`,
@@ -30,10 +30,10 @@ export function makeFakeCard(overrides: FakeCardOptions = {}) {
     section: overrides.section || "commanders",
     count: "count" in overrides ? overrides.count : 1,
     card_digest: cardDigest,
-  } as Card;
+  };
 }
 
-export function makeFakeDeck(overrides: FakeDeckOptions = {}) {
+export function makeFakeDeck(overrides: FakeDeckOptions = {}): Deck {
   const primary = overrides.primarySections || ["commanders", "nonlands"];
   const secondary = overrides.secondarySections || ["lands", "maybeboard"];
   const allSections = primary.concat(secondary);
@@ -50,7 +50,7 @@ export function makeFakeDeck(overrides: FakeDeckOptions = {}) {
     }
   });
 
-  const deck: Deck = {
+  return {
     id: overrides.id || `deck-id-${shortid.generate()}`,
     sections: {
       primary,
@@ -58,13 +58,11 @@ export function makeFakeDeck(overrides: FakeDeckOptions = {}) {
     },
     entries,
   };
-
-  return deck;
 }
 
 export function makeFakeEDHRecSuggestion(
   options: FakeEDHRecSuggestionOptions = {}
-) {
+): EDHRecSuggestion {
   return {
     primary_types: ["Creature"],
     names: ["Fake Name"],

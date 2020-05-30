@@ -71,7 +71,7 @@ describe("Drawer", function () {
     expect(spy).toBeCalledTimes(0);
 
     const event = document.createEvent("UIEvents");
-    (event as any).initUIEvent("scroll", true, true, window, 1);
+    event.initEvent("scroll", true, true);
     drawer.$(".drawer-dialog").dispatchEvent(event);
 
     expect(spy).toBeCalledTimes(1);

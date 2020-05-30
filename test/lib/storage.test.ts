@@ -2,6 +2,8 @@ import { get, set } from "Lib/storage";
 
 describe("storage", function () {
   beforeEach(function () {
+    // TODO probably should do this better
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (window.chrome as any) = {
       storage: {
         sync: {

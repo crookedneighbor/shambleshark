@@ -6,7 +6,6 @@ import { ready } from "Lib/mutation";
 import wait from "Lib/wait";
 
 import { makeFakeDeck } from "Helpers/fake";
-import { Card } from "../../../src/js/types/deck";
 import { mocked } from "ts-jest/utils";
 
 jest.mock("Lib/scryfall");

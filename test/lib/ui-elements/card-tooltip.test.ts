@@ -230,8 +230,14 @@ describe("CardTooltip", function () {
     it("opens tooltip", function () {
       const handler = tooltip.createMousemoveHandler(el);
 
-      (fakeEvent as any).pageX = 100;
-      (fakeEvent as any).pageY = 100;
+      Object.defineProperty(fakeEvent, "pageX", {
+        writable: true,
+        value: 100,
+      });
+      Object.defineProperty(fakeEvent, "pageY", {
+        writable: true,
+        value: 100,
+      });
       handler(fakeEvent);
 
       expect(tooltip.tooltipElement?.style.display).toBe("block");

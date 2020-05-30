@@ -12,7 +12,7 @@ import {
   makeFakeEDHRecSuggestion,
 } from "Helpers/fake";
 import { mocked } from "ts-jest/utils";
-import { Card, Deck, DeckSections } from "../../../src/js/types/deck";
+import { Deck } from "../../../src/js/types/deck";
 
 jest.mock("Lib/scryfall");
 jest.mock("Lib/mutation");

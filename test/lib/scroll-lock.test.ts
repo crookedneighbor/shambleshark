@@ -6,7 +6,10 @@ describe("scrollLock", function () {
   });
 
   it("freezes body to scrollY position when locked is set to true", function () {
-    (window as any).scrollY = 13;
+    Object.defineProperty(window, "scrollY", {
+      writable: true,
+      value: 13,
+    });
     expect(document.body.style.width).toEqual("");
     expect(document.body.style.position).toEqual("");
     expect(document.body.style.top).toEqual("");

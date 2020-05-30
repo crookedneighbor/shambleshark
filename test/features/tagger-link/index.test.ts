@@ -97,11 +97,10 @@ describe("Tagger Link", function () {
 
   describe("setupButtons", function () {
     let readySpy: SpyInstance;
-    let buttonSpy: SpyInstance;
 
     beforeEach(function () {
       readySpy = mocked(ready);
-      buttonSpy = jest
+      jest
         .spyOn(TaggerLink.prototype, "makeButton")
         .mockReturnValue(document.createElement("a"));
     });
