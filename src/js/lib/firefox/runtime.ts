@@ -13,16 +13,12 @@ export function openOptionsPage(): void {
   be.runtime.openOptionsPage();
 }
 
-export function getManifest() {
-  return be.runtime.getManifest();
-}
-
-export function onInstalled() {
+export function onInstalled(): FirefoxBrowserExtension["runtime"]["onInstalled"] {
   return be.runtime.onInstalled;
 }
 
 // https://stackoverflow.com/a/15534822/2601552
-export function onHeadersReceived(options: OnHeadersReceivedOptions) {
+export function onHeadersReceived(options: OnHeadersReceivedOptions): void {
   return be.webRequest.onHeadersReceived.addListener(
     options.addListener,
     options.config,
