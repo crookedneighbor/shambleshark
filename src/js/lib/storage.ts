@@ -1,24 +1,16 @@
 import { getStorage, setStorage } from "Browser/storage";
 
 // TODO no any
-export function get(...keys: string[]): any | any[] {
-  return getStorage(keys).then((result) => {
-    if (keys.length === 1) {
-      return result[keys[0]];
-    }
-
-    return result;
+export function get(key: string): any {
+  return getStorage([key]).then((result) => {
+    return result[key];
   });
 }
 
-export function set(obj: string | { [key: string]: any }, value?: any) {
-  if (typeof obj === "string") {
-    obj = {
-      [obj]: value,
-    };
-  }
-
-  return setStorage(obj);
+export function set(key: string, value: any) {
+  return setStorage({
+    [key]: value,
+  });
 }
 
 export default {
