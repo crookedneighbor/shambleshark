@@ -1,13 +1,14 @@
 import { getStorage, setStorage } from "Browser/storage";
 
-// TODO no any
-export function get(key: string): any {
+import type { AnyJsonValue } from "Js/types/json";
+
+export function get(key: string): Promise<AnyJsonValue> {
   return getStorage([key]).then((result) => {
-    return result[key];
+    return result[key] as AnyJsonValue;
   });
 }
 
-export function set(key: string, value: any) {
+export function set(key: string, value: AnyJsonValue): Promise<void> {
   return setStorage({
     [key]: value,
   });
