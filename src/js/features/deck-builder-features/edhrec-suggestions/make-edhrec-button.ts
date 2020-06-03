@@ -6,14 +6,12 @@ import AddCardElement from "Ui/add-card-element";
 import Drawer from "Ui/drawer";
 import { getCardBySetCodeAndCollectorNumber, getDeck } from "Lib/scryfall";
 import { EDHREC_SYMBOL } from "Svg";
-import type { Card, Deck, DeckSections } from "Js/types/deck";
+import type { Card, Deck } from "Js/types/deck";
 import type {
-  EDHRecResponse,
   EDHRecResponseHandler,
   EDHRecSuggestion,
   EDHRecError,
   Suggestions,
-  Suggestion,
   EDHRecSection,
 } from "Js/types/edhrec";
 
@@ -207,7 +205,7 @@ function createEDHRecResponseHandler(
   };
 }
 
-function createDrawer(button: HTMLButtonElement) {
+function createDrawer(button: HTMLButtonElement): Drawer {
   const drawer = new Drawer({
     id: "edhrec-drawer",
     headerSymbol: EDHREC_SYMBOL,
@@ -255,7 +253,7 @@ function createDrawer(button: HTMLButtonElement) {
   return drawer;
 }
 
-export default function makeEDHRecButton() {
+export default function makeEDHRecButton(): HTMLButtonElement {
   const button = createElement<HTMLButtonElement>(`<button
     id="edhrec-suggestions"
     aria-label="EDHRec Suggestions"

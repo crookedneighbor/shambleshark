@@ -1,5 +1,5 @@
 import bus from "framebus";
-import Feature, { SettingsDefaults } from "Feature";
+import Feature from "Feature";
 import {
   BUS_EVENTS as events,
   FEATURE_IDS as ids,
@@ -145,7 +145,7 @@ class TaggerLink extends Feature {
     this.showPreview = false;
   }
 
-  async run() {
+  async run(): Promise<void> {
     const settings = await TaggerLink.getSettings();
     this.showPreview = Boolean(settings.previewTags);
 
@@ -165,20 +165,22 @@ class TaggerLink extends Feature {
     });
   }
 
-  setupButtons() {
+  setupButtons(): void {
     elementReady<HTMLAnchorElement>(
       ".card-grid-item a.card-grid-item-card",
       (link) => {
         const button = this.makeButton(link.href);
 
-        link
-          .parentNode!.querySelector(".card-grid-item-card-faces")!
-          .appendChild(button as Node);
+        const cardFacesElement = (link.parentNode as HTMLElement).querySelector(
+          ".card-grid-item-card-faces"
+        ) as HTMLElement;
+
+        cardFacesElement.appendChild(button);
       }
     );
   }
 
-  makeButton(link: string) {
+  makeButton(link: string): HTMLAnchorElement {
     const taggerData = getTaggerData(link);
     const taggerLink = convertPageLinkToTagger(
       taggerData.set,
@@ -211,7 +213,7 @@ class TaggerLink extends Feature {
   createMouseoverHandler(
     button: HTMLAnchorElement,
     taggerData: { set: string; number: string }
-  ) {
+  ): (e: MouseEvent) => Promise<void> {
     let request: Promise<void>;
 
     const tooltip = button.querySelector(
@@ -242,7 +244,7 @@ class TaggerLink extends Feature {
     };
   }
 
-  addTags(tooltip: HTMLElement, payload: TaggerPayload) {
+  addTags(tooltip: HTMLElement, payload: TaggerPayload): void {
     const menuContainer = tooltip.querySelector(
       ".menu-container"
     ) as HTMLElement;
@@ -276,7 +278,7 @@ class TaggerLink extends Feature {
     tooltip.style.top = `-${Math.floor(tooltip.offsetHeight / 3.75)}px`;
   }
 
-  collectTags(payload: TaggerPayload) {
+  collectTags(payload: TaggerPayload): RelationshipCollection {
     const tags: RelationshipCollection = {
       art: [],
       oracle: [],
@@ -306,7 +308,7 @@ class TaggerLink extends Feature {
     return tags;
   }
 
-  collectRelationships(payload: TaggerPayload) {
+  collectRelationships(payload: TaggerPayload): RelationshipCollection {
     const relationships: RelationshipCollection = {
       art: [],
       oracle: [],
@@ -351,7 +353,10 @@ class TaggerLink extends Feature {
     return relationships;
   }
 
-  addTagsToMenu(tags: ShamblesharkRelationship[], menu: HTMLUListElement) {
+  addTagsToMenu(
+    tags: ShamblesharkRelationship[],
+    menu: HTMLUListElement
+  ): void {
     tags.sort(sortByAttribute(["isTag", "name"]));
 
     tags.forEach((tag) => {
@@ -370,7 +375,7 @@ class TaggerLink extends Feature {
         </li>`);
 
       if (tag.liClass) {
-        li.firstElementChild!.classList.add(tag.liClass);
+        li.classList.add(tag.liClass);
       }
       menu.appendChild(li);
     });

@@ -48,7 +48,7 @@ fragment TaggingAttrs on Tagging {
   __typename
 }`;
 
-export default function () {
+export default function (): void {
   if (!iframe.isInsideIframe()) {
     // no need to set listeners when not access from iframe
     return;

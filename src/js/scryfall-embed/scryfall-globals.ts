@@ -34,7 +34,7 @@ type DeckMetadata = {
 let getActiveDeckPromise: Promise<Deck> | null;
 let getDeckMetadataPromise: Promise<DeckMetadata> | null;
 
-export function addHooksToCardManagementEvents() {
+export function addHooksToCardManagementEvents(): void {
   if (window.ScryfallAPI) {
     [
       "addCard",
@@ -63,7 +63,7 @@ export function addHooksToCardManagementEvents() {
   }
 }
 
-export function getActiveDeck() {
+export function getActiveDeck(): Promise<Deck> {
   if (!getActiveDeckPromise) {
     getActiveDeckPromise = new Promise((resolve) => {
       window.ScryfallAPI.decks.active((deck: Deck) => {
@@ -123,7 +123,7 @@ export function getDeckMetadata(): Promise<DeckMetadata> {
   return getDeckMetadataPromise;
 }
 
-export function reset() {
+export function reset(): void {
   getActiveDeckPromise = null;
   getDeckMetadataPromise = null;
 }
@@ -151,14 +151,14 @@ export function updateEntry(cardToUpdate: Card): Promise<Card> {
 export function removeEntry(cardId: string): Promise<void> {
   return getActiveDeckId().then((id) => {
     return new Promise((resolve) => {
-      window.ScryfallAPI.decks.destroyEntry(id, cardId, (card: Card) => {
+      window.ScryfallAPI.decks.destroyEntry(id, cardId, () => {
         resolve();
       });
     });
   });
 }
 
-export function cleanUp() {
+export function cleanUp(): Promise<void> {
   window.Scryfall.deckbuilder.cleanUp();
 
   return Promise.resolve();

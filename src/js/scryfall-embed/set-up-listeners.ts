@@ -10,7 +10,7 @@ import {
 
 import type { Card, Deck, DeckSections } from "Js/types/deck";
 
-export default function setUpListeners() {
+export default function setUpListeners(): void {
   Scryfall.addHooksToCardManagementEvents();
 
   bus.on(events.REQUEST_DECK, function (reply) {
@@ -71,10 +71,10 @@ export default function setUpListeners() {
           return card.card_digest.name === cardName;
         }) as Card;
 
-        if (cardToRemove.count! <= 1) {
+        if (cardToRemove.count <= 1) {
           return Scryfall.removeEntry(cardToRemove.id);
         } else {
-          cardToRemove.count!--;
+          cardToRemove.count--;
           return Scryfall.updateEntry(cardToRemove).then(() => {
             // to make this match the same return signature as removeEntry
             return Promise.resolve();

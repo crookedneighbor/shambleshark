@@ -1,7 +1,4 @@
-import DialogInterface, {
-  DialogInterfaceOptions,
-  DialogListener,
-} from "./dialog-interface";
+import DialogInterface, { DialogInterfaceOptions } from "./dialog-interface";
 import createElement from "Lib/create-element";
 import "./drawer.css";
 import { SPINNER_GIF } from "Constants";
@@ -33,19 +30,19 @@ export default class Drawer extends DialogInterface {
     }
   }
 
-  open() {
+  open(): void {
     super.open();
 
     this.element.classList.add("open");
   }
 
-  close() {
+  close(): void {
     super.close();
 
     this.element.classList.remove("open");
   }
 
-  getScrollableElement() {
+  getScrollableElement(): HTMLElement {
     return this._scrollableEl;
   }
 
@@ -89,9 +86,12 @@ export default class Drawer extends DialogInterface {
       </div>
     </div>`);
 
-    drawer.querySelector(".dialog-close")!.addEventListener("click", () => {
-      this.close();
-    });
+    (drawer.querySelector(".dialog-close") as HTMLDivElement).addEventListener(
+      "click",
+      () => {
+        this.close();
+      }
+    );
 
     return drawer;
   }

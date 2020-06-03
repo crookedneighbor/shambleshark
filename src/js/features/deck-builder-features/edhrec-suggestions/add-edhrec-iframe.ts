@@ -9,17 +9,19 @@ function filterOutInvalidCards(card: Card) {
   return card.card_digest;
 }
 
-function getCardName(card: Card) {
-  return card.card_digest?.name;
+function getCardName(card: Card): string {
+  if (!card.card_digest) {
+    return "";
+  }
+
+  return card.card_digest.name;
 }
 
 async function getInitialCommanderList(): Promise<string[]> {
   const initialDeck = await getDeck();
+  const commanders = initialDeck.entries.commanders || [];
 
-  return initialDeck.entries
-    .commanders!.filter(filterOutInvalidCards)
-    .map(getCardName)
-    .sort() as string[];
+  return commanders.filter(filterOutInvalidCards).map(getCardName).sort();
 }
 
 async function setDisabledState(
@@ -90,7 +92,9 @@ function updateButtonStateOnCommanderChange(
   );
 }
 
-export default async function addEDHRecIframe(button: HTMLButtonElement) {
+export default async function addEDHRecIframe(
+  button: HTMLButtonElement
+): Promise<void> {
   await iframe.create({
     // does not matter where on edhrec we open the page
     // just need to be on the edhrec domain to access

@@ -148,7 +148,7 @@ describe("addEDHRecIframe", function () {
     it("enables the button entry has gone from illegal state to legal state", async function () {
       fakeDeck.entries.commanders = [
         makeFakeCard({
-          card_digest: {
+          cardDigest: {
             name: "Food Chain",
           },
         }),

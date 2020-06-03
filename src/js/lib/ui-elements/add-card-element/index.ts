@@ -99,7 +99,7 @@ export default class AddCardElement {
     this._setupListeners();
   }
 
-  _setupListeners() {
+  _setupListeners(): void {
     this.plusButton.addEventListener("keydown", (event) => {
       if (event.key !== "Enter") {
         return;
@@ -133,7 +133,7 @@ export default class AddCardElement {
     });
   }
 
-  setMetadata(value = "") {
+  setMetadata(value = ""): void {
     if (value) {
       emptyElement(this.metadata);
       this.metadata.appendChild(createElement(`<span>${value}</span>`));
@@ -154,7 +154,7 @@ export default class AddCardElement {
     }
   }
 
-  updateUI() {
+  updateUI(): void {
     this.minusButton.classList.toggle("hidden", !this.cardInDeck());
     this.plusButton.classList.toggle("solo", !this.cardInDeck());
 
@@ -167,11 +167,11 @@ export default class AddCardElement {
     this.element.classList.toggle("in-deck", this.cardInDeck());
   }
 
-  cardInDeck() {
+  cardInDeck(): boolean {
     return this.quantity > 0;
   }
 
-  addCardToDeck() {
+  addCardToDeck(): Promise<void> {
     this.quantity++;
 
     this.updateUI();
@@ -204,7 +204,7 @@ export default class AddCardElement {
       });
   }
 
-  removeCardFromDeck() {
+  removeCardFromDeck(): void {
     this.quantity--;
 
     this.updateUI();
@@ -214,7 +214,7 @@ export default class AddCardElement {
     });
   }
 
-  toggleAppearance(shouldHide = false) {
+  toggleAppearance(shouldHide = false): void {
     this.element.classList.toggle("hidden", shouldHide);
   }
 }

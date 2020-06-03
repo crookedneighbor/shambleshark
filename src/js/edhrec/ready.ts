@@ -31,7 +31,7 @@ function getRecs({
     .then((res) => res.json());
 }
 
-export default function start() {
+export default function start(): void {
   if (!iframe.isInsideIframe()) {
     return;
   }

@@ -13,6 +13,7 @@ export type Identifier =
   | { set: string; collector_number: string };
 
 // TODO move this logic of batching to scryfall-client
+// TODO get types from Scryfall Client
 export async function getCollection(ids: Identifier[]) {
   const idBatches = ids.reduce((array: Identifier[][], entry, i) => {
     if (i % 75 !== 0) {

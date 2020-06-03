@@ -149,43 +149,46 @@ describe("modifyCleanUp", function () {
     fakeDeck.sections.secondary.push("lands");
     fakeDeck.entries.nonlands = [];
     fakeDeck.entries.lands = [
-      {
+      makeFakeCard({
         id: "card-without-a-digest",
         section: "lands",
         raw_text: "raw text",
-      },
-      {
+        cardDigest: false,
+      }),
+      makeFakeCard({
         id: "creature-land",
         section: "lands",
         raw_text: "raw text",
-        card_digest: {
+        cardDigest: {
           oracle_id: "oracle-id-creature-land",
           type_line: "Creature Land - Forest",
         },
-      },
-      {
+      }),
+      makeFakeCard({
         id: "card-with-land-type",
         section: "lands",
         raw_text: "raw text",
-        card_digest: {
+        cardDigest: {
           oracle_id: "oracle-id-card-with-land-type",
           type_line: "Basic Land - Mountain",
         },
-      },
+      }),
     ];
 
     await window.Scryfall.deckbuilder.cleanUp();
 
     expect(scryfall.updateEntry).toBeCalledTimes(1);
-    expect(scryfall.updateEntry).toBeCalledWith({
-      id: "creature-land",
-      section: "nonlands",
-      raw_text: "raw text",
-      card_digest: {
-        oracle_id: "oracle-id-creature-land",
-        type_line: "Creature Land - Forest",
-      },
-    });
+    expect(scryfall.updateEntry).toBeCalledWith(
+      expect.objectContaining({
+        id: "creature-land",
+        section: "nonlands",
+        raw_text: "raw text",
+        card_digest: expect.objectContaining({
+          oracle_id: "oracle-id-creature-land",
+          type_line: "Creature Land - Forest",
+        }),
+      })
+    );
   });
 
   it("does not move creaturelands in nonlands section to lands section", async function () {
@@ -197,29 +200,30 @@ describe("modifyCleanUp", function () {
     fakeDeck.sections.secondary.push("lands");
     fakeDeck.entries.lands = [];
     fakeDeck.entries.nonlands = [
-      {
+      makeFakeCard({
         id: "card-without-a-digest",
         section: "nonlands",
         raw_text: "raw text",
-      },
-      {
+        cardDigest: false,
+      }),
+      makeFakeCard({
         id: "creature-land",
         section: "nonlands",
         raw_text: "raw text",
-        card_digest: {
+        cardDigest: {
           oracle_id: "oracle-id-creature-land",
           type_line: "Creature Land - Forest",
         },
-      },
-      {
+      }),
+      makeFakeCard({
         id: "card-with-nonland-type",
         section: "nonlands",
         raw_text: "raw text",
-        card_digest: {
+        cardDigest: {
           oracle_id: "oracle-id-card-with-nonland-type",
           type_line: "Enchantment",
         },
-      },
+      }),
     ];
 
     await window.Scryfall.deckbuilder.cleanUp();
@@ -235,29 +239,30 @@ describe("modifyCleanUp", function () {
     fakeDeck.sections.primary.push("nonlands");
     fakeDeck.sections.secondary.push("lands");
     fakeDeck.entries.lands = [
-      {
+      makeFakeCard({
         id: "card-without-a-digest",
         section: "lands",
         raw_text: "raw text",
-      },
-      {
+        cardDigest: false,
+      }),
+      makeFakeCard({
         id: "land-transform",
         section: "lands",
         raw_text: "raw text",
-        card_digest: {
+        cardDigest: {
           oracle_id: "oracle-id-land-transform",
           type_line: "Land // Creature",
         },
-      },
-      {
+      }),
+      makeFakeCard({
         id: "card-with-lands-type",
         section: "lands",
         raw_text: "raw text",
-        card_digest: {
+        cardDigest: {
           oracle_id: "oracle-id-card-with-lands-type",
           type_line: "Land",
         },
-      },
+      }),
     ];
     fakeDeck.entries.nonlands = [];
 
@@ -275,43 +280,46 @@ describe("modifyCleanUp", function () {
     fakeDeck.sections.secondary.push("lands");
     fakeDeck.entries.lands = [];
     fakeDeck.entries.nonlands = [
-      {
+      makeFakeCard({
         id: "card-without-a-digest",
         section: "nonlands",
         raw_text: "raw text",
-      },
-      {
+        cardDigest: false,
+      }),
+      makeFakeCard({
         id: "land-transform",
         section: "nonlands",
         raw_text: "raw text",
-        card_digest: {
+        cardDigest: {
           oracle_id: "oracle-id-land-transform",
           type_line: "Land // Creature",
         },
-      },
-      {
+      }),
+      makeFakeCard({
         id: "card-with-nonlands-type",
         section: "nonlands",
         raw_text: "raw text",
-        card_digest: {
+        cardDigest: {
           oracle_id: "oracle-id-card-with-nonlands-type",
           type_line: "Creature",
         },
-      },
+      }),
     ];
 
     await window.Scryfall.deckbuilder.cleanUp();
 
     expect(scryfall.updateEntry).toBeCalledTimes(1);
-    expect(scryfall.updateEntry).toBeCalledWith({
-      id: "land-transform",
-      section: "lands",
-      raw_text: "raw text",
-      card_digest: {
-        oracle_id: "oracle-id-land-transform",
-        type_line: "Land // Creature",
-      },
-    });
+    expect(scryfall.updateEntry).toBeCalledWith(
+      expect.objectContaining({
+        id: "land-transform",
+        section: "lands",
+        raw_text: "raw text",
+        card_digest: expect.objectContaining({
+          oracle_id: "oracle-id-land-transform",
+          type_line: "Land // Creature",
+        }),
+      })
+    );
   });
 
   it("does not move lands that transform into non-creature permaments to nonlands", async function () {
@@ -322,47 +330,48 @@ describe("modifyCleanUp", function () {
     fakeDeck.sections.primary.push("nonlands");
     fakeDeck.sections.secondary.push("lands");
     fakeDeck.entries.lands = [
-      {
+      makeFakeCard({
         id: "card-without-a-digest",
         section: "lands",
         raw_text: "raw text",
-      },
-      {
+        cardDigest: false,
+      }),
+      makeFakeCard({
         id: "land-transform",
         section: "lands",
         raw_text: "raw text",
-        card_digest: {
+        cardDigest: {
           oracle_id: "oracle-id-land-transform",
           type_line: "Land // Enchantment",
         },
-      },
-      {
+      }),
+      makeFakeCard({
         id: "land-transform-2",
         section: "lands",
         raw_text: "raw text",
-        card_digest: {
+        cardDigest: {
           oracle_id: "oracle-id-land-transform-2",
           type_line: "Land // Artifact",
         },
-      },
-      {
+      }),
+      makeFakeCard({
         id: "land-transform-3",
         section: "lands",
         raw_text: "raw text",
-        card_digest: {
+        cardDigest: {
           oracle_id: "oracle-id-land-transform-3",
           type_line: "Land // Planeswalker",
         },
-      },
-      {
+      }),
+      makeFakeCard({
         id: "card-with-lands-type",
         section: "lands",
         raw_text: "raw text",
-        card_digest: {
+        cardDigest: {
           oracle_id: "oracle-id-card-with-lands-type",
           type_line: "Land",
         },
-      },
+      }),
     ];
     fakeDeck.entries.nonlands = [];
 

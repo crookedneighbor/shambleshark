@@ -43,9 +43,12 @@ export default class Modal extends DialogInterface {
       </div>
    </div>`);
 
-    modal.querySelector(".dialog-close")!.addEventListener("click", () => {
-      this.close();
-    });
+    (modal.querySelector(".dialog-close") as HTMLElement).addEventListener(
+      "click",
+      () => {
+        this.close();
+      }
+    );
 
     return modal;
   }

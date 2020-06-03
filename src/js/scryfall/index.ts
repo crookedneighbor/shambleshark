@@ -5,7 +5,7 @@ import modifyEditPage from "./edit-page";
 import modifySearchPage from "./search-page";
 import embed from "./embed-scryfall-script";
 
-export default function start() {
+export default function start(): void {
   const hostname = window.location.hostname;
 
   if (hostname === "tagger.scryfall.com") {

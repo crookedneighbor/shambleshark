@@ -15,7 +15,7 @@ class DeckDisplay extends Feature {
     enabled: true,
   };
 
-  async run() {
+  async run(): Promise<void> {
     // TODO
   }
 }

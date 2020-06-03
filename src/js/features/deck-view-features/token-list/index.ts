@@ -7,7 +7,6 @@ import Modal from "Ui/modal";
 import { FEATURE_IDS as ids, FEATURE_SECTIONS as sections } from "Constants";
 
 import "./index.css";
-import { Card } from "Js/types/deck";
 
 const MAX_ENTRIES_TO_AUTO_LOOKUP = 75 * 2; // 2 collection API calls
 
@@ -176,6 +175,7 @@ class TokenList extends Feature {
     };
   }
 
+  // TODO get types from Scryfall Client
   async lookupTokens(entries: Identifier[]) {
     const cards = await getCollection(entries);
     const tokens = cards.map((c) => c.getTokens());

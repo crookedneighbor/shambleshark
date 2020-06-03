@@ -1,7 +1,7 @@
 // adapted from the mdn page on array.sort
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
 export function sortByAttribute<T>(attributes: (keyof T)[]) {
-  return (a: T, b: T) => {
+  return (a: T, b: T): number => {
     let comparison = 0;
 
     attributes.find((attr) => {

@@ -1,6 +1,6 @@
 import searchResultsFeatures from "Features/search-results-features";
 
-export default function () {
+export default function (): void {
   Promise.all(
     searchResultsFeatures.map(function (Feature) {
       return Feature.isEnabled().then((isEnabled) => {

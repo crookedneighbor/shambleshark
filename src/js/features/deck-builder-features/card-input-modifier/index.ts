@@ -10,7 +10,7 @@ import { getDeck } from "Lib/scryfall";
 import deckParser from "Lib/deck-parser";
 import wait from "Lib/wait";
 import CardTooltip from "Ui/card-tooltip";
-import { Card, Deck } from "Js/types/deck";
+import { Card } from "Js/types/deck";
 
 const CARD_EVENTS = [
   events.CALLED_CLEANUP,
@@ -66,7 +66,7 @@ class CardInputModifier extends Feature {
     });
   }
 
-  async run() {
+  async run(): Promise<void> {
     bus.on(events.CALLED_DESTROYENTRY, async ({ payload }) => {
       // clean up our imageCache
       delete this.imageCache[payload as string];
@@ -83,7 +83,7 @@ class CardInputModifier extends Feature {
     });
   }
 
-  attachListenersToEntry(entry: HTMLElement) {
+  attachListenersToEntry(entry: HTMLElement): void {
     const id = entry.getAttribute("data-entry");
 
     if (!id) {
@@ -100,7 +100,7 @@ class CardInputModifier extends Feature {
     this.tooltip.addElement(entry);
   }
 
-  getEntries(bustCache = false) {
+  getEntries(bustCache = false): Promise<Card[]> {
     if (!this._getEntriesPromise || bustCache) {
       this._getEntriesPromise = getDeck().then((deck) =>
         deckParser.flattenEntries(deck, {

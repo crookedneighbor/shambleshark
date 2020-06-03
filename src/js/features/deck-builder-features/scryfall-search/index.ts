@@ -28,7 +28,7 @@ class ScryfallSearch extends Feature {
   currentQuery?: string;
   deck?: Deck;
   isSingleton?: boolean;
-  // TODO no any
+  // TODO no any, get card type from scryfall-client
   cardList?: any;
   deckSectionChooser?: DeckSectionChooser;
   container?: HTMLDivElement;
@@ -66,22 +66,19 @@ class ScryfallSearch extends Feature {
 
   async run(): Promise<void> {
     this.drawer = this.createDrawer();
-    this.settings = await ScryfallSearch.getSettings();
+    this.settings = await ScryfallSearch.getSettings<SearchSettings>();
 
-    document
-      .getElementById("header-search-field")!
-      .addEventListener("keydown", (event) => {
-        if (
-          event.key !== "Enter" ||
-          !(event.target as HTMLInputElement)?.value
-        ) {
-          return;
-        }
+    (document.getElementById(
+      "header-search-field"
+    ) as HTMLElement).addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" || !(event.target as HTMLInputElement)?.value) {
+        return;
+      }
 
-        event.preventDefault();
+      event.preventDefault();
 
-        this.onEnter((event.target as HTMLInputElement)?.value);
-      });
+      this.onEnter((event.target as HTMLInputElement)?.value);
+    });
   }
 
   async onEnter(query: string): Promise<void> {
@@ -105,7 +102,7 @@ class ScryfallSearch extends Feature {
       this.currentQuery += ` ids:${colors.join("")}`;
     }
 
-    this.cardList = await search(this.currentQuery).catch((e) => {
+    this.cardList = await search(this.currentQuery).catch(() => {
       // most likely a 404, return no results
       return [];
     });
@@ -155,6 +152,7 @@ class ScryfallSearch extends Feature {
     }
 
     const entries = deckParser.flattenEntries(this.deck as Deck);
+    // TODO get Card type from scryfall-client
     this.cardList?.forEach((card: any) => {
       const cardInDeck = entries.find(
         (entry) =>
@@ -181,7 +179,7 @@ class ScryfallSearch extends Feature {
     });
   }
 
-  isReadyToLookupNextBatch(el: Element) {
+  isReadyToLookupNextBatch(el: Element): boolean {
     if (this._nextInProgress || !this.cardList || !this.cardList.has_more) {
       return false;
     }
@@ -189,7 +187,7 @@ class ScryfallSearch extends Feature {
     return el.scrollTop + el.clientHeight >= el.scrollHeight - 15000;
   }
 
-  createDrawer() {
+  createDrawer(): Drawer {
     const drawer = new Drawer({
       id: "scryfall-search-drawer",
       // TODO add scryfall symbol?
@@ -207,6 +205,7 @@ class ScryfallSearch extends Feature {
 
         this._nextInProgress = true;
 
+        // TODO get types from scryfall-client
         return this.cardList?.next().then((cards: any) => {
           this.cardList = cards;
           this.addCards();
@@ -224,11 +223,13 @@ class ScryfallSearch extends Feature {
 
         // re-focus the Scryfall Search input
         // for accessibility navigation
-        document.getElementById("header-search-field")!.focus();
+        (document.getElementById("header-search-field") as HTMLElement).focus();
       },
     });
     // TODO: the drawer class should probably handle this
-    document.getElementById("deckbuilder")!.appendChild(drawer.element);
+    (document.getElementById("deckbuilder") as HTMLElement).appendChild(
+      drawer.element
+    );
 
     this.container = document.createElement("div");
     drawer.setContent(this.container);

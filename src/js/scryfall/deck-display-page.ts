@@ -4,7 +4,7 @@ import { ready as elementReady } from "Lib/mutation";
 import createElement from "Lib/create-element";
 import { BUS_EVENTS as events } from "Constants";
 
-function addContainerForSidebarFeatures() {
+function addContainerForSidebarFeatures(): void {
   const section = createElement(`<div id="shambleshark-deck-display-sidebar-toolbox" class="sidebar-toolbox">
   </div>`);
 
@@ -13,7 +13,7 @@ function addContainerForSidebarFeatures() {
   });
 }
 
-export default function () {
+export default function (): void {
   bus.on(events.SCRYFALL_LISTENERS_READY, function () {
     Promise.all(
       deckViewFeatures.map(function (Feature) {

@@ -34,11 +34,11 @@ export default class CardTooltip {
     this.findTooltip();
   }
 
-  static resetTooltipElement() {
+  static resetTooltipElement(): void {
     tooltipElement = null;
   }
 
-  findTooltip() {
+  findTooltip(): void {
     if (tooltipElement) {
       this.tooltipElement = tooltipElement;
 
@@ -53,7 +53,7 @@ export default class CardTooltip {
     });
   }
 
-  addElement(el: HTMLElement) {
+  addElement(el: HTMLElement): void {
     const mousemoveHandler = this.createMousemoveHandler(el);
     const mouseoutHandler = this.createMouseoutHandler(el);
 
@@ -67,7 +67,7 @@ export default class CardTooltip {
     el.addEventListener("mouseout", mouseoutHandler);
   }
 
-  removeElement(el: HTMLElement) {
+  removeElement(el: HTMLElement): void {
     const index = this.elements.findIndex((config) => el === config.element);
 
     if (index === -1) {
@@ -82,12 +82,12 @@ export default class CardTooltip {
     this.elements.splice(index, 1);
   }
 
-  setImage(url: string) {
+  setImage(url: string): void {
     this.img = url;
   }
 
   createMousemoveHandler(el: HTMLElement): MouseHandler {
-    return (event: MouseEvent) => {
+    return (event: MouseEvent): void => {
       // largley adapted from Scryfall's site, if that changes
       // this may also need ot be updated
 
@@ -132,7 +132,7 @@ export default class CardTooltip {
   }
 
   createMouseoutHandler(el: HTMLElement): MouseHandler {
-    return () => {
+    return (): void => {
       if (!this.tooltipElement) {
         return;
       }
@@ -143,14 +143,14 @@ export default class CardTooltip {
     };
   }
 
-  triggerOnMouseover(el: HTMLElement) {
+  triggerOnMouseover(el: HTMLElement): void {
     if (!this._onMouseover) {
       return;
     }
     this._onMouseover(el);
   }
 
-  triggerOnMouseout(el: HTMLElement) {
+  triggerOnMouseout(el: HTMLElement): void {
     if (!this._onMouseout) {
       return;
     }

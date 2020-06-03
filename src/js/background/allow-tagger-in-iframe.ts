@@ -1,6 +1,6 @@
 import { onHeadersReceived } from "Browser/runtime";
 
-export default function () {
+export default function (): void {
   // removes the headers that prevent loading Tagger in an iframe
   onHeadersReceived({
     addListener(info) {

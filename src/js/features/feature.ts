@@ -29,19 +29,22 @@ export default abstract class Feature {
 
   abstract run(): Promise<void>;
 
-  static isEnabled() {
-    return this.getSettings().then((settings) => settings.enabled);
+  static isEnabled(): Promise<boolean> {
+    return this.getSettings().then((settings) => Boolean(settings.enabled));
   }
 
-  static enable() {
+  static enable(): Promise<void> {
     return this.saveSetting("enabled", true);
   }
 
-  static disable() {
+  static disable(): Promise<void> {
     return this.saveSetting("enabled", false);
   }
 
-  static async saveSetting(property: string, value: SettingValue) {
+  static async saveSetting(
+    property: string,
+    value: SettingValue
+  ): Promise<void> {
     // TODO put these in a queue to avoid race conditions
     // of too many settings being saved at once
     const settings = await this.getSettings();
@@ -59,7 +62,7 @@ export default abstract class Feature {
     return storage.set(this.metadata.id, settings);
   }
 
-  static async getSettings() {
+  static async getSettings<T = Record<string, SettingValue>>(): Promise<T> {
     let settings = await storage.get(this.metadata.id);
 
     if (!settings) {
@@ -81,7 +84,7 @@ export default abstract class Feature {
     return { ...this.settingsDefaults, ...settings };
   }
 
-  static async saveData(key: string, value: SettingValue) {
+  static async saveData(key: string, value: SettingValue): Promise<void> {
     return storage.set(`${this.metadata.id}:${key}`, value);
   }
 

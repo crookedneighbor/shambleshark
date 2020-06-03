@@ -292,6 +292,7 @@ describe("DialogInterface", function () {
     it("calls scrollTo on the element", function () {
       const dialog = new ChildDialog();
 
+      // jest doesn't know about scrollTo method on elements
       dialog.element.scrollTo = jest.fn();
 
       dialog.scrollTo(4, 10);

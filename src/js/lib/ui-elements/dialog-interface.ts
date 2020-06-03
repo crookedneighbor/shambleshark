@@ -75,11 +75,11 @@ export default abstract class DialogInterface {
     }
   }
 
-  $(selector: string) {
+  $(selector: string): HTMLElement {
     return this.element.querySelector(selector) as HTMLElement;
   }
 
-  setContent(content: string | HTMLElement) {
+  setContent(content: string | HTMLElement): void {
     emptyElement(this._contentNode);
 
     if (typeof content === "string") {
@@ -89,15 +89,15 @@ export default abstract class DialogInterface {
     }
   }
 
-  resetHeader() {
+  resetHeader(): void {
     this.setHeader(this._originalHeaderText);
   }
 
-  setHeader(value: string) {
+  setHeader(value: string): void {
     this._headerNode.innerText = value;
   }
 
-  setLoading(state: boolean) {
+  setLoading(state: boolean): void {
     const closeBtn = this.$(".dialog-close");
 
     if (state) {
@@ -113,7 +113,7 @@ export default abstract class DialogInterface {
     closeBtn.title = this._getCloseButtonMessage(state);
   }
 
-  open() {
+  open(): void {
     scrollLock(true);
 
     this.element.style.display = "";
@@ -124,7 +124,7 @@ export default abstract class DialogInterface {
     this.$(".dialog-close").focus();
   }
 
-  close() {
+  close(): void {
     scrollLock(false);
 
     this.element.style.display = "none";
@@ -136,19 +136,19 @@ export default abstract class DialogInterface {
     this.triggerOnClose();
   }
 
-  triggerOnClose() {
+  triggerOnClose(): void {
     return this._onClose(this);
   }
 
-  triggerOnOpen() {
+  triggerOnOpen(): void {
     return this._onOpen(this);
   }
 
-  triggerOnScroll() {
+  triggerOnScroll(): void {
     return this._onScroll(this);
   }
 
-  _onEscKey(event: KeyboardEvent) {
+  _onEscKey(event: KeyboardEvent): void {
     if (!this._isOpen) {
       return;
     }
@@ -160,7 +160,7 @@ export default abstract class DialogInterface {
     }
   }
 
-  _getCloseButtonMessage(isLoading?: boolean) {
+  _getCloseButtonMessage(isLoading?: boolean): string {
     if (isLoading) {
       return "The dialog is loading. You may cancel this dialog by using this button.";
     } else {
@@ -170,7 +170,7 @@ export default abstract class DialogInterface {
 
   abstract _constructElement(options: DialogInterfaceOptions): HTMLDivElement;
 
-  scrollTo(x: number, y: number) {
+  scrollTo(x: number, y: number): void {
     this.element.scrollTo(x, y);
   }
 }

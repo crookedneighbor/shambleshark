@@ -14,8 +14,8 @@ export interface FirefoxBrowserExtension {
   };
   storage: {
     sync: {
-      get: (args: string[]) => Promise<Record<string, any>>;
-      set: (obj: Record<string, any>) => Promise<void>;
+      get: (args: string[]) => Promise<Record<string, unknown>>;
+      set: (obj: Record<string, unknown>) => Promise<void>;
     };
   };
   webRequest: {

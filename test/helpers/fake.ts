@@ -1,6 +1,6 @@
 import shortid = require("shortid");
 
-import type { Deck, Card, DeckSections } from "Js/types/deck";
+import type { Deck, Card, CardDigest, DeckSections } from "Js/types/deck";
 import type { EDHRecSuggestion } from "Js/types/edhrec";
 
 type FakeDeckOptions = Partial<Deck> & {
@@ -14,22 +14,37 @@ type FakeCardOptions = Partial<Card> & {
 type FakeEDHRecSuggestionOptions = Partial<EDHRecSuggestion>;
 
 export function makeFakeCard(overrides: FakeCardOptions = {}): Card {
-  let cardDigest: Record<string, string> | undefined;
-  const defaultCardDigest: Record<string, string> = {
-    oracle_id: `oracle-id-${shortid.generate()}`,
+  const id = shortid.generate();
+  const cardDigest: CardDigest = {
+    collector_number: `collector-${id}`,
+    id: `id-${id}`,
+    image: `https://img.scryfall.com/${id}`,
+    mana_cost: "{0}",
+    name: "name",
+    object: "card_digest",
+    oracle_id: `oracle-id-${id}`,
+    scryfall_uri: `https://scryfall.com/${id}`,
+    set: "set",
+    sf: {
+      cost_render_mode: "render",
+      rendered_cost: "cost",
+      collector_number_disambiguates: false,
+      covered: false,
+    },
     type_line: "type",
   };
 
   if (overrides.cardDigest !== false) {
-    cardDigest = Object.assign({}, defaultCardDigest, overrides.cardDigest);
+    Object.assign(cardDigest, overrides.cardDigest);
   }
 
   return {
     id: overrides.id || "card-in-deck-id",
-    raw_text: "rawText" in overrides ? overrides.rawText : "raw text",
+    raw_text:
+      typeof overrides.rawText === "string" ? overrides.rawText : "raw text",
     section: overrides.section || "commanders",
-    count: "count" in overrides ? overrides.count : 1,
-    card_digest: cardDigest,
+    count: typeof overrides.count === "number" ? overrides.count : 1,
+    card_digest: overrides.cardDigest === false ? undefined : cardDigest,
   };
 }
 

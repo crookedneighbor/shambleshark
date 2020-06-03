@@ -5,7 +5,7 @@ import { getDeck } from "Lib/scryfall";
 import { ready } from "Lib/mutation";
 import wait from "Lib/wait";
 
-import { makeFakeDeck } from "Helpers/fake";
+import { makeFakeCard, makeFakeDeck } from "Helpers/fake";
 import { mocked } from "ts-jest/utils";
 
 jest.mock("Lib/scryfall");
@@ -247,12 +247,12 @@ describe("Card Input Modifier", function () {
 
     it("looks up deck to find image", async function () {
       flattenEntriesSpy.mockReturnValue([
-        {
+        makeFakeCard({
           id: "foo",
-          card_digest: {
+          cardDigest: {
             image: "https://example.com/foo-in-card-digest",
           },
-        },
+        }),
       ]);
 
       const url = await cim.lookupImage("foo");
@@ -264,12 +264,12 @@ describe("Card Input Modifier", function () {
 
     it("returns nothing if entry with specific id cannot be found", async function () {
       flattenEntriesSpy.mockReturnValue([
-        {
+        makeFakeCard({
           id: "not-foo",
-          card_digest: {
+          cardDigest: {
             image: "https://example.com/not-foo-in-card-digest",
           },
-        },
+        }),
       ]);
 
       const url = await cim.lookupImage("foo");
@@ -294,12 +294,12 @@ describe("Card Input Modifier", function () {
     it("can bust the cache to re-lookup card image", async function () {
       cim.imageCache.foo = "https://example.com/cached-foo";
       flattenEntriesSpy.mockReturnValue([
-        {
+        makeFakeCard({
           id: "foo",
-          card_digest: {
+          cardDigest: {
             image: "https://example.com/foo-in-card-digest",
           },
-        },
+        }),
       ]);
 
       const url = await cim.lookupImage("foo", true);
@@ -313,21 +313,22 @@ describe("Card Input Modifier", function () {
   describe("refreshCache", function () {
     it("resets the entry cache after 1 second", async function () {
       jest.spyOn(cim, "getEntries").mockResolvedValue([
-        {
+        makeFakeCard({
           id: "foo",
-          card_digest: {
+          cardDigest: {
             image: "https://example.com/new-foo",
           },
-        },
-        {
+        }),
+        makeFakeCard({
           id: "bar",
-          card_digest: {
+          cardDigest: {
             image: "https://example.com/bar",
           },
-        },
-        {
+        }),
+        makeFakeCard({
           id: "baz",
-        },
+          cardDigest: false,
+        }),
       ]);
       cim.imageCache.foo = "https://example.com/cached-foo";
 

@@ -49,12 +49,12 @@ function createCheckbox(
 
 function createInputForType(
   def: SettingsDefinition,
-  inputValue: boolean,
+  inputValue: string | boolean,
   ChildFeature: typeof Feature
 ): HTMLElement {
   switch (def.input) {
     case "checkbox":
-      return createCheckbox(def, inputValue, ChildFeature);
+      return createCheckbox(def, inputValue as boolean, ChildFeature);
   }
 
   return document.createElement("input");
@@ -160,7 +160,11 @@ Promise.all(
       }
 
       Feature.settingDefinitions.forEach((def: SettingsDefinition) => {
-        const input = createInputForType(def, settings[def.id], Feature);
+        const input = createInputForType(
+          def,
+          settings[def.id] as string,
+          Feature
+        );
         input.classList.add("feature-option");
 
         if (input) {

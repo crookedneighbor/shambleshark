@@ -15,7 +15,7 @@ class FutureFeatureOptIn extends Feature {
     enabled: true,
   };
 
-  async run() {
+  async run(): Promise<void> {
     // NOOP only controls install/update behavior
   }
 }

@@ -29,7 +29,7 @@ class CleanUpImprover extends Feature {
     },
   ];
 
-  async run() {
+  async run(): Promise<void> {
     const settings = await CleanUpImprover.getSettings();
     bus.emit(events.MODIFY_CLEAN_UP, settings);
   }
