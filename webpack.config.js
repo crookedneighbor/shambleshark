@@ -133,7 +133,7 @@ const options = {
     // clean the build folder
     new CleanWebpackPlugin({
       cleanOnceBeforeBuildPatterns: ["!*manifest.json"],
-      cleanAfterEveryBuildPatterns: ["!*manifest.json"],
+      cleanAfterEveryBuildPatterns: ["!*.html", "!*manifest.json"],
     }),
     // expose and write the allowed env vars on the compiled bundle
     new webpack.EnvironmentPlugin(["NODE_ENV"]),
@@ -177,18 +177,18 @@ const options = {
       ],
     }),
     new HtmlWebpackPlugin({
-      template: path.join(__dirname, "src", "popup.html"),
       filename: "popup.html",
+      title: "Shambleshark Extend Popup",
       chunks: ["popup"],
     }),
     new HtmlWebpackPlugin({
-      template: path.join(__dirname, "src", "options.html"),
       filename: "options.html",
+      title: "Shambleshark Options",
       chunks: ["options"],
     }),
     new HtmlWebpackPlugin({
-      template: path.join(__dirname, "src", "background.html"),
       filename: "background.html",
+      title: "Shambleshark Background Page",
       chunks: ["background"],
     }),
     new MiniCssExtractPlugin(),
