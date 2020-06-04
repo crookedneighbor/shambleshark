@@ -22,6 +22,22 @@ interface SearchSettings extends SettingsDefaults {
   restrictFunnyCards: boolean;
 }
 
+function createOnSearchHandler(
+  cb: (value: string) => void
+): (event: KeyboardEvent) => void {
+  return (event: KeyboardEvent) => {
+    const target = event.target as HTMLInputElement;
+
+    if (event.key !== "Enter" || !target?.value) {
+      return;
+    }
+
+    event.preventDefault();
+
+    cb(target.value);
+  };
+}
+
 class ScryfallSearch extends Feature {
   drawer?: Drawer;
   settings?: SearchSettings;
@@ -70,15 +86,22 @@ class ScryfallSearch extends Feature {
 
     (document.getElementById(
       "header-search-field"
-    ) as HTMLElement).addEventListener("keydown", (event) => {
-      if (event.key !== "Enter" || !(event.target as HTMLInputElement)?.value) {
-        return;
-      }
+    ) as HTMLElement).addEventListener(
+      "keydown",
+      createOnSearchHandler((value) => {
+        this.onEnter(value);
+      })
+    );
+  }
 
-      event.preventDefault();
+  _queryContainsColorIdentity(query: string): boolean {
+    query = query.toLowerCase();
 
-      this.onEnter((event.target as HTMLInputElement)?.value);
-    });
+    return Boolean(
+      ["id", "ids", "identity", "ci"].find((idParam) => {
+        return query.includes(`${idParam}:`);
+      })
+    );
   }
 
   async onEnter(query: string): Promise<void> {
@@ -95,7 +118,8 @@ class ScryfallSearch extends Feature {
 
     if (
       this.settings?.restrictToCommanderColorIdentity &&
-      deckParser.isCommanderLike(this.deck)
+      deckParser.isCommanderLike(this.deck) &&
+      !this._queryContainsColorIdentity(this.currentQuery)
     ) {
       const colors = await deckParser.getCommanderColorIdentity(this.deck);
 
