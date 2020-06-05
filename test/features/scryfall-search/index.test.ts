@@ -182,6 +182,14 @@ describe("Scryfall Search", function () {
       expect(search).toBeCalledWith("foo not:funny");
     });
 
+    it("does not add `not:funny` to query when restrictFunnyCards setting is active but adjustQuery param is set to false", async function () {
+      ss.settings!.restrictFunnyCards = true;
+      await ss.onEnter("foo", false);
+
+      expect(search).toBeCalledTimes(1);
+      expect(search).toBeCalledWith("foo");
+    });
+
     it("does not add `not:funny` to query when not:funny is already present", async function () {
       ss.settings!.restrictFunnyCards = true;
       await ss.onEnter("not:funny foo");
@@ -210,6 +218,20 @@ describe("Scryfall Search", function () {
 
       expect(searchSpy).toBeCalledTimes(1);
       expect(searchSpy).toBeCalledWith("foo ids:BG");
+    });
+
+    it("does not add `ids` to query when restrictToCommanderColorIdentity setting is active and deck is commanderlike but adjustQuery param is set to false", async function () {
+      ss.settings!.restrictToCommanderColorIdentity = true;
+      jest.spyOn(deckParser, "isSingletonTypeDeck").mockReturnValue(true);
+      jest.spyOn(deckParser, "isCommanderLike").mockReturnValue(true);
+      jest
+        .spyOn(deckParser, "getCommanderColorIdentity")
+        .mockResolvedValue(["B", "G"]);
+
+      await ss.onEnter("foo", false);
+
+      expect(searchSpy).toBeCalledTimes(1);
+      expect(searchSpy).toBeCalledWith("foo");
     });
 
     it.each(["id", "ids", "identity", "ci"])(
@@ -285,11 +307,12 @@ describe("Scryfall Search", function () {
       expect(ss.deck).toBe(fakeDeck);
     });
 
-    it("shows the drawer", async function () {
+    it("hides and then shows the drawer", async function () {
       await ss.onEnter("foo");
 
-      expect(ss.drawer!.setLoading).toBeCalledTimes(1);
-      expect(ss.drawer!.setLoading).toBeCalledWith(false);
+      expect(ss.drawer.setLoading).toBeCalledTimes(2);
+      expect(ss.drawer.setLoading).nthCalledWith(1, true);
+      expect(ss.drawer.setLoading).nthCalledWith(2, false);
     });
   });
 

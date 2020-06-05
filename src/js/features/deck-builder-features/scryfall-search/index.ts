@@ -121,11 +121,14 @@ class ScryfallSearch extends Feature {
     );
   }
 
-  async onEnter(query: string): Promise<void> {
+  async onEnter(query: string, adjustQuery = true): Promise<void> {
+    this.drawer.setLoading(true);
     this.drawer.open();
     this.currentQuery = query;
+    emptyElement(this.cardResultsContainer);
 
     if (
+      adjustQuery &&
       this.settings?.restrictFunnyCards &&
       this.currentQuery.indexOf(":funny") === -1
     ) {
@@ -137,6 +140,7 @@ class ScryfallSearch extends Feature {
     this.isSingleton = deckParser.isSingletonTypeDeck(this.deck);
 
     if (
+      adjustQuery &&
       this.settings?.restrictToCommanderColorIdentity &&
       deckParser.isCommanderLike(this.deck) &&
       !this._queryContainsColorIdentity(this.currentQuery)
