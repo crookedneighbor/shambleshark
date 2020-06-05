@@ -108,7 +108,10 @@ class ScryfallSearch extends Feature {
     this.drawer?.open();
     this.currentQuery = query;
 
-    if (this.settings?.restrictFunnyCards) {
+    if (
+      this.settings?.restrictFunnyCards &&
+      this.currentQuery.indexOf(":funny") === -1
+    ) {
       this.currentQuery += " not:funny";
     }
 

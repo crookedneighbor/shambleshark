@@ -196,6 +196,22 @@ describe("Scryfall Search", function () {
       expect(search).toBeCalledWith("foo not:funny");
     });
 
+    it("does not add `not:funny` to query when not:funny is already present", async function () {
+      ss.settings!.restrictFunnyCards = true;
+      await ss.onEnter("not:funny foo");
+
+      expect(search).toBeCalledTimes(1);
+      expect(search).toBeCalledWith("not:funny foo");
+    });
+
+    it("does not add `not:funny` to query when is:funny is already present", async function () {
+      ss.settings!.restrictFunnyCards = true;
+      await ss.onEnter("is:funny foo");
+
+      expect(search).toBeCalledTimes(1);
+      expect(search).toBeCalledWith("is:funny foo");
+    });
+
     it("adds `ids` to query when restrictToCommanderColorIdentity setting is active and deck is commanderlike", async function () {
       ss.settings!.restrictToCommanderColorIdentity = true;
       jest.spyOn(deckParser, "isSingletonTypeDeck").mockReturnValue(true);
@@ -209,6 +225,23 @@ describe("Scryfall Search", function () {
       expect(searchSpy).toBeCalledTimes(1);
       expect(searchSpy).toBeCalledWith("foo ids:BG");
     });
+
+    it.each(["id", "ids", "identity", "ci"])(
+      "does not add `ids` to query when `%s` is already present",
+      async function (param) {
+        ss.settings!.restrictToCommanderColorIdentity = true;
+        jest.spyOn(deckParser, "isSingletonTypeDeck").mockReturnValue(true);
+        jest.spyOn(deckParser, "isCommanderLike").mockReturnValue(true);
+        jest
+          .spyOn(deckParser, "getCommanderColorIdentity")
+          .mockResolvedValue(["B", "G"]);
+
+        await ss.onEnter(`${param}:W foo`);
+
+        expect(searchSpy).toBeCalledTimes(1);
+        expect(searchSpy).toBeCalledWith(`${param}:W foo`);
+      }
+    );
 
     it("does not add `ids` to query when restrictToCommanderColorIdentity setting is active and deck is not commanderlike", async function () {
       ss.settings!.restrictToCommanderColorIdentity = true;
