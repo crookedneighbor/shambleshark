@@ -98,7 +98,7 @@ describe("Scryfall Search", function () {
   });
 
   describe("run", function () {
-    it("sets up event listener for search bar", async function () {
+    it("sets up event listener for header search bar", async function () {
       const ss = new ScryfallSearch();
 
       jest.spyOn(ss, "onEnter").mockResolvedValue();
@@ -119,7 +119,7 @@ describe("Scryfall Search", function () {
         })
       );
       expect(ss.onEnter).toBeCalledTimes(1);
-      expect(ss.onEnter).toBeCalledWith("is:commander");
+      expect(ss.onEnter).toBeCalledWith("is:commander", true);
     });
 
     it("does not call onEnter if no value in the header search field", async function () {
@@ -131,6 +131,46 @@ describe("Scryfall Search", function () {
 
       headerSearchField.value = "";
       headerSearchField.dispatchEvent(
+        new window.KeyboardEvent("keydown", {
+          key: "Enter",
+        })
+      );
+      expect(ss.onEnter).toBeCalledTimes(0);
+    });
+
+    it("sets up event listener for inline search bar", async function () {
+      const ss = new ScryfallSearch();
+
+      jest.spyOn(ss, "onEnter").mockResolvedValue();
+
+      await ss.run();
+
+      ss.inlineSearchField.value = "is:commander";
+      ss.inlineSearchField.dispatchEvent(
+        new window.KeyboardEvent("keydown", {
+          key: "a",
+        })
+      );
+      expect(ss.onEnter).toBeCalledTimes(0);
+
+      ss.inlineSearchField.dispatchEvent(
+        new window.KeyboardEvent("keydown", {
+          key: "Enter",
+        })
+      );
+      expect(ss.onEnter).toBeCalledTimes(1);
+      expect(ss.onEnter).toBeCalledWith("is:commander", false);
+    });
+
+    it("does not call onEnter if no value in the inline search field", async function () {
+      const ss = new ScryfallSearch();
+
+      jest.spyOn(ss, "onEnter").mockResolvedValue();
+
+      await ss.run();
+
+      ss.inlineSearchField.value = "";
+      ss.inlineSearchField.dispatchEvent(
         new window.KeyboardEvent("keydown", {
           key: "Enter",
         })

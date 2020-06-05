@@ -1,3 +1,9 @@
+.header-search-inline-search {
+  background-color: #2b253a;
+  margin: -10px -10px 0 -10px;
+  padding: 0 0 0 4px;
+}
+
 .scryfall-search__non-card-element {
   padding: 10px;
 }

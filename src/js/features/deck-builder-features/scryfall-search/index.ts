@@ -22,26 +22,11 @@ interface SearchSettings extends SettingsDefaults {
   restrictFunnyCards: boolean;
 }
 
-function createOnSearchHandler(
-  cb: (value: string) => void
-): (event: KeyboardEvent) => void {
-  return (event: KeyboardEvent) => {
-    const target = event.target as HTMLInputElement;
-
-    if (event.key !== "Enter" || !target?.value) {
-      return;
-    }
-
-    event.preventDefault();
-
-    cb(target.value);
-  };
-}
-
 class ScryfallSearch extends Feature {
   drawer: Drawer;
   currentQuery: string;
   headerSearchField: HTMLInputElement;
+  inlineSearchField: HTMLInputElement;
   deckSectionChooser: DeckSectionChooser;
   container: HTMLDivElement;
   cardResultsContainer: HTMLDivElement;
@@ -95,6 +80,9 @@ class ScryfallSearch extends Feature {
     ) as HTMLDivElement;
     this.drawer = this.createDrawer();
     this.currentQuery = "";
+    this.inlineSearchField = this.container.querySelector(
+      "#inline-search-header-search-field"
+    ) as HTMLInputElement;
     this.headerSearchField = document.getElementById(
       "header-search-field"
     ) as HTMLInputElement;
@@ -105,13 +93,15 @@ class ScryfallSearch extends Feature {
 
     this.headerSearchField.addEventListener(
       "keydown",
-      createOnSearchHandler((value) => {
-        this.onEnter(value);
-      })
+      this._createOnSearchHandler(true)
+    );
+    this.inlineSearchField.addEventListener(
+      "keydown",
+      this._createOnSearchHandler(false)
     );
   }
 
-  _queryContainsColorIdentity(query: string): boolean {
+  private _queryContainsColorIdentity(query: string): boolean {
     query = query.toLowerCase();
 
     return Boolean(
@@ -119,6 +109,22 @@ class ScryfallSearch extends Feature {
         return query.includes(`${idParam}:`);
       })
     );
+  }
+
+  private _createOnSearchHandler(
+    adjustQuery: boolean
+  ): (event: KeyboardEvent) => void {
+    return (event: KeyboardEvent) => {
+      const target = event.target as HTMLInputElement;
+
+      if (event.key !== "Enter" || !target?.value) {
+        return;
+      }
+
+      event.preventDefault();
+
+      this.onEnter(target.value, adjustQuery);
+    };
   }
 
   async onEnter(query: string, adjustQuery = true): Promise<void> {
@@ -164,6 +170,14 @@ class ScryfallSearch extends Feature {
 
   createContainer(): HTMLDivElement {
     const el = createElement<HTMLDivElement>(`<div>
+      <div class="header-search-inline-search">
+        <form action="/search" accept-charset="UTF-8" method="get" class="header-search">
+          <label for="inline-search-header-search-field" class="vh">Search for Magic cards</label>
+          <input type="text" id="inline-search-header-search-field" placeholder="Search for Magic cards…" autocomplete="on" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="1024" class="header-search-field">
+          <button type="submit" class="vh">Find Cards</button>
+        </form>
+      </div>
+
       <div class="scryfall-search__options-container scryfall-search__non-card-element">
         <div class="scryfall-search__search-results-counter">
           <span class="scryfall-search__search-results-counter-total"></span>
@@ -172,6 +186,7 @@ class ScryfallSearch extends Feature {
         <div id="scryfall-search__section-selection-container"></div>
         <hr class="scryfall-search__hr" />
       </div>
+
       <div id="scryfall-search__card-results"></div>
     </div>`);
     (el.querySelector(
@@ -193,7 +208,7 @@ class ScryfallSearch extends Feature {
       "a.scryfall-search__external-link-icon"
     ) as HTMLAnchorElement).href = `/search?q=${encodeURI(this.currentQuery)}`;
 
-    // TODO add to inline search input
+    this.inlineSearchField.value = this.currentQuery;
 
     this.deckSectionChooser.addSections(this.deck as Deck);
   }
