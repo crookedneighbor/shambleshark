@@ -39,15 +39,18 @@ function createOnSearchHandler(
 }
 
 class ScryfallSearch extends Feature {
-  drawer?: Drawer;
+  drawer: Drawer;
+  currentQuery: string;
+  headerSearchField: HTMLInputElement;
+  deckSectionChooser: DeckSectionChooser;
+  container: HTMLDivElement;
+  cardResultsContainer: HTMLDivElement;
+
   settings?: SearchSettings;
-  currentQuery?: string;
-  deck?: Deck;
   isSingleton?: boolean;
+  deck?: Deck;
   // TODO no any, get card type from scryfall-client
   cardList?: any;
-  deckSectionChooser?: DeckSectionChooser;
-  container?: HTMLDivElement;
   _nextInProgress?: boolean;
 
   static metadata = {
@@ -80,13 +83,27 @@ class ScryfallSearch extends Feature {
     },
   ];
 
-  async run(): Promise<void> {
+  constructor() {
+    super();
+
+    this.deckSectionChooser = new DeckSectionChooser({
+      id: "scryfall-search__section-selection",
+    });
+    this.container = this.createContainer();
+    this.cardResultsContainer = this.container.querySelector(
+      "#scryfall-search__card-results"
+    ) as HTMLDivElement;
     this.drawer = this.createDrawer();
+    this.currentQuery = "";
+    this.headerSearchField = document.getElementById(
+      "header-search-field"
+    ) as HTMLInputElement;
+  }
+
+  async run(): Promise<void> {
     this.settings = await ScryfallSearch.getSettings<SearchSettings>();
 
-    (document.getElementById(
-      "header-search-field"
-    ) as HTMLElement).addEventListener(
+    this.headerSearchField.addEventListener(
       "keydown",
       createOnSearchHandler((value) => {
         this.onEnter(value);
@@ -105,7 +122,7 @@ class ScryfallSearch extends Feature {
   }
 
   async onEnter(query: string): Promise<void> {
-    this.drawer?.open();
+    this.drawer.open();
     this.currentQuery = query;
 
     if (
@@ -134,42 +151,53 @@ class ScryfallSearch extends Feature {
       return [];
     });
 
-    this.addSearchOptionsElement();
+    this.addMetadataToContainer();
 
     this.addCards();
 
-    this.drawer?.setLoading(false);
+    this.drawer.setLoading(false);
   }
 
-  addSearchOptionsElement(): void {
-    const totalCards = this.cardList?.total_cards;
-    const el = createElement<HTMLDivElement>(`<div
-      class="scryfall-search__options-container scryfall-search__non-card-element"
-    >
-      <div class="scryfall-search__search-results-counter">
-        ${totalCards} result${totalCards !== 1 ? "s" : ""}&nbsp;
-        <a class="scryfall-search__external-link-icon" href="/search?q=${encodeURI(
-          this.currentQuery as string
-        )}">${EXTERNAL_ARROW}</a>
+  createContainer(): HTMLDivElement {
+    const el = createElement<HTMLDivElement>(`<div>
+      <div class="scryfall-search__options-container scryfall-search__non-card-element">
+        <div class="scryfall-search__search-results-counter">
+          <span class="scryfall-search__search-results-counter-total"></span>
+          <a class="scryfall-search__external-link-icon">${EXTERNAL_ARROW}</a>
+        </div>
+        <div id="scryfall-search__section-selection-container"></div>
+        <hr class="scryfall-search__hr" />
       </div>
+      <div id="scryfall-search__card-results"></div>
     </div>`);
-    this.deckSectionChooser = new DeckSectionChooser({
-      id: "scryfall-search__section-selection",
-      deck: this.deck as Deck,
-    });
-    el?.appendChild(this.deckSectionChooser.element);
+    (el.querySelector(
+      "#scryfall-search__section-selection-container"
+    ) as HTMLDivElement).appendChild(this.deckSectionChooser.element);
 
-    const hr = document.createElement("hr");
-    hr.classList.add("scryfall-search__hr");
+    return el;
+  }
 
-    this.container?.appendChild(el as Node);
-    this.container?.appendChild(hr);
+  addMetadataToContainer(): void {
+    const totalCards = this.cardList?.total_cards || 0;
+    (this.container.querySelector(
+      ".scryfall-search__search-results-counter-total"
+    ) as HTMLSpanElement).innerText = `${totalCards} result${
+      totalCards !== 1 ? "s" : ""
+    } `;
+
+    (this.container.querySelector(
+      "a.scryfall-search__external-link-icon"
+    ) as HTMLAnchorElement).href = `/search?q=${encodeURI(this.currentQuery)}`;
+
+    // TODO add to inline search input
+
+    this.deckSectionChooser.addSections(this.deck as Deck);
   }
 
   addCards(): void {
     if (this.cardList?.length === 0) {
-      emptyElement(this.container as HTMLDivElement);
-      this.container?.appendChild(
+      emptyElement(this.cardResultsContainer);
+      this.cardResultsContainer.appendChild(
         createElement(
           '<div class="scryfall-search__no-results scryfall-search__non-card-element">No search results.</div>'
         )
@@ -202,7 +230,7 @@ class ScryfallSearch extends Feature {
         },
       });
 
-      this.container?.appendChild(addCardEl.element);
+      this.cardResultsContainer.appendChild(addCardEl.element);
     });
   }
 
@@ -246,19 +274,19 @@ class ScryfallSearch extends Feature {
         // reset this in case the error state changes it
         drawerInstance.setLoading(true);
         drawerInstance.resetHeader();
-        emptyElement(this.container as HTMLDivElement);
+        emptyElement(this.cardResultsContainer);
 
         // re-focus the Scryfall Search input
         // for accessibility navigation
-        (document.getElementById("header-search-field") as HTMLElement).focus();
+        this.headerSearchField.focus();
       },
     });
+
     // TODO: the drawer class should probably handle this
     (document.getElementById("deckbuilder") as HTMLElement).appendChild(
       drawer.element
     );
 
-    this.container = document.createElement("div");
     drawer.setContent(this.container);
 
     return drawer;
