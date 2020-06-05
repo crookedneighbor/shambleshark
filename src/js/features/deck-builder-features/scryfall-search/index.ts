@@ -91,14 +91,8 @@ class ScryfallSearch extends Feature {
   async run(): Promise<void> {
     this.settings = await ScryfallSearch.getSettings<SearchSettings>();
 
-    this.headerSearchField.addEventListener(
-      "keydown",
-      this._createOnSearchHandler(true)
-    );
-    this.inlineSearchField.addEventListener(
-      "keydown",
-      this._createOnSearchHandler(false)
-    );
+    this._attachSearchHandler(this.headerSearchField, true);
+    this._attachSearchHandler(this.inlineSearchField, false);
   }
 
   private _queryContainsColorIdentity(query: string): boolean {
@@ -111,10 +105,11 @@ class ScryfallSearch extends Feature {
     );
   }
 
-  private _createOnSearchHandler(
+  private _attachSearchHandler(
+    el: HTMLInputElement,
     adjustQuery: boolean
-  ): (event: KeyboardEvent) => void {
-    return (event: KeyboardEvent) => {
+  ): void {
+    el.addEventListener("keydown", (event: KeyboardEvent) => {
       const target = event.target as HTMLInputElement;
 
       if (event.key !== "Enter" || !target?.value) {
@@ -124,7 +119,7 @@ class ScryfallSearch extends Feature {
       event.preventDefault();
 
       this.onEnter(target.value, adjustQuery);
-    };
+    });
   }
 
   async onEnter(query: string, adjustQuery = true): Promise<void> {
