@@ -93,6 +93,8 @@ class ScryfallSearch extends Feature {
 
     this._attachSearchHandler(this.headerSearchField, true);
     this._attachSearchHandler(this.inlineSearchField, false);
+
+    this.deck = await getDeck();
   }
 
   private _queryContainsColorIdentity(query: string): boolean {

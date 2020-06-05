@@ -98,6 +98,16 @@ describe("Scryfall Search", function () {
   });
 
   describe("run", function () {
+    it("fetches the deck data", async function () {
+      mocked(getDeck).mockResolvedValue(makeFakeDeck());
+
+      const ss = new ScryfallSearch();
+
+      await ss.run();
+
+      expect(ss.deck).toBeTruthy();
+    });
+
     it("sets up event listener for header search bar", async function () {
       const ss = new ScryfallSearch();
 
