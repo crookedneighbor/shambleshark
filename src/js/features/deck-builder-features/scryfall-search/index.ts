@@ -120,11 +120,11 @@ class ScryfallSearch extends Feature {
 
       event.preventDefault();
 
-      this.onEnter(target.value, adjustQuery);
+      this.runSearch(target.value, adjustQuery);
     });
   }
 
-  async onEnter(query: string, adjustQuery = true): Promise<void> {
+  async runSearch(query: string, adjustQuery = true): Promise<void> {
     this.drawer.setLoading(true);
     this.drawer.open();
     this.currentQuery = query;

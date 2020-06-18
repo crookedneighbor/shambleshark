@@ -111,7 +111,7 @@ describe("Scryfall Search", function () {
     it("sets up event listener for header search bar", async function () {
       const ss = new ScryfallSearch();
 
-      jest.spyOn(ss, "onEnter").mockResolvedValue();
+      jest.spyOn(ss, "runSearch").mockResolvedValue();
 
       await ss.run();
 
@@ -121,21 +121,21 @@ describe("Scryfall Search", function () {
           key: "a",
         })
       );
-      expect(ss.onEnter).toBeCalledTimes(0);
+      expect(ss.runSearch).toBeCalledTimes(0);
 
       headerSearchField.dispatchEvent(
         new window.KeyboardEvent("keydown", {
           key: "Enter",
         })
       );
-      expect(ss.onEnter).toBeCalledTimes(1);
-      expect(ss.onEnter).toBeCalledWith("is:commander", true);
+      expect(ss.runSearch).toBeCalledTimes(1);
+      expect(ss.runSearch).toBeCalledWith("is:commander", true);
     });
 
-    it("does not call onEnter if no value in the header search field", async function () {
+    it("does not call runSearch if no value in the header search field", async function () {
       const ss = new ScryfallSearch();
 
-      jest.spyOn(ss, "onEnter").mockResolvedValue();
+      jest.spyOn(ss, "runSearch").mockResolvedValue();
 
       await ss.run();
 
@@ -145,13 +145,13 @@ describe("Scryfall Search", function () {
           key: "Enter",
         })
       );
-      expect(ss.onEnter).toBeCalledTimes(0);
+      expect(ss.runSearch).toBeCalledTimes(0);
     });
 
     it("sets up event listener for inline search bar", async function () {
       const ss = new ScryfallSearch();
 
-      jest.spyOn(ss, "onEnter").mockResolvedValue();
+      jest.spyOn(ss, "runSearch").mockResolvedValue();
 
       await ss.run();
 
@@ -161,21 +161,21 @@ describe("Scryfall Search", function () {
           key: "a",
         })
       );
-      expect(ss.onEnter).toBeCalledTimes(0);
+      expect(ss.runSearch).toBeCalledTimes(0);
 
       ss.inlineSearchField.dispatchEvent(
         new window.KeyboardEvent("keydown", {
           key: "Enter",
         })
       );
-      expect(ss.onEnter).toBeCalledTimes(1);
-      expect(ss.onEnter).toBeCalledWith("is:commander", false);
+      expect(ss.runSearch).toBeCalledTimes(1);
+      expect(ss.runSearch).toBeCalledWith("is:commander", false);
     });
 
-    it("does not call onEnter if no value in the inline search field", async function () {
+    it("does not call runSearch if no value in the inline search field", async function () {
       const ss = new ScryfallSearch();
 
-      jest.spyOn(ss, "onEnter").mockResolvedValue();
+      jest.spyOn(ss, "runSearch").mockResolvedValue();
 
       await ss.run();
 
@@ -185,11 +185,11 @@ describe("Scryfall Search", function () {
           key: "Enter",
         })
       );
-      expect(ss.onEnter).toBeCalledTimes(0);
+      expect(ss.runSearch).toBeCalledTimes(0);
     });
   });
 
-  describe("onEnter", function () {
+  describe("runSearch", function () {
     let ss: ScryfallSearch;
     let getDeckSpy: jest.SpyInstance;
     let searchSpy: jest.SpyInstance;
@@ -212,13 +212,13 @@ describe("Scryfall Search", function () {
     });
 
     it("opens the drawer", async function () {
-      await ss.onEnter("foo");
+      await ss.runSearch("foo");
 
       expect(ss.drawer?.open).toBeCalledTimes(1);
     });
 
     it("queries the api", async function () {
-      await ss.onEnter("foo");
+      await ss.runSearch("foo");
 
       expect(search).toBeCalledTimes(1);
       expect(search).toBeCalledWith("foo");
@@ -226,7 +226,7 @@ describe("Scryfall Search", function () {
 
     it("adds `not:funny` to query when restrictFunnyCards setting is active", async function () {
       ss.settings!.restrictFunnyCards = true;
-      await ss.onEnter("foo");
+      await ss.runSearch("foo");
 
       expect(search).toBeCalledTimes(1);
       expect(search).toBeCalledWith("foo not:funny");
@@ -234,7 +234,7 @@ describe("Scryfall Search", function () {
 
     it("does not add `not:funny` to query when restrictFunnyCards setting is active but adjustQuery param is set to false", async function () {
       ss.settings!.restrictFunnyCards = true;
-      await ss.onEnter("foo", false);
+      await ss.runSearch("foo", false);
 
       expect(search).toBeCalledTimes(1);
       expect(search).toBeCalledWith("foo");
@@ -242,7 +242,7 @@ describe("Scryfall Search", function () {
 
     it("does not add `not:funny` to query when not:funny is already present", async function () {
       ss.settings!.restrictFunnyCards = true;
-      await ss.onEnter("not:funny foo");
+      await ss.runSearch("not:funny foo");
 
       expect(search).toBeCalledTimes(1);
       expect(search).toBeCalledWith("not:funny foo");
@@ -250,7 +250,7 @@ describe("Scryfall Search", function () {
 
     it("does not add `not:funny` to query when is:funny is already present", async function () {
       ss.settings!.restrictFunnyCards = true;
-      await ss.onEnter("is:funny foo");
+      await ss.runSearch("is:funny foo");
 
       expect(search).toBeCalledTimes(1);
       expect(search).toBeCalledWith("is:funny foo");
@@ -264,7 +264,7 @@ describe("Scryfall Search", function () {
         .spyOn(deckParser, "getCommanderColorIdentity")
         .mockResolvedValue(["B", "G"]);
 
-      await ss.onEnter("foo");
+      await ss.runSearch("foo");
 
       expect(searchSpy).toBeCalledTimes(1);
       expect(searchSpy).toBeCalledWith("foo ids:BG");
@@ -278,7 +278,7 @@ describe("Scryfall Search", function () {
         .spyOn(deckParser, "getCommanderColorIdentity")
         .mockResolvedValue(["B", "G"]);
 
-      await ss.onEnter("foo", false);
+      await ss.runSearch("foo", false);
 
       expect(searchSpy).toBeCalledTimes(1);
       expect(searchSpy).toBeCalledWith("foo");
@@ -294,7 +294,7 @@ describe("Scryfall Search", function () {
           .spyOn(deckParser, "getCommanderColorIdentity")
           .mockResolvedValue(["B", "G"]);
 
-        await ss.onEnter(`${param}:W foo`);
+        await ss.runSearch(`${param}:W foo`);
 
         expect(searchSpy).toBeCalledTimes(1);
         expect(searchSpy).toBeCalledWith(`${param}:W foo`);
@@ -309,7 +309,7 @@ describe("Scryfall Search", function () {
         .spyOn(deckParser, "getCommanderColorIdentity")
         .mockResolvedValue(["B", "G"]);
 
-      await ss.onEnter("foo");
+      await ss.runSearch("foo");
 
       expect(searchSpy).toBeCalledTimes(1);
       expect(searchSpy).toBeCalledWith("foo");
@@ -324,7 +324,7 @@ describe("Scryfall Search", function () {
         .spyOn(deckParser, "getCommanderColorIdentity")
         .mockResolvedValue(["B", "G"]);
 
-      await ss.onEnter("foo");
+      await ss.runSearch("foo");
 
       expect(searchSpy).toBeCalledTimes(1);
       expect(searchSpy).toBeCalledWith("foo not:funny ids:BG");
@@ -335,14 +335,14 @@ describe("Scryfall Search", function () {
 
       searchSpy.mockResolvedValue(cards);
 
-      await ss.onEnter("foo");
+      await ss.runSearch("foo");
 
       expect(ss.cardList).toBe(cards);
       expect(ss.addCards).toBeCalledTimes(1);
     });
 
     it("fetches the current deck", async function () {
-      await ss.onEnter("foo");
+      await ss.runSearch("foo");
 
       expect(getDeckSpy).toBeCalledTimes(1);
     });
@@ -352,13 +352,13 @@ describe("Scryfall Search", function () {
 
       getDeckSpy.mockResolvedValue(fakeDeck);
 
-      await ss.onEnter("foo");
+      await ss.runSearch("foo");
 
       expect(ss.deck).toBe(fakeDeck);
     });
 
     it("hides and then shows the drawer", async function () {
-      await ss.onEnter("foo");
+      await ss.runSearch("foo");
 
       expect(ss.drawer.setLoading).toBeCalledTimes(2);
       expect(ss.drawer.setLoading).nthCalledWith(1, true);
