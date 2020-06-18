@@ -109,3 +109,16 @@ export const SIMILAR_TO_SYMBOL = `
     <path d="M23.9,16.5c-1-2.1-3.7-5.8-8.5-3.6c-3,1.4-4.8,2.2-4.8,2.2L6.2,17c-1.2,0.6-3.9-0.3-5.5-0.8c-0.4-0.1-0.8,0.3-0.6,0.7 c1,2.1,3.7,5.8,8.5,3.6c3-1.4,9.2-4,9.2-4c1.2-0.7,3.9,0.2,5.5,0.8C23.7,17.4,24.1,16.9,23.9,16.5z"></path>
   </svg>
 `;
+
+// utility symbols
+export const ARROW = `
+  <svg aria-hidden="true" focusable="false" class="" width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
+    <path d="M9.375 3l12.625 12-12.562 12-1.438-1.406 11.094-10.594-11.094-10.562z"></path>
+  </svg>
+`;
+
+export const ELLIPSIS = `
+  <svg aria-hidden="true" focusable="false" viewBox="0 0 17 4" xmlns="http://www.w3.org/2000/svg">
+    <path d="M2.12 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2m12 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2m-6-4c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2" fill="#000" fill-rule="nonzero"></path>
+  </svg>
+`;
