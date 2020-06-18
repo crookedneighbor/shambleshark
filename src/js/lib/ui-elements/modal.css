@@ -8,3 +8,7 @@
   max-height: 600px;
   overflow-y: scroll;
 }
+
+.dialog-content.modal-dialog-stage-content {
+  width: 100%;
+}
