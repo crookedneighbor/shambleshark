@@ -1,7 +1,7 @@
 import storage from "Lib/storage";
 import { FEATURE_IDS as ids } from "Constants";
 
-import type { JsonMap, AnyJson } from "Js/types/json";
+import type { JsonMap, AnyJson, JsonArray } from "Js/types/json";
 
 export interface Metadata {
   id: string;
@@ -89,7 +89,7 @@ export default abstract class Feature {
     return storage.set(`${this.metadata.id}:${key}`, value);
   }
 
-  static async getData(key: string): Promise<JsonMap> {
+  static async getData(key: string): Promise<JsonMap | JsonArray> {
     const data = (await storage.get(`${this.metadata.id}:${key}`)) as JsonMap;
 
     return data;
