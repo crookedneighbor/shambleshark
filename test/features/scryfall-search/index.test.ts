@@ -3,6 +3,7 @@ import deckParser from "Lib/deck-parser";
 import { getDeck, search } from "Lib/scryfall";
 import bus from "framebus";
 import Drawer from "Lib/ui-elements/drawer";
+import Modal from "Lib/ui-elements/modal";
 
 import { makeFakeDeck, makeFakeCard } from "Helpers/fake";
 import { mocked } from "ts-jest/utils";
@@ -29,10 +30,13 @@ describe("Scryfall Search", function () {
 
     document.body.appendChild(deckbuilderContainer);
     document.body.appendChild(searchInput);
+
+    jest.spyOn(Drawer.prototype, "scrollTo").mockImplementation();
+    jest.spyOn(Modal.prototype, "scrollTo").mockImplementation();
   });
 
   describe("Constructor", () => {
-    it("creates a drawer", async () => {
+    it("creates a drawer to display search results in", async () => {
       jest.spyOn(ScryfallSearch.prototype, "createDrawer");
 
       const ss = new ScryfallSearch();
@@ -43,6 +47,21 @@ describe("Scryfall Search", function () {
       expect(
         deckbuilderContainer.querySelector("#scryfall-search-drawer")
       ).toBe(ss.drawer.element);
+    });
+
+    it("creates a modal to display saved searches in", async () => {
+      jest.spyOn(ScryfallSearch.prototype, "createModal");
+
+      const ss = new ScryfallSearch();
+
+      await ss.run();
+
+      expect(ss.createModal).toBeCalledTimes(1);
+      expect(
+        deckbuilderContainer.querySelector(
+          "#scryfall-search-saved-search-modal"
+        )
+      ).toBe(ss.savedSearchModal.element);
     });
   });
 
@@ -94,6 +113,297 @@ describe("Scryfall Search", function () {
       await ss.drawer.triggerOnScroll();
 
       expect(ss.addCards).toBeCalledTimes(0);
+    });
+  });
+
+  describe("saved searches modal behavior", () => {
+    describe("on close", () => {
+      it("sets loading state back to tru", () => {
+        const ss = new ScryfallSearch();
+
+        jest.spyOn(ss.savedSearchModal, "setLoading");
+
+        expect(ss.savedSearchModal.setLoading).toBeCalledTimes(0);
+
+        ss.savedSearchModal.triggerOnClose();
+
+        expect(ss.savedSearchModal.setLoading).toBeCalledTimes(1);
+        expect(ss.savedSearchModal.setLoading).toBeCalledWith(true);
+      });
+    });
+
+    describe("on open", () => {
+      beforeEach(() => {
+        jest
+          .spyOn(ScryfallSearch.prototype, "getSavedSearches")
+          .mockResolvedValue([
+            {
+              name: "some name",
+              query: "query",
+            },
+          ]);
+      });
+
+      it("looks up saved searches", async () => {
+        const ss = new ScryfallSearch();
+
+        expect(ss.getSavedSearches).toBeCalledTimes(0);
+
+        await ss.savedSearchModal.triggerOnOpen();
+
+        expect(ss.getSavedSearches).toBeCalledTimes(1);
+        expect(ss.savedSearches.length).toBe(1);
+        expect(ss.savedSearches[0]).toEqual({
+          name: "some name",
+          query: "query",
+        });
+      });
+
+      it("sets saved input to current query", async () => {
+        const ss = new ScryfallSearch();
+
+        ss.currentQuery = "some query";
+        await ss.savedSearchModal.triggerOnOpen();
+
+        expect(ss.newSavedSearchInputs.query.value).toBe("some query");
+      });
+
+      it("creates elements for each saved search", async () => {
+        const ss = new ScryfallSearch();
+
+        jest.spyOn(ss, "getSavedSearches").mockResolvedValue([
+          {
+            name: "Query 1",
+            query: "query",
+          },
+          {
+            name: "Query 2",
+            query: "query",
+          },
+          {
+            name: "Query 3",
+            query: "query",
+          },
+        ]);
+
+        await ss.savedSearchModal.triggerOnOpen();
+
+        expect(
+          ss.savedSearchModal.element.querySelectorAll(
+            ".scryfall-search__saved-search-group"
+          ).length
+        ).toBe(3);
+      });
+
+      it("runs search when saved search is clicked", async () => {
+        const ss = new ScryfallSearch();
+
+        jest.spyOn(ss, "getSavedSearches").mockResolvedValue([
+          {
+            name: "Query",
+            query: "query",
+          },
+        ]);
+
+        await ss.savedSearchModal.triggerOnOpen();
+
+        jest.spyOn(ss, "runSearch");
+
+        const searchEl = ss.savedSearchModal.element.querySelector(
+          ".scryfall-search__saved-search-details"
+        ) as HTMLElement;
+
+        searchEl.click();
+
+        expect(ss.runSearch).toBeCalledTimes(1);
+        expect(ss.runSearch).toBeCalledWith("query");
+      });
+
+      it("creates a new saved search when a new saved search is submitted", async () => {
+        const ss = new ScryfallSearch();
+
+        jest.spyOn(ss, "getSavedSearches").mockResolvedValue([]);
+        jest.spyOn(ss, "saveSearches");
+
+        await ss.savedSearchModal.triggerOnOpen();
+
+        ss.newSavedSearchInputs.name.value = "name";
+        ss.newSavedSearchInputs.query.value = "query";
+
+        ss.savedSearchModal.element.querySelector("form")?.submit();
+
+        expect(ss.savedSearches[0]).toEqual({
+          name: "name",
+          query: "query",
+        });
+        expect(ss.saveSearches).toBeCalledTimes(1);
+        expect(
+          ss.savedSearchModal.element.querySelector(
+            ".scryfall-search__saved-search-details"
+          )
+        ).toBeTruthy();
+        expect(ss.newSavedSearchInputs.name.value).toBe("");
+        expect(ss.newSavedSearchInputs.query.value).toBe("");
+      });
+
+      it("does not create a new saved search when name input is missing", async () => {
+        const ss = new ScryfallSearch();
+
+        jest.spyOn(ss, "getSavedSearches").mockResolvedValue([]);
+        jest.spyOn(ss, "saveSearches");
+
+        await ss.savedSearchModal.triggerOnOpen();
+
+        ss.newSavedSearchInputs.name.value = "";
+        ss.newSavedSearchInputs.query.value = "query";
+
+        ss.savedSearchModal.element.querySelector("form")?.submit();
+
+        expect(ss.savedSearches[0]).toBeFalsy();
+        expect(ss.saveSearches).toBeCalledTimes(0);
+        expect(
+          ss.savedSearchModal.element.querySelector(
+            ".scryfall-search__saved-search-details"
+          )
+        ).toBeFalsy();
+        expect(
+          ss.newSavedSearchInputs.name.classList.contains("validation-error")
+        ).toBeTruthy();
+        expect(ss.newSavedSearchInputs.name.value).toBe("");
+        expect(ss.newSavedSearchInputs.query.value).toBe("query");
+      });
+
+      it("does not create a new saved search when query input is missing", async () => {
+        const ss = new ScryfallSearch();
+
+        jest.spyOn(ss, "getSavedSearches").mockResolvedValue([]);
+        jest.spyOn(ss, "saveSearches");
+
+        await ss.savedSearchModal.triggerOnOpen();
+
+        ss.newSavedSearchInputs.name.value = "name";
+        ss.newSavedSearchInputs.query.value = "";
+
+        ss.savedSearchModal.element.querySelector("form")?.submit();
+
+        expect(ss.savedSearches[0]).toBeFalsy();
+        expect(ss.saveSearches).toBeCalledTimes(0);
+        expect(
+          ss.savedSearchModal.element.querySelector(
+            ".scryfall-search__saved-search-details"
+          )
+        ).toBeFalsy();
+        expect(
+          ss.newSavedSearchInputs.query.classList.contains("validation-error")
+        ).toBeTruthy();
+        expect(ss.newSavedSearchInputs.name.value).toBe("name");
+        expect(ss.newSavedSearchInputs.query.value).toBe("");
+      });
+
+      it("runs the search when selected from options menu", async () => {
+        const ss = new ScryfallSearch();
+
+        jest.spyOn(ss, "getSavedSearches").mockResolvedValue([
+          {
+            name: "Query",
+            query: "query",
+          },
+        ]);
+
+        await ss.savedSearchModal.triggerOnOpen();
+
+        jest.spyOn(ss, "runSearch");
+
+        const select = ss.savedSearchModal.element.querySelector(
+          ".scryfall-search__saved-search-options-select select"
+        ) as HTMLSelectElement;
+
+        select.value = "open";
+        select.dispatchEvent(new Event("change"));
+
+        expect(ss.runSearch).toBeCalledTimes(1);
+        expect(ss.runSearch).toBeCalledWith("query");
+      });
+
+      it("sets the new search inputs to the search details when edit is chosesn from the selections menu", async () => {
+        const ss = new ScryfallSearch();
+
+        jest.spyOn(ss, "getSavedSearches").mockResolvedValue([
+          {
+            name: "Query",
+            query: "query",
+          },
+        ]);
+        jest.spyOn(ss, "deleteSearch");
+        jest.spyOn(ss.newSavedSearchInputs.query, "focus");
+
+        await ss.savedSearchModal.triggerOnOpen();
+
+        const select = ss.savedSearchModal.element.querySelector(
+          ".scryfall-search__saved-search-options-select select"
+        ) as HTMLSelectElement;
+
+        select.value = "edit";
+        select.dispatchEvent(new Event("change"));
+
+        expect(ss.deleteSearch).toBeCalledTimes(1);
+        expect(ss.deleteSearch).toBeCalledWith(
+          {
+            name: "Query",
+            query: "query",
+          },
+          expect.any(HTMLDivElement)
+        );
+        expect(ss.newSavedSearchInputs.name.value).toBe("Query");
+        expect(ss.newSavedSearchInputs.query.value).toBe("query");
+        expect(ss.newSavedSearchInputs.query.focus).toBeCalledTimes(1);
+      });
+
+      it("deletes the search when delete is chosesn from the selections menu", async () => {
+        const ss = new ScryfallSearch();
+
+        jest.spyOn(ss, "getSavedSearches").mockResolvedValue([
+          {
+            name: "Query",
+            query: "query",
+          },
+        ]);
+        jest.spyOn(ss, "deleteSearch");
+
+        await ss.savedSearchModal.triggerOnOpen();
+
+        const select = ss.savedSearchModal.element.querySelector(
+          ".scryfall-search__saved-search-options-select select"
+        ) as HTMLSelectElement;
+
+        select.value = "delete";
+        select.dispatchEvent(new Event("change"));
+
+        expect(ss.deleteSearch).toBeCalledTimes(1);
+        expect(ss.deleteSearch).toBeCalledWith(
+          {
+            name: "Query",
+            query: "query",
+          },
+          expect.any(HTMLDivElement)
+        );
+      });
+
+      it("sets the content of the modal with the saved search element and turns off loadin", async () => {
+        const ss = new ScryfallSearch();
+
+        jest.spyOn(ss.savedSearchModal, "setContent");
+        jest.spyOn(ss.savedSearchModal, "setLoading");
+
+        await ss.savedSearchModal.triggerOnOpen();
+
+        expect(ss.savedSearchModal.setContent).toBeCalledTimes(1);
+        expect(ss.savedSearchModal.setContent).toBeCalledWith(
+          ss.savedSearchElement
+        );
+        expect(ss.savedSearchModal.setLoading).toBeCalledTimes(1);
+        expect(ss.savedSearchModal.setLoading).toBeCalledWith(false);
+      });
     });
   });
 
@@ -198,7 +508,6 @@ describe("Scryfall Search", function () {
       ss = new ScryfallSearch();
       ss.drawer = new Drawer();
       jest.spyOn(ss.drawer, "setLoading");
-      jest.spyOn(Drawer.prototype, "scrollTo").mockImplementation();
       jest.spyOn(Drawer.prototype, "open");
       ss.settings = {
         enabled: false,
@@ -215,6 +524,14 @@ describe("Scryfall Search", function () {
       await ss.runSearch("foo");
 
       expect(ss.drawer?.open).toBeCalledTimes(1);
+    });
+
+    it("closes the saved searches modal", async function () {
+      jest.spyOn(Modal.prototype, "close");
+
+      await ss.runSearch("foo");
+
+      expect(ss.savedSearchModal?.close).toBeCalledTimes(1);
     });
 
     it("queries the api", async function () {
@@ -490,6 +807,106 @@ describe("Scryfall Search", function () {
           scrollHeight: 100,
         } as Element)
       ).toBe(true);
+    });
+  });
+
+  describe("getSavedSearches", () => {
+    it("looks up saved searches for deck id", async () => {
+      const data = [
+        {
+          name: "search",
+          query: "query",
+        },
+      ];
+      mocked(getDeck).mockResolvedValue(
+        makeFakeDeck({ id: "deck-with-saved-searches" })
+      );
+      jest.spyOn(ScryfallSearch, "getData").mockResolvedValue(data);
+
+      const ss = new ScryfallSearch();
+
+      const savedSearches = await ss.getSavedSearches();
+
+      expect(ScryfallSearch.getData).toBeCalledTimes(1);
+      expect(ScryfallSearch.getData).toBeCalledWith(
+        "saved-searches:deck-with-saved-searches"
+      );
+      expect(savedSearches).toBe(data);
+    });
+
+    it("provides empty array when no data is present", async () => {
+      mocked(getDeck).mockResolvedValue(makeFakeDeck());
+      // @ts-ignore
+      jest.spyOn(ScryfallSearch, "getData").mockResolvedValue(null);
+
+      const ss = new ScryfallSearch();
+
+      const savedSearches = await ss.getSavedSearches();
+
+      expect(savedSearches).toEqual([]);
+    });
+  });
+
+  describe("saveSearches", () => {
+    it("saves searches", async () => {
+      const ss = new ScryfallSearch();
+
+      mocked(getDeck).mockResolvedValue(
+        makeFakeDeck({ id: "deck-with-saved-searches" })
+      );
+      ss.savedSearches = [
+        {
+          name: "name",
+          query: "query",
+        },
+      ];
+
+      jest.spyOn(ScryfallSearch, "saveData").mockResolvedValue();
+
+      await ss.saveSearches();
+
+      expect(ScryfallSearch.saveData).toBeCalledTimes(1);
+      expect(ScryfallSearch.saveData).toBeCalledWith(
+        "saved-searches:deck-with-saved-searches",
+        ss.savedSearches
+      );
+    });
+  });
+
+  describe("deleteSearch", () => {
+    let ss: ScryfallSearch;
+    let searchElement: HTMLDivElement;
+
+    beforeEach(() => {
+      ss = new ScryfallSearch();
+      searchElement = document.createElement("div");
+      ss.savedSearchesContainer.appendChild(searchElement);
+    });
+
+    it("removes a saved search", () => {
+      const search = {
+        name: "Search to be removed",
+        query: "remove",
+      };
+      ss.savedSearches = [
+        {
+          name: "search",
+          query: "query",
+        },
+        search,
+        {
+          name: "search",
+          query: "query",
+        },
+      ];
+
+      jest.spyOn(ss, "saveSearches");
+
+      ss.deleteSearch(search, searchElement);
+
+      expect(ss.savedSearches.includes(search)).toBeFalsy();
+      expect(ss.saveSearches).toBeCalledTimes(1);
+      expect(ss.savedSearchesContainer.contains(searchElement)).toBeFalsy();
     });
   });
 });

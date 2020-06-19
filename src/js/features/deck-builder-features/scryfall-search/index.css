@@ -4,6 +4,57 @@
   padding: 0 0 0 4px;
 }
 
+.scryfall-search__saved-search-selector {
+  cursor: pointer;
+  fill: rgba(255, 255, 255, 0.75);
+  transform: scale(0.65) rotate(90deg);
+  margin-right: 5px;
+}
+
+.scryfall-search__saved-search-container {
+  width: 100%;
+}
+
+.scryfall-search__saved-search-form {
+  margin-bottom: 10px;
+}
+
+.scryfall-search__saved-search-form input {
+  width: 100%;
+  border: 1px solid lightgray;
+  padding: 5px;
+  margin: 2px 0;
+}
+
+.scryfall-search__saved-search-form input.validation-error {
+  border: 2px solid darkred;
+}
+
+.scryfall-search__saved-search-form button.button-n {
+  margin: auto;
+}
+
+.scryfall-search__saved-search-group {
+  margin: 10px 0;
+  position: relative;
+  cursor: pointer;
+}
+
+.scryfall-search__saved-search-options-select {
+  border-left: none !important;
+  position: absolute !important;
+  right: 0;
+  top: 0;
+}
+
+.scryfall-search__saved-search-options-select select {
+  opacity: 0;
+}
+
+.scryfall-search__saved-search-selector:hover {
+  fill: white;
+}
+
 .scryfall-search__non-card-element {
   padding: 10px;
 }

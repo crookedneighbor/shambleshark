@@ -6,6 +6,7 @@
   - Tagger button is now positioned correctly when sorting cards by spoiled date
 - Scryfall Search
   - Includes an inline search bar in search dialog
+  - Add option to save searches
 
 # 0.5.0 - Pre-release
 

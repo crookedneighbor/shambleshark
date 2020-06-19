@@ -6,6 +6,7 @@ import {
   FEATURE_SECTIONS as sections,
 } from "Constants";
 import Drawer from "Ui/drawer";
+import Modal from "Ui/modal";
 import DeckSectionChooser from "Ui/deck-section-chooser";
 import AddCardElement from "Ui/add-card-element";
 import deckParser from "Lib/deck-parser";
@@ -13,17 +14,34 @@ import { getDeck, search } from "Lib/scryfall";
 import createElement from "Lib/create-element";
 import emptyElement from "Lib/empty-element";
 import "./index.css";
-import { EXTERNAL_ARROW } from "Svg";
+import { EXTERNAL_ARROW, ARROW, ELLIPSIS, CHECK_SYMBOL } from "Svg";
 import { Deck, DeckSections } from "Js/types/deck";
 
-// TODO saved searches
+// TODO saved searches - nice to haves
+// * organize searches
+// * choose searches from dropdown
+// * manage all searches from all decks
+// * persistent storage
 interface SearchSettings extends SettingsDefaults {
   restrictToCommanderColorIdentity: boolean;
   restrictFunnyCards: boolean;
 }
 
+type SavedSearch = {
+  query: string;
+  name: string;
+};
+
 class ScryfallSearch extends Feature {
   drawer: Drawer;
+  savedSearchModal: Modal;
+  savedSearches: SavedSearch[];
+  savedSearchElement: HTMLElement;
+  savedSearchesContainer: HTMLDivElement;
+  newSavedSearchInputs: {
+    name: HTMLInputElement;
+    query: HTMLInputElement;
+  };
   currentQuery: string;
   headerSearchField: HTMLInputElement;
   inlineSearchField: HTMLInputElement;
@@ -79,6 +97,22 @@ class ScryfallSearch extends Feature {
       "#scryfall-search__card-results"
     ) as HTMLDivElement;
     this.drawer = this.createDrawer();
+    this.savedSearchModal = this.createModal();
+    this.savedSearches = [];
+    this.savedSearchElement = this.createSavedSearchElement();
+    this.savedSearchesContainer = this.savedSearchElement.querySelector(
+      ".scryfall-search__new-saved-search-button"
+    ) as HTMLDivElement;
+    this.newSavedSearchInputs = {
+      name: this.savedSearchElement.querySelector(
+        "#scryfall-search__new-saved-search-name"
+      ) as HTMLInputElement,
+      query: this.savedSearchElement.querySelector(
+        "#scryfall-search__new-saved-search-query"
+      ) as HTMLInputElement,
+    };
+    this._setupSavedSearchForm();
+
     this.currentQuery = "";
     this.inlineSearchField = this.container.querySelector(
       "#inline-search-header-search-field"
@@ -108,10 +142,10 @@ class ScryfallSearch extends Feature {
   }
 
   private _attachSearchHandler(
-    el: HTMLInputElement,
+    container: HTMLInputElement,
     adjustQuery: boolean
   ): void {
-    el.addEventListener("keydown", (event: KeyboardEvent) => {
+    container.addEventListener("keydown", (event: KeyboardEvent) => {
       const target = event.target as HTMLInputElement;
 
       if (event.key !== "Enter" || !target?.value) {
@@ -122,9 +156,67 @@ class ScryfallSearch extends Feature {
 
       this.runSearch(target.value, adjustQuery);
     });
+
+    const savedSearchOpener = createElement(`
+      <div class="scryfall-search__saved-search-selector">${ARROW}</div>
+    `);
+
+    savedSearchOpener.addEventListener("click", () => {
+      this.currentQuery = container.value;
+      this.drawer.close();
+      this.savedSearchModal.open();
+    });
+
+    container.parentNode?.appendChild(savedSearchOpener);
+  }
+
+  private async _getKeyForSavedSearch(): Promise<string> {
+    const id = (await getDeck()).id;
+
+    return `saved-searches:${id}`;
+  }
+
+  private _setupSavedSearchForm(): void {
+    this.newSavedSearchInputs.name.addEventListener("focus", () => {
+      this.newSavedSearchInputs.name.classList.remove("validation-error");
+    });
+    this.newSavedSearchInputs.query.addEventListener("focus", () => {
+      this.newSavedSearchInputs.query.classList.remove("validation-error");
+    });
+    this.savedSearchElement
+      .querySelector(".scryfall-search__saved-search-form")
+      ?.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        this.newSavedSearchInputs.name.classList.remove("validation-error");
+        this.newSavedSearchInputs.query.classList.remove("validation-error");
+
+        const newSearch = {
+          name: this.newSavedSearchInputs.name.value,
+          query: this.newSavedSearchInputs.query.value,
+        };
+
+        if (!newSearch.name || !newSearch.name.trim()) {
+          this.newSavedSearchInputs.name.classList.add("validation-error");
+          return;
+        }
+
+        if (!newSearch.query || !newSearch.query.trim()) {
+          this.newSavedSearchInputs.query.classList.add("validation-error");
+          return;
+        }
+
+        this.savedSearches.push(newSearch);
+        this.saveSearches();
+
+        this.newSavedSearchInputs.name.value = "";
+        this.newSavedSearchInputs.query.value = "";
+        this._createSearchElement(newSearch);
+      });
   }
 
   async runSearch(query: string, adjustQuery = true): Promise<void> {
+    this.savedSearchModal.close();
     this.drawer.setLoading(true);
     this.drawer.open();
     this.currentQuery = query;
@@ -306,6 +398,145 @@ class ScryfallSearch extends Feature {
     drawer.setContent(this.container);
 
     return drawer;
+  }
+
+  createSavedSearchElement(): HTMLDivElement {
+    return createElement<HTMLDivElement>(
+      `<div class="scryfall-search__saved-search-container">
+        <form class="scryfall-search__saved-search-form">
+          <label>Search description and query</label>
+          <div>
+            <input id="scryfall-search__new-saved-search-name" type="text" placeholder="Saved Search Description" />
+          </div>
+          <div>
+            <input id="scryfall-search__new-saved-search-query" type="text" placeholder="Query" value="" />
+          </div>
+          <div>
+            <button id="scryfall-search__new-saved-search-button" type="submit" class="button-n primary">
+              ${CHECK_SYMBOL}
+              <i>Save Search</i>
+            </button>
+          </div>
+        </form>
+
+        <hr class="scryfall-search__hr" />
+
+        <div class="scryfall-search__new-saved-search-button"></div>
+      </div>`
+    );
+  }
+
+  private _createSearchElement(search: SavedSearch): Element {
+    const searchGroup = createElement(`<div class="scryfall-search__saved-search-group">
+      <div class="scryfall-search__saved-search-details">
+        <div class="scryfall-search__saved-search-details-name-container">
+          ${search.name}
+        </div>
+        <div class="scryfall-search__saved-search-details-query-container">
+          <pre>${search.query}</pre>
+        </div>
+      </div>
+
+      <span class="deckbuilder-entry-menu scryfall-search__saved-search-options-select">
+        <span class="deckbuilder-entry-menu-visual">
+          ${ELLIPSIS}
+        </span>
+        <select class="deckbuilder-entry-menu-select">
+          <option value="" selected disabled>What do you want to do?</option>
+          <option value="open">Run this search</option>
+          <option value="edit">Edit Saved Search</option>
+          <option value="delete">Delete Saved Search</option>
+        </select>
+      </span>
+    </div>`);
+
+    searchGroup
+      .querySelector(".scryfall-search__saved-search-details")
+      ?.addEventListener("click", () => {
+        this.runSearch(search.query);
+      });
+
+    this._setupSearchSelect(search, searchGroup);
+    this.savedSearchesContainer.appendChild(searchGroup);
+
+    return searchGroup;
+  }
+
+  private _setupSearchSelect(search: SavedSearch, searchGroup: Element): void {
+    const select = searchGroup.querySelector(
+      ".scryfall-search__saved-search-options-select select"
+    ) as HTMLSelectElement;
+    select.addEventListener("focus", function () {
+      // reset value so that the change will always be picked up
+      this.value = "";
+    });
+    select.addEventListener("change", (event) => {
+      const choice = (event.target as HTMLSelectElement).value;
+
+      switch (choice) {
+        case "open":
+          this.runSearch(search.query);
+          break;
+        case "edit":
+          this.deleteSearch(search, searchGroup);
+          this.newSavedSearchInputs.name.value = search.name;
+          this.newSavedSearchInputs.query.value = search.query;
+          this.newSavedSearchInputs.query.focus();
+          break;
+        case "delete":
+          this.deleteSearch(search, searchGroup);
+          break;
+        default:
+      }
+
+      // so that the focus listener to reset the value will always be called
+      select.blur();
+    });
+  }
+
+  deleteSearch(search: SavedSearch, searchGroup: Element): void {
+    this.savedSearches = this.savedSearches.filter((s) => s !== search);
+    this.saveSearches();
+    this.savedSearchesContainer.removeChild(searchGroup);
+  }
+
+  async getSavedSearches(): Promise<SavedSearch[]> {
+    const dataKey = await this._getKeyForSavedSearch();
+
+    return ((await ScryfallSearch.getData(dataKey)) as SavedSearch[]) || [];
+  }
+
+  async saveSearches(): Promise<void> {
+    const dataKey = await this._getKeyForSavedSearch();
+
+    return ScryfallSearch.saveData(dataKey, this.savedSearches);
+  }
+
+  createModal(): Modal {
+    const modal = new Modal({
+      id: "scryfall-search-saved-search-modal",
+      header: "Saved Searches",
+      onClose: () => {
+        modal.setLoading(true);
+      },
+      onOpen: async () => {
+        this.savedSearches = await this.getSavedSearches();
+
+        this.newSavedSearchInputs.query.value = this.currentQuery;
+        emptyElement(this.savedSearchesContainer);
+
+        this.savedSearches.forEach((s) => this._createSearchElement(s));
+
+        modal.setContent(this.savedSearchElement);
+
+        modal.setLoading(false);
+      },
+    });
+    (document.getElementById("deckbuilder") as HTMLElement).appendChild(
+      modal.element
+    );
+
+    return modal;
   }
 }
 
