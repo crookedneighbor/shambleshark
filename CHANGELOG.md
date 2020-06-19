@@ -2,6 +2,7 @@
 
 # unreleased
 
+- Update link to Scryfall spinner gif
 - Tagger Link
   - Tagger button is now positioned correctly when sorting cards by spoiled date
 - Scryfall Search
