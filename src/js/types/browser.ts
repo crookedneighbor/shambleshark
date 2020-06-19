@@ -11,6 +11,7 @@ export interface FirefoxBrowserExtension {
     openOptionsPage: () => void;
     getManifest: () => void;
     onInstalled: () => void;
+    getURL: (path: string) => string;
   };
   storage: {
     sync: {

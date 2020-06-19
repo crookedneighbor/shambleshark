@@ -1,3 +1,6 @@
+import { getURL } from "Browser/runtime";
+import "../../img/spinner.gif";
+
 export const FEATURE_SECTIONS = {
   GLOBAL: "global",
   DECK_VIEW: "deck-view",
@@ -42,5 +45,4 @@ export const BUS_EVENTS: Record<string, string> = {
   TAGGER_TAGS_REQUEST: "TAGGER_TAGS_REQUEST",
 };
 
-export const SPINNER_GIF =
-  "https://assets.scryfall.com/assets/spinner-8535a1deef4bf6a0e1b967fe70c4d24c9baaa11ab85ac412fd51716a1eb0a73c.gif";
+export const SPINNER_GIF = getURL("spinner.gif");

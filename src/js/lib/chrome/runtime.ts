@@ -16,3 +16,7 @@ export function onHeadersReceived(options: OnHeadersReceivedOptions): void {
     options.permissions
   );
 }
+
+export function getURL(path: string): string {
+  return chrome?.runtime?.getURL && chrome.runtime.getURL(path);
+}

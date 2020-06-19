@@ -25,3 +25,7 @@ export function onHeadersReceived(options: OnHeadersReceivedOptions): void {
     options.permissions
   );
 }
+
+export function getURL(path: string): string {
+  return be?.runtime?.getURL && be.runtime.getURL(path);
+}
