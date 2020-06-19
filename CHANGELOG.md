@@ -1,6 +1,6 @@
 ## Changelog
 
-# unreleased
+# 0.6.0 - Pre-release
 
 - Fix issue where spinner gif was missing
 - Tagger Link
