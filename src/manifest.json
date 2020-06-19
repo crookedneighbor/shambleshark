@@ -21,10 +21,7 @@
       "all_frames": true
     }
   ],
-  "web_accessible_resources": [
-    "scryfallEmbed.bundle.js",
-    "spinner.gif"
-  ],
+  "web_accessible_resources": ["scryfallEmbed.bundle.js", "spinner.gif"],
   "permissions": [
     "webRequest",
     "webRequestBlocking",

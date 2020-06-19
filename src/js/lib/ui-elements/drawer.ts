@@ -1,7 +1,9 @@
 import DialogInterface, { DialogInterfaceOptions } from "./dialog-interface";
 import createElement from "Lib/create-element";
+import { getURL } from "Browser/runtime";
 import "./drawer.css";
-import { SPINNER_GIF } from "Constants";
+
+const SPINNER_GIF = getURL("spinner.gif");
 
 interface DrawerOptions extends DialogInterfaceOptions {
   position?: string;

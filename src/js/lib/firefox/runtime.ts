@@ -3,23 +3,17 @@ import type {
   OnHeadersReceivedOptions,
 } from "Js/types/browser";
 
-// Too much work for too little gain to handle this the TS way
-// so just ignore it and work around it for now
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-const be = browser as FirefoxBrowserExtension;
-
 export function openOptionsPage(): void {
-  be.runtime.openOptionsPage();
+  browser.runtime.openOptionsPage();
 }
 
 export function onInstalled(): FirefoxBrowserExtension["runtime"]["onInstalled"] {
-  return be.runtime.onInstalled;
+  return browser.runtime.onInstalled;
 }
 
 // https://stackoverflow.com/a/15534822/2601552
 export function onHeadersReceived(options: OnHeadersReceivedOptions): void {
-  return be.webRequest.onHeadersReceived.addListener(
+  return browser.webRequest.onHeadersReceived.addListener(
     options.addListener,
     options.config,
     options.permissions
@@ -27,5 +21,9 @@ export function onHeadersReceived(options: OnHeadersReceivedOptions): void {
 }
 
 export function getURL(path: string): string {
-  return be?.runtime?.getURL && be.runtime.getURL(path);
+  if (typeof browser === "undefined") {
+    return "";
+  }
+
+  return browser.runtime.getURL(path);
 }

@@ -1,6 +1,8 @@
 import DialogInterface, { DialogInterfaceOptions } from "./dialog-interface";
 import createElement from "Lib/create-element";
-import { SPINNER_GIF } from "Constants";
+import { getURL } from "Browser/runtime";
+
+const SPINNER_GIF = getURL("spinner.gif");
 
 import "./modal.css";
 
