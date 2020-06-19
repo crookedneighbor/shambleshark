@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const webpack = require("webpack");
 const path = require("path");
-const fileSystem = require("fs");
+const fileSystem = require("fs-extra");
 const env = require("./utils/env");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
@@ -13,11 +13,13 @@ const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 const TsconfigPathsPlugin = require("tsconfig-paths-webpack-plugin");
 
 const BROWSER = env.BROWSER;
+const PATH_TO_BROWSER_UTILS = path.resolve(__dirname, "build/browser-utils/");
 
 // NOTE: whenever you add an alias here, you also need to add the
 // corresponding alias to the paths field in the tsconfig
 // TODO: should probably do that programatically
 const alias = {
+  Browser: PATH_TO_BROWSER_UTILS,
   Constants: path.resolve(__dirname, "src/js/resources/constants.ts"),
   Feature: path.resolve(__dirname, "src/js/features/feature.ts"),
   Features: path.resolve(__dirname, "src/js/features/"),
@@ -26,10 +28,17 @@ const alias = {
   Svg: path.resolve(__dirname, "src/js/resources/svg.ts"),
 };
 
+fileSystem.mkdirp(PATH_TO_BROWSER_UTILS);
 if (BROWSER === "GOOGLE_CHROME") {
-  alias.Browser = path.resolve(__dirname, "src/js/lib/chrome/");
+  fileSystem.copySync(
+    path.resolve(__dirname, "src/js/lib/chrome/"),
+    PATH_TO_BROWSER_UTILS
+  );
 } else if (BROWSER === "FIREFOX") {
-  alias.Browser = path.resolve(__dirname, "src/js/lib/firefox/");
+  fileSystem.copySync(
+    path.resolve(__dirname, "src/js/lib/firefox/"),
+    PATH_TO_BROWSER_UTILS
+  );
 }
 
 const secretsPath = path.join(__dirname, "secrets." + env.NODE_ENV + ".js");

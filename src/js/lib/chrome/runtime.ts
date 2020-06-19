@@ -18,5 +18,9 @@ export function onHeadersReceived(options: OnHeadersReceivedOptions): void {
 }
 
 export function getURL(path: string): string {
-  return chrome?.runtime?.getURL && chrome.runtime.getURL(path);
+  if (typeof chrome === "undefined") {
+    return "";
+  }
+
+  return chrome.runtime.getURL(path);
 }

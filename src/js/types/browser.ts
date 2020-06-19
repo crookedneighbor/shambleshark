@@ -1,3 +1,6 @@
+declare global {
+  const browser: FirefoxBrowserExtension;
+}
 type AddListener = (info: chrome.webRequest.WebResponseHeadersDetails) => void;
 type Config = {
   urls: string[];
@@ -10,7 +13,7 @@ export interface FirefoxBrowserExtension {
   runtime: {
     openOptionsPage: () => void;
     getManifest: () => void;
-    onInstalled: () => void;
+    onInstalled: chrome.runtime.RuntimeInstalledEvent;
     getURL: (path: string) => string;
   };
   storage: {
