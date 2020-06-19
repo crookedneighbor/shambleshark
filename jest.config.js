@@ -9,7 +9,7 @@ module.exports = {
   moduleNameMapper: {
     "^Js/(.*)$": path.resolve(__dirname, "src/js/$1"),
     "^Helpers/(.*)$": path.resolve(__dirname, "test/helpers/$1"),
-    "\\.css$": "<rootDir>/test/mocks/styles.ts",
+    "\\.(css|gif|png|jpg|jpeg)$": "<rootDir>/test/mocks/assets.ts",
 
     // These need to be duplicated from the webpack config
     "^Constants$": path.resolve(__dirname, "src/js/resources/constants.ts"),
