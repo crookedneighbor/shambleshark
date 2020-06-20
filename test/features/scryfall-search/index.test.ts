@@ -518,6 +518,7 @@ describe("Scryfall Search", function () {
       searchSpy = mocked(search as jest.Mock).mockResolvedValue([]);
       getDeckSpy = mocked(getDeck).mockResolvedValue(makeFakeDeck());
       jest.spyOn(ss, "addCards").mockImplementation();
+      jest.spyOn(ss, "addWarnings").mockImplementation();
     });
 
     it("opens the drawer", async function () {
@@ -658,6 +659,19 @@ describe("Scryfall Search", function () {
       expect(ss.addCards).toBeCalledTimes(1);
     });
 
+    it("adds warnings from the api result", async function () {
+      const cards = {
+        warnings: ["warning"],
+      };
+
+      searchSpy.mockResolvedValue(cards);
+
+      await ss.runSearch("foo");
+
+      expect(ss.cardList).toBe(cards);
+      expect(ss.addWarnings).toBeCalledTimes(1);
+    });
+
     it("fetches the current deck", async function () {
       await ss.runSearch("foo");
 
@@ -744,6 +758,48 @@ describe("Scryfall Search", function () {
       ss.addCards();
 
       expect(ss.cardResultsContainer.innerHTML).toContain("No search results.");
+    });
+  });
+
+  describe("addWarnings", () => {
+    let ss: ScryfallSearch;
+
+    beforeEach(function () {
+      ss = new ScryfallSearch();
+    });
+
+    it("adds warnings", () => {
+      ss.cardList = {
+        warnings: ["warning 1", "warning 2"],
+      };
+
+      ss.addWarnings();
+
+      expect(ss.searchErrorsContainer.innerText).toBe("warning 1 warning 2");
+    });
+
+    it("empties warnings container between uses", () => {
+      ss.cardList = {
+        warnings: ["warning 1", "warning 2"],
+      };
+
+      ss.addWarnings();
+
+      expect(ss.searchErrorsContainer.innerText).toBe("warning 1 warning 2");
+
+      ss.cardList = {
+        warnings: ["warning 3"],
+      };
+
+      ss.addWarnings();
+
+      expect(ss.searchErrorsContainer.innerText).toBe("warning 3");
+
+      ss.cardList = {};
+
+      ss.addWarnings();
+
+      expect(ss.searchErrorsContainer.innerText).toBe("");
     });
   });
 

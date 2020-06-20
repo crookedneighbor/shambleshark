@@ -1,5 +1,9 @@
 ## Changelog
 
+# 0.7.0 - Pre-release
+
+- Add warnings from search results
+
 # 0.6.0 - Pre-release
 
 - Fix issue where spinner gif was missing

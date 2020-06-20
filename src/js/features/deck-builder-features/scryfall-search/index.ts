@@ -48,6 +48,7 @@ class ScryfallSearch extends Feature {
   deckSectionChooser: DeckSectionChooser;
   container: HTMLDivElement;
   cardResultsContainer: HTMLDivElement;
+  searchErrorsContainer: HTMLDivElement;
 
   settings?: SearchSettings;
   isSingleton?: boolean;
@@ -95,6 +96,9 @@ class ScryfallSearch extends Feature {
     this.container = this.createContainer();
     this.cardResultsContainer = this.container.querySelector(
       "#scryfall-search__card-results"
+    ) as HTMLDivElement;
+    this.searchErrorsContainer = this.container.querySelector(
+      "#scryfall-search__warnings"
     ) as HTMLDivElement;
     this.drawer = this.createDrawer();
     this.savedSearchModal = this.createModal();
@@ -221,6 +225,7 @@ class ScryfallSearch extends Feature {
     this.drawer.open();
     this.currentQuery = query;
     emptyElement(this.cardResultsContainer);
+    emptyElement(this.searchErrorsContainer);
 
     if (
       adjustQuery &&
@@ -252,6 +257,7 @@ class ScryfallSearch extends Feature {
 
     this.addMetadataToContainer();
 
+    this.addWarnings();
     this.addCards();
 
     this.drawer.setLoading(false);
@@ -273,7 +279,10 @@ class ScryfallSearch extends Feature {
           <a class="scryfall-search__external-link-icon">${EXTERNAL_ARROW}</a>
         </div>
         <div id="scryfall-search__section-selection-container"></div>
+
         <hr class="scryfall-search__hr" />
+
+        <div id="scryfall-search__warnings" class="search-info"></div>
       </div>
 
       <div id="scryfall-search__card-results"></div>
@@ -300,6 +309,17 @@ class ScryfallSearch extends Feature {
     this.inlineSearchField.value = this.currentQuery;
 
     this.deckSectionChooser.addSections(this.deck as Deck);
+  }
+
+  addWarnings(): void {
+    emptyElement(this.searchErrorsContainer);
+
+    if (!this.cardList?.warnings) {
+      return;
+    }
+
+    const warnings = this.cardList.warnings.join(" ");
+    this.searchErrorsContainer.innerText = warnings;
   }
 
   addCards(): void {
@@ -383,6 +403,7 @@ class ScryfallSearch extends Feature {
         drawerInstance.setLoading(true);
         drawerInstance.resetHeader();
         emptyElement(this.cardResultsContainer);
+        emptyElement(this.searchErrorsContainer);
 
         // re-focus the Scryfall Search input
         // for accessibility navigation
