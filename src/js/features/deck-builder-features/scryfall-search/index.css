@@ -4,6 +4,10 @@
   padding: 0 0 0 4px;
 }
 
+#scryfall-search__warnings:empty {
+  display: none;
+}
+
 .scryfall-search__saved-search-selector {
   cursor: pointer;
   fill: rgba(255, 255, 255, 0.75);
