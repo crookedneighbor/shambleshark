@@ -11,6 +11,7 @@ import createElement from "Lib/create-element";
 import { ready as elementReady } from "Lib/mutation";
 import { sortByAttribute } from "Lib/sort";
 import "./index.css";
+import type { TaggerPayload } from "Js/types/tagger";
 
 import {
   TAGGER_SYMBOL,
@@ -29,24 +30,6 @@ import {
 
 const SPINNER_GIF = getURL("spinner.gif");
 
-export interface Tagging {
-  tag: {
-    name: string;
-    type: string;
-  };
-}
-
-export interface Relationship {
-  classifierInverse: string;
-  relatedName: string;
-  classifier: string;
-  contentName: string;
-  relatedId: string;
-  foreignKey: "illustrationId" | "oracleId";
-  illustrationId?: string;
-  oracleId?: string;
-}
-
 export interface ShamblesharkRelationship {
   name: string;
   symbol: string;
@@ -55,13 +38,6 @@ export interface ShamblesharkRelationship {
 }
 
 type RelationshipCollection = Record<string, ShamblesharkRelationship[]>;
-
-export interface TaggerPayload {
-  illustrationId?: string;
-  oracleId?: string;
-  taggings?: Tagging[];
-  relationships?: Relationship[];
-}
 
 const TAG_SYMBOLS: Record<string, string> = {
   ILLUSTRATION_TAG: ILLUSTRATION_SYMBOL,

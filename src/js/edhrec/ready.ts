@@ -1,21 +1,17 @@
 import bus from "framebus";
 import iframe from "Lib/iframe";
 import { BUS_EVENTS as events } from "Constants";
+import type { EDHRecResponseHandler, EDHRecResponse } from "Js/types/edhrec";
 
 type GetRecsOptions = {
   commanders: string[];
   cards: string[];
 };
 
-type GetRecsPayload = {
-  errors?: Error[];
-  [prop: string]: unknown;
-};
-
 function getRecs({
   commanders,
   cards,
-}: GetRecsOptions): Promise<GetRecsPayload> {
+}: GetRecsOptions): Promise<EDHRecResponse> {
   return window
     .fetch("https://edhrec.com/api/recs/", {
       method: "POST",
@@ -36,16 +32,19 @@ export default function start(): void {
     return;
   }
 
-  bus.on(events.REQUEST_EDHREC_RECOMENDATIONS, function (payload, reply) {
-    getRecs(payload as GetRecsOptions)
-      .then((result) => {
-        if (result.errors) {
-          reply([result]);
-          return;
-        }
-
-        reply([null, result]);
-      })
-      .catch((err) => reply([err]));
+  bus.on(events.REQUEST_EDHREC_RECOMENDATIONS, function (
+    payload: GetRecsOptions,
+    reply: EDHRecResponseHandler
+  ) {
+    getRecs(payload)
+      .then((res) => reply(res))
+      .catch((err) =>
+        reply({
+          commanders: [],
+          outRecs: [],
+          inRecs: [],
+          errors: [err],
+        })
+      );
   });
 }

@@ -13,7 +13,7 @@ import type { Card, Deck, DeckSections } from "Js/types/deck";
 export default function setUpListeners(): void {
   Scryfall.addHooksToCardManagementEvents();
 
-  bus.on(events.REQUEST_DECK, function (reply) {
+  bus.on(events.REQUEST_DECK, function (reply: (deck: Deck) => void) {
     // TODO need to update bus to be a generic so
     // you can specify what the shape of the payload is
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -26,6 +26,11 @@ export default function setUpListeners(): void {
     message,
     color = "purple",
     type = "deck",
+  }: {
+    header: string;
+    message: string;
+    color: string;
+    type: string;
   }) {
     // TODO need to update bus to be a generic so
     // you can specify what the shape of the payload is
@@ -34,7 +39,15 @@ export default function setUpListeners(): void {
     Scryfall.pushNotification(header, message, color, type);
   });
 
-  bus.on(events.ADD_CARD_TO_DECK, function ({ cardName, cardId, section }) {
+  bus.on(events.ADD_CARD_TO_DECK, function ({
+    cardName,
+    cardId,
+    section,
+  }: {
+    cardName: string;
+    cardId: string;
+    section: string;
+  }) {
     // adds card if it does not exist and increments
     // the card if it already exists
     Scryfall.addCard(cardId as string).then(function (addedCardInfo) {
@@ -59,7 +72,11 @@ export default function setUpListeners(): void {
     });
   });
 
-  bus.on(events.REMOVE_CARD_FROM_DECK, function ({ cardName }) {
+  bus.on(events.REMOVE_CARD_FROM_DECK, function ({
+    cardName,
+  }: {
+    cardName: string;
+  }) {
     Scryfall.getDeck()
       .then((deck) => {
         const entries = flattenEntries(deck);

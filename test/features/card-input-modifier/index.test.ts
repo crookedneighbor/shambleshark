@@ -111,7 +111,9 @@ describe("Card Input Modifier", function () {
         payload: "foo",
       };
       cim.imageCache.foo = "foo";
-      busOnSpy.mockImplementation((event, cb) => {
+
+      type ReplyType = (res: Record<string, string>) => void;
+      busOnSpy.mockImplementation((event: string, cb: ReplyType) => {
         if (event === "CALLED_DESTROYENTRY") {
           cb(payload);
         }

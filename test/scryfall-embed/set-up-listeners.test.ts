@@ -24,6 +24,8 @@ import {
 } from "../mocks/scryfall-global";
 import { makeFakeDeck, makeFakeCard } from "Helpers/fake";
 
+type FramebusMockCallback<T = Record<string, string>> = (arg: T) => void;
+
 describe("set up listeners on Scryfall page", function () {
   beforeEach(function () {
     window.ScryfallAPI = generateScryfallAPIGlobal();
@@ -75,14 +77,13 @@ describe("set up listeners on Scryfall page", function () {
       const spy = jest.fn();
 
       mocked(getDeck).mockResolvedValue(fakeDeck);
-      // TODO figure out the best way to mock this
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      (bus.on as jest.Mock).mockImplementation((event, cb) => {
-        if (event === "REQUEST_DECK") {
-          cb(spy);
+      (bus.on as jest.Mock).mockImplementation(
+        (event: string, cb: FramebusMockCallback<jest.Mock>) => {
+          if (event === "REQUEST_DECK") {
+            cb(spy);
+          }
         }
-      });
+      );
 
       setUpListeners();
 
@@ -98,11 +99,13 @@ describe("set up listeners on Scryfall page", function () {
     let pushData: Record<string, string>;
 
     beforeEach(function () {
-      (bus.on as jest.Mock).mockImplementation((event, cb) => {
-        if (event === "SCRYFALL_PUSH_NOTIFICATION") {
-          cb(pushData);
+      (bus.on as jest.Mock).mockImplementation(
+        (event: string, cb: FramebusMockCallback) => {
+          if (event === "SCRYFALL_PUSH_NOTIFICATION") {
+            cb(pushData);
+          }
         }
-      });
+      );
     });
 
     it("sends a push notification", function () {
@@ -183,11 +186,13 @@ describe("set up listeners on Scryfall page", function () {
           type_line: "Creature",
         },
       });
-      (bus.on as jest.Mock).mockImplementation((event, cb) => {
-        if (event === "ADD_CARD_TO_DECK") {
-          cb(cardData);
+      (bus.on as jest.Mock).mockImplementation(
+        (event: string, cb: FramebusMockCallback) => {
+          if (event === "ADD_CARD_TO_DECK") {
+            cb(cardData);
+          }
         }
-      });
+      );
       mocked(addCard).mockResolvedValue(scryfallCard);
     });
 
@@ -289,11 +294,13 @@ describe("set up listeners on Scryfall page", function () {
       cardData = {
         cardName: "Rashmi, Etrnities Crafter",
       };
-      (bus.on as jest.Mock).mockImplementation((event, cb) => {
-        if (event === "REMOVE_CARD_FROM_DECK") {
-          cb(cardData);
+      (bus.on as jest.Mock).mockImplementation(
+        (event: string, cb: FramebusMockCallback) => {
+          if (event === "REMOVE_CARD_FROM_DECK") {
+            cb(cardData);
+          }
         }
-      });
+      );
       mocked(getDeck).mockResolvedValue(
         makeFakeDeck({
           primarySections: ["commanders"],
@@ -371,11 +378,13 @@ describe("set up listeners on Scryfall page", function () {
 
   describe("CLEAN_UP_DECK", function () {
     beforeEach(function () {
-      (bus.on as jest.Mock).mockImplementation((event, cb) => {
-        if (event === "CLEAN_UP_DECK") {
-          cb();
+      (bus.on as jest.Mock).mockImplementation(
+        (event: string, cb: FramebusMockCallback<void>) => {
+          if (event === "CLEAN_UP_DECK") {
+            cb();
+          }
         }
-      });
+      );
     });
 
     it("calls cleanup", function () {

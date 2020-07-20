@@ -18,6 +18,8 @@ jest.mock("Lib/scryfall");
 jest.mock("Lib/mutation");
 jest.mock("framebus");
 
+type EDHRecReplyHandler = (res: EDHRecResponse) => void;
+
 describe("makeEDHRecButton", function () {
   let getCardSpy: jest.SpyInstance;
   let getDeckSpy: jest.SpyInstance;
@@ -175,13 +177,19 @@ describe("makeEDHRecButton", function () {
           }),
         ],
       };
-      mocked(bus.emit).mockImplementation(function (eventName, payload, reply) {
-        if (eventName === "REQUEST_EDHREC_RECOMENDATIONS") {
-          reply!([null, fakeEDHRecResponse]);
-        }
+      mocked(bus.emit).mockImplementation(
+        (
+          eventName: string,
+          payload: Record<string, string>,
+          reply: EDHRecReplyHandler
+        ) => {
+          if (eventName === "REQUEST_EDHREC_RECOMENDATIONS") {
+            reply(fakeEDHRecResponse);
+          }
 
-        return true;
-      });
+          return true;
+        }
+      );
 
       getDeckSpy.mockResolvedValue(fakeDeck);
     });
@@ -303,37 +311,25 @@ describe("makeEDHRecButton", function () {
       );
     });
 
-    it("displays generic error when edhrec request errors", async function () {
-      mocked(bus.emit).mockImplementation(function (eventName, payload, reply) {
-        const err = new Error("network error");
-
-        reply!([err]);
-
-        return true;
-      });
-      jest.spyOn(Drawer.prototype, "setContent");
-
-      const btn = await makeEDHRecButton();
-
-      click(btn);
-
-      await wait();
-
-      const body = document.querySelector("#edhrec-drawer")?.innerHTML;
-      expect(body).toContain("An unknown error occurred:");
-      expect(body).toContain("network error");
-    });
-
     it("displays specific error when edhrec request errors with specific errors", async function () {
-      mocked(bus.emit).mockImplementation((eventName, payload, reply) => {
-        const err = {
-          errors: ["1 error", "2 error"],
-        };
+      mocked(bus.emit).mockImplementation(
+        (
+          eventName: string,
+          payload: Record<string, string>,
+          reply: EDHRecReplyHandler
+        ) => {
+          const res = {
+            commanders: [],
+            outRecs: [],
+            inRecs: [],
+            errors: ["1 error", "2 error"],
+          } as EDHRecResponse;
 
-        reply!([err]);
+          reply(res);
 
-        return true;
-      });
+          return true;
+        }
+      );
       jest.spyOn(Drawer.prototype, "setContent");
 
       const btn = await makeEDHRecButton();

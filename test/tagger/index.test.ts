@@ -57,15 +57,21 @@ describe("Tagger", () => {
 
   it("requests tags", async () => {
     const replySpy = jest.fn();
-    (bus.on as jest.Mock).mockImplementation((eventName, cb) => {
-      cb(
-        {
-          set: "set",
-          number: "number",
-        },
-        replySpy
-      );
-    });
+    type FramebusCallback = (
+      arg: Record<string, string>,
+      reply: jest.Mock
+    ) => void;
+    (bus.on as jest.Mock).mockImplementation(
+      (eventName: string, cb: FramebusCallback) => {
+        cb(
+          {
+            set: "set",
+            number: "number",
+          },
+          replySpy
+        );
+      }
+    );
 
     start();
 

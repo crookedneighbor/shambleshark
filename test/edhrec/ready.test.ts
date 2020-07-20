@@ -14,7 +14,8 @@ describe("EDHRec Ready", function () {
   beforeEach(function () {
     jest.spyOn(iframe, "isInsideIframe").mockReturnValue(true);
 
-    mocked(bus.on).mockImplementation((event, reply) => {
+    type ReplyType = (res: Record<string, string[]>, reply: jest.Mock) => void;
+    mocked(bus.on).mockImplementation((event: string, reply: ReplyType) => {
       const response = {
         commanders: ["Arjun, the Shifting Flame"],
         cards: ["1 foo", "1 bar"],
@@ -85,7 +86,7 @@ describe("EDHRec Ready", function () {
     await wait();
 
     expect(replySpy).toBeCalledTimes(1);
-    expect(replySpy).toBeCalledWith([null, "result"]);
+    expect(replySpy).toBeCalledWith("result");
   });
 
   it("sends back errors if request to edhrec resolves with errors", async function () {
@@ -99,11 +100,11 @@ describe("EDHRec Ready", function () {
     await wait();
 
     expect(replySpy).toBeCalledTimes(1);
-    expect(replySpy).toBeCalledWith([
-      {
+    expect(replySpy).toBeCalledWith(
+      expect.objectContaining({
         errors: ["1 error", "2 error"],
-      },
-    ]);
+      })
+    );
   });
 
   it("sends back error in array if request to edhrec fails", async function () {
@@ -117,6 +118,10 @@ describe("EDHRec Ready", function () {
     await wait();
 
     expect(replySpy).toBeCalledTimes(1);
-    expect(replySpy).toBeCalledWith([err]);
+    expect(replySpy).toBeCalledWith(
+      expect.objectContaining({
+        errors: [err],
+      })
+    );
   });
 });

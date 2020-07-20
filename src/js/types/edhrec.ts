@@ -1,14 +1,13 @@
 import type AddCardElement from "Ui/add-card-element";
 
 export interface EDHRecResponse {
+  errors?: string[];
   commanders: [];
   outRecs: EDHRecSuggestion[];
   inRecs: EDHRecSuggestion[];
 }
 
-export type EDHRecResponseHandler = (
-  args: [EDHRecError | null, EDHRecResponse]
-) => void;
+export type EDHRecResponseHandler = (response: EDHRecResponse) => void;
 
 export interface EDHRecSuggestion {
   primary_types: string[];
@@ -21,7 +20,6 @@ export interface EDHRecSuggestion {
 }
 
 export type EDHRecError = {
-  errors?: string[];
   toString: () => string;
 };
 

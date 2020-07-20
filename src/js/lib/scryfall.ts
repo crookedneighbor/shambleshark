@@ -41,8 +41,8 @@ export function getDeck(): Promise<Deck> {
   }
 
   getDeckPromise = new Promise((resolve) => {
-    bus.emit(events.REQUEST_DECK, (deck) => {
-      resolve(deck as Deck);
+    bus.emit(events.REQUEST_DECK, (deck: Deck) => {
+      resolve(deck);
     });
   });
 

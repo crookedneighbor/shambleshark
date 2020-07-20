@@ -1,8 +1,8 @@
 import bus from "framebus";
 import TaggerLink, {
   ShamblesharkRelationship,
-  TaggerPayload,
 } from "Features/search-results-features/tagger-link";
+import type { TaggerPayload } from "Js/types/tagger";
 import iframe from "Lib/iframe";
 import { ready } from "Lib/mutation";
 import noop from "Lib/noop";
@@ -32,12 +32,18 @@ describe("Tagger Link", function () {
     let settingsSpy: SpyInstance;
 
     beforeEach(function () {
-      busSpy = mocked(bus.on).mockImplementation((event, cb) => {
-        // TODO no data is actually passed here... why does framebus typing care?
-        cb({}, noop);
+      type FramebusMockCallback = (
+        data: Record<string, string>,
+        cb: () => void
+      ) => void;
+      busSpy = mocked(bus.on).mockImplementation(
+        (event: string, cb: FramebusMockCallback) => {
+          // TODO no data is actually passed here... why does framebus typing care?
+          cb({}, noop);
 
-        return true;
-      });
+          return true;
+        }
+      );
       jest.spyOn(iframe, "create").mockImplementation();
       jest.spyOn(TaggerLink.prototype, "setupButtons").mockImplementation();
       settingsSpy = jest.spyOn(TaggerLink, "getSettings").mockResolvedValue({

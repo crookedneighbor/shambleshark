@@ -74,28 +74,19 @@ function formatEDHRecSuggestions(list: EDHRecSuggestion[]): Suggestions {
   }, {});
 }
 
-function createErrorDrawerState(drawer: Drawer, err: EDHRecError) {
+function createErrorDrawerState(drawer: Drawer, errors: EDHRecError[]) {
   drawer.setHeader("Something went wrong");
 
   const container = document.createElement("div");
 
-  if (err.errors) {
-    const errorList = document.createElement("ul");
-    err.errors.forEach((errorMessage) => {
-      const errorElement = document.createElement("li");
-      errorElement.innerText = errorMessage;
-      errorList.appendChild(errorElement);
-    });
+  const errorList = document.createElement("ul");
+  errors.forEach((errorMessage) => {
+    const errorElement = document.createElement("li");
+    errorElement.innerText = errorMessage.toString();
+    errorList.appendChild(errorElement);
+  });
 
-    container.appendChild(errorList);
-  } else {
-    container.appendChild(
-      createElement(`<div>
-      <p>An unknown error occurred:</p>
-      <pre><code>${err.toString()}</code></pre>
-    </div>`)
-    );
-  }
+  container.appendChild(errorList);
 
   drawer.setContent(container);
   drawer.setLoading(false);
@@ -127,9 +118,9 @@ function createEDHRecResponseHandler(
   drawer: Drawer,
   deck: Deck
 ): EDHRecResponseHandler {
-  return function ([err, result]) {
-    if (err) {
-      createErrorDrawerState(drawer, err);
+  return function (result) {
+    if (result.errors) {
+      createErrorDrawerState(drawer, result.errors);
       return;
     }
 
