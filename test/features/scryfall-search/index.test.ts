@@ -118,7 +118,7 @@ describe("Scryfall Search", function () {
 
   describe("saved searches modal behavior", () => {
     describe("on close", () => {
-      it("sets loading state back to tru", () => {
+      it("sets loading state back to true", () => {
         const ss = new ScryfallSearch();
 
         jest.spyOn(ss.savedSearchModal, "setLoading");
@@ -142,6 +142,10 @@ describe("Scryfall Search", function () {
               query: "query",
             },
           ]);
+        jest
+          .spyOn(ScryfallSearch.prototype, "saveSearches")
+          .mockImplementation();
+        jest.spyOn(ScryfallSearch.prototype, "runSearch").mockImplementation();
       });
 
       it("looks up saved searches", async () => {
@@ -207,7 +211,7 @@ describe("Scryfall Search", function () {
 
         await ss.savedSearchModal.triggerOnOpen();
 
-        jest.spyOn(ss, "runSearch");
+        jest.spyOn(ss, "runSearch").mockImplementation();
 
         const searchEl = ss.savedSearchModal.element.querySelector(
           ".scryfall-search__saved-search-details"
@@ -223,7 +227,6 @@ describe("Scryfall Search", function () {
         const ss = new ScryfallSearch();
 
         jest.spyOn(ss, "getSavedSearches").mockResolvedValue([]);
-        jest.spyOn(ss, "saveSearches");
 
         await ss.savedSearchModal.triggerOnOpen();
 
@@ -250,7 +253,6 @@ describe("Scryfall Search", function () {
         const ss = new ScryfallSearch();
 
         jest.spyOn(ss, "getSavedSearches").mockResolvedValue([]);
-        jest.spyOn(ss, "saveSearches");
 
         await ss.savedSearchModal.triggerOnOpen();
 
@@ -277,7 +279,6 @@ describe("Scryfall Search", function () {
         const ss = new ScryfallSearch();
 
         jest.spyOn(ss, "getSavedSearches").mockResolvedValue([]);
-        jest.spyOn(ss, "saveSearches");
 
         await ss.savedSearchModal.triggerOnOpen();
 
@@ -956,7 +957,7 @@ describe("Scryfall Search", function () {
         },
       ];
 
-      jest.spyOn(ss, "saveSearches");
+      jest.spyOn(ss, "saveSearches").mockImplementation();
 
       ss.deleteSearch(search, searchElement);
 
