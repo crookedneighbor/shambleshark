@@ -236,7 +236,7 @@ function createDrawer(button: HTMLButtonElement): Drawer {
         },
         // TODO no any, not sure how to handle this correctly :(
         // does framebus need to be updated?
-        createEDHRecResponseHandler(drawer, deck) as any
+        createEDHRecResponseHandler(drawer, deck) as unknown
       );
     });
   });

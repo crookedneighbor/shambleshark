@@ -5,23 +5,17 @@ import { sortByAttribute } from "Lib/sort";
 import createElement from "Lib/create-element";
 import Modal from "Ui/modal";
 import { FEATURE_IDS as ids, FEATURE_SECTIONS as sections } from "Constants";
+import type { Card } from "scryfall-client/dist/types/model";
 
 import "./index.css";
 
 const MAX_ENTRIES_TO_AUTO_LOOKUP = 75 * 2; // 2 collection API calls
 
-export interface Token {
-  name: string;
-  oracle_id: string;
-  scryfall_uri: string;
-  getImage: () => string;
-}
-
 class TokenList extends Feature {
   elements: HTMLAnchorElement[];
   modal?: Modal;
   private _addedToUI?: boolean;
-  private _generateTokenCollectionPromise?: Promise<Token[]>;
+  private _generateTokenCollectionPromise?: Promise<Card[]>;
 
   static metadata = {
     id: ids.TokenList,
@@ -91,7 +85,7 @@ class TokenList extends Feature {
     container.appendChild(section);
   }
 
-  addToUI(tokens: Token[]): void {
+  addToUI(tokens: Card[]): void {
     if (this._addedToUI) {
       return;
     }
@@ -143,7 +137,7 @@ class TokenList extends Feature {
     }
   }
 
-  async generateTokenCollection(): Promise<Token[]> {
+  async generateTokenCollection(): Promise<Card[]> {
     // TODO add meta data about what cards create the tokens
     if (this._generateTokenCollectionPromise) {
       return this._generateTokenCollectionPromise;
@@ -158,7 +152,7 @@ class TokenList extends Feature {
     );
 
     this._generateTokenCollectionPromise = this.lookupTokens(entries).then(
-      (tokenCollection: Token[][]) =>
+      (tokenCollection: Card[][]) =>
         this.flattenTokenCollection(tokenCollection) || []
     );
 
@@ -175,15 +169,14 @@ class TokenList extends Feature {
     };
   }
 
-  // TODO get types from Scryfall Client
-  async lookupTokens(entries: Identifier[]) {
+  async lookupTokens(entries: Identifier[]): Promise<Card[][]> {
     const cards = await getCollection(entries);
     const tokens = cards.map((c) => c.getTokens());
 
     return Promise.all(tokens);
   }
 
-  flattenTokenCollection(tokenCollection: Token[][]): Token[] {
+  flattenTokenCollection(tokenCollection: Card[][]): Card[] {
     // Tokens can have the same name, but be functionally different
     // IE: https://scryfall.com/search?q=t%3Atoken+!"Vampire"&unique=cards
     // TODO this doesn't handle double sided tokens particularly well

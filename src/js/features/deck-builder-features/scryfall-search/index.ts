@@ -16,6 +16,7 @@ import emptyElement from "Lib/empty-element";
 import "./index.css";
 import { EXTERNAL_ARROW, ARROW, ELLIPSIS, CHECK_SYMBOL } from "Svg";
 import { Deck, DeckSections } from "Js/types/deck";
+import type { Card, List } from "scryfall-client/dist/types/model";
 
 // TODO saved searches - nice to haves
 // * organize searches
@@ -53,8 +54,7 @@ class ScryfallSearch extends Feature {
   settings?: SearchSettings;
   isSingleton?: boolean;
   deck?: Deck;
-  // TODO no any, get card type from scryfall-client
-  cardList?: any;
+  cardList?: List<Card>;
   _nextInProgress?: boolean;
 
   static metadata = {
@@ -252,7 +252,8 @@ class ScryfallSearch extends Feature {
 
     this.cardList = await search(this.currentQuery).catch(() => {
       // most likely a 404, return no results
-      return [];
+      // fake it as a Card List
+      return ([] as unknown) as List<Card>;
     });
 
     this.addMetadataToContainer();
@@ -335,8 +336,7 @@ class ScryfallSearch extends Feature {
     }
 
     const entries = deckParser.flattenEntries(this.deck as Deck);
-    // TODO get Card type from scryfall-client
-    this.cardList?.forEach((card: any) => {
+    this.cardList?.forEach((card: Card) => {
       const cardInDeck = entries.find(
         (entry) =>
           entry.card_digest && entry.card_digest.oracle_id === card.oracle_id
@@ -388,8 +388,7 @@ class ScryfallSearch extends Feature {
 
         this._nextInProgress = true;
 
-        // TODO get types from scryfall-client
-        return this.cardList?.next().then((cards: any) => {
+        return this.cardList?.next().then((cards: List<Card>) => {
           this.cardList = cards;
           this.addCards();
           this._nextInProgress = false;

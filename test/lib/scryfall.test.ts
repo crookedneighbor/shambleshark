@@ -98,49 +98,5 @@ describe("scryfall", function () {
 
       expect(cards).toEqual(fakeCards);
     });
-
-    it("calls collection endpoint in batches of 75", async function () {
-      const fakeEntry = {
-        set: "foo",
-        collector_number: "1",
-      };
-      const entries = [];
-      let i = 0;
-      while (i < 400) {
-        entries.push(fakeEntry);
-        i++;
-      }
-
-      await getCollection(entries);
-
-      expect(getCollectionSpy).toBeCalledTimes(6);
-      expect(getCollectionSpy.mock.calls[0][0].length).toBe(75);
-      expect(getCollectionSpy.mock.calls[1][0].length).toBe(75);
-      expect(getCollectionSpy.mock.calls[2][0].length).toBe(75);
-      expect(getCollectionSpy.mock.calls[3][0].length).toBe(75);
-      expect(getCollectionSpy.mock.calls[4][0].length).toBe(75);
-      expect(getCollectionSpy.mock.calls[5][0].length).toBe(25);
-    });
-
-    it("resolves with flattened array of the results of each card's getTokens call", async function () {
-      const fakeEntry = {
-        set: "foo",
-        collector_number: "1",
-      };
-      const entries = [];
-      let i = 0;
-      while (i < 200) {
-        entries.push(fakeEntry);
-        i++;
-      }
-
-      const cards = await getCollection(entries);
-
-      expect(getCollectionSpy).toBeCalledTimes(3);
-
-      cards.forEach((c) => {
-        expect(Array.isArray(c)).toBe(false);
-      });
-    });
   });
 });

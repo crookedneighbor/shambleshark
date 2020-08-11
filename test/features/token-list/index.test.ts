@@ -1,8 +1,9 @@
-import TokenList, { Token } from "Features/deck-view-features/token-list";
+import TokenList from "Features/deck-view-features/token-list";
 import { ready } from "Lib/mutation";
 import { getCollection } from "Lib/scryfall";
 import wait from "Lib/wait";
 import Modal from "Lib/ui-elements/modal";
+import type { Card } from "scryfall-client/dist/types/model";
 import { mocked } from "ts-jest/utils";
 
 jest.mock("Lib/scryfall");
@@ -126,7 +127,7 @@ describe("Token List", function () {
     });
 
     it("adds tokens to modal when it opens", async function () {
-      const tokens: Token[] = [];
+      const tokens: Card[] = [];
 
       tl.createUI(container);
 
@@ -158,29 +159,29 @@ describe("Token List", function () {
   });
 
   describe("addToUI", function () {
-    let tokens: Token[];
+    let tokens: Card[];
 
     let setContentSpy: jest.SpyInstance;
 
     beforeEach(function () {
       const container = document.createElement("div");
       tokens = [
-        {
+        ({
           name: "Token 1",
           scryfall_uri: "https://scryfall.com/token-1",
           oracle_id: "token-1",
           getImage: jest
             .fn()
             .mockReturnValue("https://img.scryfall.com/token-1"),
-        },
-        {
+        } as unknown) as Card,
+        ({
           name: "Token 2",
           scryfall_uri: "https://scryfall.com/token-2",
           oracle_id: "token-2",
           getImage: jest
             .fn()
             .mockReturnValue("https://img.scryfall.com/token-2"),
-        },
+        } as unknown) as Card,
       ];
       tl.createUI(container);
       setContentSpy = jest
@@ -239,33 +240,33 @@ describe("Token List", function () {
   });
 
   describe("flattenTokenCollection", function () {
-    let tokenCollection: Token[][];
+    let tokenCollection: Card[][];
 
     beforeEach(function () {
       tokenCollection = [
         [],
         [
-          {
+          ({
             name: "Token 1",
             oracle_id: "id-1",
             scryfall_uri: "https://scryfall.com/code/1",
             getImage: jest.fn(),
-          },
-          {
+          } as unknown) as Card,
+          ({
             name: "Token 2",
             oracle_id: "id-2",
             scryfall_uri: "https://scryfall.com/code/2",
             getImage: jest.fn(),
-          },
+          } as unknown) as Card,
         ],
         [],
         [
-          {
+          ({
             name: "Token 3",
             oracle_id: "id-3",
             scryfall_uri: "https://scryfall.com/code/3",
             getImage: jest.fn(),
-          },
+          } as unknown) as Card,
         ],
       ];
     });
@@ -290,12 +291,12 @@ describe("Token List", function () {
     });
 
     it("alphebetizes by name", function () {
-      tokenCollection[1].push({
+      tokenCollection[1].push(({
         oracle_id: "alpha-token-id",
         name: "Alpha Token",
         scryfall_uri: "https://scryfall.com/code/2",
         getImage: jest.fn(),
-      });
+      } as unknown) as Card);
       const tokens = tl.flattenTokenCollection(tokenCollection);
 
       expect(tokens).toEqual([
@@ -319,12 +320,12 @@ describe("Token List", function () {
     });
 
     it("removes duplicate ids", function () {
-      tokenCollection[2].push({
+      tokenCollection[2].push(({
         oracle_id: "id-1",
         name: "Token 1",
         scryfall_uri: "https://scryfall.com/code/1",
         getImage: jest.fn(),
-      });
+      } as unknown) as Card);
       const tokens = tl.flattenTokenCollection(tokenCollection);
 
       expect(tokens).toEqual([
@@ -348,7 +349,8 @@ describe("Token List", function () {
     let getCollectionSpy: jest.SpyInstance;
 
     beforeEach(function () {
-      getCollectionSpy = mocked(getCollection).mockResolvedValue([]);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      getCollectionSpy = mocked(getCollection).mockResolvedValue([] as any);
     });
 
     it("calls getCollection", async function () {
@@ -500,7 +502,7 @@ describe("Token List", function () {
 
     it("looks up tokens with elements", async function () {
       const tokenCollection = [[{ id: "token" }]];
-      const result: Token[] = [];
+      const result: Card[] = [];
 
       lookupTokensSpy.mockResolvedValue(tokenCollection);
       flattenTokenCollectionSpy.mockReturnValue([]);

@@ -12,22 +12,10 @@ export type Identifier =
   | { name: string }
   | { set: string; collector_number: string };
 
-// TODO move this logic of batching to scryfall-client
-// TODO get types from Scryfall Client
-export async function getCollection(ids: Identifier[]) {
-  const idBatches = ids.reduce((array: Identifier[][], entry, i) => {
-    if (i % 75 !== 0) {
-      return array;
-    }
-
-    return array.concat([ids.slice(i, i + 75)]);
-  }, []);
-
-  const collectionResults = await Promise.all(
-    idBatches.map((identifiers) => api.getCollection(identifiers))
-  );
-
-  return collectionResults.flat();
+export async function getCollection(
+  ids: Identifier[]
+): ReturnType<typeof api.getCollection> {
+  return api.getCollection(ids);
 }
 
 export const getCardBySetCodeAndCollectorNumber =

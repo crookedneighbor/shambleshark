@@ -4,6 +4,7 @@ import { getDeck, search } from "Lib/scryfall";
 import bus from "framebus";
 import Drawer from "Lib/ui-elements/drawer";
 import Modal from "Lib/ui-elements/modal";
+import { Card, List } from "scryfall-client/dist/types/model";
 
 import { makeFakeDeck, makeFakeCard } from "Helpers/fake";
 import { mocked } from "ts-jest/utils";
@@ -88,7 +89,7 @@ describe("Scryfall Search", function () {
     it("adds cards on scroll if ready for the next batch", async () => {
       const ss = new ScryfallSearch();
 
-      ss.cardList = [];
+      ss.cardList = ([] as unknown) as List<Card>;
 
       ss.cardList.next = jest.fn().mockResolvedValue(ss.cardList);
 
@@ -107,7 +108,7 @@ describe("Scryfall Search", function () {
 
       jest.spyOn(ss, "isReadyToLookupNextBatch").mockReturnValue(false);
       jest.spyOn(ss, "addCards");
-      ss.cardList = [];
+      ss.cardList = ([] as unknown) as List<Card>;
       ss.cardList.next = jest.fn().mockResolvedValue([]);
 
       await ss.drawer.triggerOnScroll();
@@ -716,7 +717,7 @@ describe("Scryfall Search", function () {
     });
 
     it("creates card elements to add to container", function () {
-      ss.cardList = [
+      ss.cardList = ([
         {
           id: "id-1",
           color_identity: ["W"],
@@ -737,7 +738,7 @@ describe("Scryfall Search", function () {
           },
           type_line: "type 2",
         },
-      ];
+      ] as unknown) as List<Card>;
 
       ss.addCards();
 
@@ -754,7 +755,7 @@ describe("Scryfall Search", function () {
     });
 
     it("adds an error message when no card list is available", function () {
-      ss.cardList = [];
+      ss.cardList = ([] as unknown) as List<Card>;
 
       ss.addCards();
 
@@ -770,9 +771,9 @@ describe("Scryfall Search", function () {
     });
 
     it("adds warnings", () => {
-      ss.cardList = {
+      ss.cardList = ({
         warnings: ["warning 1", "warning 2"],
-      };
+      } as unknown) as List<Card>;
 
       ss.addWarnings();
 
@@ -780,23 +781,23 @@ describe("Scryfall Search", function () {
     });
 
     it("empties warnings container between uses", () => {
-      ss.cardList = {
+      ss.cardList = ({
         warnings: ["warning 1", "warning 2"],
-      };
+      } as unknown) as List<Card>;
 
       ss.addWarnings();
 
       expect(ss.searchErrorsContainer.innerText).toBe("warning 1 warning 2");
 
-      ss.cardList = {
+      ss.cardList = ({
         warnings: ["warning 3"],
-      };
+      } as unknown) as List<Card>;
 
       ss.addWarnings();
 
       expect(ss.searchErrorsContainer.innerText).toBe("warning 3");
 
-      ss.cardList = {};
+      ss.cardList = ({} as unknown) as List<Card>;
 
       ss.addWarnings();
 
@@ -830,7 +831,7 @@ describe("Scryfall Search", function () {
     it("returns false if card list has no more in list", function () {
       const ss = new ScryfallSearch();
 
-      ss.cardList = [];
+      ss.cardList = ([] as unknown) as List<Card>;
       ss.cardList.has_more = false;
 
       expect(ss.isReadyToLookupNextBatch(el)).toBe(false);
@@ -839,7 +840,7 @@ describe("Scryfall Search", function () {
     it("returns false if element position is beneath the scroll threshold", function () {
       const ss = new ScryfallSearch();
 
-      ss.cardList = [];
+      ss.cardList = ([] as unknown) as List<Card>;
       ss.cardList.has_more = true;
 
       expect(
@@ -854,7 +855,7 @@ describe("Scryfall Search", function () {
     it("returns true if element position is within the scroll threshold", function () {
       const ss = new ScryfallSearch();
 
-      ss.cardList = [];
+      ss.cardList = ([] as unknown) as List<Card>;
       ss.cardList.has_more = true;
 
       expect(
