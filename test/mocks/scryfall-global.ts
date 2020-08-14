@@ -8,6 +8,11 @@ export function generateScryfallGlobal(): ScryfallGlobal {
     deckbuilder: {
       deckId: "deck-id",
       cleanUp: jest.fn(),
+      entries: {
+        mainboard: [],
+        sideboard: [],
+        maybeboard: [],
+      },
     },
     pushNotification: jest.fn(),
   };

@@ -10,6 +10,7 @@ export type ScryfallGlobal = {
   deckbuilder: {
     deckId: string;
     cleanUp: ScryfallFunction;
+    entries: Record<string, Card[]>;
   };
   pushNotification: ScryfallFunction;
 };
@@ -55,6 +56,18 @@ export function addHooksToCardManagementEvents(): void {
   }
 
   if (window.Scryfall && window.Scryfall.deckbuilder) {
+    Object.defineProperties(window.Scryfall.deckbuilder, {
+      entries: {
+        get() {
+          return this._entries;
+        },
+        set(entries) {
+          this._entries = entries;
+
+          bus.emit(events.DECK_ENTRIES_UPDATED, { entries });
+        },
+      },
+    });
     const originalCleanup = window.Scryfall.deckbuilder.cleanUp;
     window.Scryfall.deckbuilder.cleanUp = function (...args: unknown[]) {
       originalCleanup(...args);

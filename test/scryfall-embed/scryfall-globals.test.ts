@@ -80,6 +80,20 @@ describe("Scryfall Globals", function () {
       }
     );
 
+    it("emits event when deck entries are updated", () => {
+      addHooksToCardManagementEvents();
+
+      const entries = {
+        mainboard: [],
+        sideboard: [],
+        maybeboard: [],
+      };
+
+      window.Scryfall.deckbuilder.entries = entries;
+
+      expect(bus.emit).toBeCalledWith("DECK_ENTRIES_UPDATED", { entries });
+    });
+
     it("replaces Scryfall.deckbuilder.cleanUp with a method that emits a bus event when calling the original method", function () {
       const original = ScryfallSpy.deckbuilder.cleanUp;
 
