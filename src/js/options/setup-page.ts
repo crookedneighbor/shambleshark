@@ -4,7 +4,7 @@ import "./options.css";
 
 import createElement from "Lib/create-element";
 
-import Feature, { SettingsDefinition } from "Feature";
+import Feature, { SettingsDefinition, ListSettingsDefinition } from "Feature";
 import globalFeatures from "Features/global-features";
 import deckbuilderFeatures from "Features/deck-builder-features";
 import deckViewFeatures from "Features/deck-view-features";
@@ -47,6 +47,34 @@ function createCheckbox(
   return checkboxContainer;
 }
 
+function createList(
+  def: ListSettingsDefinition,
+  inputValue: string,
+  ChildFeature: typeof Feature
+): HTMLDivElement {
+  const id = `select-${def.id}`;
+  const options = def.options
+    .map((option) => `<option value="${option.value}">${option.label}</option>`)
+    .join("\n");
+  const container = createElement<HTMLDivElement>(`<div class="field">
+    <label for="${id}"><p>${def.label}</p></label>
+
+    <div id="${id}" class="select">
+      <select>
+        ${options}
+      </select>
+    </div>
+  </div>`);
+  const select = container.querySelector("select") as HTMLSelectElement;
+
+  select.value = inputValue;
+  select.addEventListener("change", () => {
+    ChildFeature.saveSetting(def.id, select.value);
+  });
+
+  return container;
+}
+
 function createInputForType(
   def: SettingsDefinition,
   inputValue: string | boolean,
@@ -55,6 +83,12 @@ function createInputForType(
   switch (def.input) {
     case "checkbox":
       return createCheckbox(def, inputValue as boolean, ChildFeature);
+    case "list":
+      return createList(
+        def as ListSettingsDefinition,
+        inputValue as string,
+        ChildFeature
+      );
   }
 
   return document.createElement("input");

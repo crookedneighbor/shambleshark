@@ -23,6 +23,10 @@ export interface SettingsDefinition {
   input: string;
 }
 
+export interface ListSettingsDefinition extends SettingsDefinition {
+  options: Record<string, string>[];
+}
+
 export default abstract class Feature {
   static metadata: Metadata;
   static settingsDefaults: SettingsDefaults;
