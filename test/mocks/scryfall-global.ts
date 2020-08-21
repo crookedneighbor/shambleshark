@@ -13,6 +13,8 @@ export function generateScryfallGlobal(): ScryfallGlobal {
         sideboard: [],
         maybeboard: [],
       },
+      flatSections: [],
+      $forceUpdate: jest.fn(),
     },
     pushNotification: jest.fn(),
   };

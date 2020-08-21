@@ -11,6 +11,8 @@ export type ScryfallGlobal = {
     deckId: string;
     cleanUp: ScryfallFunction;
     entries: Record<string, Card[]>;
+    flatSections: string[];
+    $forceUpdate: () => void; // Vue function to force re-rendering
   };
   pushNotification: ScryfallFunction;
 };
@@ -68,6 +70,7 @@ export function addHooksToCardManagementEvents(): void {
         },
       },
     });
+
     const originalCleanup = window.Scryfall.deckbuilder.cleanUp;
     window.Scryfall.deckbuilder.cleanUp = function (...args: unknown[]) {
       originalCleanup(...args);
