@@ -2,7 +2,7 @@ import scryfall from "Js/scryfall-embed/scryfall-globals";
 import modifyCleanUp from "Js/scryfall-embed/modify-clean-up";
 
 import { Deck } from "Js/types/deck";
-import { generateScryfallGlobal } from "../mocks/scryfall-global";
+import { generateScryfallGlobal } from "../../mocks/scryfall-global";
 
 import { makeFakeDeck, makeFakeCard } from "Helpers/fake";
 

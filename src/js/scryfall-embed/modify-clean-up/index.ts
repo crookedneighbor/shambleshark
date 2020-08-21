@@ -1,4 +1,4 @@
-import scryfall from "./scryfall-globals";
+import scryfall from "../scryfall-globals";
 import { hasDedicatedLandSection, isLandCard } from "Lib/deck-parser";
 
 import type { Card, Deck } from "Js/types/deck";
