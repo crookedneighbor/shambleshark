@@ -70,12 +70,6 @@ export function addHooksToCardManagementEvents(): void {
         },
       },
     });
-
-    const originalCleanup = window.Scryfall.deckbuilder.cleanUp;
-    window.Scryfall.deckbuilder.cleanUp = function (...args: unknown[]) {
-      originalCleanup(...args);
-      bus.emit(events.CALLED_CLEANUP);
-    };
   }
 }
 

@@ -94,20 +94,6 @@ describe("Scryfall Globals", function () {
       expect(bus.emit).toBeCalledWith("DECK_ENTRIES_UPDATED", { entries });
     });
 
-    it("replaces Scryfall.deckbuilder.cleanUp with a method that emits a bus event when calling the original method", function () {
-      const original = ScryfallSpy.deckbuilder.cleanUp;
-
-      addHooksToCardManagementEvents();
-
-      expect(original).not.toBe(ScryfallSpy.deckbuilder.cleanUp);
-      ScryfallSpy.deckbuilder.cleanUp("foo", "bar");
-
-      expect(bus.emit).toBeCalledTimes(1);
-      expect(bus.emit).toBeCalledWith("CALLED_CLEANUP");
-      expect(original).toBeCalledTimes(1);
-      expect(original).toBeCalledWith("foo", "bar");
-    });
-
     it("does not attempt to replace Scryfall.deckbuilder.cleanUp if Scryfall.deckbuilder global is not available", function () {
       delete ScryfallSpy.deckbuilder;
 
