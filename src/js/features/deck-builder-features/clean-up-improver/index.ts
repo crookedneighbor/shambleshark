@@ -18,6 +18,7 @@ class CleanUpImprover extends Feature {
   static settingsDefaults = {
     enabled: true,
     cleanUpLandsInSingleton: true,
+    sortEntriesPrimary: "none",
   };
 
   static settingDefinitions = [
@@ -26,6 +27,38 @@ class CleanUpImprover extends Feature {
       label:
         "Move lands and nonlands to their correct columns when cleaning up a singleton deck",
       input: "checkbox",
+    },
+    {
+      id: "sortEntriesPrimary",
+      label: "Keep cards sorted by:",
+      input: "list",
+      options: [
+        {
+          label: "Default (let Scryfall decide order on cleanup)",
+          value: "none",
+        },
+        {
+          label: "Card Type",
+          value: "card-type",
+        },
+        {
+          label: "By Name",
+          value: "name",
+        },
+        // TODO can't apply this until there's a reliable way to look up the deck updates
+        // {
+        //   label: "By ManaCost",
+        //   value: "mana-cost",
+        // },
+        // {
+        //   label: "By Color",
+        //   value: "color",
+        // },
+        // {
+        //   label: "By Color Identity",
+        //   value: "color-identity",
+        // },
+      ],
     },
   ];
 

@@ -1,5 +1,10 @@
 ## Changelog
 
+# unreleased
+
+- Cleanup Improver
+  - Add feature to keep deck organized by specific settings
+
 # 0.7.0 - Pre-release
 
 - Add warnings from search results
