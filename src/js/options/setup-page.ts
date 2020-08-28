@@ -32,10 +32,12 @@ function createCheckbox(
   inputValue: boolean,
   ChildFeature: typeof Feature
 ): HTMLLabelElement {
+  const id = makeInputId(def);
   const checkboxContainer = createElement<HTMLLabelElement>(`<label
     class="checkbox"
+    for="${id}"
   >
-    <input type="checkbox" id="${def.id}-checkbox" />
+    <input type="checkbox" id="${id}" />
     ${def.label}
   </label>`);
   const checkbox = checkboxContainer.querySelector("input") as HTMLInputElement;
@@ -52,15 +54,15 @@ function createList(
   inputValue: string,
   ChildFeature: typeof Feature
 ): HTMLDivElement {
-  const id = `select-${def.id}`;
+  const id = makeInputId(def);
   const options = def.options
     .map((option) => `<option value="${option.value}">${option.label}</option>`)
     .join("\n");
   const container = createElement<HTMLDivElement>(`<div class="field">
     <label for="${id}"><p>${def.label}</p></label>
 
-    <div id="${id}" class="select">
-      <select>
+    <div class="select">
+      <select id="${id}">
         ${options}
       </select>
     </div>
@@ -73,6 +75,10 @@ function createList(
   });
 
   return container;
+}
+
+function makeInputId(def: SettingsDefinition): string {
+  return `${def.id}-input`;
 }
 
 function createInputForType(
@@ -91,7 +97,10 @@ function createInputForType(
       );
   }
 
-  return document.createElement("input");
+  const input = document.createElement("input");
+  input.id = makeInputId(def);
+
+  return input;
 }
 
 const page = createElement(`<div>
