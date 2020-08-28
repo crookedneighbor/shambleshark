@@ -4,7 +4,11 @@ import "./options.css";
 
 import createElement from "Lib/create-element";
 
-import Feature, { SettingsDefinition, ListSettingsDefinition } from "Feature";
+import Feature, {
+  SettingsDefinition,
+  CheckboxSettingsDefinition,
+  ListSettingsDefinition,
+} from "Feature";
 import globalFeatures from "Features/global-features";
 import deckbuilderFeatures from "Features/deck-builder-features";
 import deckViewFeatures from "Features/deck-view-features";
@@ -28,7 +32,7 @@ function setupToggleListeners(element: HTMLInputElement, fn: () => void) {
 }
 
 function createCheckbox(
-  def: SettingsDefinition,
+  def: CheckboxSettingsDefinition,
   inputValue: boolean,
   ChildFeature: typeof Feature
 ): HTMLLabelElement {
@@ -44,6 +48,10 @@ function createCheckbox(
   checkbox.checked = inputValue;
   checkbox.addEventListener("change", () => {
     ChildFeature.saveSetting(def.id, checkbox.checked);
+
+    if (def.onChange) {
+      def.onChange(checkbox.checked);
+    }
   });
 
   return checkboxContainer;
@@ -72,6 +80,10 @@ function createList(
   select.value = inputValue;
   select.addEventListener("change", () => {
     ChildFeature.saveSetting(def.id, select.value);
+
+    if (def.onChange) {
+      def.onChange(select.value);
+    }
   });
 
   return container;

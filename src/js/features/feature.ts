@@ -23,8 +23,13 @@ export interface SettingsDefinition {
   input: string;
 }
 
+export interface CheckboxSettingsDefinition extends SettingsDefinition {
+  onChange?: (value: boolean) => void;
+}
+
 export interface ListSettingsDefinition extends SettingsDefinition {
   options: Record<string, string>[];
+  onChange?: (value: string) => void;
 }
 
 export default abstract class Feature {
