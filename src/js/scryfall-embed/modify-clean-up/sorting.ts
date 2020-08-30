@@ -1,16 +1,7 @@
 import type { Card } from "Js/types/deck";
+import { getPrimaryType } from "Lib/card-parser";
 
 type CardSorter = (first: Card, second: Card) => number;
-
-const TYPE_PREFERENCE = [
-  "creature",
-  "land",
-  "artifact",
-  "enchantment",
-  "planeswalker",
-  "instant",
-  "sorcery",
-];
 
 const TYPE_ORDER = [
   "creature",
@@ -44,16 +35,6 @@ export function sortByName(): CardSorter {
   };
 }
 
-function getPrimaryType(typeLine: string): string {
-  typeLine = typeLine.toLowerCase().split(" - ")[0];
-
-  return (
-    TYPE_PREFERENCE.find((cardType) => {
-      return typeLine.indexOf(cardType) > -1;
-    }) || typeLine
-  );
-}
-
 export function sortByPrimaryCardType(): CardSorter {
   return function (first: Card, second: Card): number {
     if (!first.card_digest) {
@@ -64,8 +45,8 @@ export function sortByPrimaryCardType(): CardSorter {
       return -1;
     }
 
-    const firstTypeLine = getPrimaryType(first.card_digest.type_line);
-    const secondTypeLine = getPrimaryType(second.card_digest.type_line);
+    const firstTypeLine = getPrimaryType(first);
+    const secondTypeLine = getPrimaryType(second);
     const firstPref = TYPE_ORDER.indexOf(firstTypeLine);
     const secondPref = TYPE_ORDER.indexOf(secondTypeLine);
 
