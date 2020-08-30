@@ -21,6 +21,7 @@ import {
   generateScryfallAPIGlobal,
 } from "../mocks/scryfall-global";
 import { makeFakeDeck, makeFakeCard } from "Helpers/fake";
+import { mocked } from "ts-jest/utils";
 
 describe("Scryfall Globals", function () {
   let ScryfallAPISpy: ScryfallAPIGlobal;
@@ -92,6 +93,40 @@ describe("Scryfall Globals", function () {
       window.Scryfall.deckbuilder.entries = entries;
 
       expect(bus.emit).toBeCalledWith("DECK_ENTRIES_UPDATED", { entries });
+    });
+
+    it("emits event when totalCount is called and count has changed", () => {
+      const spy = mocked(window.Scryfall.deckbuilder.totalCount);
+      spy.mockReturnValue(10);
+
+      addHooksToCardManagementEvents();
+
+      expect(bus.emit).not.toBeCalledWith(
+        "DECK_TOTAL_COUNT_UPDATED",
+        expect.anything()
+      );
+
+      spy.mockReturnValue(100);
+
+      window.Scryfall.deckbuilder.totalCount();
+
+      expect(bus.emit).toBeCalledWith("DECK_TOTAL_COUNT_UPDATED", {
+        totalCount: 100,
+      });
+    });
+
+    it("emits event when totalCount is called and count has changed", () => {
+      const spy = mocked(window.Scryfall.deckbuilder.totalCount);
+      spy.mockReturnValue(10);
+
+      addHooksToCardManagementEvents();
+
+      window.Scryfall.deckbuilder.totalCount();
+
+      expect(bus.emit).not.toBeCalledWith(
+        "DECK_TOTAL_COUNT_UPDATED",
+        expect.anything()
+      );
     });
 
     it("does not attempt to replace Scryfall.deckbuilder.cleanUp if Scryfall.deckbuilder global is not available", function () {

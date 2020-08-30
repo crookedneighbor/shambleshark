@@ -6,13 +6,19 @@ import type { Deck, Card } from "Js/types/deck";
 
 type ScryfallFunction = (...args: unknown[]) => void;
 
+type VoidReturnFunction = () => void;
+
 export type ScryfallGlobal = {
   deckbuilder: {
     deckId: string;
     cleanUp: ScryfallFunction;
     entries: Record<string, Card[]>;
     flatSections: string[];
-    $forceUpdate: () => void; // Vue function to force re-rendering
+    totalCount: () => number;
+    // Vue function to force re-rendering
+    $forceUpdate: VoidReturnFunction;
+    // Vue function to wait till the next vue process has finished before proceeding
+    $nextTick: (func: VoidReturnFunction) => void;
   };
   pushNotification: ScryfallFunction;
 };
@@ -58,6 +64,21 @@ export function addHooksToCardManagementEvents(): void {
   }
 
   if (window.Scryfall && window.Scryfall.deckbuilder) {
+    const originalTotalCountFunction = window.Scryfall.deckbuilder.totalCount;
+    let cachedTotalCount = originalTotalCountFunction();
+    window.Scryfall.deckbuilder.totalCount = () => {
+      const newTotalCount = originalTotalCountFunction();
+
+      if (cachedTotalCount !== newTotalCount) {
+        cachedTotalCount = newTotalCount;
+        bus.emit(events.DECK_TOTAL_COUNT_UPDATED, {
+          totalCount: newTotalCount,
+        });
+      }
+
+      return newTotalCount;
+    };
+
     Object.defineProperties(window.Scryfall.deckbuilder, {
       entries: {
         get() {
