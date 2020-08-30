@@ -16,7 +16,9 @@ export function generateScryfallGlobal(): ScryfallGlobal {
       flatSections: [],
       totalCount: jest.fn().mockReturnValue(0),
       $forceUpdate: jest.fn(),
-      $nextTick: jest.fn(),
+      $nextTick: jest.fn().mockImplementation((cb) => {
+        cb();
+      }),
     },
     pushNotification: jest.fn(),
   };

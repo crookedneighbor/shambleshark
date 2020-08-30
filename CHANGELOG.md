@@ -4,6 +4,7 @@
 
 - Cleanup Improver
   - Add feature to keep deck organized by specific settings
+  - Add feature to include headings in deck organization
 
 # 0.7.0 - Pre-release
 

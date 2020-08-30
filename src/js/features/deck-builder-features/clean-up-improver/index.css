@@ -1,0 +1,11 @@
+li.cleanup-improver__deck-section-heading {
+  margin-top: 30px;
+}
+
+li.cleanup-improver__deck-section-heading:first-child {
+  margin-top: 0px;
+}
+
+h6.deckbuilder-section-title-bar.is-hidden {
+  display: none;
+}

@@ -5,6 +5,10 @@ import {
   sortByName,
   sortByPrimaryCardType,
 } from "Js/scryfall-embed/modify-clean-up/sorting";
+import {
+  addDeckTotalUpdateListener,
+  insertHeadings,
+} from "Js/scryfall-embed/modify-clean-up/add-section-heading";
 
 import { Deck } from "Js/types/deck";
 import { generateScryfallGlobal } from "../../mocks/scryfall-global";
@@ -13,6 +17,7 @@ import { makeFakeDeck, makeFakeCard } from "Helpers/fake";
 
 jest.mock("framebus");
 jest.mock("Js/scryfall-embed/modify-clean-up/sorting");
+jest.mock("Js/scryfall-embed/modify-clean-up/add-section-heading");
 
 describe("modifyCleanUp", function () {
   beforeEach(() => {
@@ -508,7 +513,6 @@ describe("modifyCleanUp", function () {
         "sideboard",
         "maybeboard",
       ];
-      // window.Scryfall.deckbuilder.entries = fakeDeck.entries;
     });
 
     it("does not setup DECK_ENTRIES_UPDATED event when config is not set to sort entries", () => {
@@ -582,6 +586,71 @@ describe("modifyCleanUp", function () {
       expect(
         window.Scryfall.deckbuilder.entries.maybeboard.sort
       ).toBeCalledWith(sorterSpy);
+    });
+  });
+
+  describe("headings", () => {
+    it("does not setup listeners for inserting headings when config is not set to sort entries", () => {
+      modifyCleanUp({
+        insertSortingHeadings: true,
+      });
+
+      expect(addDeckTotalUpdateListener).toBeCalledTimes(0);
+    });
+
+    it("does not setup listeners for inserting headings when config is set to none", () => {
+      modifyCleanUp({
+        sortEntriesPrimary: "none",
+        insertSortingHeadings: true,
+      });
+
+      expect(addDeckTotalUpdateListener).toBeCalledTimes(0);
+    });
+
+    it("does not setup listeners for inserting headings when insertSortingHeadings is not set", () => {
+      modifyCleanUp({
+        sortEntriesPrimary: "name",
+      });
+
+      expect(addDeckTotalUpdateListener).toBeCalledTimes(0);
+    });
+
+    it("sets up listeners for inserting headings when config is set to a non-none value and insertSortingHeadings is true", () => {
+      modifyCleanUp({
+        sortEntriesPrimary: "name",
+        insertSortingHeadings: true,
+      });
+
+      expect(addDeckTotalUpdateListener).toBeCalledTimes(1);
+      expect(addDeckTotalUpdateListener).toBeCalledWith("name");
+    });
+
+    it("inserts headings when deck entries update", () => {
+      // TODO better way to mock this?
+      bus.on.mockImplementation((eventName: string, cb: () => void) => {
+        cb();
+      });
+
+      modifyCleanUp({
+        sortEntriesPrimary: "name",
+        insertSortingHeadings: true,
+      });
+
+      expect(insertHeadings).toBeCalledTimes(1);
+      expect(insertHeadings).toBeCalledWith("name", {});
+    });
+
+    it("does not insert headings when not configured", () => {
+      // TODO better way to mock this?
+      bus.on.mockImplementation((eventName: string, cb: () => void) => {
+        cb();
+      });
+
+      modifyCleanUp({
+        sortEntriesPrimary: "name",
+      });
+
+      expect(insertHeadings).toBeCalledTimes(0);
     });
   });
 });

@@ -6,6 +6,8 @@ import {
 } from "Constants";
 import bus from "framebus";
 
+import "./index.css";
+
 class CleanUpImprover extends Feature {
   static metadata = {
     id: ids.CleanUpImprover,
@@ -18,6 +20,7 @@ class CleanUpImprover extends Feature {
   static settingsDefaults = {
     enabled: true,
     cleanUpLandsInSingleton: true,
+    insertSortingHeadings: true,
     sortEntriesPrimary: "none",
   };
 
@@ -59,6 +62,11 @@ class CleanUpImprover extends Feature {
         //   value: "color-identity",
         // },
       ],
+    },
+    {
+      id: "insertSortingHeadings",
+      label: "Include headings above different sections of cards",
+      input: "checkbox",
     },
   ];
 

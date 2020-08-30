@@ -39,7 +39,7 @@ export function makeFakeCard(overrides: FakeCardOptions = {}): Card {
   }
 
   return {
-    id: overrides.id || "card-in-deck-id",
+    id: overrides.id || shortid(),
     raw_text:
       typeof overrides.rawText === "string" ? overrides.rawText : "raw text",
     section: overrides.section || "commanders",

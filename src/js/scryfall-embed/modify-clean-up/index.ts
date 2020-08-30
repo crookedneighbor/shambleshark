@@ -3,12 +3,17 @@ import { BUS_EVENTS as events } from "Constants";
 import scryfall from "../scryfall-globals";
 import { hasDedicatedLandSection, isLandCard } from "Lib/deck-parser";
 import { sortByName, sortByPrimaryCardType } from "./sorting";
-
+import {
+  addDeckTotalUpdateListener,
+  insertHeadings,
+  Headings,
+} from "./add-section-heading";
 import type { Card, Deck } from "Js/types/deck";
 type SortEntryOptions = "card-type" | "name" | "none";
 type ModifyCleanupOptions = {
   cleanUpLandsInSingleton?: boolean;
   sortEntriesPrimary?: SortEntryOptions;
+  insertSortingHeadings?: boolean;
 };
 
 const sorters = {
@@ -42,9 +47,15 @@ function correctLandNonLandColumns(deck: Deck): Promise<Card[]> {
 
 export default function modifyCleanUp(config: ModifyCleanupOptions = {}): void {
   const oldCleanup = window.Scryfall.deckbuilder.cleanUp;
+  const sortChoice = config.sortEntriesPrimary;
 
-  if (config.sortEntriesPrimary && config.sortEntriesPrimary !== "none") {
-    const sorter = sorters[config.sortEntriesPrimary]();
+  if (sortChoice && sortChoice !== "none") {
+    const sorter = sorters[sortChoice]();
+    const headings: Headings = {};
+
+    if (config.insertSortingHeadings) {
+      addDeckTotalUpdateListener(sortChoice);
+    }
 
     bus.on(events.DECK_ENTRIES_UPDATED, () => {
       window.Scryfall.deckbuilder.flatSections.forEach((section) => {
@@ -52,6 +63,10 @@ export default function modifyCleanUp(config: ModifyCleanupOptions = {}): void {
       });
 
       window.Scryfall.deckbuilder.$forceUpdate();
+
+      if (config.insertSortingHeadings) {
+        insertHeadings(sortChoice, headings);
+      }
     });
   }
 
