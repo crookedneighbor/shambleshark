@@ -14,7 +14,11 @@ export function getPrimaryType(card: Card): string {
   if (!card.card_digest) {
     return "";
   }
-  const typeLine = card.card_digest.type_line.toLowerCase().split(" - ")[0];
+  const typeLine = card.card_digest.type_line
+    .toLowerCase()
+    .split(" // ")[0]
+    .split(" - ")[0]
+    .trim();
 
   return (
     TYPE_PREFERENCE_FOR_PRIMARY_TYPE.find((cardType) => {

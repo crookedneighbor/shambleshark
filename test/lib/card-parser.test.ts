@@ -169,5 +169,17 @@ describe("Card Parser", () => {
 
       expect(getPrimaryType(entry)).toBe("sorcery");
     });
+
+    it("prefers front side of card over backside", () => {
+      expect(
+        getPrimaryType(
+          makeFakeCard({
+            cardDigest: {
+              type_line: "Sorcery // Creature",
+            },
+          })
+        )
+      ).toBe("sorcery");
+    });
   });
 });
