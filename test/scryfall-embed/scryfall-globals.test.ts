@@ -130,6 +130,7 @@ describe("Scryfall Globals", function () {
     });
 
     it("does not attempt to replace Scryfall.deckbuilder.cleanUp if Scryfall.deckbuilder global is not available", function () {
+      // @ts-ignore
       delete ScryfallSpy.deckbuilder;
 
       expect(() => {
@@ -138,6 +139,7 @@ describe("Scryfall Globals", function () {
     });
 
     it("does not attempt to replace ScryfallAPI methods if Scryfall API is not availabel", function () {
+      // @ts-ignore
       delete window.ScryfallAPI;
 
       expect(() => {
@@ -156,6 +158,7 @@ describe("Scryfall Globals", function () {
     it("waits progressively longer for grant secret", async function () {
       let hasResolved = false;
       jest.useFakeTimers();
+      // @ts-ignore
       delete ScryfallAPISpy.grantSecret;
 
       const getActiveDeckIdPromise = getActiveDeckId().then(() => {

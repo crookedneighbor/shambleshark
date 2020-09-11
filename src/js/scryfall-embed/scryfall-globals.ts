@@ -28,6 +28,7 @@ export type ScryfallAPIGlobal = {
   decks: Record<string, ScryfallFunction>;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 declare global {
   interface Window {
     Scryfall: ScryfallGlobal;

@@ -92,6 +92,7 @@ describe("sort.sortByAttribute", function () {
 
   it("if one value is defined and the other is undefined, it does not throw and prefers the truthy value", function () {
     const handler = sortByAttribute(["id"]);
+    // @ts-ignore
     delete array[0].id;
 
     array.sort(handler);

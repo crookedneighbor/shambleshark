@@ -4,6 +4,7 @@ describe("url", function () {
   const { location } = window;
 
   beforeEach(function () {
+    // @ts-ignore
     delete window.location;
     // we have to do this to succesfully mock window.location without ts being mad at us
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
