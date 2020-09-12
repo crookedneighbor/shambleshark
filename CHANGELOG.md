@@ -4,7 +4,7 @@
 
 - Cleanup Improver
   - Add feature to keep deck organized by specific settings
-  - Add feature to include headings in deck organization
+  - Add feature to include headings in deck organization (#32)
 - Price Options
   - Add feature to display no price on deck view page (#68)
 
