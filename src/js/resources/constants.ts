@@ -17,6 +17,7 @@ export const FEATURE_IDS = {
 
   // Deck Display
   DeckDisplay: "deck-display",
+  PriceOptions: "price-options",
   TokenList: "token-list",
 
   // Search results
