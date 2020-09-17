@@ -43,7 +43,7 @@ describe("Card Input Modifier", function () {
     );
   });
 
-  it("does not set tooltip image if id is not in image cache", function () {
+  it("sets tooltip image to empty string if id is not in image cache", () => {
     const el = document.createElement("div");
     el.setAttribute("data-entry", "id");
 
@@ -51,7 +51,7 @@ describe("Card Input Modifier", function () {
 
     cim.tooltip.triggerOnMouseover(el);
 
-    expect(cim.tooltip.setImage).not.toBeCalled();
+    expect(cim.tooltip.setImage).toBeCalledWith("");
   });
 
   describe("run", function () {

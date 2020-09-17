@@ -58,6 +58,7 @@ class CardInputModifier extends Feature {
         const img = id && this.imageCache[id];
 
         if (!img) {
+          this.tooltip.setImage("");
           return;
         }
 

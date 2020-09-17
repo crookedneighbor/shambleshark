@@ -2,6 +2,8 @@
 
 # unreleased
 
+- Card Input Modifier
+  - Fix issue where newly created card entry would show incorrect card image (closes #64)
 - Cleanup Improver
   - Add feature to keep deck organized by specific settings
   - Add feature to include headings in deck organization (#32)
