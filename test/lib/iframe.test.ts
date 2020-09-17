@@ -1,9 +1,9 @@
 import wait from "Lib/wait";
 import { create, isInsideIframe } from "Lib/iframe";
 
-describe("iframe", function () {
-  describe("create", function () {
-    it("creates an iframe that resolves when it loads", async function () {
+describe("iframe", () => {
+  describe("create", () => {
+    it("creates an iframe that resolves when it loads", async () => {
       const fakeIframe = document.createElement("iframe");
       jest
         .spyOn(fakeIframe, "addEventListener")
@@ -28,14 +28,14 @@ describe("iframe", function () {
     });
   });
 
-  describe("isInsideIframe", function () {
-    it("returns false when parent location is identitical to window location", function () {
+  describe("isInsideIframe", () => {
+    it("returns false when parent location is identitical to window location", () => {
       expect(window.location).toEqual(window.parent.location);
 
       expect(isInsideIframe()).toBe(false);
     });
 
-    it("returns true when parent location is not identitical to window location", function () {
+    it("returns true when parent location is not identitical to window location", () => {
       Object.defineProperty(window, "parent", {
         writable: true,
         value: {

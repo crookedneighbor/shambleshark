@@ -4,7 +4,7 @@ import link from "Browser/extensions-link";
 
 import "./contact-page.css";
 
-export default function (): void {
+export default function renderContactPageMessage(): void {
   elementReady(".control-panel-content", (panel) => {
     const warning = createElement(`<div class="form-n">
       <h1 class="form-n-title">IMPORTANT! Read this first!</h1>

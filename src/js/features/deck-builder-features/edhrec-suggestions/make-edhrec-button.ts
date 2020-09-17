@@ -118,7 +118,7 @@ function createEDHRecResponseHandler(
   drawer: Drawer,
   deck: Deck
 ): EDHRecResponseHandler {
-  return function (result) {
+  return (result) => {
     if (result.errors) {
       createErrorDrawerState(drawer, result.errors);
       return;
@@ -174,8 +174,8 @@ function createEDHRecResponseHandler(
       section.cards.push(card);
     });
 
-    TYPE_ORDER.forEach(function (type) {
-      const section = sections[type];
+    TYPE_ORDER.forEach((cardType) => {
+      const section = sections[cardType];
 
       if (!section) {
         return;

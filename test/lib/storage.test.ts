@@ -1,7 +1,7 @@
 import { get, set } from "Lib/storage";
 
-describe("storage", function () {
-  beforeEach(function () {
+describe("storage", () => {
+  beforeEach(() => {
     // TODO probably should do this better
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (window.chrome as any) = {
@@ -22,8 +22,8 @@ describe("storage", function () {
     };
   });
 
-  describe("get", function () {
-    it("calls out to chrome get function", async function () {
+  describe("get", () => {
+    it("calls out to chrome get function", async () => {
       const result = await get("foo");
 
       expect(result).toBe("bar");
@@ -35,8 +35,8 @@ describe("storage", function () {
     });
   });
 
-  describe("set", function () {
-    it("calls out to chrome set function", async function () {
+  describe("set", () => {
+    it("calls out to chrome set function", async () => {
       await set("foo", "bar");
 
       expect(window.chrome.storage.sync.set).toBeCalledTimes(1);

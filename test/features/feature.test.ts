@@ -8,8 +8,8 @@ jest.mock("Lib/storage");
 const getSpy = mocked(storage.get);
 const setSpy = mocked(storage.set);
 
-describe("Base Feature", function () {
-  describe("enable", function () {
+describe("Base Feature", () => {
+  describe("enable", () => {
     class FeatureThatEnables extends Feature {
       static metadata = {
         id: "feature-that-enables",
@@ -23,7 +23,7 @@ describe("Base Feature", function () {
       }
     }
 
-    it("sets enabled property for feature on storage", async function () {
+    it("sets enabled property for feature on storage", async () => {
       jest
         .spyOn(FeatureThatEnables, "saveSetting")
         .mockResolvedValue(undefined);
@@ -34,7 +34,7 @@ describe("Base Feature", function () {
     });
   });
 
-  describe("disable", function () {
+  describe("disable", () => {
     class FeatureThatDisables extends Feature {
       static metadata = {
         id: "feature-that-disables",
@@ -48,7 +48,7 @@ describe("Base Feature", function () {
       }
     }
 
-    it("saves feature on storage", async function () {
+    it("saves feature on storage", async () => {
       jest
         .spyOn(FeatureThatDisables, "saveSetting")
         .mockResolvedValue(undefined);
@@ -59,7 +59,7 @@ describe("Base Feature", function () {
     });
   });
 
-  describe("isEnabled", function () {
+  describe("isEnabled", () => {
     class FeatureThatReportsIfItsEnabled extends Feature {
       static metadata = {
         id: "feature-that-reports",
@@ -73,7 +73,7 @@ describe("Base Feature", function () {
       }
     }
 
-    it("resolves to true if feature is enabled", async function () {
+    it("resolves to true if feature is enabled", async () => {
       jest
         .spyOn(FeatureThatReportsIfItsEnabled, "getSettings")
         .mockResolvedValue({
@@ -87,7 +87,7 @@ describe("Base Feature", function () {
       expect(FeatureThatReportsIfItsEnabled.getSettings).toBeCalledTimes(1);
     });
 
-    it("resolves to false if feature is disabled", async function () {
+    it("resolves to false if feature is disabled", async () => {
       jest
         .spyOn(FeatureThatReportsIfItsEnabled, "getSettings")
         .mockResolvedValue({
@@ -102,7 +102,7 @@ describe("Base Feature", function () {
     });
   });
 
-  describe("getSettings", function () {
+  describe("getSettings", () => {
     class FeatureWithSavedSettings extends Feature {
       static metadata = {
         id: "feature-with-saved",
@@ -135,7 +135,7 @@ describe("Base Feature", function () {
       }
     }
 
-    it("calls out to storage for settings", async function () {
+    it("calls out to storage for settings", async () => {
       getSpy.mockResolvedValue({
         foo: "value1",
         baz: "value2",
@@ -149,7 +149,7 @@ describe("Base Feature", function () {
       expect(settings.baz).toBe("value2");
     });
 
-    it("applies defaults when param is not available", async function () {
+    it("applies defaults when param is not available", async () => {
       getSpy.mockResolvedValue({
         foo: "value1",
       });
@@ -162,7 +162,7 @@ describe("Base Feature", function () {
       expect(settings.baz).toBe("buz");
     });
 
-    it("applies defaults when existing settingsa re not available and future opt in setting is not available", async function () {
+    it("applies defaults when existing settingsa re not available and future opt in setting is not available", async () => {
       getSpy.mockResolvedValueOnce(null);
       getSpy.mockResolvedValueOnce(null);
 
@@ -176,7 +176,7 @@ describe("Base Feature", function () {
       expect(settings.baz).toBe("buz");
     });
 
-    it("applies defaults when existing settings are not available and future opt in setting is enabled", async function () {
+    it("applies defaults when existing settings are not available and future opt in setting is enabled", async () => {
       getSpy.mockResolvedValueOnce(null);
       getSpy.mockResolvedValueOnce({
         enabled: true,
@@ -192,7 +192,7 @@ describe("Base Feature", function () {
       expect(settings.baz).toBe("buz");
     });
 
-    it('saves it as enabled "false" when no previous settings are present and future opt in is disabled', async function () {
+    it('saves it as enabled "false" when no previous settings are present and future opt in is disabled', async () => {
       getSpy.mockResolvedValueOnce(null);
       getSpy.mockResolvedValueOnce({
         enabled: false,
@@ -210,7 +210,7 @@ describe("Base Feature", function () {
       expect(settings.enabled).toBe(false);
     });
 
-    it('saves it as enabled "true" when no previous settings are present and future opt in is enabled', async function () {
+    it('saves it as enabled "true" when no previous settings are present and future opt in is enabled', async () => {
       getSpy.mockResolvedValueOnce(null);
       getSpy.mockResolvedValueOnce({
         enabled: true,
@@ -228,7 +228,7 @@ describe("Base Feature", function () {
       expect(settings.enabled).toBe(true);
     });
 
-    it('does not save it as enabled "false" if feature is a future feature', async function () {
+    it('does not save it as enabled "false" if feature is a future feature', async () => {
       getSpy.mockResolvedValueOnce(null);
       getSpy.mockResolvedValueOnce({
         enabled: false,
@@ -243,7 +243,7 @@ describe("Base Feature", function () {
       expect(settings.enabled).toBe(false);
     });
 
-    it("resolves with enabled false if feature is a future feature", async function () {
+    it("resolves with enabled false if feature is a future feature", async () => {
       getSpy.mockResolvedValueOnce(null);
       getSpy.mockResolvedValueOnce({
         enabled: true,
@@ -259,7 +259,7 @@ describe("Base Feature", function () {
     });
   });
 
-  describe("saveSetting", function () {
+  describe("saveSetting", () => {
     class FeatureThatSavesSettings extends Feature {
       static metadata = {
         id: "feature-that-saves",
@@ -278,7 +278,7 @@ describe("Base Feature", function () {
       }
     }
 
-    it("grabs previously saved settings and overwrites the single property", async function () {
+    it("grabs previously saved settings and overwrites the single property", async () => {
       jest.spyOn(FeatureThatSavesSettings, "getSettings").mockResolvedValue({
         foo: "bar",
         baz: "buz",
@@ -293,7 +293,7 @@ describe("Base Feature", function () {
       });
     });
 
-    it("rejects if attempting to set a property that does not exist in defaults", async function () {
+    it("rejects if attempting to set a property that does not exist in defaults", async () => {
       let error;
 
       jest.spyOn(FeatureThatSavesSettings, "getSettings").mockResolvedValue({
@@ -316,7 +316,7 @@ describe("Base Feature", function () {
     });
   });
 
-  describe("saveData", function () {
+  describe("saveData", () => {
     class SubFeature extends Feature {
       static metadata = {
         id: "sub-id",
@@ -330,7 +330,7 @@ describe("Base Feature", function () {
       }
     }
 
-    it("sets storage with metadata id", async function () {
+    it("sets storage with metadata id", async () => {
       const data = {};
 
       await SubFeature.saveData("some-id", data);
@@ -340,7 +340,7 @@ describe("Base Feature", function () {
     });
   });
 
-  describe("getData", function () {
+  describe("getData", () => {
     class SubFeature extends Feature {
       static metadata = {
         id: "sub-id",
@@ -354,7 +354,7 @@ describe("Base Feature", function () {
       }
     }
 
-    it("gets storage with metadata id", async function () {
+    it("gets storage with metadata id", async () => {
       await SubFeature.getData("some-id");
 
       expect(getSpy).toBeCalledTimes(1);

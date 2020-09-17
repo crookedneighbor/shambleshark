@@ -11,21 +11,21 @@ import { makeFakeDeck } from "Helpers/fake";
 jest.mock("framebus");
 jest.mock("scryfall-client");
 
-describe("scryfall", function () {
-  describe("getDeck", function () {
+describe("scryfall", () => {
+  describe("getDeck", () => {
     let emitSpy: jest.SpyInstance;
 
-    beforeEach(function () {
+    beforeEach(() => {
       jest.useFakeTimers();
       emitSpy = mocked(bus.emit);
     });
 
-    afterEach(function () {
+    afterEach(() => {
       jest.runAllTimers();
       emitSpy.mockReset();
     });
 
-    it("requests deck from Scryfall page", async function () {
+    it("requests deck from Scryfall page", async () => {
       const deck = makeFakeDeck();
 
       emitSpy.mockImplementation((event, cb) => {
@@ -38,7 +38,7 @@ describe("scryfall", function () {
       expect(bus.emit).toBeCalledWith("REQUEST_DECK", expect.any(Function));
     });
 
-    it("caches result if request is made a second time within 2 seconds", async function () {
+    it("caches result if request is made a second time within 2 seconds", async () => {
       const firstDeck = makeFakeDeck();
       const secondDeck = makeFakeDeck();
 
@@ -68,11 +68,11 @@ describe("scryfall", function () {
     });
   });
 
-  describe("getCollection", function () {
+  describe("getCollection", () => {
     let fakeCards: { id: string }[];
     let getCollectionSpy: SpyInstance;
 
-    beforeEach(function () {
+    beforeEach(() => {
       fakeCards = [{ id: "foo" }];
 
       getCollectionSpy = mocked(scryfall.getCollection).mockResolvedValue(
@@ -80,7 +80,7 @@ describe("scryfall", function () {
       );
     });
 
-    it("looks up collection endpoint", async function () {
+    it("looks up collection endpoint", async () => {
       const cards = await getCollection([
         {
           set: "DOM",

@@ -14,7 +14,7 @@ const TYPE_ORDER = [
 ];
 
 export function sortByName(): CardSorter {
-  return function (first: Card, second: Card): number {
+  return (first: Card, second: Card): number => {
     if (!first.card_digest) {
       return 1;
     }
@@ -36,7 +36,7 @@ export function sortByName(): CardSorter {
 }
 
 export function sortByPrimaryCardType(): CardSorter {
-  return function (first: Card, second: Card): number {
+  return (first: Card, second: Card): number => {
     if (!first.card_digest) {
       return 1;
     }

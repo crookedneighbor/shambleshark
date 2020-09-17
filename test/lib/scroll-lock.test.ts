@@ -1,11 +1,11 @@
 import scrollLock from "Lib/scroll-lock";
 
-describe("scrollLock", function () {
-  beforeEach(function () {
+describe("scrollLock", () => {
+  beforeEach(() => {
     (window.scrollTo as jest.Mock).mockClear();
   });
 
-  it("freezes body to scrollY position when locked is set to true", function () {
+  it("freezes body to scrollY position when locked is set to true", () => {
     Object.defineProperty(window, "scrollY", {
       writable: true,
       value: 13,
@@ -21,7 +21,7 @@ describe("scrollLock", function () {
     expect(document.body.style.top).toEqual("-13px");
   });
 
-  it("resets body and scrolls to position when locked is set to false", function () {
+  it("resets body and scrolls to position when locked is set to false", () => {
     document.body.style.width = "100%";
     document.body.style.position = "fixed";
     document.body.style.top = "-13px";
@@ -35,7 +35,7 @@ describe("scrollLock", function () {
     expect(window.scrollTo).toBeCalledWith(0, 13);
   });
 
-  it("does not scroll if body has no top attribute when locked is set to false", function () {
+  it("does not scroll if body has no top attribute when locked is set to false", () => {
     document.body.style.top = "";
 
     scrollLock(false);

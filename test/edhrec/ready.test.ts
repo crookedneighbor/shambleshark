@@ -7,11 +7,11 @@ import { mocked } from "ts-jest/utils";
 
 jest.mock("framebus");
 
-describe("EDHRec Ready", function () {
+describe("EDHRec Ready", () => {
   let replySpy: jest.Mock;
   let fetchSpy: jest.Mock;
 
-  beforeEach(function () {
+  beforeEach(() => {
     jest.spyOn(iframe, "isInsideIframe").mockReturnValue(true);
 
     type ReplyType = (res: Record<string, string[]>, reply: jest.Mock) => void;
@@ -39,12 +39,12 @@ describe("EDHRec Ready", function () {
     );
   });
 
-  afterEach(async function () {
+  afterEach(async () => {
     // allow pending promises to resolve
     await wait();
   });
 
-  it("does not listen for recomendations if not in an iframe", function () {
+  it("does not listen for recomendations if not in an iframe", () => {
     (iframe.isInsideIframe as jest.Mock).mockReturnValue(false);
 
     start();
@@ -52,7 +52,7 @@ describe("EDHRec Ready", function () {
     expect(bus.on).not.toBeCalled();
   });
 
-  it("listens for recomendations", function () {
+  it("listens for recomendations", () => {
     start();
 
     expect(bus.on).toBeCalledTimes(1);
@@ -62,7 +62,7 @@ describe("EDHRec Ready", function () {
     );
   });
 
-  it("requests recomendations from edhrec", function () {
+  it("requests recomendations from edhrec", () => {
     start();
 
     expect(window.fetch).toBeCalledTimes(1);
@@ -79,7 +79,7 @@ describe("EDHRec Ready", function () {
     });
   });
 
-  it("replies with response from edhrec", async function () {
+  it("replies with response from edhrec", async () => {
     start();
 
     // let request promise resolve
@@ -89,7 +89,7 @@ describe("EDHRec Ready", function () {
     expect(replySpy).toBeCalledWith("result");
   });
 
-  it("sends back errors if request to edhrec resolves with errors", async function () {
+  it("sends back errors if request to edhrec resolves with errors", async () => {
     fetchSpy.mockResolvedValue({
       errors: ["1 error", "2 error"],
     });
@@ -107,7 +107,7 @@ describe("EDHRec Ready", function () {
     );
   });
 
-  it("sends back error in array if request to edhrec fails", async function () {
+  it("sends back error in array if request to edhrec fails", async () => {
     const err = new Error("fetch error");
 
     (window.fetch as jest.Mock).mockRejectedValue(err);

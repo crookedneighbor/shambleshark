@@ -10,13 +10,13 @@ import { mocked } from "ts-jest/utils";
 jest.mock("Lib/scryfall");
 jest.mock("Lib/mutation");
 
-describe("EDHRec Suggestions", function () {
-  describe("run", function () {
+describe("EDHRec Suggestions", () => {
+  describe("run", () => {
     let toolbar: HTMLDivElement;
     let getDeckSpy: SpyInstance;
     let readySpy: SpyInstance;
 
-    beforeEach(function () {
+    beforeEach(() => {
       getDeckSpy = mocked(getDeck);
       toolbar = document.createElement("div");
       toolbar.classList.add("deckbuilder-toolbar-items-right");
@@ -46,7 +46,7 @@ describe("EDHRec Suggestions", function () {
       jest.spyOn(iframe, "create").mockImplementation();
     });
 
-    it("adds an edhrec button to the toolbar items on the page for a commander deck", async function () {
+    it("adds an edhrec button to the toolbar items on the page for a commander deck", async () => {
       const feature = new EDHRecSuggestions();
 
       await feature.run();
@@ -54,7 +54,7 @@ describe("EDHRec Suggestions", function () {
       expect(toolbar.querySelector("#edhrec-suggestions")).not.toBeFalsy();
     });
 
-    it("does not add an edhrec button to the toolbar items on the page for a non-commander deck", async function () {
+    it("does not add an edhrec button to the toolbar items on the page for a non-commander deck", async () => {
       const feature = new EDHRecSuggestions();
 
       readySpy.mockImplementation((selector, cb) => {

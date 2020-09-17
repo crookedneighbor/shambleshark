@@ -18,15 +18,15 @@ class ChildDialog extends DialogInterface {
   }
 }
 
-describe("DialogInterface", function () {
-  describe("element", function () {
-    it("hides the dialog by default", function () {
+describe("DialogInterface", () => {
+  describe("element", () => {
+    it("hides the dialog by default", () => {
       const dialog = new ChildDialog();
 
       expect(dialog.element.style.display).toBe("none");
     });
 
-    it("can opt into showing the dialog", function () {
+    it("can opt into showing the dialog", () => {
       const dialog = new ChildDialog({
         open: true,
       });
@@ -34,7 +34,7 @@ describe("DialogInterface", function () {
       expect(dialog.element.style.display).toBeFalsy();
     });
 
-    it("can provide an id", function () {
+    it("can provide an id", () => {
       const dialog = new ChildDialog({
         id: "my-id",
       });
@@ -42,7 +42,7 @@ describe("DialogInterface", function () {
       expect(dialog.element.id).toBe("my-id");
     });
 
-    it("can provide content", function () {
+    it("can provide content", () => {
       const dialog = new ChildDialog({
         content: "Some content",
       });
@@ -50,13 +50,13 @@ describe("DialogInterface", function () {
       expect(dialog.$(".dialog-content").innerText).toBe("Some content");
     });
 
-    it("does not require content", function () {
+    it("does not require content", () => {
       const dialog = new ChildDialog();
 
       expect(dialog.$(".dialog-content")!.innerHTML).toBe("");
     });
 
-    it("can provide a header", function () {
+    it("can provide a header", () => {
       const dialog = new ChildDialog({
         header: "Title",
       });
@@ -64,7 +64,7 @@ describe("DialogInterface", function () {
       expect(dialog.$(".dialog-title-content").innerText).toContain("Title");
     });
 
-    it("can provide a symbol to header", function () {
+    it("can provide a symbol to header", () => {
       const dialog = new ChildDialog({
         headerSymbol: '<div class="symbol"></div>',
         header: "Title",
@@ -74,7 +74,7 @@ describe("DialogInterface", function () {
       expect(dialog.$(".dialog-title-content").innerText).toContain("Title");
     });
 
-    it("closes when the backdrop is clicked", function () {
+    it("closes when the backdrop is clicked", () => {
       const dialog = new ChildDialog();
 
       jest.spyOn(dialog, "close").mockImplementation();
@@ -86,7 +86,7 @@ describe("DialogInterface", function () {
       expect(dialog.close).toBeCalledTimes(1);
     });
 
-    it("does not close when modal element is clicked", function () {
+    it("does not close when modal element is clicked", () => {
       const dialog = new ChildDialog();
 
       jest.spyOn(dialog, "close").mockImplementation();
@@ -98,7 +98,7 @@ describe("DialogInterface", function () {
       expect(dialog.close).toBeCalledTimes(0);
     });
 
-    it("closes when the esc key is typed", function () {
+    it("closes when the esc key is typed", () => {
       const dialog = new ChildDialog();
 
       jest.spyOn(dialog, "close").mockImplementation();
@@ -113,7 +113,7 @@ describe("DialogInterface", function () {
       expect(dialog.close).toBeCalledTimes(1);
     });
 
-    it("does not close when the esc key is typed if dialog is not opened", function () {
+    it("does not close when the esc key is typed if dialog is not opened", () => {
       const dialog = new ChildDialog();
 
       jest.spyOn(dialog, "close").mockImplementation();
@@ -127,8 +127,8 @@ describe("DialogInterface", function () {
     });
   });
 
-  describe("resetHeader", function () {
-    it("resets header after it has been changed", function () {
+  describe("resetHeader", () => {
+    it("resets header after it has been changed", () => {
       const dialog = new ChildDialog({
         header: "Some title",
       });
@@ -140,8 +140,8 @@ describe("DialogInterface", function () {
     });
   });
 
-  describe("setHeader", function () {
-    it("can write over content", function () {
+  describe("setHeader", () => {
+    it("can write over content", () => {
       const dialog = new ChildDialog({
         header: "Some title",
       });
@@ -152,8 +152,8 @@ describe("DialogInterface", function () {
     });
   });
 
-  describe("setContent", function () {
-    it("can write over content", function () {
+  describe("setContent", () => {
+    it("can write over content", () => {
       const dialog = new ChildDialog({
         content: "Some content",
       });
@@ -163,7 +163,7 @@ describe("DialogInterface", function () {
       expect(dialog.$(".dialog-content").innerText).toBe("new content");
     });
 
-    it("replaces content with DOM node when DOM node is provided", function () {
+    it("replaces content with DOM node when DOM node is provided", () => {
       const dialog = new ChildDialog({
         content: "Some content",
       });
@@ -179,13 +179,13 @@ describe("DialogInterface", function () {
     });
   });
 
-  describe("setLoading", function () {
-    beforeEach(function () {
+  describe("setLoading", () => {
+    beforeEach(() => {
       // jest doesn't know about the scrollTo method on elements
       jest.spyOn(DialogInterface.prototype, "scrollTo").mockImplementation();
     });
 
-    it("hides the spinner when setting loading to false", function () {
+    it("hides the spinner when setting loading to false", () => {
       const dialog = new ChildDialog({
         content: "Some content",
       });
@@ -196,7 +196,7 @@ describe("DialogInterface", function () {
       expect(dialog.$(".dialog-loader").style.display).toBe("none");
     });
 
-    it("scrolls up to the top when setting loading to false", function () {
+    it("scrolls up to the top when setting loading to false", () => {
       const dialog = new ChildDialog({
         content: "Some content",
       });
@@ -207,7 +207,7 @@ describe("DialogInterface", function () {
       expect(dialog.scrollTo).toBeCalledWith(0, 0);
     });
 
-    it("shows the spinner when empty content is given", function () {
+    it("shows the spinner when empty content is given", () => {
       const dialog = new ChildDialog({
         content: "Some content",
       });
@@ -221,8 +221,8 @@ describe("DialogInterface", function () {
     });
   });
 
-  describe("open", function () {
-    it("shows the dialog", function () {
+  describe("open", () => {
+    it("shows the dialog", () => {
       const dialog = new ChildDialog();
 
       expect(dialog.element.style.display).toBe("none");
@@ -232,7 +232,7 @@ describe("DialogInterface", function () {
       expect(dialog.element.style.display).toBeFalsy();
     });
 
-    it("can call an onOpen hook if specified", function () {
+    it("can call an onOpen hook if specified", () => {
       const spy = jest.fn();
       const dialog = new ChildDialog({
         onOpen: spy,
@@ -245,8 +245,8 @@ describe("DialogInterface", function () {
     });
   });
 
-  describe("close", function () {
-    it("hides the dialog", function () {
+  describe("close", () => {
+    it("hides the dialog", () => {
       const dialog = new ChildDialog({
         open: true,
       });
@@ -258,7 +258,7 @@ describe("DialogInterface", function () {
       expect(dialog.element.style.display).toBe("none");
     });
 
-    it("can reset content on close if specified", function () {
+    it("can reset content on close if specified", () => {
       const dialog = new ChildDialog({
         open: true,
         content: "original content",
@@ -274,7 +274,7 @@ describe("DialogInterface", function () {
       expect(dialog.setContent).toBeCalledWith("original content");
     });
 
-    it("can call an onClose hook if specified", function () {
+    it("can call an onClose hook if specified", () => {
       const spy = jest.fn();
       const dialog = new ChildDialog({
         open: true,
@@ -288,8 +288,8 @@ describe("DialogInterface", function () {
     });
   });
 
-  describe("scollTo", function () {
-    it("calls scrollTo on the element", function () {
+  describe("scollTo", () => {
+    it("calls scrollTo on the element", () => {
       const dialog = new ChildDialog();
 
       // jest doesn't know about scrollTo method on elements
@@ -302,8 +302,8 @@ describe("DialogInterface", function () {
     });
   });
 
-  describe("triggerOnClose", function () {
-    it("triggers onClose", function () {
+  describe("triggerOnClose", () => {
+    it("triggers onClose", () => {
       const onClose = jest.fn();
       const dialog = new ChildDialog({
         onClose,
@@ -318,8 +318,8 @@ describe("DialogInterface", function () {
     });
   });
 
-  describe("triggerOnOpen", function () {
-    it("triggers onOpen", function () {
+  describe("triggerOnOpen", () => {
+    it("triggers onOpen", () => {
       const onOpen = jest.fn();
       const dialog = new ChildDialog({
         onOpen,
@@ -334,8 +334,8 @@ describe("DialogInterface", function () {
     });
   });
 
-  describe("triggerOnScroll", function () {
-    it("triggers onScroll", function () {
+  describe("triggerOnScroll", () => {
+    it("triggers onScroll", () => {
       const onScroll = jest.fn();
       const dialog = new ChildDialog({
         onScroll,

@@ -49,7 +49,7 @@ fragment TaggingAttrs on Tagging {
   __typename
 }`;
 
-export default function (): void {
+export default function setupTaggerListeners(): void {
   if (!iframe.isInsideIframe()) {
     // no need to set listeners when not access from iframe
     return;
@@ -75,7 +75,7 @@ export default function (): void {
       xhr.open("POST", "https://tagger.scryfall.com/graphql", true);
       xhr.setRequestHeader("Content-Type", "application/json");
       xhr.setRequestHeader("X-CSRF-Token", token);
-      xhr.onreadystatechange = function () {
+      xhr.onreadystatechange = () => {
         if (xhr.readyState === 4 && xhr.status === 200) {
           const json = JSON.parse(xhr.responseText);
           reply(json.data.card);

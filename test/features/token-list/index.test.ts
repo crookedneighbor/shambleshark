@@ -10,21 +10,21 @@ jest.mock("Lib/scryfall");
 jest.mock("Lib/mutation");
 
 // TODO mock modal class
-describe("Token List", function () {
+describe("Token List", () => {
   let tl: TokenList;
 
-  beforeEach(function () {
+  beforeEach(() => {
     tl = new TokenList();
   });
 
-  describe("run", function () {
+  describe("run", () => {
     let elements: HTMLElement[], container: HTMLDivElement;
 
     let readySpy: jest.SpyInstance;
     let getCardElementsSpy: jest.SpyInstance;
     let generateTokenCollectionSpy: jest.SpyInstance;
 
-    beforeEach(function () {
+    beforeEach(() => {
       container = document.createElement("div") as HTMLDivElement;
       readySpy = mocked(ready).mockImplementation((selector, cb) => {
         cb(container);
@@ -43,7 +43,7 @@ describe("Token List", function () {
       jest.spyOn(tl, "addToUI").mockImplementation();
     });
 
-    it("waits for shambleshark sidebar to be on the dom", async function () {
+    it("waits for shambleshark sidebar to be on the dom", async () => {
       readySpy.mockImplementation();
 
       await tl.run();
@@ -61,7 +61,7 @@ describe("Token List", function () {
       expect(tl.createUI).toBeCalled();
     });
 
-    it("creates card elements", async function () {
+    it("creates card elements", async () => {
       await tl.run();
 
       await wait();
@@ -69,7 +69,7 @@ describe("Token List", function () {
       expect(getCardElementsSpy).toBeCalledTimes(1);
     });
 
-    it("prefetches tokens", async function () {
+    it("prefetches tokens", async () => {
       await tl.run();
 
       await wait();
@@ -77,7 +77,7 @@ describe("Token List", function () {
       expect(generateTokenCollectionSpy).toBeCalledTimes(1);
     });
 
-    it("does not prefetch tokens if there are more than 150 elements to look up", async function () {
+    it("does not prefetch tokens if there are more than 150 elements to look up", async () => {
       let i = 0;
       while (i < 151) {
         elements.push(document.createElement("div"));
@@ -91,26 +91,26 @@ describe("Token List", function () {
     });
   });
 
-  describe("createUI", function () {
+  describe("createUI", () => {
     let container: HTMLDivElement;
 
-    beforeEach(function () {
+    beforeEach(() => {
       container = document.createElement("div");
     });
 
-    it("adds token list button to UI", function () {
+    it("adds token list button to UI", () => {
       tl.createUI(container);
 
       expect(container.querySelector("button.button-n")).toBeTruthy();
     });
 
-    it("adds modal", function () {
+    it("adds modal", () => {
       tl.createUI(container);
 
       expect(tl.modal).toBeTruthy();
     });
 
-    it("opens the modal when token list button is clicked", function () {
+    it("opens the modal when token list button is clicked", () => {
       tl.createUI(container);
 
       const openSpy = jest
@@ -126,7 +126,7 @@ describe("Token List", function () {
       expect(openSpy).toBeCalledTimes(1);
     });
 
-    it("adds tokens to modal when it opens", async function () {
+    it("adds tokens to modal when it opens", async () => {
       const tokens: Card[] = [];
 
       tl.createUI(container);
@@ -144,7 +144,7 @@ describe("Token List", function () {
       expect(tl.modal?.setLoading).toBeCalledWith(false);
     });
 
-    it("refocuses button when it closes", function () {
+    it("refocuses button when it closes", () => {
       tl.createUI(container);
 
       const btn = container.querySelector(
@@ -158,12 +158,12 @@ describe("Token List", function () {
     });
   });
 
-  describe("addToUI", function () {
+  describe("addToUI", () => {
     let tokens: Card[];
 
     let setContentSpy: jest.SpyInstance;
 
-    beforeEach(function () {
+    beforeEach(() => {
       const container = document.createElement("div");
       tokens = [
         ({
@@ -189,7 +189,7 @@ describe("Token List", function () {
         .mockImplementation();
     });
 
-    it("adds a message if no tokens were found", function () {
+    it("adds a message if no tokens were found", () => {
       tokens = [];
 
       tl.addToUI(tokens);
@@ -199,7 +199,7 @@ describe("Token List", function () {
       expect(el.innerHTML).toBe("No tokens detected.");
     });
 
-    it("adds tokens to modal", function () {
+    it("adds tokens to modal", () => {
       tl.addToUI(tokens);
 
       const el = setContentSpy.mock.calls[0][0];
@@ -218,7 +218,7 @@ describe("Token List", function () {
       expect(tokenEls[1].querySelector("img").alt).toBe("Token 2");
     });
 
-    it("adds tokens to modal only once", function () {
+    it("adds tokens to modal only once", () => {
       tl.addToUI(tokens);
       tl.addToUI(tokens);
       tl.addToUI(tokens);
@@ -228,8 +228,8 @@ describe("Token List", function () {
     });
   });
 
-  describe("parseSetAndCollectorNumber", function () {
-    it("parses a scryfall url into a set and collector number", function () {
+  describe("parseSetAndCollectorNumber", () => {
+    it("parses a scryfall url into a set and collector number", () => {
       expect(
         tl.parseSetAndCollectorNumber("https://scryfall.com/card/dom/102")
       ).toEqual({
@@ -239,10 +239,10 @@ describe("Token List", function () {
     });
   });
 
-  describe("flattenTokenCollection", function () {
+  describe("flattenTokenCollection", () => {
     let tokenCollection: Card[][];
 
-    beforeEach(function () {
+    beforeEach(() => {
       tokenCollection = [
         [],
         [
@@ -271,7 +271,7 @@ describe("Token List", function () {
       ];
     });
 
-    it("flattens multidimensional array to single array", function () {
+    it("flattens multidimensional array to single array", () => {
       const tokens = tl.flattenTokenCollection(tokenCollection);
 
       expect(tokens).toEqual([
@@ -290,7 +290,7 @@ describe("Token List", function () {
       ]);
     });
 
-    it("alphebetizes by name", function () {
+    it("alphebetizes by name", () => {
       tokenCollection[1].push(({
         oracle_id: "alpha-token-id",
         name: "Alpha Token",
@@ -319,7 +319,7 @@ describe("Token List", function () {
       ]);
     });
 
-    it("removes duplicate ids", function () {
+    it("removes duplicate ids", () => {
       tokenCollection[2].push(({
         oracle_id: "id-1",
         name: "Token 1",
@@ -345,15 +345,15 @@ describe("Token List", function () {
     });
   });
 
-  describe("lookupTokens", function () {
+  describe("lookupTokens", () => {
     let getCollectionSpy: jest.SpyInstance;
 
-    beforeEach(function () {
+    beforeEach(() => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       getCollectionSpy = mocked(getCollection).mockResolvedValue([] as any);
     });
 
-    it("calls getCollection", async function () {
+    it("calls getCollection", async () => {
       await tl.lookupTokens([
         {
           set: "dom",
@@ -370,7 +370,7 @@ describe("Token List", function () {
       ]);
     });
 
-    it("resolves with array of the results of each card's getTokens call", async function () {
+    it("resolves with array of the results of each card's getTokens call", async () => {
       const fakeToken1 = [{ id: 1 }, { id: 2 }, { id: 3 }];
       const fakeToken2 = [{ id: 4 }];
       const spy1 = jest.fn().mockResolvedValue(fakeToken1);
@@ -409,10 +409,10 @@ describe("Token List", function () {
     });
   });
 
-  describe("getCardElements", function () {
+  describe("getCardElements", () => {
     let parentElement: HTMLDivElement;
 
-    beforeEach(function () {
+    beforeEach(() => {
       jest.spyOn(document, "querySelectorAll");
 
       const makeEl = (url: string) => {
@@ -434,7 +434,7 @@ describe("Token List", function () {
       document.body.appendChild(parentElement);
     });
 
-    it("looks for elements in deck entry view", function () {
+    it("looks for elements in deck entry view", () => {
       tl.getCardElements();
 
       expect(document.querySelectorAll).toBeCalledTimes(1);
@@ -447,7 +447,7 @@ describe("Token List", function () {
       expect(tl.elements![1].href).toBe("https://scryfall.com/card/kld/184");
     });
 
-    it("uses visual deck mode to find tokens when deck list entry comes up empty", async function () {
+    it("uses visual deck mode to find tokens when deck list entry comes up empty", async () => {
       parentElement.className = "";
       parentElement.querySelectorAll("a").forEach((el) => {
         el.className = "card-grid-item-card";
@@ -466,7 +466,7 @@ describe("Token List", function () {
       expect(tl.elements![1].href).toBe("https://scryfall.com/card/kld/184");
     });
 
-    it("sets elements to empty array when none can be found", async function () {
+    it("sets elements to empty array when none can be found", async () => {
       parentElement.className = "";
 
       await tl.getCardElements();
@@ -481,11 +481,11 @@ describe("Token List", function () {
     });
   });
 
-  describe("generateTokenCollection", function () {
+  describe("generateTokenCollection", () => {
     let lookupTokensSpy: jest.SpyInstance;
     let flattenTokenCollectionSpy: jest.SpyInstance;
 
-    beforeEach(function () {
+    beforeEach(() => {
       lookupTokensSpy = jest.spyOn(tl, "lookupTokens").mockResolvedValue([]);
       flattenTokenCollectionSpy = jest
         .spyOn(tl, "flattenTokenCollection")
@@ -500,7 +500,7 @@ describe("Token List", function () {
       ] as HTMLAnchorElement[];
     });
 
-    it("looks up tokens with elements", async function () {
+    it("looks up tokens with elements", async () => {
       const tokenCollection = [[{ id: "token" }]];
       const result: Card[] = [];
 
@@ -526,7 +526,7 @@ describe("Token List", function () {
       expect(tokens).toEqual(result);
     });
 
-    it("noops if no elements available", async function () {
+    it("noops if no elements available", async () => {
       tl.elements = [];
       const tokens = await tl.generateTokenCollection();
 

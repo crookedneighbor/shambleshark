@@ -1,14 +1,14 @@
 import DialogInterface from "Ui/dialog-interface";
 import Modal from "Ui/modal";
 
-describe("Modal", function () {
-  it("is a DialogInterface", function () {
+describe("Modal", () => {
+  it("is a DialogInterface", () => {
     const modal = new Modal();
 
     expect(modal).toBeInstanceOf(DialogInterface);
   });
 
-  it("creates a scryfall style modal", function () {
+  it("creates a scryfall style modal", () => {
     const modal = new Modal();
 
     expect(modal.$(".modal-dialog")).not.toBeFalsy();
@@ -16,7 +16,7 @@ describe("Modal", function () {
     expect(modal.$(".modal-dialog-close")).not.toBeFalsy();
   });
 
-  it("closes when the close button is clicked", function () {
+  it("closes when the close button is clicked", () => {
     const modal = new Modal();
     const close = modal.$(".modal-dialog-close");
 
@@ -27,7 +27,7 @@ describe("Modal", function () {
     expect(modal.close).toBeCalledTimes(1);
   });
 
-  it("has default loading label", function () {
+  it("has default loading label", () => {
     const modal = new Modal();
 
     expect(modal.$(".dialog-loader").getAttribute("aria-label")).toBe(
@@ -35,7 +35,7 @@ describe("Modal", function () {
     );
   });
 
-  it("can provide a loading label", function () {
+  it("can provide a loading label", () => {
     const modal = new Modal({
       loadingMessage: "Custom Loading Message",
     });

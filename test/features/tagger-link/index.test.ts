@@ -26,12 +26,12 @@ import { mocked } from "ts-jest/utils";
 jest.mock("framebus");
 jest.mock("Lib/mutation");
 
-describe("Tagger Link", function () {
-  describe("run", function () {
+describe("Tagger Link", () => {
+  describe("run", () => {
     let busSpy: SpyInstance;
     let settingsSpy: SpyInstance;
 
-    beforeEach(function () {
+    beforeEach(() => {
       type FramebusMockCallback = (
         data: Record<string, string>,
         cb: () => void
@@ -51,7 +51,7 @@ describe("Tagger Link", function () {
       });
     });
 
-    it("fetches tagger metadata", async function () {
+    it("fetches tagger metadata", async () => {
       const tl = new TaggerLink();
 
       await tl.run();
@@ -59,7 +59,7 @@ describe("Tagger Link", function () {
       expect(TaggerLink.getSettings).toBeCalledTimes(1);
     });
 
-    it("when previewTags setting is true, waits for Tager to emit ready event", async function () {
+    it("when previewTags setting is true, waits for Tager to emit ready event", async () => {
       busSpy.mockImplementation();
 
       const tl = new TaggerLink();
@@ -75,7 +75,7 @@ describe("Tagger Link", function () {
       expect(tl.setupButtons).toBeCalledTimes(1);
     });
 
-    it("when previewTags setting is true, adds an iframe to communicate with tagger", async function () {
+    it("when previewTags setting is true, adds an iframe to communicate with tagger", async () => {
       const tl = new TaggerLink();
 
       await tl.run();
@@ -87,7 +87,7 @@ describe("Tagger Link", function () {
       });
     });
 
-    it("when previewTags setting is false, skips setting up Tagger iframe", async function () {
+    it("when previewTags setting is false, skips setting up Tagger iframe", async () => {
       const tl = new TaggerLink();
 
       settingsSpy.mockResolvedValue({
@@ -101,17 +101,17 @@ describe("Tagger Link", function () {
     });
   });
 
-  describe("setupButtons", function () {
+  describe("setupButtons", () => {
     let readySpy: SpyInstance;
 
-    beforeEach(function () {
+    beforeEach(() => {
       readySpy = mocked(ready);
       jest
         .spyOn(TaggerLink.prototype, "makeButton")
         .mockReturnValue(document.createElement("a"));
     });
 
-    it("listens for new card grid items", async function () {
+    it("listens for new card grid items", async () => {
       const tl = new TaggerLink();
 
       await tl.setupButtons();
@@ -123,7 +123,7 @@ describe("Tagger Link", function () {
       );
     });
 
-    it("adds a button to .card-grid-item", async function () {
+    it("adds a button to .card-grid-item", async () => {
       const tl = new TaggerLink();
       const el = document.createElement("div");
       el.classList.add("card-grid-item");

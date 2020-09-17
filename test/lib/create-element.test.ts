@@ -1,7 +1,7 @@
 import createElement from "Lib/create-element";
 
-describe("createElement", function () {
-  it("creates an element", function () {
+describe("createElement", () => {
+  it("creates an element", () => {
     const div = createElement('<div id="foo"></div>');
 
     document.body.appendChild(div);
@@ -9,7 +9,7 @@ describe("createElement", function () {
     expect(document.getElementById("foo")).toBeTruthy();
   });
 
-  it("pulls tags from body by default", function () {
+  it("pulls tags from body by default", () => {
     const div = createElement('<style id="style"></style><div id="foo"></div>');
 
     document.body.appendChild(div);
@@ -18,7 +18,7 @@ describe("createElement", function () {
     expect(document.body.querySelector("#style")).toBeFalsy();
   });
 
-  it("can pull tags from head", function () {
+  it("can pull tags from head", () => {
     const div = createElement(
       '<style id="style"></style><div id="foo"></div>',
       {

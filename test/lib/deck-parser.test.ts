@@ -18,10 +18,10 @@ import { mocked } from "ts-jest/utils";
 
 jest.mock("Lib/scryfall");
 
-describe("Deck Parser", function () {
+describe("Deck Parser", () => {
   let searchSpy: SpyInstance;
 
-  beforeEach(function () {
+  beforeEach(() => {
     searchSpy = mocked(search);
   });
 
@@ -29,8 +29,8 @@ describe("Deck Parser", function () {
     searchSpy.mockReset();
   });
 
-  describe("getCommanderColorIdentity", function () {
-    it("returns array of color identity for commander", async function () {
+  describe("getCommanderColorIdentity", () => {
+    it("returns array of color identity for commander", async () => {
       const fakeDeck = makeFakeDeck({
         entries: {
           commanders: [
@@ -57,7 +57,7 @@ describe("Deck Parser", function () {
       expect(search).toBeCalledWith('oracle_id:"id-1"');
     });
 
-    it("returns array of color identity for multiple commanders", async function () {
+    it("returns array of color identity for multiple commanders", async () => {
       const fakeDeck = makeFakeDeck({
         entries: {
           commanders: [
@@ -104,7 +104,7 @@ describe("Deck Parser", function () {
       );
     });
 
-    it("returns array of c when color idenity is empty", async function () {
+    it("returns array of c when color idenity is empty", async () => {
       const fakeDeck = makeFakeDeck({
         entries: {
           commanders: [
@@ -126,7 +126,7 @@ describe("Deck Parser", function () {
       expect(colors).toEqual(["C"]);
     });
 
-    it("ignores cards without a card digeest", async function () {
+    it("ignores cards without a card digeest", async () => {
       const fakeDeck = makeFakeDeck({
         entries: {
           commanders: [
@@ -167,8 +167,8 @@ describe("Deck Parser", function () {
     });
   });
 
-  describe("getSections", function () {
-    it("returns a flattened array of deck sections", function () {
+  describe("getSections", () => {
+    it("returns a flattened array of deck sections", () => {
       const fakeDeck = makeFakeDeck({
         primarySections: ["nonlands", "lands"],
         secondarySections: ["maybeboard", "sideboard"],
@@ -183,8 +183,8 @@ describe("Deck Parser", function () {
     });
   });
 
-  describe("isLandCard", function () {
-    it("returns false if card is not a land card", function () {
+  describe("isLandCard", () => {
+    it("returns false if card is not a land card", () => {
       expect(
         isLandCard(
           makeFakeCard({
@@ -196,7 +196,7 @@ describe("Deck Parser", function () {
       ).toBe(false);
     });
 
-    it("returns true if card is a land card", function () {
+    it("returns true if card is a land card", () => {
       expect(
         isLandCard(
           makeFakeCard({
@@ -208,7 +208,7 @@ describe("Deck Parser", function () {
       ).toBe(true);
     });
 
-    it("returns false if card is land card on flip side", function () {
+    it("returns false if card is land card on flip side", () => {
       expect(
         isLandCard(
           makeFakeCard({
@@ -220,7 +220,7 @@ describe("Deck Parser", function () {
       ).toBe(false);
     });
 
-    it("returns true if card is a land card on front side", function () {
+    it("returns true if card is a land card on front side", () => {
       expect(
         isLandCard(
           makeFakeCard({
@@ -232,7 +232,7 @@ describe("Deck Parser", function () {
       ).toBe(true);
     });
 
-    it("returns false if card is a creature land", function () {
+    it("returns false if card is a creature land", () => {
       expect(
         isLandCard(
           makeFakeCard({
@@ -244,7 +244,7 @@ describe("Deck Parser", function () {
       ).toBe(false);
     });
 
-    it("returns true if card is a creature on the flipside", function () {
+    it("returns true if card is a creature on the flipside", () => {
       expect(
         isLandCard(
           makeFakeCard({
@@ -257,8 +257,8 @@ describe("Deck Parser", function () {
     });
   });
 
-  describe("hasDedicatedLandSection", function () {
-    it("returns false if deck does not have a lands section", function () {
+  describe("hasDedicatedLandSection", () => {
+    it("returns false if deck does not have a lands section", () => {
       expect(
         hasDedicatedLandSection(
           makeFakeDeck({
@@ -269,7 +269,7 @@ describe("Deck Parser", function () {
       ).toBe(false);
     });
 
-    it("returns true if deck does have a lands section", function () {
+    it("returns true if deck does have a lands section", () => {
       expect(
         hasDedicatedLandSection(
           makeFakeDeck({
@@ -281,10 +281,10 @@ describe("Deck Parser", function () {
     });
   });
 
-  describe("flattenEntries", function () {
+  describe("flattenEntries", () => {
     let fakeDeck: Deck;
 
-    beforeEach(function () {
+    beforeEach(() => {
       fakeDeck = makeFakeDeck({
         primarySections: ["commanders", "nonlands"],
         secondarySections: ["lands", "maybeboard"],
@@ -333,7 +333,7 @@ describe("Deck Parser", function () {
       });
     });
 
-    it("takes deck entries and flattens them into a single list", function () {
+    it("takes deck entries and flattens them into a single list", () => {
       const entries = flattenEntries(fakeDeck);
 
       expect(entries.length).toBe(8);
@@ -371,7 +371,7 @@ describe("Deck Parser", function () {
       });
     });
 
-    it("by default collapses cards with the same orracle id in multiple entries in sections into one", function () {
+    it("by default collapses cards with the same orracle id in multiple entries in sections into one", () => {
       fakeDeck.entries.commanders![1].card_digest!.oracle_id = "oracle-custom";
       fakeDeck.entries.lands = [
         makeFakeCard({
@@ -413,7 +413,7 @@ describe("Deck Parser", function () {
       });
     });
 
-    it("can specify to collapse by id", function () {
+    it("can specify to collapse by id", () => {
       fakeDeck.entries.lands = [
         makeFakeCard({
           id: "id-9",
@@ -461,7 +461,7 @@ describe("Deck Parser", function () {
       });
     });
 
-    it("ignores entries without raw_text when grouping by id", function () {
+    it("ignores entries without raw_text when grouping by id", () => {
       fakeDeck.entries.lands = [
         makeFakeCard({
           section: "lands",
@@ -505,7 +505,7 @@ describe("Deck Parser", function () {
       });
     });
 
-    it("can ignore sections", function () {
+    it("can ignore sections", () => {
       const entries = flattenEntries(fakeDeck, {
         ignoredSections: {
           commanders: true,
@@ -533,14 +533,14 @@ describe("Deck Parser", function () {
     });
   });
 
-  describe("hasLegalCommanders", function () {
-    it("returns false if deck has a commanders section, but no commanders", async function () {
+  describe("hasLegalCommanders", () => {
+    it("returns false if deck has a commanders section, but no commanders", async () => {
       const commanders: string[] = [];
 
       await expect(hasLegalCommanders(commanders)).resolves.toBe(false);
     });
 
-    it("returns true if deck has a commanders section and all cards in it are legal commanders", async function () {
+    it("returns true if deck has a commanders section and all cards in it are legal commanders", async () => {
       const commanders = ["Sidar Kondo of Jamuraa", "Tana the Bloodsower"];
 
       searchSpy.mockResolvedValue({});
@@ -550,7 +550,7 @@ describe("Deck Parser", function () {
       expect(search).toBeCalledWith('!"Tana the Bloodsower" is:commander');
     });
 
-    it("returns false if any cards in it are not legal commanders", async function () {
+    it("returns false if any cards in it are not legal commanders", async () => {
       const commanders = ["Tana the Bloodsower", "Craterhoof Behemoth"];
 
       searchSpy.mockResolvedValueOnce({});
@@ -562,8 +562,8 @@ describe("Deck Parser", function () {
     });
   });
 
-  describe("isCommanderLike", function () {
-    it("returns true when deck has a commanders section", function () {
+  describe("isCommanderLike", () => {
+    it("returns true when deck has a commanders section", () => {
       const deck = makeFakeDeck({
         primarySections: ["mainboard"],
         secondarySections: ["sideboard", "commanders", "maybeboard"],
@@ -572,7 +572,7 @@ describe("Deck Parser", function () {
       expect(isCommanderLike(deck)).toBe(true);
     });
 
-    it("returns false when deck has no commanders", function () {
+    it("returns false when deck has no commanders", () => {
       const deck = makeFakeDeck({
         primarySections: ["mainboard"],
         secondarySections: ["sideboard", "lands", "maybeboard"],
@@ -582,8 +582,8 @@ describe("Deck Parser", function () {
     });
   });
 
-  describe("isSingletonTypeDeck", function () {
-    it("returns true when deck has a commanders section", function () {
+  describe("isSingletonTypeDeck", () => {
+    it("returns true when deck has a commanders section", () => {
       const deck = makeFakeDeck({
         primarySections: ["mainboard"],
         secondarySections: ["sideboard", "lands", "commanders", "maybeboard"],
@@ -592,7 +592,7 @@ describe("Deck Parser", function () {
       expect(isSingletonTypeDeck(deck)).toBe(true);
     });
 
-    it("returns true when deck has a nonlands section", function () {
+    it("returns true when deck has a nonlands section", () => {
       const deck = makeFakeDeck({
         primarySections: ["commanders"],
         secondarySections: ["lands", "nonlands", "maybeboard"],
@@ -601,7 +601,7 @@ describe("Deck Parser", function () {
       expect(isSingletonTypeDeck(deck)).toBe(true);
     });
 
-    it("returns false when deck has no commanders or nonlands section", function () {
+    it("returns false when deck has no commanders or nonlands section", () => {
       const deck = makeFakeDeck({
         primarySections: ["mainboard"],
         secondarySections: ["sideboard"],

@@ -4,8 +4,8 @@ import { PLUS_SYMBOL } from "Svg";
 
 jest.mock("framebus");
 
-describe("AddCardElement", function () {
-  it("defaults card in deck status to false", async function () {
+describe("AddCardElement", () => {
+  it("defaults card in deck status to false", async () => {
     const cardEl = new AddCardElement({
       name: "Arcane Denial",
       id: "arcane-denial-id",
@@ -17,7 +17,7 @@ describe("AddCardElement", function () {
     expect(cardEl.element.classList.contains("in-deck")).toBe(false);
   });
 
-  it("can set card in deck status to true when quantity is greater than 0", async function () {
+  it("can set card in deck status to true when quantity is greater than 0", async () => {
     const cardEl = new AddCardElement({
       name: "Arcane Denial",
       id: "arcane-denial-id",
@@ -30,7 +30,7 @@ describe("AddCardElement", function () {
     expect(cardEl.element.classList.contains("in-deck")).toBe(true);
   });
 
-  it("defaults to having the minus button be hidden", async function () {
+  it("defaults to having the minus button be hidden", async () => {
     const cardEl = new AddCardElement({
       name: "Arcane Denial",
       id: "arcane-denial-id",
@@ -42,7 +42,7 @@ describe("AddCardElement", function () {
     expect(cardEl.minusButton.classList.contains("hidden")).toBe(true);
   });
 
-  it("shows the minus button if quantity > 0", async function () {
+  it("shows the minus button if quantity > 0", async () => {
     const cardEl = new AddCardElement({
       name: "Arcane Denial",
       quantity: 1,
@@ -55,7 +55,7 @@ describe("AddCardElement", function () {
     expect(cardEl.minusButton.classList.contains("hidden")).toBe(false);
   });
 
-  it("sets minus button to use check symbol when in singleton mode", async function () {
+  it("sets minus button to use check symbol when in singleton mode", async () => {
     const cardElInNormalMode = new AddCardElement({
       name: "Arcane Denial",
       id: "arcane-denial-id",
@@ -84,7 +84,7 @@ describe("AddCardElement", function () {
     );
   });
 
-  it("calls addCardToDeck when plus button is clicked", async function () {
+  it("calls addCardToDeck when plus button is clicked", async () => {
     const cardEl = new AddCardElement({
       name: "Arcane Denial",
       id: "arcane-denial-id",
@@ -103,7 +103,7 @@ describe("AddCardElement", function () {
     expect(cardEl.addCardToDeck).toBeCalledTimes(2);
   });
 
-  it("calls addCardToDeck when pressing enter while plus button is focussed", async function () {
+  it("calls addCardToDeck when pressing enter while plus button is focussed", async () => {
     const cardEl = new AddCardElement({
       name: "Arcane Denial",
       id: "arcane-denial-id",
@@ -127,7 +127,7 @@ describe("AddCardElement", function () {
     expect(cardEl.addCardToDeck).toBeCalledTimes(2);
   });
 
-  it("calls removeCardFromDeck when minus button is clicked", async function () {
+  it("calls removeCardFromDeck when minus button is clicked", async () => {
     const cardEl = new AddCardElement({
       name: "Arcane Denial",
       id: "arcane-denial-id",
@@ -146,7 +146,7 @@ describe("AddCardElement", function () {
     expect(cardEl.removeCardFromDeck).toBeCalledTimes(2);
   });
 
-  it("calls removeCardFromDeck when pressing enter while minus button is focussed", async function () {
+  it("calls removeCardFromDeck when pressing enter while minus button is focussed", async () => {
     const cardEl = new AddCardElement({
       name: "Arcane Denial",
       quantity: 3,
@@ -171,7 +171,7 @@ describe("AddCardElement", function () {
     expect(cardEl.removeCardFromDeck).toBeCalledTimes(2);
   });
 
-  it("focuses on plus button when last card is removed from deck using the keyboard", async function () {
+  it("focuses on plus button when last card is removed from deck using the keyboard", async () => {
     const cardEl = new AddCardElement({
       name: "Arcane Denial",
       quantity: 0,
@@ -193,7 +193,7 @@ describe("AddCardElement", function () {
     expect(cardEl.plusButton.focus).toBeCalledTimes(1);
   });
 
-  it("does not focus on plus button when cards remain in deck when being removed using the keyboard", async function () {
+  it("does not focus on plus button when cards remain in deck when being removed using the keyboard", async () => {
     const cardEl = new AddCardElement({
       name: "Arcane Denial",
       quantity: 2,
@@ -215,8 +215,8 @@ describe("AddCardElement", function () {
     expect(cardEl.plusButton.focus).toBeCalledTimes(0);
   });
 
-  describe("setMetadata", function () {
-    it("sets metadata to quantity when there is a quantity and no value is passed in", function () {
+  describe("setMetadata", () => {
+    it("sets metadata to quantity when there is a quantity and no value is passed in", () => {
       const cardEl = new AddCardElement({
         name: "Arcane Denial",
         quantity: 2,
@@ -232,7 +232,7 @@ describe("AddCardElement", function () {
       expect(cardEl.metadata.innerHTML).toContain("3x");
     });
 
-    it("sets metadata to empty when in singleton mode", function () {
+    it("sets metadata to empty when in singleton mode", () => {
       const cardEl = new AddCardElement({
         name: "Arcane Denial",
         singleton: true,
@@ -247,7 +247,7 @@ describe("AddCardElement", function () {
       expect(cardEl.metadata.innerHTML).toBe("");
     });
 
-    it("sets metadata to empty when quantity is 0 and no value is passed in", function () {
+    it("sets metadata to empty when quantity is 0 and no value is passed in", () => {
       const cardEl = new AddCardElement({
         name: "Arcane Denial",
         quantity: 2,
@@ -263,7 +263,7 @@ describe("AddCardElement", function () {
       expect(cardEl.metadata.innerHTML).toBe("");
     });
 
-    it("sets metadata to value when value is passed in", function () {
+    it("sets metadata to value when value is passed in", () => {
       const cardEl = new AddCardElement({
         name: "Arcane Denial",
         quantity: 2,
@@ -278,8 +278,8 @@ describe("AddCardElement", function () {
     });
   });
 
-  describe("updateUI", function () {
-    it("sets the state for card not being in deck", function () {
+  describe("updateUI", () => {
+    it("sets the state for card not being in deck", () => {
       const cardEl = new AddCardElement({
         name: "Arcane Denial",
         id: "arcane-denial-id",
@@ -306,7 +306,7 @@ describe("AddCardElement", function () {
       expect(cardEl.element.classList.contains("in-deck")).toBe(false);
     });
 
-    it("sets the state for card being in deck", function () {
+    it("sets the state for card being in deck", () => {
       const cardEl = new AddCardElement({
         name: "Arcane Denial",
         id: "arcane-denial-id",
@@ -333,7 +333,7 @@ describe("AddCardElement", function () {
       expect(cardEl.element.classList.contains("in-deck")).toBe(true);
     });
 
-    it("sets the state for card not being in deck in singleton mode", function () {
+    it("sets the state for card not being in deck in singleton mode", () => {
       const cardEl = new AddCardElement({
         name: "Arcane Denial",
         id: "arcane-denial-id",
@@ -361,7 +361,7 @@ describe("AddCardElement", function () {
       expect(cardEl.element.classList.contains("in-deck")).toBe(false);
     });
 
-    it("sets the state for card being in deck in singleton mode", function () {
+    it("sets the state for card being in deck in singleton mode", () => {
       const cardEl = new AddCardElement({
         name: "Arcane Denial",
         id: "arcane-denial-id",
@@ -390,8 +390,8 @@ describe("AddCardElement", function () {
     });
   });
 
-  describe("cardInDeck", function () {
-    it("returns true when quantity is greater than zero", function () {
+  describe("cardInDeck", () => {
+    it("returns true when quantity is greater than zero", () => {
       const cardEl = new AddCardElement({
         name: "Arcane Denial",
         id: "arcane-denial-id",
@@ -403,7 +403,7 @@ describe("AddCardElement", function () {
       expect(cardEl.cardInDeck()).toBe(true);
     });
 
-    it("returns false when quantity is zero", function () {
+    it("returns false when quantity is zero", () => {
       const cardEl = new AddCardElement({
         name: "Arcane Denial",
         id: "arcane-denial-id",
@@ -416,8 +416,8 @@ describe("AddCardElement", function () {
     });
   });
 
-  describe("addCardToDeck", function () {
-    it("emits event to add card to deck", async function () {
+  describe("addCardToDeck", () => {
+    it("emits event to add card to deck", async () => {
       const cardEl = new AddCardElement({
         name: "Arcane Denial",
         id: "arcane-denial-id",
@@ -433,7 +433,7 @@ describe("AddCardElement", function () {
       });
     });
 
-    it("passes add card object to onAddCard before emitting add card to deck event", async function () {
+    it("passes add card object to onAddCard before emitting add card to deck event", async () => {
       const cardEl = new AddCardElement({
         name: "Arcane Denial",
         id: "arcane-denial-id",
@@ -454,7 +454,7 @@ describe("AddCardElement", function () {
       });
     });
 
-    it("updates card ui", async function () {
+    it("updates card ui", async () => {
       const cardEl = new AddCardElement({
         name: "Arcane Denial",
         id: "arcane-denial-id",
@@ -469,7 +469,7 @@ describe("AddCardElement", function () {
       expect(cardEl.updateUI).toBeCalledTimes(1);
     });
 
-    it("can pass a custom getScryfallId function", async function () {
+    it("can pass a custom getScryfallId function", async () => {
       const cardEl = new AddCardElement({
         name: "Arcane Denial",
         id: "arcane-denial-id",
@@ -488,7 +488,7 @@ describe("AddCardElement", function () {
       });
     });
 
-    it("handles error when getScryfallId fails", async function () {
+    it("handles error when getScryfallId fails", async () => {
       const errFromScryfall = new Error("Error from scryfall");
       const cardEl = new AddCardElement({
         name: "Arcane Denial",
@@ -522,8 +522,8 @@ describe("AddCardElement", function () {
     });
   });
 
-  describe("removeCardFromDeck", function () {
-    it("emits event to remove from deck", function () {
+  describe("removeCardFromDeck", () => {
+    it("emits event to remove from deck", () => {
       const cardEl = new AddCardElement({
         name: "Arcane Denial",
         id: "arcane-denial-id",
@@ -538,7 +538,7 @@ describe("AddCardElement", function () {
       });
     });
 
-    it("decrements quantity", function () {
+    it("decrements quantity", () => {
       const cardEl = new AddCardElement({
         name: "Arcane Denial",
         quantity: 10,
@@ -552,7 +552,7 @@ describe("AddCardElement", function () {
       expect(cardEl.quantity).toBe(9);
     });
 
-    it("updates ui", async function () {
+    it("updates ui", async () => {
       const cardEl = new AddCardElement({
         name: "Arcane Denial",
         singleton: true,
@@ -571,8 +571,8 @@ describe("AddCardElement", function () {
     });
   });
 
-  describe("toggleAppearance", function () {
-    it("adds hidden class if true is passed in", function () {
+  describe("toggleAppearance", () => {
+    it("adds hidden class if true is passed in", () => {
       const cardEl = new AddCardElement({
         name: "Arcane Denial",
         singleton: true,
@@ -590,7 +590,7 @@ describe("AddCardElement", function () {
       expect(cardEl.element.classList.contains("hidden")).toBe(true);
     });
 
-    it("removes hidden class if false is passed in", function () {
+    it("removes hidden class if false is passed in", () => {
       const cardEl = new AddCardElement({
         name: "Arcane Denial",
         singleton: true,

@@ -32,19 +32,19 @@ export default function start(): void {
     return;
   }
 
-  bus.on(events.REQUEST_EDHREC_RECOMENDATIONS, function (
-    payload: GetRecsOptions,
-    reply: EDHRecResponseHandler
-  ) {
-    getRecs(payload)
-      .then((res) => reply(res))
-      .catch((err) =>
-        reply({
-          commanders: [],
-          outRecs: [],
-          inRecs: [],
-          errors: [err],
-        })
-      );
-  });
+  bus.on(
+    events.REQUEST_EDHREC_RECOMENDATIONS,
+    (payload: GetRecsOptions, reply: EDHRecResponseHandler) => {
+      getRecs(payload)
+        .then((res) => reply(res))
+        .catch((err) =>
+          reply({
+            commanders: [],
+            outRecs: [],
+            inRecs: [],
+            errors: [err],
+          })
+        );
+    }
+  );
 }

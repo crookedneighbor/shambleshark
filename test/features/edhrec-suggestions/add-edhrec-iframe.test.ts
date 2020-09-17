@@ -12,14 +12,14 @@ import { mocked } from "ts-jest/utils";
 jest.mock("Lib/scryfall");
 jest.mock("Lib/mutation");
 
-describe("addEDHRecIframe", function () {
+describe("addEDHRecIframe", () => {
   let btn: HTMLButtonElement;
 
   let getDeckSpy: SpyInstance;
   let hasLegalCommandersSpy: SpyInstance;
   let mutationChangeSpy: SpyInstance;
 
-  beforeEach(function () {
+  beforeEach(() => {
     btn = document.createElement("button");
 
     getDeckSpy = mocked(getDeck).mockResolvedValue(
@@ -46,7 +46,7 @@ describe("addEDHRecIframe", function () {
     jest.spyOn(iframe, "create").mockImplementation();
   });
 
-  it("sets button to disabled when requested deck does not have legal commanders", async function () {
+  it("sets button to disabled when requested deck does not have legal commanders", async () => {
     hasLegalCommandersSpy.mockResolvedValue(false);
 
     await addEDHRecIframe(btn);
@@ -54,7 +54,7 @@ describe("addEDHRecIframe", function () {
     expect(btn.getAttribute("disabled")).toBe("disabled");
   });
 
-  it("sets button to not disabled when requested has legal commanders", async function () {
+  it("sets button to not disabled when requested has legal commanders", async () => {
     hasLegalCommandersSpy.mockResolvedValue(true);
 
     await addEDHRecIframe(btn);
@@ -62,7 +62,7 @@ describe("addEDHRecIframe", function () {
     expect(btn.getAttribute("disabled")).toBeFalsy();
   });
 
-  it("adds an edhrec iframe to page", async function () {
+  it("adds an edhrec iframe to page", async () => {
     await addEDHRecIframe(btn);
 
     expect(iframe.create).toBeCalledTimes(1);
@@ -72,7 +72,7 @@ describe("addEDHRecIframe", function () {
     });
   });
 
-  describe("when commander list changes", function () {
+  describe("when commander list changes", () => {
     let fakeDeck: Deck, commanderSection: HTMLDivElement;
 
     const addEntry = (options: Partial<HTMLOptionElement> = {}) => {
@@ -126,7 +126,7 @@ describe("addEDHRecIframe", function () {
       document.body.appendChild(commanderSection);
     });
 
-    it("enables the button when all entries are commanders", async function () {
+    it("enables the button when all entries are commanders", async () => {
       fakeDeck.entries.commanders = [];
       addEntry();
       hasLegalCommandersSpy.mockResolvedValue(false);
@@ -145,7 +145,7 @@ describe("addEDHRecIframe", function () {
       expect(btn.getAttribute("disabled")).toBeFalsy();
     });
 
-    it("enables the button entry has gone from illegal state to legal state", async function () {
+    it("enables the button entry has gone from illegal state to legal state", async () => {
       fakeDeck.entries.commanders = [
         makeFakeCard({
           cardDigest: {
@@ -172,7 +172,7 @@ describe("addEDHRecIframe", function () {
       expect(btn.getAttribute("disabled")).toBeFalsy();
     });
 
-    it("disables the button when the values have changed at least one entry is not a commander", async function () {
+    it("disables the button when the values have changed at least one entry is not a commander", async () => {
       addEntry({
         value: "1 Arjun, the Shifting Flame",
       });
@@ -192,7 +192,7 @@ describe("addEDHRecIframe", function () {
       expect(btn.getAttribute("disabled")).toBeTruthy();
     });
 
-    it("ignores blank entries", async function () {
+    it("ignores blank entries", async () => {
       await addEDHRecIframe(btn);
       const changeHandler = mutationChangeSpy.mock.calls[0][1];
 
@@ -212,7 +212,7 @@ describe("addEDHRecIframe", function () {
       ]);
     });
 
-    it("ignores entries that have not finished lookup", async function () {
+    it("ignores entries that have not finished lookup", async () => {
       await addEDHRecIframe(btn);
       const changeHandler = mutationChangeSpy.mock.calls[0][1];
 
@@ -231,7 +231,7 @@ describe("addEDHRecIframe", function () {
       expect(hasLegalCommandersSpy).toBeCalledWith(["Sidar Kondo of Jamuraa"]);
     });
 
-    it("ignores entries that do not match deck pattern", async function () {
+    it("ignores entries that do not match deck pattern", async () => {
       await addEDHRecIframe(btn);
       const changeHandler = mutationChangeSpy.mock.calls[0][1];
 
@@ -249,7 +249,7 @@ describe("addEDHRecIframe", function () {
       expect(hasLegalCommandersSpy).toBeCalledWith(["Sidar Kondo of Jamuraa"]);
     });
 
-    it("does not check legality of commanders whe commander list is unchanged", async function () {
+    it("does not check legality of commanders whe commander list is unchanged", async () => {
       addEntry({
         value: "1 Arjun, the Shifting Flame",
       });
@@ -263,7 +263,7 @@ describe("addEDHRecIframe", function () {
       expect(hasLegalCommandersSpy).not.toBeCalled();
     });
 
-    it("does not check legality of commanders whe commander list is unchanged but in a different order", async function () {
+    it("does not check legality of commanders whe commander list is unchanged but in a different order", async () => {
       fakeDeck.entries.commanders = [
         makeFakeCard({
           cardDigest: {
@@ -292,7 +292,7 @@ describe("addEDHRecIframe", function () {
       expect(hasLegalCommandersSpy).not.toBeCalled();
     });
 
-    it("does not check commanders when section is not the commander section", async function () {
+    it("does not check commanders when section is not the commander section", async () => {
       const title = document.createElement("div");
       title.innerText = "Lands";
       const fakeEl = {

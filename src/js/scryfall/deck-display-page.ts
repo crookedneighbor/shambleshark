@@ -13,10 +13,10 @@ function addContainerForSidebarFeatures(): void {
   });
 }
 
-export default function (): void {
+export default function addDeckDisplayFeatures(): void {
   bus.on(events.SCRYFALL_LISTENERS_READY, function () {
     Promise.all(
-      deckViewFeatures.map(function (Feature) {
+      deckViewFeatures.map((Feature) => {
         return Feature.isEnabled().then((isEnabled) => {
           if (isEnabled) {
             const feature = new Feature();

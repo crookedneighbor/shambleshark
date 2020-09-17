@@ -1,20 +1,20 @@
 import DialogInterface from "Ui/dialog-interface";
 import Drawer from "Ui/drawer";
 
-describe("Drawer", function () {
-  it("is a DialogInterface", function () {
+describe("Drawer", () => {
+  it("is a DialogInterface", () => {
     const drawer = new Drawer();
 
     expect(drawer).toBeInstanceOf(DialogInterface);
   });
 
-  it("makes a drawer element", function () {
+  it("makes a drawer element", () => {
     const drawer = new Drawer();
 
     expect(drawer.$(".drawer-dialog")).toBeTruthy();
   });
 
-  it("defaults position to right", function () {
+  it("defaults position to right", () => {
     const drawer = new Drawer();
 
     expect(drawer.$(".drawer-dialog-position-right")).toBeTruthy();
@@ -23,7 +23,7 @@ describe("Drawer", function () {
     expect(drawer.$(".drawer-dialog-position-bottom")).toBeFalsy();
   });
 
-  it("can set position", function () {
+  it("can set position", () => {
     const drawer = new Drawer({
       position: "top",
     });
@@ -32,7 +32,7 @@ describe("Drawer", function () {
     expect(drawer.$(".drawer-dialog-position-top")).toBeTruthy();
   });
 
-  it("closes when the close button is clicked", function () {
+  it("closes when the close button is clicked", () => {
     const drawer = new Drawer();
     const close = drawer.$(".dialog-close");
 
@@ -43,7 +43,7 @@ describe("Drawer", function () {
     expect(drawer.close).toBeCalledTimes(1);
   });
 
-  it("adds an open class when open is called", function () {
+  it("adds an open class when open is called", () => {
     const drawer = new Drawer();
 
     expect(drawer.element.classList.contains("open")).toBeFalsy();
@@ -53,7 +53,7 @@ describe("Drawer", function () {
     expect(drawer.element.classList.contains("open")).toBeTruthy();
   });
 
-  it("removes open class when close is called", function () {
+  it("removes open class when close is called", () => {
     const drawer = new Drawer();
 
     drawer.open();
@@ -63,7 +63,7 @@ describe("Drawer", function () {
     expect(drawer.element.classList.contains("open")).toBeFalsy();
   });
 
-  it("can set on onScroll callback", function () {
+  it("can set on onScroll callback", () => {
     const spy = jest.fn();
     const drawer = new Drawer({
       onScroll: spy,
@@ -77,7 +77,7 @@ describe("Drawer", function () {
     expect(spy).toBeCalledTimes(1);
   });
 
-  it("can return the scrollable element", function () {
+  it("can return the scrollable element", () => {
     const drawer = new Drawer();
 
     const el = drawer.getScrollableElement();

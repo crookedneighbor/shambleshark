@@ -1,9 +1,9 @@
 import CleanUpImprover from "Features/deck-builder-features/clean-up-improver";
 import bus from "framebus";
 
-describe("Clean Up Improver", function () {
-  describe("run", function () {
-    beforeEach(function () {
+describe("Clean Up Improver", () => {
+  describe("run", () => {
+    beforeEach(() => {
       jest.spyOn(bus, "emit").mockImplementation();
       jest.spyOn(CleanUpImprover, "getSettings").mockResolvedValue({
         enabled: true,
@@ -11,7 +11,7 @@ describe("Clean Up Improver", function () {
       });
     });
 
-    it("emits a MODIFY_CLEAN_UP", async function () {
+    it("emits a MODIFY_CLEAN_UP", async () => {
       const cui = new CleanUpImprover();
 
       await cui.run();

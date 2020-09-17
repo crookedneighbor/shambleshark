@@ -1,7 +1,7 @@
 import wait from "Lib/wait";
 
-describe("wait", function () {
-  it("wraps setTimeout in a promise", function () {
+describe("wait", () => {
+  it("wraps setTimeout in a promise", () => {
     jest.spyOn(global, "setTimeout");
 
     return wait(10).then(() => {
@@ -9,7 +9,7 @@ describe("wait", function () {
     });
   });
 
-  it("defautls wait time to 1", function () {
+  it("defautls wait time to 1", () => {
     jest.spyOn(global, "setTimeout");
 
     return wait().then(() => {

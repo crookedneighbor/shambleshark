@@ -12,7 +12,7 @@ import { mocked } from "ts-jest/utils";
 jest.mock("Lib/scryfall");
 jest.mock("framebus");
 
-describe("Scryfall Search", function () {
+describe("Scryfall Search", () => {
   let headerSearchField: HTMLInputElement;
   let deckbuilderContainer: HTMLDivElement;
   let searchInput: HTMLInputElement;
@@ -66,8 +66,8 @@ describe("Scryfall Search", function () {
     });
   });
 
-  describe("drawer behavior", function () {
-    it("triggers cleanup on close", function () {
+  describe("drawer behavior", () => {
+    it("triggers cleanup on close", () => {
       const ss = new ScryfallSearch();
 
       ss.drawer.triggerOnClose();
@@ -76,7 +76,7 @@ describe("Scryfall Search", function () {
       expect(bus.emit).toBeCalledWith("CLEAN_UP_DECK");
     });
 
-    it("focuses search input on close", function () {
+    it("focuses search input on close", () => {
       const ss = new ScryfallSearch();
 
       jest.spyOn(ss.headerSearchField, "focus");
@@ -103,7 +103,7 @@ describe("Scryfall Search", function () {
       expect(ss.addCards).toBeCalledTimes(1);
     });
 
-    it("does not add cards on scroll if not ready for the next batch", async function () {
+    it("does not add cards on scroll if not ready for the next batch", async () => {
       const ss = new ScryfallSearch();
 
       jest.spyOn(ss, "isReadyToLookupNextBatch").mockReturnValue(false);
@@ -409,8 +409,8 @@ describe("Scryfall Search", function () {
     });
   });
 
-  describe("run", function () {
-    it("fetches the deck data", async function () {
+  describe("run", () => {
+    it("fetches the deck data", async () => {
       mocked(getDeck).mockResolvedValue(makeFakeDeck());
 
       const ss = new ScryfallSearch();
@@ -420,7 +420,7 @@ describe("Scryfall Search", function () {
       expect(ss.deck).toBeTruthy();
     });
 
-    it("sets up event listener for header search bar", async function () {
+    it("sets up event listener for header search bar", async () => {
       const ss = new ScryfallSearch();
 
       jest.spyOn(ss, "runSearch").mockResolvedValue();
@@ -444,7 +444,7 @@ describe("Scryfall Search", function () {
       expect(ss.runSearch).toBeCalledWith("is:commander", true);
     });
 
-    it("does not call runSearch if no value in the header search field", async function () {
+    it("does not call runSearch if no value in the header search field", async () => {
       const ss = new ScryfallSearch();
 
       jest.spyOn(ss, "runSearch").mockResolvedValue();
@@ -460,7 +460,7 @@ describe("Scryfall Search", function () {
       expect(ss.runSearch).toBeCalledTimes(0);
     });
 
-    it("sets up event listener for inline search bar", async function () {
+    it("sets up event listener for inline search bar", async () => {
       const ss = new ScryfallSearch();
 
       jest.spyOn(ss, "runSearch").mockResolvedValue();
@@ -484,7 +484,7 @@ describe("Scryfall Search", function () {
       expect(ss.runSearch).toBeCalledWith("is:commander", false);
     });
 
-    it("does not call runSearch if no value in the inline search field", async function () {
+    it("does not call runSearch if no value in the inline search field", async () => {
       const ss = new ScryfallSearch();
 
       jest.spyOn(ss, "runSearch").mockResolvedValue();
@@ -501,12 +501,12 @@ describe("Scryfall Search", function () {
     });
   });
 
-  describe("runSearch", function () {
+  describe("runSearch", () => {
     let ss: ScryfallSearch;
     let getDeckSpy: jest.SpyInstance;
     let searchSpy: jest.SpyInstance;
 
-    beforeEach(function () {
+    beforeEach(() => {
       ss = new ScryfallSearch();
       ss.drawer = new Drawer();
       jest.spyOn(ss.drawer, "setLoading");
@@ -523,13 +523,13 @@ describe("Scryfall Search", function () {
       jest.spyOn(ss, "addWarnings").mockImplementation();
     });
 
-    it("opens the drawer", async function () {
+    it("opens the drawer", async () => {
       await ss.runSearch("foo");
 
       expect(ss.drawer?.open).toBeCalledTimes(1);
     });
 
-    it("closes the saved searches modal", async function () {
+    it("closes the saved searches modal", async () => {
       jest.spyOn(Modal.prototype, "close");
 
       await ss.runSearch("foo");
@@ -537,14 +537,14 @@ describe("Scryfall Search", function () {
       expect(ss.savedSearchModal?.close).toBeCalledTimes(1);
     });
 
-    it("queries the api", async function () {
+    it("queries the api", async () => {
       await ss.runSearch("foo");
 
       expect(search).toBeCalledTimes(1);
       expect(search).toBeCalledWith("foo");
     });
 
-    it("adds `not:funny` to query when restrictFunnyCards setting is active", async function () {
+    it("adds `not:funny` to query when restrictFunnyCards setting is active", async () => {
       ss.settings!.restrictFunnyCards = true;
       await ss.runSearch("foo");
 
@@ -552,7 +552,7 @@ describe("Scryfall Search", function () {
       expect(search).toBeCalledWith("foo not:funny");
     });
 
-    it("does not add `not:funny` to query when restrictFunnyCards setting is active but adjustQuery param is set to false", async function () {
+    it("does not add `not:funny` to query when restrictFunnyCards setting is active but adjustQuery param is set to false", async () => {
       ss.settings!.restrictFunnyCards = true;
       await ss.runSearch("foo", false);
 
@@ -560,7 +560,7 @@ describe("Scryfall Search", function () {
       expect(search).toBeCalledWith("foo");
     });
 
-    it("does not add `not:funny` to query when not:funny is already present", async function () {
+    it("does not add `not:funny` to query when not:funny is already present", async () => {
       ss.settings!.restrictFunnyCards = true;
       await ss.runSearch("not:funny foo");
 
@@ -568,7 +568,7 @@ describe("Scryfall Search", function () {
       expect(search).toBeCalledWith("not:funny foo");
     });
 
-    it("does not add `not:funny` to query when is:funny is already present", async function () {
+    it("does not add `not:funny` to query when is:funny is already present", async () => {
       ss.settings!.restrictFunnyCards = true;
       await ss.runSearch("is:funny foo");
 
@@ -576,7 +576,7 @@ describe("Scryfall Search", function () {
       expect(search).toBeCalledWith("is:funny foo");
     });
 
-    it("adds `ids` to query when restrictToCommanderColorIdentity setting is active and deck is commanderlike", async function () {
+    it("adds `ids` to query when restrictToCommanderColorIdentity setting is active and deck is commanderlike", async () => {
       ss.settings!.restrictToCommanderColorIdentity = true;
       jest.spyOn(deckParser, "isSingletonTypeDeck").mockReturnValue(true);
       jest.spyOn(deckParser, "isCommanderLike").mockReturnValue(true);
@@ -590,7 +590,7 @@ describe("Scryfall Search", function () {
       expect(searchSpy).toBeCalledWith("foo ids:BG");
     });
 
-    it("does not add `ids` to query when restrictToCommanderColorIdentity setting is active and deck is commanderlike but adjustQuery param is set to false", async function () {
+    it("does not add `ids` to query when restrictToCommanderColorIdentity setting is active and deck is commanderlike but adjustQuery param is set to false", async () => {
       ss.settings!.restrictToCommanderColorIdentity = true;
       jest.spyOn(deckParser, "isSingletonTypeDeck").mockReturnValue(true);
       jest.spyOn(deckParser, "isCommanderLike").mockReturnValue(true);
@@ -621,7 +621,7 @@ describe("Scryfall Search", function () {
       }
     );
 
-    it("does not add `ids` to query when restrictToCommanderColorIdentity setting is active and deck is not commanderlike", async function () {
+    it("does not add `ids` to query when restrictToCommanderColorIdentity setting is active and deck is not commanderlike", async () => {
       ss.settings!.restrictToCommanderColorIdentity = true;
       jest.spyOn(deckParser, "isSingletonTypeDeck").mockReturnValue(true);
       jest.spyOn(deckParser, "isCommanderLike").mockReturnValue(false);
@@ -635,7 +635,7 @@ describe("Scryfall Search", function () {
       expect(searchSpy).toBeCalledWith("foo");
     });
 
-    it("can add both `not:funny` and `ids` to query", async function () {
+    it("can add both `not:funny` and `ids` to query", async () => {
       ss.settings!.restrictFunnyCards = true;
       ss.settings!.restrictToCommanderColorIdentity = true;
       jest.spyOn(deckParser, "isSingletonTypeDeck").mockReturnValue(true);
@@ -650,7 +650,7 @@ describe("Scryfall Search", function () {
       expect(searchSpy).toBeCalledWith("foo not:funny ids:BG");
     });
 
-    it("adds cards from the api result", async function () {
+    it("adds cards from the api result", async () => {
       const cards = [{}, {}];
 
       searchSpy.mockResolvedValue(cards);
@@ -661,7 +661,7 @@ describe("Scryfall Search", function () {
       expect(ss.addCards).toBeCalledTimes(1);
     });
 
-    it("adds warnings from the api result", async function () {
+    it("adds warnings from the api result", async () => {
       const cards = {
         warnings: ["warning"],
       };
@@ -674,13 +674,13 @@ describe("Scryfall Search", function () {
       expect(ss.addWarnings).toBeCalledTimes(1);
     });
 
-    it("fetches the current deck", async function () {
+    it("fetches the current deck", async () => {
       await ss.runSearch("foo");
 
       expect(getDeckSpy).toBeCalledTimes(1);
     });
 
-    it("adds deck to instance", async function () {
+    it("adds deck to instance", async () => {
       const fakeDeck = makeFakeDeck();
 
       getDeckSpy.mockResolvedValue(fakeDeck);
@@ -690,7 +690,7 @@ describe("Scryfall Search", function () {
       expect(ss.deck).toBe(fakeDeck);
     });
 
-    it("hides and then shows the drawer", async function () {
+    it("hides and then shows the drawer", async () => {
       await ss.runSearch("foo");
 
       expect(ss.drawer.setLoading).toBeCalledTimes(2);
@@ -699,10 +699,10 @@ describe("Scryfall Search", function () {
     });
   });
 
-  describe("addCards", function () {
+  describe("addCards", () => {
     let ss: ScryfallSearch;
 
-    beforeEach(function () {
+    beforeEach(() => {
       ss = new ScryfallSearch();
       ss.deck = makeFakeDeck({
         primarySections: ["mainboard"],
@@ -716,7 +716,7 @@ describe("Scryfall Search", function () {
       });
     });
 
-    it("creates card elements to add to container", function () {
+    it("creates card elements to add to container", () => {
       ss.cardList = ([
         {
           id: "id-1",
@@ -754,7 +754,7 @@ describe("Scryfall Search", function () {
       ).toBeTruthy();
     });
 
-    it("adds an error message when no card list is available", function () {
+    it("adds an error message when no card list is available", () => {
       ss.cardList = ([] as unknown) as List<Card>;
 
       ss.addCards();
@@ -766,7 +766,7 @@ describe("Scryfall Search", function () {
   describe("addWarnings", () => {
     let ss: ScryfallSearch;
 
-    beforeEach(function () {
+    beforeEach(() => {
       ss = new ScryfallSearch();
     });
 
@@ -805,14 +805,14 @@ describe("Scryfall Search", function () {
     });
   });
 
-  describe("isReadyToLookupNextBatch ", function () {
+  describe("isReadyToLookupNextBatch ", () => {
     let el: Element;
 
-    beforeEach(function () {
+    beforeEach(() => {
       el = document.createElement("div");
     });
 
-    it("returns false if lookup is already in progress", function () {
+    it("returns false if lookup is already in progress", () => {
       const ss = new ScryfallSearch();
 
       ss._nextInProgress = true;
@@ -820,7 +820,7 @@ describe("Scryfall Search", function () {
       expect(ss.isReadyToLookupNextBatch(el)).toBe(false);
     });
 
-    it("returns false if there is no card list", function () {
+    it("returns false if there is no card list", () => {
       const ss = new ScryfallSearch();
 
       ss.cardList = undefined;
@@ -828,7 +828,7 @@ describe("Scryfall Search", function () {
       expect(ss.isReadyToLookupNextBatch(el)).toBe(false);
     });
 
-    it("returns false if card list has no more in list", function () {
+    it("returns false if card list has no more in list", () => {
       const ss = new ScryfallSearch();
 
       ss.cardList = ([] as unknown) as List<Card>;
@@ -837,7 +837,7 @@ describe("Scryfall Search", function () {
       expect(ss.isReadyToLookupNextBatch(el)).toBe(false);
     });
 
-    it("returns false if element position is beneath the scroll threshold", function () {
+    it("returns false if element position is beneath the scroll threshold", () => {
       const ss = new ScryfallSearch();
 
       ss.cardList = ([] as unknown) as List<Card>;
@@ -852,7 +852,7 @@ describe("Scryfall Search", function () {
       ).toBe(false);
     });
 
-    it("returns true if element position is within the scroll threshold", function () {
+    it("returns true if element position is within the scroll threshold", () => {
       const ss = new ScryfallSearch();
 
       ss.cardList = ([] as unknown) as List<Card>;

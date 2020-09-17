@@ -20,10 +20,10 @@ const features = globalFeatures
   .concat(searchResultsFeatures);
 
 function setupToggleListeners(element: HTMLInputElement, fn: () => void) {
-  element.addEventListener("change", function () {
+  element.addEventListener("change", () => {
     fn();
   });
-  element.addEventListener("keydown", function (event) {
+  element.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
       element.checked = !element.checked;
       fn();

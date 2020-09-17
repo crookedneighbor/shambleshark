@@ -26,8 +26,8 @@ import { makeFakeDeck, makeFakeCard } from "Helpers/fake";
 
 type FramebusMockCallback<T = Record<string, string>> = (arg: T) => void;
 
-describe("set up listeners on Scryfall page", function () {
-  beforeEach(function () {
+describe("set up listeners on Scryfall page", () => {
+  beforeEach(() => {
     window.ScryfallAPI = generateScryfallAPIGlobal();
     window.Scryfall = generateScryfallGlobal();
 
@@ -42,7 +42,7 @@ describe("set up listeners on Scryfall page", function () {
     mocked(removeEntry).mockResolvedValue();
   });
 
-  it("listens for events", function () {
+  it("listens for events", () => {
     setUpListeners();
 
     expect(bus.on).toBeCalledWith("REQUEST_DECK", expect.any(Function));
@@ -59,20 +59,20 @@ describe("set up listeners on Scryfall page", function () {
     expect(bus.on).toBeCalledWith("MODIFY_CLEAN_UP", modifyCleanUp);
   });
 
-  it("reports that listeners are ready", function () {
+  it("reports that listeners are ready", () => {
     setUpListeners();
 
     expect(bus.emit).toBeCalledWith("SCRYFALL_LISTENERS_READY");
   });
 
-  it("adds hooks to card management events", function () {
+  it("adds hooks to card management events", () => {
     setUpListeners();
 
     expect(addHooksToCardManagementEvents).toBeCalledTimes(1);
   });
 
-  describe("REQUEST_DECK", function () {
-    it("replies with the active deck passed into the setup script", function () {
+  describe("REQUEST_DECK", () => {
+    it("replies with the active deck passed into the setup script", () => {
       const fakeDeck = makeFakeDeck();
       const spy = jest.fn();
 
@@ -95,10 +95,10 @@ describe("set up listeners on Scryfall page", function () {
     });
   });
 
-  describe("SCRYFALL_PUSH_NOTIFICATION", function () {
+  describe("SCRYFALL_PUSH_NOTIFICATION", () => {
     let pushData: Record<string, string>;
 
-    beforeEach(function () {
+    beforeEach(() => {
       (bus.on as jest.Mock).mockImplementation(
         (event: string, cb: FramebusMockCallback) => {
           if (event === "SCRYFALL_PUSH_NOTIFICATION") {
@@ -108,7 +108,7 @@ describe("set up listeners on Scryfall page", function () {
       );
     });
 
-    it("sends a push notification", function () {
+    it("sends a push notification", () => {
       pushData = {
         header: "header",
         message: "message",
@@ -129,7 +129,7 @@ describe("set up listeners on Scryfall page", function () {
       });
     });
 
-    it("defaults push notification color to purple", function () {
+    it("defaults push notification color to purple", () => {
       pushData = {
         header: "header",
         message: "message",
@@ -149,7 +149,7 @@ describe("set up listeners on Scryfall page", function () {
       });
     });
 
-    it("defaults push notification type to deck", function () {
+    it("defaults push notification type to deck", () => {
       pushData = {
         header: "header",
         message: "message",
@@ -170,10 +170,10 @@ describe("set up listeners on Scryfall page", function () {
     });
   });
 
-  describe("ADD_CARD_TO_DECK", function () {
+  describe("ADD_CARD_TO_DECK", () => {
     let cardData: Record<string, string>, scryfallCard: Card;
 
-    beforeEach(function () {
+    beforeEach(() => {
       cardData = {
         cardName: "Rashmi, Eternities Crafter",
         cardId: "id-1",
@@ -196,14 +196,14 @@ describe("set up listeners on Scryfall page", function () {
       mocked(addCard).mockResolvedValue(scryfallCard);
     });
 
-    it("adds card to active deck", function () {
+    it("adds card to active deck", () => {
       setUpListeners();
 
       expect(mocked(addCard).mock.calls.length).toBe(1);
       expect(mocked(addCard).mock.calls[0][0]).toBe("id-1");
     });
 
-    it("updates card for specific section if section is specified", function () {
+    it("updates card for specific section if section is specified", () => {
       cardData.section = "sideboard";
 
       setUpListeners();
@@ -215,7 +215,7 @@ describe("set up listeners on Scryfall page", function () {
       });
     });
 
-    it("updates card for specific section if section is specified even when card is a land card and there is a dedicated land section", function () {
+    it("updates card for specific section if section is specified even when card is a land card and there is a dedicated land section", () => {
       cardData.section = "sideboard";
       scryfallCard.card_digest!.type_line = "Land";
       mocked(getDeckMetadata).mockResolvedValue({
@@ -235,7 +235,7 @@ describe("set up listeners on Scryfall page", function () {
       });
     });
 
-    it("updates lands to be put in lands section if deck has dedicated lands section and no section is specified", function () {
+    it("updates lands to be put in lands section if deck has dedicated lands section and no section is specified", () => {
       scryfallCard.card_digest!.type_line = "Land";
       mocked(getDeckMetadata).mockResolvedValue({
         id: "deck-id",
@@ -254,7 +254,7 @@ describe("set up listeners on Scryfall page", function () {
       });
     });
 
-    it("does not update lands to be put in lands section if deck does not have dedicated lands section", function () {
+    it("does not update lands to be put in lands section if deck does not have dedicated lands section", () => {
       scryfallCard.card_digest!.type_line = "Land";
 
       setUpListeners();
@@ -264,7 +264,7 @@ describe("set up listeners on Scryfall page", function () {
       });
     });
 
-    it("does not update non-lands to be put in lands section", function () {
+    it("does not update non-lands to be put in lands section", () => {
       setUpListeners();
 
       return wait().then(() => {
@@ -272,7 +272,7 @@ describe("set up listeners on Scryfall page", function () {
       });
     });
 
-    it("sends a push notification", function () {
+    it("sends a push notification", () => {
       setUpListeners();
 
       return wait().then(() => {
@@ -287,10 +287,10 @@ describe("set up listeners on Scryfall page", function () {
     });
   });
 
-  describe("REMOVE_CARD_FROM_DECK", function () {
+  describe("REMOVE_CARD_FROM_DECK", () => {
     let cardData: Record<string, string>;
 
-    beforeEach(function () {
+    beforeEach(() => {
       cardData = {
         cardName: "Rashmi, Etrnities Crafter",
       };
@@ -332,7 +332,7 @@ describe("set up listeners on Scryfall page", function () {
       );
     });
 
-    it("removes card from deck if there was only 1 left", async function () {
+    it("removes card from deck if there was only 1 left", async () => {
       setUpListeners();
 
       await wait(5);
@@ -341,7 +341,7 @@ describe("set up listeners on Scryfall page", function () {
       expect(removeEntry).toBeCalledWith("rashmi-id");
     });
 
-    it("decrements count if card has more than 1 entry", async function () {
+    it("decrements count if card has more than 1 entry", async () => {
       cardData.cardName = "Birds of Paradise";
 
       setUpListeners();
@@ -361,7 +361,7 @@ describe("set up listeners on Scryfall page", function () {
       );
     });
 
-    it("sends a push notification", async function () {
+    it("sends a push notification", async () => {
       setUpListeners();
 
       await wait(5);
@@ -376,8 +376,8 @@ describe("set up listeners on Scryfall page", function () {
     });
   });
 
-  describe("CLEAN_UP_DECK", function () {
-    beforeEach(function () {
+  describe("CLEAN_UP_DECK", () => {
+    beforeEach(() => {
       (bus.on as jest.Mock).mockImplementation(
         (event: string, cb: FramebusMockCallback<void>) => {
           if (event === "CLEAN_UP_DECK") {
@@ -387,7 +387,7 @@ describe("set up listeners on Scryfall page", function () {
       );
     });
 
-    it("calls cleanup", function () {
+    it("calls cleanup", () => {
       setUpListeners();
 
       expect(cleanUp).toBeCalledTimes(1);

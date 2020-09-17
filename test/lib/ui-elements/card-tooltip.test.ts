@@ -6,21 +6,21 @@ import { mocked } from "ts-jest/utils";
 
 jest.mock("Lib/mutation");
 
-describe("CardTooltip", function () {
-  beforeEach(function () {
+describe("CardTooltip", () => {
+  beforeEach(() => {
     jest.spyOn(CardTooltip.prototype, "findTooltip").mockImplementation();
   });
 
-  it("looks for tooltip", function () {
+  it("looks for tooltip", () => {
     const tooltip = new CardTooltip();
 
     expect(tooltip.findTooltip).toBeCalledTimes(1);
   });
 
-  describe("findTooltip", function () {
+  describe("findTooltip", () => {
     let tooltip: CardTooltip, fakeElement: HTMLElement;
 
-    beforeEach(function () {
+    beforeEach(() => {
       fakeElement = document.createElement("div");
       mocked(ready).mockImplementation((selector, cb) => {
         cb(fakeElement);
@@ -29,18 +29,18 @@ describe("CardTooltip", function () {
       (tooltip.findTooltip as jest.Mock).mockRestore();
     });
 
-    afterEach(function () {
+    afterEach(() => {
       CardTooltip.resetTooltipElement();
     });
 
-    it("waits for tooltip element to be available", function () {
+    it("waits for tooltip element to be available", () => {
       tooltip.findTooltip();
 
       expect(ready).toBeCalledTimes(1);
       expect(ready).toBeCalledWith("#card-tooltip", expect.any(Function));
     });
 
-    it("skips waiting for tooltip element if it is already available", function () {
+    it("skips waiting for tooltip element if it is already available", () => {
       tooltip.findTooltip();
 
       expect(ready).toBeCalledTimes(1);
@@ -52,16 +52,16 @@ describe("CardTooltip", function () {
     });
   });
 
-  describe("addElement", function () {
+  describe("addElement", () => {
     let tooltip: CardTooltip;
 
-    beforeEach(function () {
+    beforeEach(() => {
       tooltip = new CardTooltip();
       jest.spyOn(tooltip, "createMousemoveHandler").mockReturnValue(noop);
       jest.spyOn(tooltip, "createMouseoutHandler").mockReturnValue(noop);
     });
 
-    it("adds an element to list of elements with handlers", function () {
+    it("adds an element to list of elements with handlers", () => {
       const el = document.createElement("div");
 
       expect(tooltip.elements.length).toBe(0);
@@ -74,7 +74,7 @@ describe("CardTooltip", function () {
       expect(tooltip.elements[0].mouseoutHandler).toBeInstanceOf(Function);
     });
 
-    it("adds event listeners to element", function () {
+    it("adds event listeners to element", () => {
       const el = document.createElement("div");
 
       jest.spyOn(el, "addEventListener");
@@ -98,16 +98,16 @@ describe("CardTooltip", function () {
     });
   });
 
-  describe("removeElement", function () {
+  describe("removeElement", () => {
     let tooltip: CardTooltip;
 
-    beforeEach(function () {
+    beforeEach(() => {
       tooltip = new CardTooltip();
       jest.spyOn(tooltip, "createMousemoveHandler").mockReturnValue(noop);
       jest.spyOn(tooltip, "createMouseoutHandler").mockReturnValue(noop);
     });
 
-    it("ignores elements that do not exist in list", function () {
+    it("ignores elements that do not exist in list", () => {
       const el = document.createElement("div");
 
       expect(() => {
@@ -117,7 +117,7 @@ describe("CardTooltip", function () {
       expect(tooltip.elements.length).toBe(0);
     });
 
-    it("removes element from list of elements with handlers", function () {
+    it("removes element from list of elements with handlers", () => {
       const el = document.createElement("div");
 
       tooltip.addElement(el);
@@ -129,7 +129,7 @@ describe("CardTooltip", function () {
       expect(tooltip.elements.length).toBe(0);
     });
 
-    it("removes event listeners from element", function () {
+    it("removes event listeners from element", () => {
       const el = document.createElement("div");
 
       jest.spyOn(el, "removeEventListener");
@@ -153,8 +153,8 @@ describe("CardTooltip", function () {
     });
   });
 
-  describe("setImage", function () {
-    it("sets image", function () {
+  describe("setImage", () => {
+    it("sets image", () => {
       const tooltip = new CardTooltip();
 
       tooltip.setImage("https://example.com/foo.png");
@@ -162,13 +162,13 @@ describe("CardTooltip", function () {
     });
   });
 
-  describe("createMousemoveHandler", function () {
+  describe("createMousemoveHandler", () => {
     let tooltip: CardTooltip;
     let el: HTMLElement;
     let fakeEvent: MouseEvent;
     let mousemoveSpy: jest.Mock;
 
-    beforeEach(function () {
+    beforeEach(() => {
       mousemoveSpy = jest.fn();
 
       tooltip = new CardTooltip({
@@ -184,11 +184,11 @@ describe("CardTooltip", function () {
       fakeEvent = new MouseEvent("mouseout");
     });
 
-    it("returns a function", function () {
+    it("returns a function", () => {
       expect(tooltip.createMousemoveHandler(el)).toBeInstanceOf(Function);
     });
 
-    it("does nothing if no tooltip element is available", function () {
+    it("does nothing if no tooltip element is available", () => {
       delete tooltip.tooltipElement;
 
       const handler = tooltip.createMousemoveHandler(el);
@@ -198,7 +198,7 @@ describe("CardTooltip", function () {
       }).not.toThrow();
     });
 
-    it("noops when window width is small", function () {
+    it("noops when window width is small", () => {
       const originalWidth = window.innerWidth;
       const handler = tooltip.createMousemoveHandler(el);
 
@@ -217,7 +217,7 @@ describe("CardTooltip", function () {
       });
     });
 
-    it("noops when there is no img", function () {
+    it("noops when there is no img", () => {
       delete tooltip.img;
 
       const handler = tooltip.createMousemoveHandler(el);
@@ -227,7 +227,7 @@ describe("CardTooltip", function () {
       expect(tooltip.tooltipElement?.style.display).not.toBe("block");
     });
 
-    it("opens tooltip", function () {
+    it("opens tooltip", () => {
       const handler = tooltip.createMousemoveHandler(el);
 
       Object.defineProperty(fakeEvent, "pageX", {
@@ -249,7 +249,7 @@ describe("CardTooltip", function () {
       ).toBe("https://example.com/image.png");
     });
 
-    it("calls onMousemove callback with element if provided", function () {
+    it("calls onMousemove callback with element if provided", () => {
       const handler = tooltip.createMousemoveHandler(el);
 
       handler(fakeEvent);
@@ -259,20 +259,20 @@ describe("CardTooltip", function () {
     });
   });
 
-  describe("createMouseoutHandler", function () {
+  describe("createMouseoutHandler", () => {
     let tooltip: CardTooltip, el: HTMLElement;
 
-    beforeEach(function () {
+    beforeEach(() => {
       tooltip = new CardTooltip();
       tooltip.tooltipElement = document.createElement("div");
       el = document.createElement("div");
     });
 
-    it("returns a function", function () {
+    it("returns a function", () => {
       expect(tooltip.createMouseoutHandler(el)).toBeInstanceOf(Function);
     });
 
-    it("does nothing if no tooltip element is available", function () {
+    it("does nothing if no tooltip element is available", () => {
       delete tooltip.tooltipElement;
 
       const handler = tooltip.createMouseoutHandler(el);
@@ -282,7 +282,7 @@ describe("CardTooltip", function () {
       }).not.toThrow();
     });
 
-    it("sets tooltip element style to `none`", function () {
+    it("sets tooltip element style to `none`", () => {
       const handler = tooltip.createMouseoutHandler(el);
 
       handler(new MouseEvent("mouseout"));
@@ -290,7 +290,7 @@ describe("CardTooltip", function () {
       expect(tooltip.tooltipElement?.style.display).toBe("none");
     });
 
-    it("calls onMouseout callback with element if provided", function () {
+    it("calls onMouseout callback with element if provided", () => {
       const spy = jest.fn();
 
       tooltip = new CardTooltip({
@@ -306,8 +306,8 @@ describe("CardTooltip", function () {
     });
   });
 
-  describe("triggerOnMouseover", function () {
-    it("calls onMouseover handler", function () {
+  describe("triggerOnMouseover", () => {
+    it("calls onMouseover handler", () => {
       const spy = jest.fn();
       const el = document.createElement("div");
       const tooltip = new CardTooltip({
@@ -320,7 +320,7 @@ describe("CardTooltip", function () {
       expect(spy).toBeCalledWith(el);
     });
 
-    it("does not error if no onMouseover option is passed", function () {
+    it("does not error if no onMouseover option is passed", () => {
       const el = document.createElement("div");
       const tooltip = new CardTooltip();
 
@@ -330,8 +330,8 @@ describe("CardTooltip", function () {
     });
   });
 
-  describe("triggerOnMouseout", function () {
-    it("calls onMouseout handler", function () {
+  describe("triggerOnMouseout", () => {
+    it("calls onMouseout handler", () => {
       const spy = jest.fn();
       const el = document.createElement("div");
       const tooltip = new CardTooltip({
@@ -344,7 +344,7 @@ describe("CardTooltip", function () {
       expect(spy).toBeCalledWith(el);
     });
 
-    it("does not error if no onMouseout option is passed", function () {
+    it("does not error if no onMouseout option is passed", () => {
       const el = document.createElement("div");
       const tooltip = new CardTooltip();
 

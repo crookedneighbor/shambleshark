@@ -1,13 +1,13 @@
 import { sortByAttribute } from "Lib/sort";
 
-describe("sort.sortByAttribute", function () {
+describe("sort.sortByAttribute", () => {
   let array: {
     id: number;
     name: string | number;
     bool: boolean;
   }[];
 
-  beforeEach(function () {
+  beforeEach(() => {
     array = [
       {
         id: 3,
@@ -27,7 +27,7 @@ describe("sort.sortByAttribute", function () {
     ];
   });
 
-  it("creates a sort handler to sort arrays of objects by specific attributes", function () {
+  it("creates a sort handler to sort arrays of objects by specific attributes", () => {
     const nameHandler = sortByAttribute(["name"]);
 
     array.sort(nameHandler);
@@ -53,7 +53,7 @@ describe("sort.sortByAttribute", function () {
     expect(array[2].name).toBe("C-Last Entry");
   });
 
-  it("disregards case of string values", function () {
+  it("disregards case of string values", () => {
     const handler = sortByAttribute(["name"]);
     array[0].name = "b-middle entry";
 
@@ -64,7 +64,7 @@ describe("sort.sortByAttribute", function () {
     expect(array[2].name).toBe("C-Last Entry");
   });
 
-  it("can sort by multiple attributes if the current attribute is identical", function () {
+  it("can sort by multiple attributes if the current attribute is identical", () => {
     const handler = sortByAttribute(["bool", "id", "name"]);
 
     array.push({
@@ -81,7 +81,7 @@ describe("sort.sortByAttribute", function () {
     expect(array[3].name).toBe("C-Last Entry");
   });
 
-  it("throws an error if typeof values do not match", function () {
+  it("throws an error if typeof values do not match", () => {
     const handler = sortByAttribute(["name"]);
     array[0].name = 123;
 
@@ -90,7 +90,7 @@ describe("sort.sortByAttribute", function () {
     }).toThrow("name `C-Last Entry` and name `123` are not of the same type");
   });
 
-  it("if one value is defined and the other is undefined, it does not throw and prefers the truthy value", function () {
+  it("if one value is defined and the other is undefined, it does not throw and prefers the truthy value", () => {
     const handler = sortByAttribute(["id"]);
     // @ts-ignore
     delete array[0].id;

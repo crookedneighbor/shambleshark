@@ -23,12 +23,12 @@ import {
 import { makeFakeDeck, makeFakeCard } from "Helpers/fake";
 import { mocked } from "ts-jest/utils";
 
-describe("Scryfall Globals", function () {
+describe("Scryfall Globals", () => {
   let ScryfallAPISpy: ScryfallAPIGlobal;
   let ScryfallSpy: ScryfallGlobal;
   let fakeDeck: Deck;
 
-  beforeEach(function () {
+  beforeEach(() => {
     jest.spyOn(bus, "emit").mockImplementation();
     fakeDeck = makeFakeDeck({
       id: "deck-id",
@@ -55,7 +55,7 @@ describe("Scryfall Globals", function () {
     ScryfallSpy = window.Scryfall = generateScryfallGlobal();
   });
 
-  describe("addHooksToCardManagementEvents", function () {
+  describe("addHooksToCardManagementEvents", () => {
     it.each([
       "addCard",
       "updateEntry",
@@ -129,7 +129,7 @@ describe("Scryfall Globals", function () {
       );
     });
 
-    it("does not attempt to replace Scryfall.deckbuilder.cleanUp if Scryfall.deckbuilder global is not available", function () {
+    it("does not attempt to replace Scryfall.deckbuilder.cleanUp if Scryfall.deckbuilder global is not available", () => {
       // @ts-ignore
       delete ScryfallSpy.deckbuilder;
 
@@ -138,7 +138,7 @@ describe("Scryfall Globals", function () {
       }).not.toThrow();
     });
 
-    it("does not attempt to replace ScryfallAPI methods if Scryfall API is not availabel", function () {
+    it("does not attempt to replace ScryfallAPI methods if Scryfall API is not availabel", () => {
       // @ts-ignore
       delete window.ScryfallAPI;
 
@@ -148,14 +148,14 @@ describe("Scryfall Globals", function () {
     });
   });
 
-  describe("getActiveDeckId", function () {
-    it("calls getActiveDeck to get the active deck", function () {
+  describe("getActiveDeckId", () => {
+    it("calls getActiveDeck to get the active deck", () => {
       return getActiveDeckId().then((id: string) => {
         expect(id).toBe("deck-id");
       });
     });
 
-    it("waits progressively longer for grant secret", async function () {
+    it("waits progressively longer for grant secret", async () => {
       let hasResolved = false;
       jest.useFakeTimers();
       // @ts-ignore
@@ -180,7 +180,7 @@ describe("Scryfall Globals", function () {
       expect(hasResolved).toBe(true);
     });
 
-    it("skips api call if the deck id is available in the url", function () {
+    it("skips api call if the deck id is available in the url", () => {
       jest.spyOn(url, "getDeckId").mockReturnValue("deck-id-from-url");
 
       return getActiveDeckId().then((id: string) => {
@@ -189,7 +189,7 @@ describe("Scryfall Globals", function () {
       });
     });
 
-    it("skips api call if the deck id is available on the window", function () {
+    it("skips api call if the deck id is available on the window", () => {
       ScryfallSpy.deckbuilder.deckId = "deck-id-from-window";
 
       return getActiveDeckId().then((id: string) => {
@@ -198,7 +198,7 @@ describe("Scryfall Globals", function () {
       });
     });
 
-    it("prefers deck id from url over window", function () {
+    it("prefers deck id from url over window", () => {
       jest.spyOn(url, "getDeckId").mockReturnValue("deck-id-from-url");
       ScryfallSpy.deckbuilder.deckId = "deck-id-from-window";
 
@@ -209,16 +209,16 @@ describe("Scryfall Globals", function () {
     });
   });
 
-  describe("getActiveDeck", function () {
-    it("resolves with the active deck", function () {
+  describe("getActiveDeck", () => {
+    it("resolves with the active deck", () => {
       return getActiveDeck().then((deck: Deck) => {
         expect(deck.id).toBe("deck-id");
       });
     });
   });
 
-  describe("getDeck", function () {
-    it("gets the active deck", function () {
+  describe("getDeck", () => {
+    it("gets the active deck", () => {
       const deck = makeFakeDeck({ id: "deck-id" });
 
       (ScryfallAPISpy.decks.get as jest.Mock).mockImplementation((id, cb) => {
@@ -236,8 +236,8 @@ describe("Scryfall Globals", function () {
     });
   });
 
-  describe("getDeckMetadata", function () {
-    it("gets the metadata from active deck", function () {
+  describe("getDeckMetadata", () => {
+    it("gets the metadata from active deck", () => {
       const deck = makeFakeDeck({
         id: "deck-id",
         primarySections: ["mainboard"],
@@ -265,8 +265,8 @@ describe("Scryfall Globals", function () {
     });
   });
 
-  describe("addCard", function () {
-    it("resolves with the card", function () {
+  describe("addCard", () => {
+    it("resolves with the card", () => {
       const card = makeFakeCard();
 
       (ScryfallAPISpy.decks.addCard as jest.Mock).mockImplementation(
@@ -287,8 +287,8 @@ describe("Scryfall Globals", function () {
     });
   });
 
-  describe("updateEntry", function () {
-    it("resolves with the card", function () {
+  describe("updateEntry", () => {
+    it("resolves with the card", () => {
       const cardToUpdate = makeFakeCard({ id: "card-id" });
       const card = makeFakeCard();
 
@@ -310,8 +310,8 @@ describe("Scryfall Globals", function () {
     });
   });
 
-  describe("removeEntry", function () {
-    it("calls destroy API", function () {
+  describe("removeEntry", () => {
+    it("calls destroy API", () => {
       const data = {};
 
       (ScryfallAPISpy.decks.destroyEntry as jest.Mock).mockImplementation(
@@ -330,18 +330,18 @@ describe("Scryfall Globals", function () {
     });
   });
 
-  describe("cleanUp", function () {
-    it("resolves after cleaning up", function () {
+  describe("cleanUp", () => {
+    it("resolves after cleaning up", () => {
       return cleanUp().then(() => {
         expect(ScryfallSpy.deckbuilder.cleanUp).toBeCalledTimes(1);
       });
     });
   });
 
-  describe("pushNotification", function () {
-    it("sends a push notification", function () {
+  describe("pushNotification", () => {
+    it("sends a push notification", () => {
       return pushNotification("Title", "message", "color", "category").then(
-        function () {
+        () => {
           expect(ScryfallSpy.pushNotification).toBeCalledTimes(1);
           expect(ScryfallSpy.pushNotification).toBeCalledWith(
             "Title",

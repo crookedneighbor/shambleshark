@@ -20,11 +20,11 @@ jest.mock("framebus");
 
 type EDHRecReplyHandler = (res: EDHRecResponse) => void;
 
-describe("makeEDHRecButton", function () {
+describe("makeEDHRecButton", () => {
   let getCardSpy: jest.SpyInstance;
   let getDeckSpy: jest.SpyInstance;
 
-  beforeEach(function () {
+  beforeEach(() => {
     getCardSpy = mocked(getCardBySetCodeAndCollectorNumber);
     getDeckSpy = mocked(getDeck).mockResolvedValue(
       makeFakeDeck({
@@ -47,19 +47,19 @@ describe("makeEDHRecButton", function () {
     jest.spyOn(Drawer.prototype, "scrollTo").mockImplementation();
   });
 
-  it("makes a button", function () {
+  it("makes a button", () => {
     const btn = makeEDHRecButton();
 
     expect(btn.tagName).toBe("BUTTON");
   });
 
-  it("adds an edhrec drawer to page", async function () {
+  it("adds an edhrec drawer to page", async () => {
     await makeEDHRecButton();
 
     expect(document.querySelector("#edhrec-drawer")).not.toBeFalsy();
   });
 
-  it("cleans up deck after drawer is closed", async function () {
+  it("cleans up deck after drawer is closed", async () => {
     const button = await makeEDHRecButton();
 
     button.click();
@@ -76,7 +76,7 @@ describe("makeEDHRecButton", function () {
     expect(bus.emit).toBeCalledWith("CLEAN_UP_DECK");
   });
 
-  it("focuses back on the button when closed", async function () {
+  it("focuses back on the button when closed", async () => {
     const button = await makeEDHRecButton();
 
     jest.spyOn(button, "focus");
@@ -94,12 +94,12 @@ describe("makeEDHRecButton", function () {
     expect(button.focus).toBeCalledTimes(1);
   });
 
-  describe("when clicked", function () {
+  describe("when clicked", () => {
     let fakeDeck: Partial<Deck>,
       fakeEDHRecResponse: EDHRecResponse,
       click: (btn: HTMLButtonElement) => void;
 
-    beforeEach(async function () {
+    beforeEach(async () => {
       click = (btn: HTMLButtonElement) => {
         // https://stackoverflow.com/a/2706236/2601552
         const evObj = document.createEvent("Events");
@@ -194,12 +194,12 @@ describe("makeEDHRecButton", function () {
       getDeckSpy.mockResolvedValue(fakeDeck);
     });
 
-    afterEach(async function () {
+    afterEach(async () => {
       // allow mocked promises to resolve
       await wait();
     });
 
-    it("opens the drawer", function () {
+    it("opens the drawer", () => {
       const btn = makeEDHRecButton();
 
       jest.spyOn(Drawer.prototype, "open");
@@ -209,7 +209,7 @@ describe("makeEDHRecButton", function () {
       expect(Drawer.prototype.open).toBeCalledTimes(1);
     });
 
-    it("emits a request for EDHRec recomendations with deck data", async function () {
+    it("emits a request for EDHRec recomendations with deck data", async () => {
       const btn = await makeEDHRecButton();
 
       click(btn);
@@ -227,7 +227,7 @@ describe("makeEDHRecButton", function () {
       );
     });
 
-    it("attempts any number of cards in command zone", async function () {
+    it("attempts any number of cards in command zone", async () => {
       fakeDeck.entries!.commanders = [
         makeFakeCard({
           id: "sidar-id",
@@ -268,7 +268,7 @@ describe("makeEDHRecButton", function () {
       );
     });
 
-    it("does not error when cards in deck are missing the card_digest", async function () {
+    it("does not error when cards in deck are missing the card_digest", async () => {
       fakeDeck.entries?.lands?.push(
         makeFakeCard({
           cardDigest: false,
@@ -311,7 +311,7 @@ describe("makeEDHRecButton", function () {
       );
     });
 
-    it("displays specific error when edhrec request errors with specific errors", async function () {
+    it("displays specific error when edhrec request errors with specific errors", async () => {
       mocked(bus.emit).mockImplementation(
         (
           eventName: string,
@@ -345,7 +345,7 @@ describe("makeEDHRecButton", function () {
       expect(errors[1].innerText).toContain("2 error");
     });
 
-    it("populates drawer with list of recomendations organized by type", async function () {
+    it("populates drawer with list of recomendations organized by type", async () => {
       jest.spyOn(Drawer.prototype, "setLoading");
 
       const btn = await makeEDHRecButton();
@@ -387,7 +387,7 @@ describe("makeEDHRecButton", function () {
       );
     });
 
-    it("looks up card in scryfall and adds it to deck when chosen", async function () {
+    it("looks up card in scryfall and adds it to deck when chosen", async () => {
       const btn = await makeEDHRecButton();
       getCardSpy.mockResolvedValue({
         name: "Arcane Denial",
@@ -416,7 +416,7 @@ describe("makeEDHRecButton", function () {
       });
     });
 
-    it("looks up card in scryfall and adds it to particualr section in deck when chosen", async function () {
+    it("looks up card in scryfall and adds it to particualr section in deck when chosen", async () => {
       const btn = await makeEDHRecButton();
       getCardSpy.mockResolvedValue({
         name: "Arcane Denial",
@@ -450,7 +450,7 @@ describe("makeEDHRecButton", function () {
       });
     });
 
-    it("organizes sections in particular order", async function () {
+    it("organizes sections in particular order", async () => {
       fakeEDHRecResponse.inRecs.push(
         makeFakeEDHRecSuggestion({
           names: ["Fake Creature"],
@@ -490,7 +490,7 @@ describe("makeEDHRecButton", function () {
       expect(sections[6].querySelector("h3")?.innerHTML).toBe("Lands");
     });
 
-    it("ignores unknown sections", async function () {
+    it("ignores unknown sections", async () => {
       fakeEDHRecResponse.inRecs.push(
         makeFakeEDHRecSuggestion({
           names: ["Fake Unknown Type"],

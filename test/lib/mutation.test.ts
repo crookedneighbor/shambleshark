@@ -1,12 +1,12 @@
 import { reset, change, ready } from "Lib/mutation";
 
-describe("mutation", function () {
-  describe("ready", function () {
-    afterEach(function () {
+describe("mutation", () => {
+  describe("ready", () => {
+    afterEach(() => {
       reset();
     });
 
-    it("applies transformation to specified DOM nodes right away", function () {
+    it("applies transformation to specified DOM nodes right away", () => {
       const spy = jest.fn();
 
       const div = document.createElement("div");
@@ -25,7 +25,7 @@ describe("mutation", function () {
       expect(spy).toBeCalledWith(div2);
     });
 
-    it("only creates observer once", function () {
+    it("only creates observer once", () => {
       const spy = jest.fn();
 
       jest.spyOn(window.MutationObserver.prototype, "observe");
@@ -45,7 +45,7 @@ describe("mutation", function () {
       expect(window.MutationObserver.prototype.observe).toBeCalledTimes(1);
     });
 
-    it("applies transformation to specified DOM nodes only once", function () {
+    it("applies transformation to specified DOM nodes only once", () => {
       const spy = jest.fn();
       const spy2 = jest.fn();
 
@@ -71,8 +71,8 @@ describe("mutation", function () {
     });
   });
 
-  describe("change", function () {
-    it("observes DOM node for selector when ready", function () {
+  describe("change", () => {
+    it("observes DOM node for selector when ready", () => {
       const node = document.createElement("div");
 
       node.id = "parent";

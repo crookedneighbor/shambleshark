@@ -19,7 +19,7 @@ jest.mock("framebus");
 jest.mock("Js/scryfall-embed/modify-clean-up/sorting");
 jest.mock("Js/scryfall-embed/modify-clean-up/add-section-heading");
 
-describe("modifyCleanUp", function () {
+describe("modifyCleanUp", () => {
   beforeEach(() => {
     window.Scryfall = generateScryfallGlobal();
   });
@@ -43,7 +43,7 @@ describe("modifyCleanUp", function () {
       jest.spyOn(scryfall, "updateEntry").mockResolvedValue(makeFakeCard());
     });
 
-    it("replaces the cleanup function", function () {
+    it("replaces the cleanup function", () => {
       modifyCleanUp();
 
       const newCleanupFunction = window.Scryfall.deckbuilder.cleanUp;
@@ -51,7 +51,7 @@ describe("modifyCleanUp", function () {
       expect(newCleanupFunction).not.toEqual(originalCleanupFunction);
     });
 
-    it("moves lands in nonlands section back to lands section when configured", async function () {
+    it("moves lands in nonlands section back to lands section when configured", async () => {
       modifyCleanUp({
         cleanUpLandsInSingleton: true,
       });
@@ -104,7 +104,7 @@ describe("modifyCleanUp", function () {
       expect(anotherCardWithLandType.section).toBe("lands");
     });
 
-    it("moves nonlands in lands section back to nonlands section when configured", async function () {
+    it("moves nonlands in lands section back to nonlands section when configured", async () => {
       modifyCleanUp({
         cleanUpLandsInSingleton: true,
       });
@@ -157,7 +157,7 @@ describe("modifyCleanUp", function () {
       expect(anotherCardWithNonLandType.section).toBe("nonlands");
     });
 
-    it("moves creaturelands in lands section back to nonlands section when configured", async function () {
+    it("moves creaturelands in lands section back to nonlands section when configured", async () => {
       modifyCleanUp({
         cleanUpLandsInSingleton: true,
       });
@@ -208,7 +208,7 @@ describe("modifyCleanUp", function () {
       );
     });
 
-    it("does not move creaturelands in nonlands section to lands section", async function () {
+    it("does not move creaturelands in nonlands section to lands section", async () => {
       modifyCleanUp({
         cleanUpLandsInSingleton: true,
       });
@@ -248,7 +248,7 @@ describe("modifyCleanUp", function () {
       expect(scryfall.updateEntry).toBeCalledTimes(0);
     });
 
-    it("does not move lands that transform into creatures to nonlands", async function () {
+    it("does not move lands that transform into creatures to nonlands", async () => {
       modifyCleanUp({
         cleanUpLandsInSingleton: true,
       });
@@ -288,7 +288,7 @@ describe("modifyCleanUp", function () {
       expect(scryfall.updateEntry).toBeCalledTimes(0);
     });
 
-    it("moves lands that transform into creatures to lands", async function () {
+    it("moves lands that transform into creatures to lands", async () => {
       modifyCleanUp({
         cleanUpLandsInSingleton: true,
       });
@@ -339,7 +339,7 @@ describe("modifyCleanUp", function () {
       );
     });
 
-    it("does not move lands that transform into non-creature permaments to nonlands", async function () {
+    it("does not move lands that transform into non-creature permaments to nonlands", async () => {
       modifyCleanUp({
         cleanUpLandsInSingleton: true,
       });
@@ -397,7 +397,7 @@ describe("modifyCleanUp", function () {
       expect(scryfall.updateEntry).toBeCalledTimes(0);
     });
 
-    it("moves lands that transform into non-creature permants to lands", async function () {
+    it("moves lands that transform into non-creature permants to lands", async () => {
       modifyCleanUp({
         cleanUpLandsInSingleton: true,
       });
@@ -461,7 +461,7 @@ describe("modifyCleanUp", function () {
       expect(yetAnotherLandTransformCard.section).toBe("lands");
     });
 
-    it("does not update cards if nothing is available to update", async function () {
+    it("does not update cards if nothing is available to update", async () => {
       modifyCleanUp({
         cleanUpLandsInSingleton: true,
       });
