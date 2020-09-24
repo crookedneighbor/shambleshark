@@ -10,68 +10,21 @@ import iframe from "Lib/iframe";
 import createElement from "Lib/create-element";
 import { ready as elementReady } from "Lib/mutation";
 import { sortByAttribute } from "Lib/sort";
+import TaggerIcon from "Lib/ui-elements/tagger-icon";
 import "./index.css";
 import type { TaggerPayload } from "Js/types/tagger";
 
-import {
-  TAGGER_SYMBOL,
-  ILLUSTRATION_SYMBOL,
-  CARD_SYMBOL,
-  PRINTING_SYMBOL,
-  CREATURE_BODY_SYMBOL,
-  DEPICTS_SYMBOL,
-  SEEN_BEFORE_SYMBOL,
-  BETTER_THAN_SYMBOL,
-  COLORSHIFTED_SYMBOL,
-  MIRRORS_SYMBOL,
-  RELATED_TO_SYMBOL,
-  SIMILAR_TO_SYMBOL,
-} from "Svg";
+import { TAGGER_SYMBOL } from "Svg";
 
 const SPINNER_GIF = getURL("spinner.gif");
 
 export interface ShamblesharkRelationship {
   name: string;
-  symbol: string;
-  liClass?: string;
+  symbol: TaggerIcon;
   isTag?: boolean;
 }
 
 type RelationshipCollection = Record<string, ShamblesharkRelationship[]>;
-
-const TAG_SYMBOLS: Record<string, string> = {
-  ILLUSTRATION_TAG: ILLUSTRATION_SYMBOL,
-  ORACLE_CARD_TAG: CARD_SYMBOL,
-  PRINTING_TAG: PRINTING_SYMBOL,
-};
-
-const RELATIONSHIP_SYMBOLS: Record<string, string> = {
-  BETTER_THAN: BETTER_THAN_SYMBOL,
-  COLORSHIFTED: COLORSHIFTED_SYMBOL,
-  COMES_AFTER: SEEN_BEFORE_SYMBOL,
-  COMES_BEFORE: SEEN_BEFORE_SYMBOL,
-  DEPICTED_IN: DEPICTS_SYMBOL,
-  DEPICTS: DEPICTS_SYMBOL,
-  MIRRORS: MIRRORS_SYMBOL,
-  REFERENCED_BY: DEPICTS_SYMBOL,
-  REFERENCES_TO: DEPICTS_SYMBOL,
-  RELATED_TO: RELATED_TO_SYMBOL,
-  SIMILAR_TO: SIMILAR_TO_SYMBOL,
-  WITHOUT_BODY: CREATURE_BODY_SYMBOL,
-  WITH_BODY: CREATURE_BODY_SYMBOL,
-  WORSE_THAN: BETTER_THAN_SYMBOL,
-};
-
-const SYMBOLS_THAT_MUST_BE_FLIPPED = {
-  WITHOUT_BODY: true,
-};
-
-const SYMBOLS_THAT_MUST_BE_REVERSED = {
-  COMES_BEFORE: true,
-  DEPICTS: true,
-  REFERENCES_TO: true,
-  BETTER_THAN: true,
-};
 
 // TODOS nice to haves
 // * handle small screens
@@ -269,10 +222,10 @@ class TaggerLink extends Feature {
     };
 
     payload.taggings?.forEach((t) => {
-      const type = t.tag.type;
-      const key = tagToCollectionMap[type];
+      const tagType = t.tag.type;
+      const key = tagToCollectionMap[tagType];
       const tagsByType = tags[key];
-      const symbol = TAG_SYMBOLS[type];
+      const symbol = new TaggerIcon(tagType);
 
       if (tagsByType) {
         tagsByType.push({
@@ -297,24 +250,18 @@ class TaggerLink extends Feature {
     };
 
     payload.relationships?.forEach((r) => {
-      let name, type;
-      let liClass = "";
+      let name, tagType;
       const isTheRelatedTag = payload[r.foreignKey] === r.relatedId;
+
       if (isTheRelatedTag) {
         name = r.contentName;
-        type = r.classifier;
+        tagType = r.classifier;
       } else {
         name = r.relatedName;
-        type = r.classifierInverse;
+        tagType = r.classifierInverse;
       }
 
-      const symbol = RELATIONSHIP_SYMBOLS[type] || "";
-
-      if (type in SYMBOLS_THAT_MUST_BE_FLIPPED) {
-        liClass = "icon-upside-down";
-      } else if (type in SYMBOLS_THAT_MUST_BE_REVERSED) {
-        liClass = "icon-flipped";
-      }
+      const symbol = new TaggerIcon(tagType || "");
 
       const relationshipsFromType =
         relationships[typeToRelationshipMap[r.foreignKey]];
@@ -323,7 +270,6 @@ class TaggerLink extends Feature {
         relationshipsFromType.push({
           name,
           symbol,
-          liClass,
         });
       }
     });
@@ -348,13 +294,10 @@ class TaggerLink extends Feature {
         return;
       }
 
-      const li = createElement(`<li>
-        ${tag.symbol} ${tag.name}
-        </li>`);
+      const li = document.createElement("li");
+      li.appendChild(tag.symbol.element);
+      li.appendChild(createElement(`<span>${tag.name}</span>`));
 
-      if (tag.liClass) {
-        li.classList.add(tag.liClass);
-      }
       menu.appendChild(li);
     });
   }

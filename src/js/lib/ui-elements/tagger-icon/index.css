@@ -1,0 +1,7 @@
+.icon-upside-down svg {
+  transform: scale(-1);
+}
+
+.icon-flipped svg {
+  transform: scale(-1, 1);
+}

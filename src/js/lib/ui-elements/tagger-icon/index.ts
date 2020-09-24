@@ -1,0 +1,63 @@
+import createElement from "Lib/create-element";
+
+import "./index.css";
+
+import {
+  ILLUSTRATION_SYMBOL,
+  CARD_SYMBOL,
+  PRINTING_SYMBOL,
+  CREATURE_BODY_SYMBOL,
+  DEPICTS_SYMBOL,
+  SEEN_BEFORE_SYMBOL,
+  BETTER_THAN_SYMBOL,
+  COLORSHIFTED_SYMBOL,
+  MIRRORS_SYMBOL,
+  RELATED_TO_SYMBOL,
+  SIMILAR_TO_SYMBOL,
+} from "./svg";
+
+const TAG_SYMBOLS: Record<string, string> = {
+  ILLUSTRATION_TAG: ILLUSTRATION_SYMBOL,
+  ORACLE_CARD_TAG: CARD_SYMBOL,
+  PRINTING_TAG: PRINTING_SYMBOL,
+  BETTER_THAN: BETTER_THAN_SYMBOL,
+  COLORSHIFTED: COLORSHIFTED_SYMBOL,
+  COMES_AFTER: SEEN_BEFORE_SYMBOL,
+  COMES_BEFORE: SEEN_BEFORE_SYMBOL,
+  DEPICTED_IN: DEPICTS_SYMBOL,
+  DEPICTS: DEPICTS_SYMBOL,
+  MIRRORS: MIRRORS_SYMBOL,
+  REFERENCED_BY: DEPICTS_SYMBOL,
+  REFERENCES_TO: DEPICTS_SYMBOL,
+  RELATED_TO: RELATED_TO_SYMBOL,
+  SIMILAR_TO: SIMILAR_TO_SYMBOL,
+  WITHOUT_BODY: CREATURE_BODY_SYMBOL,
+  WITH_BODY: CREATURE_BODY_SYMBOL,
+  WORSE_THAN: BETTER_THAN_SYMBOL,
+};
+
+const SYMBOLS_THAT_MUST_BE_FLIPPED = {
+  WITHOUT_BODY: true,
+};
+
+const SYMBOLS_THAT_MUST_BE_REVERSED = {
+  COMES_BEFORE: true,
+  DEPICTS: true,
+  REFERENCES_TO: true,
+  BETTER_THAN: true,
+};
+
+export default class TaggerIcon {
+  element: HTMLDivElement;
+
+  constructor(tagType: string) {
+    const svg = TAG_SYMBOLS[tagType];
+    this.element = createElement(`<span>${svg}</span>`);
+
+    if (tagType in SYMBOLS_THAT_MUST_BE_FLIPPED) {
+      this.element.classList.add("icon-upside-down");
+    } else if (tagType in SYMBOLS_THAT_MUST_BE_REVERSED) {
+      this.element.classList.add("icon-flipped");
+    }
+  }
+}

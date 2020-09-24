@@ -4,22 +4,10 @@ import TaggerLink, {
 } from "Features/search-results-features/tagger-link";
 import type { TaggerPayload } from "Js/types/tagger";
 import iframe from "Lib/iframe";
+import TaggerIcon from "Ui/tagger-icon";
 import { ready } from "Lib/mutation";
 import noop from "Lib/noop";
 
-import {
-  ILLUSTRATION_SYMBOL,
-  CARD_SYMBOL,
-  PRINTING_SYMBOL,
-  CREATURE_BODY_SYMBOL,
-  DEPICTS_SYMBOL,
-  SEEN_BEFORE_SYMBOL,
-  BETTER_THAN_SYMBOL,
-  COLORSHIFTED_SYMBOL,
-  MIRRORS_SYMBOL,
-  RELATED_TO_SYMBOL,
-  SIMILAR_TO_SYMBOL,
-} from "Svg";
 import SpyInstance = jest.SpyInstance;
 import { mocked } from "ts-jest/utils";
 
@@ -518,21 +506,21 @@ describe("Tagger Link", () => {
           {
             name: "Tag 1",
             isTag: true,
-            symbol: ILLUSTRATION_SYMBOL,
+            symbol: expect.any(TaggerIcon),
           },
         ],
         oracle: [
           {
             name: "Tag 2",
             isTag: true,
-            symbol: CARD_SYMBOL,
+            symbol: expect.any(TaggerIcon),
           },
         ],
         print: [
           {
             name: "Tag 3",
             isTag: true,
-            symbol: PRINTING_SYMBOL,
+            symbol: expect.any(TaggerIcon),
           },
         ],
       });
@@ -553,21 +541,21 @@ describe("Tagger Link", () => {
           {
             name: "Tag 1",
             isTag: true,
-            symbol: ILLUSTRATION_SYMBOL,
+            symbol: expect.any(TaggerIcon),
           },
         ],
         oracle: [
           {
             name: "Tag 2",
             isTag: true,
-            symbol: CARD_SYMBOL,
+            symbol: expect.any(TaggerIcon),
           },
         ],
         print: [
           {
             name: "Tag 3",
             isTag: true,
-            symbol: PRINTING_SYMBOL,
+            symbol: expect.any(TaggerIcon),
           },
         ],
       });
@@ -610,15 +598,13 @@ describe("Tagger Link", () => {
         art: [
           {
             name: "Depicted Relationship",
-            liClass: "",
-            symbol: DEPICTS_SYMBOL,
+            symbol: expect.any(TaggerIcon),
           },
         ],
         oracle: [
           {
             name: "Worse Than Relationship",
-            liClass: "",
-            symbol: BETTER_THAN_SYMBOL,
+            symbol: expect.any(TaggerIcon),
           },
         ],
       });
@@ -633,15 +619,13 @@ describe("Tagger Link", () => {
         art: [
           {
             name: "Depicted Relationship",
-            liClass: "",
-            symbol: "",
+            symbol: expect.any(TaggerIcon),
           },
         ],
         oracle: [
           {
             name: "Worse Than Relationship",
-            liClass: "",
-            symbol: "",
+            symbol: expect.any(TaggerIcon),
           },
         ],
       });
@@ -683,73 +667,59 @@ describe("Tagger Link", () => {
         oracle: [
           {
             name: "BETTER_THAN related",
-            liClass: "icon-flipped",
-            symbol: BETTER_THAN_SYMBOL,
+            symbol: expect.any(TaggerIcon),
           },
           {
             name: "COLORSHIFTED related",
-            liClass: "",
-            symbol: COLORSHIFTED_SYMBOL,
+            symbol: expect.any(TaggerIcon),
           },
           {
             name: "COMES_AFTER related",
-            liClass: "",
-            symbol: SEEN_BEFORE_SYMBOL,
+            symbol: expect.any(TaggerIcon),
           },
           {
             name: "COMES_BEFORE related",
-            liClass: "icon-flipped",
-            symbol: SEEN_BEFORE_SYMBOL,
+            symbol: expect.any(TaggerIcon),
           },
           {
             name: "DEPICTED_IN related",
-            liClass: "",
-            symbol: DEPICTS_SYMBOL,
+            symbol: expect.any(TaggerIcon),
           },
           {
             name: "DEPICTS related",
-            liClass: "icon-flipped",
-            symbol: DEPICTS_SYMBOL,
+            symbol: expect.any(TaggerIcon),
           },
           {
             name: "MIRRORS related",
-            liClass: "",
-            symbol: MIRRORS_SYMBOL,
+            symbol: expect.any(TaggerIcon),
           },
           {
             name: "REFERENCED_BY related",
-            liClass: "",
-            symbol: DEPICTS_SYMBOL,
+            symbol: expect.any(TaggerIcon),
           },
           {
             name: "REFERENCES_TO related",
-            liClass: "icon-flipped",
-            symbol: DEPICTS_SYMBOL,
+            symbol: expect.any(TaggerIcon),
           },
           {
             name: "RELATED_TO related",
-            liClass: "",
-            symbol: RELATED_TO_SYMBOL,
+            symbol: expect.any(TaggerIcon),
           },
           {
             name: "SIMILAR_TO related",
-            liClass: "",
-            symbol: SIMILAR_TO_SYMBOL,
+            symbol: expect.any(TaggerIcon),
           },
           {
             name: "WITHOUT_BODY related",
-            liClass: "icon-upside-down",
-            symbol: CREATURE_BODY_SYMBOL,
+            symbol: expect.any(TaggerIcon),
           },
           {
             name: "WITH_BODY related",
-            liClass: "",
-            symbol: CREATURE_BODY_SYMBOL,
+            symbol: expect.any(TaggerIcon),
           },
           {
             name: "WORSE_THAN related",
-            liClass: "",
-            symbol: BETTER_THAN_SYMBOL,
+            symbol: expect.any(TaggerIcon),
           },
         ],
       });
@@ -773,8 +743,7 @@ describe("Tagger Link", () => {
         oracle: [
           {
             name: "Content Name",
-            liClass: "icon-flipped",
-            symbol: BETTER_THAN_SYMBOL,
+            symbol: expect.any(TaggerIcon),
           },
         ],
       });
@@ -798,8 +767,7 @@ describe("Tagger Link", () => {
         oracle: [
           {
             name: "Related Name",
-            liClass: "",
-            symbol: BETTER_THAN_SYMBOL,
+            symbol: expect.any(TaggerIcon),
           },
         ],
       });
@@ -823,15 +791,13 @@ describe("Tagger Link", () => {
         art: [
           {
             name: "Depicted Relationship",
-            liClass: "",
-            symbol: DEPICTS_SYMBOL,
+            symbol: expect.any(TaggerIcon),
           },
         ],
         oracle: [
           {
             name: "Worse Than Relationship",
-            liClass: "",
-            symbol: BETTER_THAN_SYMBOL,
+            symbol: expect.any(TaggerIcon),
           },
         ],
       });
@@ -849,11 +815,11 @@ describe("Tagger Link", () => {
       tags = [
         {
           name: "Tag 1",
-          symbol: "symbol 1",
+          symbol: new TaggerIcon("ILLUSTRATION_TAG"),
         },
         {
           name: "Tag 2",
-          symbol: "symbol 2",
+          symbol: new TaggerIcon("ILLUSTRATION_TAG"),
         },
       ];
     });
@@ -862,37 +828,35 @@ describe("Tagger Link", () => {
       tl.addTagsToMenu(tags, menu);
 
       expect(menu.children.length).toBe(2);
-      expect(menu.children[0].innerHTML).toContain("symbol 1 Tag 1");
-      expect(menu.children[1].innerHTML).toContain("symbol 2 Tag 2");
+      expect(menu.children[0].innerHTML).toContain("Tag 1");
+      expect(menu.children[1].innerHTML).toContain("Tag 2");
     });
 
     it("sorts by name", () => {
       tags.push({
         name: "First",
-        symbol: "symbol 3",
+        symbol: new TaggerIcon("ILLUSTRATION_TAG"),
       });
       tl.addTagsToMenu(tags, menu);
 
       expect(menu.children.length).toBe(3);
-      expect(menu.children[0].innerHTML).toContain("symbol 3 First");
-      expect(menu.children[1].innerHTML).toContain("symbol 1 Tag 1");
-      expect(menu.children[2].innerHTML).toContain("symbol 2 Tag 2");
+      expect(menu.children[0].innerHTML).toContain("First");
+      expect(menu.children[1].innerHTML).toContain("Tag 1");
+      expect(menu.children[2].innerHTML).toContain("Tag 2");
     });
 
     it("prefers tags when sorting", () => {
       tags.push({
         name: "Z - last alphabetically",
         isTag: true,
-        symbol: "symbol 3",
+        symbol: new TaggerIcon("ILLUSTRATION_TAG"),
       });
       tl.addTagsToMenu(tags, menu);
 
       expect(menu.children.length).toBe(3);
-      expect(menu.children[0].innerHTML).toContain(
-        "symbol 3 Z - last alphabetically"
-      );
-      expect(menu.children[1].innerHTML).toContain("symbol 1 Tag 1");
-      expect(menu.children[2].innerHTML).toContain("symbol 2 Tag 2");
+      expect(menu.children[0].innerHTML).toContain("Z - last alphabetically");
+      expect(menu.children[1].innerHTML).toContain("Tag 1");
+      expect(menu.children[2].innerHTML).toContain("Tag 2");
     });
 
     it("prints a + x more tag when there are more than 8 tags", () => {
@@ -901,7 +865,7 @@ describe("Tagger Link", () => {
         index++;
         tags.push({
           name: `name ${index}`,
-          symbol: `symbol ${index}`,
+          symbol: new TaggerIcon("ILLUSTRATION_TAG"),
         });
       });
       tl.addTagsToMenu(tags, menu);
@@ -916,21 +880,21 @@ describe("Tagger Link", () => {
         index++;
         tags.push({
           name: `name ${index}`,
-          symbol: `symbol ${index}`,
+          symbol: new TaggerIcon("ILLUSTRATION_TAG"),
         });
       });
       tl.addTagsToMenu(tags, menu);
 
       expect(menu.children.length).toBe(9);
-      expect(menu.children[0].innerHTML).toContain("symbol 1 name 1");
-      expect(menu.children[1].innerHTML).toContain("symbol 2 name 2");
-      expect(menu.children[2].innerHTML).toContain("symbol 3 name 3");
-      expect(menu.children[3].innerHTML).toContain("symbol 4 name 4");
-      expect(menu.children[4].innerHTML).toContain("symbol 5 name 5");
-      expect(menu.children[5].innerHTML).toContain("symbol 6 name 6");
-      expect(menu.children[6].innerHTML).toContain("symbol 7 name 7");
-      expect(menu.children[7].innerHTML).toContain("symbol 8 name 8");
-      expect(menu.children[8].innerHTML).not.toContain("symbol 9 name 9");
+      expect(menu.children[0].innerHTML).toContain("name 1");
+      expect(menu.children[1].innerHTML).toContain("name 2");
+      expect(menu.children[2].innerHTML).toContain("name 3");
+      expect(menu.children[3].innerHTML).toContain("name 4");
+      expect(menu.children[4].innerHTML).toContain("name 5");
+      expect(menu.children[5].innerHTML).toContain("name 6");
+      expect(menu.children[6].innerHTML).toContain("name 7");
+      expect(menu.children[7].innerHTML).toContain("name 8");
+      expect(menu.children[8].innerHTML).not.toContain("name 9");
     });
   });
 });

@@ -78,14 +78,6 @@
   position: relative;
 }
 
-.icon-upside-down svg {
-  transform: scale(-1);
-}
-
-.icon-flipped svg {
-  transform: scale(-1, 1);
-}
-
 .tagger-link-button:hover .tagger-link-hover {
   display: block;
 }
