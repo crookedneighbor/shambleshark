@@ -1,30 +1,21 @@
-import bus from "framebus";
 import { getURL } from "Browser/runtime";
 import Feature from "Feature";
+import { FEATURE_IDS as ids, FEATURE_SECTIONS as sections } from "Constants";
 import {
-  BUS_EVENTS as events,
-  FEATURE_IDS as ids,
-  FEATURE_SECTIONS as sections,
-} from "Constants";
-import iframe from "Lib/iframe";
+  setupBridgeToTagger,
+  requestTags,
+  TagEntries,
+  TagInfo,
+} from "Lib/tagger-bridge";
 import createElement from "Lib/create-element";
 import { ready as elementReady } from "Lib/mutation";
 import { sortByAttribute } from "Lib/sort";
 import TaggerIcon from "Lib/ui-elements/tagger-icon";
 import "./index.css";
-import type { TaggerPayload } from "Js/types/tagger";
 
 import { TAGGER_SYMBOL } from "Svg";
 
 const SPINNER_GIF = getURL("spinner.gif");
-
-export interface ShamblesharkRelationship {
-  name: string;
-  symbol: TaggerIcon;
-  isTag?: boolean;
-}
-
-type RelationshipCollection = Record<string, ShamblesharkRelationship[]>;
 
 // TODOS nice to haves
 // * handle small screens
@@ -86,14 +77,9 @@ class TaggerLink extends Feature {
       return;
     }
 
-    bus.on(events.TAGGER_READY, () => {
-      this.setupButtons();
-    });
+    await setupBridgeToTagger();
 
-    await iframe.create({
-      id: "tagger-link-tagger-iframe",
-      src: "https://tagger.scryfall.com",
-    });
+    this.setupButtons();
   }
 
   setupButtons(): void {
@@ -164,10 +150,8 @@ class TaggerLink extends Feature {
       }
 
       if (!request) {
-        request = new Promise((resolve) => {
-          bus.emit(events.TAGGER_TAGS_REQUEST, taggerData, resolve);
-        }).then((payload) => {
-          this.addTags(tooltip, payload as TaggerPayload);
+        request = requestTags(taggerData).then((tagData) => {
+          this.addTags(tooltip, tagData);
         });
       }
 
@@ -175,7 +159,7 @@ class TaggerLink extends Feature {
     };
   }
 
-  addTags(tooltip: HTMLElement, payload: TaggerPayload): void {
+  addTags(tooltip: HTMLElement, payload: TagEntries): void {
     const menuContainer = tooltip.querySelector(
       ".menu-container"
     ) as HTMLElement;
@@ -185,10 +169,8 @@ class TaggerLink extends Feature {
       ".modal-dialog-spinner"
     ) as HTMLElement;
 
-    const tags = this.collectTags(payload);
-    const relationships = this.collectRelationships(payload);
-    const artEntries = tags.art.concat(tags.print).concat(relationships.art);
-    const oracleEntries = tags.oracle.concat(relationships.oracle);
+    const artEntries = payload.art;
+    const oracleEntries = payload.oracle;
 
     spinner.classList.add("hidden");
 
@@ -209,78 +191,7 @@ class TaggerLink extends Feature {
     tooltip.style.top = `-${Math.floor(tooltip.offsetHeight / 3.75)}px`;
   }
 
-  collectTags(payload: TaggerPayload): RelationshipCollection {
-    const tags: RelationshipCollection = {
-      art: [],
-      oracle: [],
-      print: [],
-    };
-    const tagToCollectionMap: Record<string, string> = {
-      ILLUSTRATION_TAG: "art",
-      ORACLE_CARD_TAG: "oracle",
-      PRINTING_TAG: "print",
-    };
-
-    payload.taggings?.forEach((t) => {
-      const tagType = t.tag.type;
-      const key = tagToCollectionMap[tagType];
-      const tagsByType = tags[key];
-      const symbol = new TaggerIcon(tagType);
-
-      if (tagsByType) {
-        tagsByType.push({
-          symbol,
-          isTag: true,
-          name: t.tag.name,
-        });
-      }
-    });
-
-    return tags;
-  }
-
-  collectRelationships(payload: TaggerPayload): RelationshipCollection {
-    const relationships: RelationshipCollection = {
-      art: [],
-      oracle: [],
-    };
-    const typeToRelationshipMap: Record<string, string> = {
-      illustrationId: "art",
-      oracleId: "oracle",
-    };
-
-    payload.relationships?.forEach((r) => {
-      let name, tagType;
-      const isTheRelatedTag = payload[r.foreignKey] === r.relatedId;
-
-      if (isTheRelatedTag) {
-        name = r.contentName;
-        tagType = r.classifier;
-      } else {
-        name = r.relatedName;
-        tagType = r.classifierInverse;
-      }
-
-      const symbol = new TaggerIcon(tagType || "");
-
-      const relationshipsFromType =
-        relationships[typeToRelationshipMap[r.foreignKey]];
-
-      if (relationshipsFromType) {
-        relationshipsFromType.push({
-          name,
-          symbol,
-        });
-      }
-    });
-
-    return relationships;
-  }
-
-  addTagsToMenu(
-    tags: ShamblesharkRelationship[],
-    menu: HTMLUListElement
-  ): void {
+  addTagsToMenu(tags: TagInfo[], menu: HTMLUListElement): void {
     tags.sort(sortByAttribute(["isTag", "name"]));
 
     tags.forEach((tag) => {
@@ -295,7 +206,8 @@ class TaggerLink extends Feature {
       }
 
       const li = document.createElement("li");
-      li.appendChild(tag.symbol.element);
+      const tagIcon = new TaggerIcon(tag.tagType);
+      li.appendChild(tagIcon.element);
       li.appendChild(createElement(`<span>${tag.name}</span>`));
 
       menu.appendChild(li);
