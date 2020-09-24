@@ -2,6 +2,8 @@ export interface Tagging {
   tag: {
     name: string;
     type: string;
+    slug: string;
+    typeSlug: string;
   };
 }
 
@@ -10,6 +12,7 @@ export interface Relationship {
   relatedName: string;
   classifier: string;
   contentName: string;
+  contentId: string;
   relatedId: string;
   foreignKey: "illustrationId" | "oracleId";
   illustrationId?: string;

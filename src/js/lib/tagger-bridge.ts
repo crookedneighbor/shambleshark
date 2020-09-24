@@ -7,9 +7,11 @@ import type { TaggerPayload } from "Js/types/tagger";
 export type TagEntries = {
   art: TagInfo[];
   oracle: TagInfo[];
+  taggerLink: string;
 };
 export interface TagInfo {
   name: string;
+  link: string;
   tagType: string;
   isTag?: boolean;
 }
@@ -56,16 +58,17 @@ function collectTags(payload: TaggerPayload): RelationshipCollection {
     PRINTING_TAG: "print",
   };
 
-  payload.taggings?.forEach((t) => {
-    const tagType = t.tag.type;
+  payload.taggings?.forEach(({ tag }) => {
+    const tagType = tag.type;
     const key = tagToCollectionMap[tagType];
     const tagsByType = tags[key];
 
     if (tagsByType) {
       tagsByType.push({
+        link: `https://tagger.scryfall.com/tags/${tag.typeSlug}/${tag.slug}`,
         isTag: true,
         tagType,
-        name: t.tag.name,
+        name: tag.name,
       });
     }
   });
@@ -86,13 +89,16 @@ function collectRelationships(payload: TaggerPayload): RelationshipCollection {
   payload.relationships?.forEach((r) => {
     let name, tagType;
     const isTheRelatedTag = payload[r.foreignKey] === r.relatedId;
+    let link = `https://scryfall.com/search?q=${r.foreignKey}=`;
 
     if (isTheRelatedTag) {
       name = r.contentName;
       tagType = r.classifier;
+      link += r.contentId;
     } else {
       name = r.relatedName;
       tagType = r.classifierInverse;
+      link += r.relatedId;
     }
 
     const relationshipsFromType =
@@ -100,6 +106,7 @@ function collectRelationships(payload: TaggerPayload): RelationshipCollection {
 
     if (relationshipsFromType) {
       relationshipsFromType.push({
+        link,
         tagType,
         name,
       });
@@ -124,5 +131,6 @@ export async function requestTags(
   return {
     art: artEntries,
     oracle: oracleEntries,
+    taggerLink: `https://tagger.scryfall.com/card/${taggerData.set}/${taggerData.number}`,
   };
 }

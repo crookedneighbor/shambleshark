@@ -176,6 +176,7 @@ describe("Tagger Link", () => {
       } as MouseEvent;
 
       mocked(requestTags).mockResolvedValue({
+        taggerLink: "https://tagger.scryfall.com",
         art: [],
         oracle: [],
       });
@@ -221,6 +222,7 @@ describe("Tagger Link", () => {
       expect(tl.addTags).toBeCalledWith(
         btn.querySelector(".tagger-link-hover"),
         {
+          taggerLink: "https://tagger.scryfall.com",
           art: [],
           oracle: [],
         }
@@ -236,6 +238,7 @@ describe("Tagger Link", () => {
       tl = new TaggerLink();
       addTagsToMenuSpy = jest.spyOn(tl, "addTagsToMenu").mockImplementation();
       payload = {
+        taggerLink: "https://tagger.scryfall.com",
         art: [],
         oracle: [],
       };
@@ -265,13 +268,21 @@ describe("Tagger Link", () => {
         name: "art-tag",
         tagType: "ILLUSTRATION_TAG",
         isTag: true,
+        link: "https://tagger.scryfall.com",
       });
       tl.addTags(tooltip, payload);
 
       expect(tooltip.querySelectorAll(".menu-container ul").length).toBe(1);
       expect(tl.addTagsToMenu).toBeCalledTimes(1);
       expect(tl.addTagsToMenu).toBeCalledWith(
-        [{ name: "art-tag", tagType: "ILLUSTRATION_TAG", isTag: true }],
+        [
+          {
+            name: "art-tag",
+            tagType: "ILLUSTRATION_TAG",
+            isTag: true,
+            link: "https://tagger.scryfall.com",
+          },
+        ],
         expect.anything()
       );
     });
@@ -281,13 +292,21 @@ describe("Tagger Link", () => {
         name: "oracle-tag",
         tagType: "ORACLE_CARD_TAG",
         isTag: true,
+        link: "https://scryfall.com",
       });
       tl.addTags(tooltip, payload);
 
       expect(tooltip.querySelectorAll(".menu-container ul").length).toBe(1);
       expect(addTagsToMenuSpy).toBeCalledTimes(1);
       expect(addTagsToMenuSpy).toBeCalledWith(
-        [{ name: "oracle-tag", tagType: "ORACLE_CARD_TAG", isTag: true }],
+        [
+          {
+            name: "oracle-tag",
+            tagType: "ORACLE_CARD_TAG",
+            isTag: true,
+            link: "https://scryfall.com",
+          },
+        ],
         expect.anything()
       );
     });
@@ -308,16 +327,19 @@ describe("Tagger Link", () => {
       tl = new TaggerLink();
       menu = document.createElement("ul");
       tags = {
+        taggerLink: "https://tagger.scryfall.com",
         art: [
           {
             name: "Tag 1",
             tagType: "ILLUSTRATION_TAG",
             isTag: true,
+            link: "https://scryfall.com/tag-1",
           },
           {
             name: "Tag 2",
             tagType: "ILLUSTRATION_TAG",
             isTag: true,
+            link: "https://scryfall.com/tag-2",
           },
         ],
         oracle: [],
@@ -337,6 +359,7 @@ describe("Tagger Link", () => {
         name: "First",
         tagType: "ILLUSTRATION_TAG",
         isTag: true,
+        link: "https://tagger.scryfall.com",
       });
       tl.addTagsToMenu(tags.art, menu);
 
@@ -353,6 +376,7 @@ describe("Tagger Link", () => {
         name: "Z - last alphabetically",
         isTag: true,
         tagType: "ILLUSTRATION_TAG",
+        link: "https://tagger.scryfall.com",
       });
       tl.addTagsToMenu(tags.art, menu);
 
@@ -370,6 +394,7 @@ describe("Tagger Link", () => {
           name: `name ${index}`,
           tagType: "ILLUSTRATION_TAG",
           isTag: true,
+          link: "https://tagger.scryfall.com",
         });
       });
       tl.addTagsToMenu(tags.art, menu);
@@ -386,6 +411,7 @@ describe("Tagger Link", () => {
           name: `name ${index}`,
           tagType: "ILLUSTRATION_TAG",
           isTag: true,
+          link: "https://tagger.scryfall.com",
         });
       });
       tl.addTagsToMenu(tags.art, menu);

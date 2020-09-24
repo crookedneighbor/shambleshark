@@ -42,6 +42,8 @@ fragment RelationshipAttrs on Relationship {
 fragment TagAttrs on Tag {
   name
   type
+  slug
+  typeSlug
   __typename
 }
 

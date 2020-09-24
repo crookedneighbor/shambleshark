@@ -75,18 +75,24 @@ describe("tagger bridge", () => {
             tag: {
               name: "Tag 1",
               type: "ILLUSTRATION_TAG",
+              slug: "tag-1",
+              typeSlug: "artwork",
             },
           },
           {
             tag: {
               name: "Tag 2",
               type: "ORACLE_CARD_TAG",
+              slug: "tag-2",
+              typeSlug: "card",
             },
           },
           {
             tag: {
               name: "Tag 3",
               type: "PRINTING_TAG",
+              slug: "tag-3",
+              typeSlug: "prints",
             },
           },
         ],
@@ -95,6 +101,7 @@ describe("tagger bridge", () => {
             foreignKey: "illustrationId",
             relatedId: "related-id",
             contentName: "Depicts Relationship",
+            contentId: "depicts-id",
             relatedName: "Depicted Relationship",
             classifier: "DEPICTS",
             classifierInverse: "DEPICTED_IN",
@@ -103,6 +110,7 @@ describe("tagger bridge", () => {
             foreignKey: "oracleId",
             relatedId: "related-id",
             contentName: "Better Than Relationship",
+            contentId: "worse-than-id",
             relatedName: "Worse Than Relationship",
             classifier: "BETTER_THAN",
             classifierInverse: "WORSE_THAN",
@@ -140,15 +148,18 @@ describe("tagger bridge", () => {
           name: "Tag 1",
           isTag: true,
           tagType: "ILLUSTRATION_TAG",
+          link: "https://tagger.scryfall.com/tags/artwork/tag-1",
         },
         {
           name: "Tag 3",
           isTag: true,
           tagType: "PRINTING_TAG",
+          link: "https://tagger.scryfall.com/tags/prints/tag-3",
         },
         {
           name: "Depicted Relationship",
           tagType: "DEPICTED_IN",
+          link: "https://scryfall.com/search?q=illustrationId=related-id",
         },
       ]);
       expect(tags.oracle).toEqual([
@@ -156,10 +167,12 @@ describe("tagger bridge", () => {
           name: "Tag 2",
           isTag: true,
           tagType: "ORACLE_CARD_TAG",
+          link: "https://tagger.scryfall.com/tags/card/tag-2",
         },
         {
           name: "Worse Than Relationship",
           tagType: "WORSE_THAN",
+          link: "https://scryfall.com/search?q=oracleId=related-id",
         },
       ]);
     });
@@ -169,6 +182,8 @@ describe("tagger bridge", () => {
         tag: {
           name: "bad type",
           type: "NONE",
+          slug: "bad-type",
+          typeSlug: "none",
         },
       });
 
@@ -184,6 +199,7 @@ describe("tagger bridge", () => {
           foreignKey: "oracleId",
           relatedId: "oracle-id",
           contentName: "Content Name",
+          contentId: "better-than-id",
           relatedName: "Related Name",
           classifier: "BETTER_THAN",
           classifierInverse: "WORSE_THAN",
@@ -194,6 +210,7 @@ describe("tagger bridge", () => {
       expect(tags.oracle[1]).toEqual({
         name: "Content Name",
         tagType: "BETTER_THAN",
+        link: "https://scryfall.com/search?q=oracleId=better-than-id",
       });
     });
 
@@ -203,6 +220,7 @@ describe("tagger bridge", () => {
           foreignKey: "oracleId",
           relatedId: "not-oracle-id",
           contentName: "Content Name",
+          contentId: "better-than-id",
           relatedName: "Related Name",
           classifier: "BETTER_THAN",
           classifierInverse: "WORSE_THAN",
@@ -213,6 +231,7 @@ describe("tagger bridge", () => {
       expect(tags.oracle[1]).toEqual({
         name: "Related Name",
         tagType: "WORSE_THAN",
+        link: "https://scryfall.com/search?q=oracleId=not-oracle-id",
       });
     });
 
@@ -224,6 +243,7 @@ describe("tagger bridge", () => {
         foreignKey: "unknown",
         relatedId: "not-oracle-id",
         contentName: "Content Name",
+        contentId: "better-than-id",
         relatedName: "Related Name",
         classifier: "BETTER_THAN",
         classifierInverse: "WORSE_THAN",
