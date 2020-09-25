@@ -10,11 +10,13 @@ import Feature, {
   ListSettingsDefinition,
 } from "Feature";
 import globalFeatures from "Features/global-features";
+import cardPageFeatures from "Features/card-page-features";
 import deckbuilderFeatures from "Features/deck-builder-features";
 import deckViewFeatures from "Features/deck-view-features";
 import searchResultsFeatures from "Features/search-results-features";
 
 const features = globalFeatures
+  .concat(cardPageFeatures)
   .concat(deckbuilderFeatures)
   .concat(deckViewFeatures)
   .concat(searchResultsFeatures);
@@ -134,6 +136,10 @@ const page = createElement(`<div>
               <div id="global">
                 <h2 class="title has-text-dark">Global Settings</h2>
               </div>
+              <div id="card-page">
+                <h2 class="title has-text-dark">Card Detail Page</h2>
+              </div>
+              <hr>
               <div id="deck-builder">
                 <h2 class="title has-text-dark">Deckbuilder Page</h2>
               </div>

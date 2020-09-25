@@ -1,0 +1,11 @@
+.tags-table {
+  margin-top: 6px !important;
+}
+
+.tag-menu-row:hover svg {
+  height: 30px;
+  width: 30px;
+  top: -2px;
+  left: -19px;
+  z-index: 99999;
+}

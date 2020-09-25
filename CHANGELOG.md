@@ -9,6 +9,9 @@
   - Add feature to include headings in deck organization (#32)
 - Price Options
   - Add feature to display no price on deck view page (#68)
+- Tag Menu on Card Display Page
+  - Add ability to display art tags/relationships on card page
+  - Add ability to display card tags/relationships on card page
 
 # 0.7.0 - Pre-release
 

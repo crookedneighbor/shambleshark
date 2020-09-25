@@ -1,5 +1,6 @@
 export const FEATURE_SECTIONS = {
   GLOBAL: "global",
+  CARD_PAGE: "card-page",
   DECK_VIEW: "deck-view",
   DECK_BUILDER: "deck-builder",
   SEARCH_RESULTS: "search-results",
@@ -22,6 +23,9 @@ export const FEATURE_IDS = {
 
   // Search results
   TaggerLink: "tagger-link",
+
+  // Card Page
+  TagMenu: "tag-menu",
 };
 
 export const BUS_EVENTS: Record<string, string> = {
