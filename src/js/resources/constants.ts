@@ -12,7 +12,9 @@ export const FEATURE_IDS = {
 
   // Deckbuilders
   CardInputModifier: "card-input-modifier",
+  CardNotes: "card-notes",
   CleanUpImprover: "clean-up-improver",
+  LegalityCheck: "legality-check",
   EDHRecSuggestions: "edhrec-suggestions-button",
   ScryfallSearch: "scryfall-search",
 
