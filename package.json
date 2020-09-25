@@ -1,7 +1,7 @@
 {
   "name": "shambleshark",
   "private": true,
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Unofficial browser extension to add functionality to the Scryfall website. This extension is not developed by the Scryfall team.",
   "scripts": {
     "pretty": "prettier --write .",
