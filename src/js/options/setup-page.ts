@@ -117,6 +117,14 @@ function createInputForType(
   return input;
 }
 
+function createSection(id: string, name: string): string {
+  return `
+  <div id="${id}">
+    <h2 class="title has-text-dark">${name}</h2>
+  </div>
+  <hr>`;
+}
+
 const page = createElement(`<div>
   <section class="hero is-primary is-fullheight">
     <div class="hero-body">
@@ -133,26 +141,13 @@ const page = createElement(`<div>
             <br />
 
             <form id="settings-form">
-              <div id="global">
-                <h2 class="title has-text-dark">Global Settings</h2>
-              </div>
-              <div id="card-page">
-                <h2 class="title has-text-dark">Card Detail Page</h2>
-              </div>
-              <hr>
-              <div id="deck-builder">
-                <h2 class="title has-text-dark">Deckbuilder Page</h2>
-              </div>
-              <hr>
-              <div id="deck-view">
-                <h2 class="title has-text-dark">Deck View Page</h2>
-              </div>
-              <hr>
-              <div id="search-results">
-                <h2 class="title has-text-dark">Search Results</h2>
-              </div>
-              <hr>
+              ${createSection("global", "Global Settings")}
+              ${createSection("card-page", "Card Detail Page")}
+              ${createSection("deck-builder", "Deckbuilder Page")}
+              ${createSection("deck-view", "Deck View Page")}
+              ${createSection("search-results", "Search Results")}
             </form>
+
             <footer class="footer is-paddingless">
               <div class="has-text-centered">
                 <p>
