@@ -1,0 +1,8 @@
+.deck-display__collapse-card-gride-enabled .card-grid-item[data-card-id] {
+  height: 50px;
+}
+
+.deck-display__collapse-card-gride-enabled
+  .card-grid-item[data-card-id].deck-display__last-card-grid-item {
+  height: auto;
+}

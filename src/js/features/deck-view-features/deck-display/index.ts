@@ -1,10 +1,13 @@
 import Feature from "Feature";
 import { FEATURE_IDS as ids, FEATURE_SECTIONS as sections } from "Constants";
+import { ready } from "Lib/mutation";
+
+import "./index.css";
 
 class DeckDisplay extends Feature {
   static metadata = {
     id: ids.DeckDisplay,
-    futureFeature: true,
+    futureFeature: false,
     title: "Deck Display",
     section: sections.DECK_VIEW,
     description:
@@ -13,10 +16,32 @@ class DeckDisplay extends Feature {
 
   static settingsDefaults = {
     enabled: true,
+    collapseCardView: false,
   };
 
+  static settingDefinitions = [
+    {
+      id: "collapseCardView",
+      label: "Present the visual card list in a stacked presentation",
+      input: "checkbox",
+    },
+  ];
+
   async run(): Promise<void> {
-    // TODO
+    const settings = await DeckDisplay.getSettings();
+
+    if (!settings.collapseCardView) {
+      return;
+    }
+
+    ready(".card-grid", (el) => {
+      const cardItems = el.querySelectorAll(".card-grid-item[data-card-id]");
+
+      cardItems[cardItems.length - 1].classList.add(
+        "deck-display__last-card-grid-item"
+      );
+      el.classList.add("deck-display__collapse-card-gride-enabled");
+    });
   }
 }
 

@@ -2,6 +2,11 @@
 
 # unreleased
 
+- Deck Display
+  - Add option to stack view of the visual card list
+
+# 0.8.0 - Pre-release
+
 - Card Input Modifier
   - Fix issue where newly created card entry would show incorrect card image (closes #64)
 - Cleanup Improver
