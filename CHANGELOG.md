@@ -1,6 +1,6 @@
-## Changelog
+# Changelog
 
-# unreleased
+# 0.9.0 - Pre-release
 
 - Deck Display
   - Add option to stack view of the visual card list
