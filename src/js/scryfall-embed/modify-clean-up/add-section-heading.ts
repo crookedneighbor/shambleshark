@@ -1,4 +1,4 @@
-import bus from "framebus";
+import Framebus from "framebus";
 import {
   calculateTotalsByName,
   calculateTotalsByCardType,
@@ -88,6 +88,8 @@ const headingGroupings: Record<string, HeadingDefinition[]> = {
   ],
 };
 
+const bus = new Framebus();
+
 function getHeadingForName(entry: Card): HeadingDefinition | void {
   const name = entry.card_digest?.name || "";
   const firstCharacter = name.charAt(0);
@@ -151,20 +153,17 @@ function updateSubTotalsInHeadings(section: string, sortChoice: string): void {
 }
 
 export function addDeckTotalUpdateListener(sortChoice: string): void {
-  bus.on(
-    events.DECK_TOTAL_COUNT_UPDATED,
-    ({ totalCount }: { totalCount: number }) => {
-      updateTotalsInHeadings(totalCount);
+  bus.on(events.DECK_TOTAL_COUNT_UPDATED, (data) => {
+    updateTotalsInHeadings(data.totalCount as number);
 
-      window.Scryfall.deckbuilder.flatSections.forEach((section) => {
-        if (!(section in SECTIONS_TO_APPLY_HEADERS)) {
-          return;
-        }
+    window.Scryfall.deckbuilder.flatSections.forEach((section) => {
+      if (!(section in SECTIONS_TO_APPLY_HEADERS)) {
+        return;
+      }
 
-        updateSubTotalsInHeadings(section, sortChoice);
-      });
-    }
-  );
+      updateSubTotalsInHeadings(section, sortChoice);
+    });
+  });
 }
 
 function resetDefaultHeadings(): void {

@@ -1,4 +1,4 @@
-import bus from "framebus";
+import Framebus from "framebus";
 import url from "Lib/url";
 import {
   addCard,
@@ -29,7 +29,7 @@ describe("Scryfall Globals", () => {
   let fakeDeck: Deck;
 
   beforeEach(() => {
-    jest.spyOn(bus, "emit").mockImplementation();
+    jest.spyOn(Framebus.prototype, "emit").mockImplementation();
     fakeDeck = makeFakeDeck({
       id: "deck-id",
       primarySections: ["mainboard"],
@@ -72,11 +72,14 @@ describe("Scryfall Globals", () => {
         expect(original).not.toBe(ScryfallAPISpy.decks[s]);
         ScryfallAPISpy.decks[s]("foo", "bar");
 
-        expect(bus.emit).toBeCalledTimes(1);
-        expect(bus.emit).toBeCalledWith(`CALLED_${s.toUpperCase()}`, {
-          deckId: "foo",
-          payload: "bar",
-        });
+        expect(Framebus.prototype.emit).toBeCalledTimes(1);
+        expect(Framebus.prototype.emit).toBeCalledWith(
+          `CALLED_${s.toUpperCase()}`,
+          {
+            deckId: "foo",
+            payload: "bar",
+          }
+        );
         expect(original).toBeCalledWith("foo", "bar");
       }
     );
@@ -92,26 +95,8 @@ describe("Scryfall Globals", () => {
 
       window.Scryfall.deckbuilder.entries = entries;
 
-      expect(bus.emit).toBeCalledWith("DECK_ENTRIES_UPDATED", { entries });
-    });
-
-    it("emits event when totalCount is called and count has changed", () => {
-      const spy = mocked(window.Scryfall.deckbuilder.totalCount);
-      spy.mockReturnValue(10);
-
-      addHooksToCardManagementEvents();
-
-      expect(bus.emit).not.toBeCalledWith(
-        "DECK_TOTAL_COUNT_UPDATED",
-        expect.anything()
-      );
-
-      spy.mockReturnValue(100);
-
-      window.Scryfall.deckbuilder.totalCount();
-
-      expect(bus.emit).toBeCalledWith("DECK_TOTAL_COUNT_UPDATED", {
-        totalCount: 100,
+      expect(Framebus.prototype.emit).toBeCalledWith("DECK_ENTRIES_UPDATED", {
+        entries,
       });
     });
 
@@ -121,9 +106,32 @@ describe("Scryfall Globals", () => {
 
       addHooksToCardManagementEvents();
 
+      expect(Framebus.prototype.emit).not.toBeCalledWith(
+        "DECK_TOTAL_COUNT_UPDATED",
+        expect.anything()
+      );
+
+      spy.mockReturnValue(100);
+
       window.Scryfall.deckbuilder.totalCount();
 
-      expect(bus.emit).not.toBeCalledWith(
+      expect(Framebus.prototype.emit).toBeCalledWith(
+        "DECK_TOTAL_COUNT_UPDATED",
+        {
+          totalCount: 100,
+        }
+      );
+    });
+
+    it("emits event when totalCount is called and count has changed", () => {
+      const spy = mocked(window.Scryfall.deckbuilder.totalCount);
+      spy.mockReturnValue(10);
+
+      addHooksToCardManagementEvents();
+
+      window.Scryfall.deckbuilder.totalCount();
+
+      expect(Framebus.prototype.emit).not.toBeCalledWith(
         "DECK_TOTAL_COUNT_UPDATED",
         expect.anything()
       );

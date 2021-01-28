@@ -1,7 +1,9 @@
-import bus from "framebus";
+import Framebus from "framebus";
 import deckbuilderFeatures from "Features/deck-builder-features";
 import "./edit-page.css";
 import { BUS_EVENTS as events } from "Constants";
+
+const bus = new Framebus();
 
 export default function addEditPageFeatures(): void {
   bus.on(events.SCRYFALL_LISTENERS_READY, () => {

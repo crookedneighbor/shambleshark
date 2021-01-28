@@ -1,4 +1,4 @@
-import bus from "framebus";
+import Framebus from "framebus";
 import { BUS_EVENTS as events } from "Constants";
 import scryfall from "../scryfall-globals";
 import { hasDedicatedLandSection, isLandCard } from "Lib/deck-parser";
@@ -20,6 +20,8 @@ const sorters = {
   "card-type": sortByPrimaryCardType,
   name: sortByName,
 };
+
+const bus = new Framebus();
 
 function correctLandNonLandColumns(deck: Deck): Promise<Card[]> {
   if (!hasDedicatedLandSection(deck)) {

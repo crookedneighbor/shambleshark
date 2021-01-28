@@ -1,7 +1,7 @@
 import ScryfallSearch from "Features/deck-builder-features/scryfall-search";
 import deckParser from "Lib/deck-parser";
 import { getDeck, search } from "Lib/scryfall";
-import bus from "framebus";
+import Framebus from "framebus";
 import Drawer from "Lib/ui-elements/drawer";
 import Modal from "Lib/ui-elements/modal";
 import { Card, List } from "scryfall-client/dist/types/model";
@@ -72,8 +72,8 @@ describe("Scryfall Search", () => {
 
       ss.drawer.triggerOnClose();
 
-      expect(bus.emit).toBeCalledTimes(1);
-      expect(bus.emit).toBeCalledWith("CLEAN_UP_DECK");
+      expect(Framebus.prototype.emit).toBeCalledTimes(1);
+      expect(Framebus.prototype.emit).toBeCalledWith("CLEAN_UP_DECK");
     });
 
     it("focuses search input on close", () => {

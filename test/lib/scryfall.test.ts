@@ -2,7 +2,7 @@ import scryfall = require("scryfall-client");
 import type List from "scryfall-client/dist/models/list";
 import type Card from "scryfall-client/dist/models/card";
 import { getCollection, getDeck } from "Lib/scryfall";
-import bus from "framebus";
+import Framebus from "framebus";
 import { mocked } from "ts-jest/utils";
 
 import SpyInstance = jest.SpyInstance;
@@ -17,7 +17,7 @@ describe("scryfall", () => {
 
     beforeEach(() => {
       jest.useFakeTimers();
-      emitSpy = mocked(bus.emit);
+      emitSpy = mocked(Framebus.prototype.emitAsPromise);
     });
 
     afterEach(() => {
@@ -28,26 +28,20 @@ describe("scryfall", () => {
     it("requests deck from Scryfall page", async () => {
       const deck = makeFakeDeck();
 
-      emitSpy.mockImplementation((event, cb) => {
-        cb(deck);
-      });
+      emitSpy.mockResolvedValue(deck);
 
       const resolvedDeck = await getDeck();
 
       expect(resolvedDeck).toEqual(deck);
-      expect(bus.emit).toBeCalledWith("REQUEST_DECK", expect.any(Function));
+      expect(emitSpy).toBeCalledWith("REQUEST_DECK");
     });
 
     it("caches result if request is made a second time within 2 seconds", async () => {
       const firstDeck = makeFakeDeck();
       const secondDeck = makeFakeDeck();
 
-      emitSpy.mockImplementationOnce((event, cb) => {
-        cb(firstDeck);
-      });
-      emitSpy.mockImplementationOnce((event, cb) => {
-        cb(secondDeck);
-      });
+      emitSpy.mockResolvedValueOnce(firstDeck);
+      emitSpy.mockResolvedValueOnce(secondDeck);
 
       const resolvedDeck = await getDeck();
 

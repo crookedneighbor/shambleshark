@@ -1,12 +1,14 @@
-import bus from "framebus";
+import Framebus from "framebus";
 import iframe from "Lib/iframe";
 import { BUS_EVENTS as events } from "Constants";
-import type { EDHRecResponseHandler, EDHRecResponse } from "Js/types/edhrec";
+import type { EDHRecResponse } from "Js/types/edhrec";
 
 type GetRecsOptions = {
   commanders: string[];
   cards: string[];
 };
+
+const bus = new Framebus();
 
 function getRecs({
   commanders,
@@ -32,19 +34,16 @@ export default function start(): void {
     return;
   }
 
-  bus.on(
-    events.REQUEST_EDHREC_RECOMENDATIONS,
-    (payload: GetRecsOptions, reply: EDHRecResponseHandler) => {
-      getRecs(payload)
-        .then((res) => reply(res))
-        .catch((err) =>
-          reply({
-            commanders: [],
-            outRecs: [],
-            inRecs: [],
-            errors: [err],
-          })
-        );
-    }
-  );
+  bus.on(events.REQUEST_EDHREC_RECOMENDATIONS, (payload, reply) => {
+    getRecs(payload as GetRecsOptions)
+      .then((res) => reply(res))
+      .catch((err) =>
+        reply({
+          commanders: [],
+          outRecs: [],
+          inRecs: [],
+          errors: [err],
+        })
+      );
+  });
 }

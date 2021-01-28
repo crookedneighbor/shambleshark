@@ -1,10 +1,12 @@
+jest.mock("framebus");
+
 import CleanUpImprover from "Features/deck-builder-features/clean-up-improver";
-import bus from "framebus";
+import Framebus from "framebus";
 
 describe("Clean Up Improver", () => {
   describe("run", () => {
     beforeEach(() => {
-      jest.spyOn(bus, "emit").mockImplementation();
+      jest.spyOn(Framebus.prototype, "emit").mockImplementation();
       jest.spyOn(CleanUpImprover, "getSettings").mockResolvedValue({
         enabled: true,
         foo: "bar",
@@ -16,8 +18,8 @@ describe("Clean Up Improver", () => {
 
       await cui.run();
 
-      expect(bus.emit).toBeCalledTimes(1);
-      expect(bus.emit).toBeCalledWith("MODIFY_CLEAN_UP", {
+      expect(Framebus.prototype.emit).toBeCalledTimes(1);
+      expect(Framebus.prototype.emit).toBeCalledWith("MODIFY_CLEAN_UP", {
         enabled: true,
         foo: "bar",
       });

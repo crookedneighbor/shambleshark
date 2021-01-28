@@ -1,4 +1,4 @@
-import bus from "framebus";
+import Framebus from "framebus";
 import AddCardElement from "Ui/add-card-element";
 import { PLUS_SYMBOL } from "Svg";
 
@@ -427,7 +427,7 @@ describe("AddCardElement", () => {
 
       await cardEl.addCardToDeck();
 
-      expect(bus.emit).toBeCalledWith("ADD_CARD_TO_DECK", {
+      expect(Framebus.prototype.emit).toBeCalledWith("ADD_CARD_TO_DECK", {
         cardName: "Arcane Denial",
         cardId: "arcane-denial-id",
       });
@@ -447,7 +447,7 @@ describe("AddCardElement", () => {
 
       await cardEl.addCardToDeck();
 
-      expect(bus.emit).toBeCalledWith("ADD_CARD_TO_DECK", {
+      expect(Framebus.prototype.emit).toBeCalledWith("ADD_CARD_TO_DECK", {
         cardName: "foo",
         section: "bar",
         cardId: "arcane-denial-id",
@@ -482,7 +482,7 @@ describe("AddCardElement", () => {
 
       await cardEl.addCardToDeck();
 
-      expect(bus.emit).toBeCalledWith("ADD_CARD_TO_DECK", {
+      expect(Framebus.prototype.emit).toBeCalledWith("ADD_CARD_TO_DECK", {
         cardName: "Arcane Denial",
         cardId: "different-id",
       });
@@ -504,16 +504,19 @@ describe("AddCardElement", () => {
 
       await cardEl.addCardToDeck();
 
-      expect(bus.emit).not.toBeCalledWith(
+      expect(Framebus.prototype.emit).not.toBeCalledWith(
         "ADD_CARD_TO_DECK",
         expect.any(Object)
       );
-      expect(bus.emit).toBeCalledWith("SCRYFALL_PUSH_NOTIFICATION", {
-        header: "Card could not be added",
-        message:
-          "There was an error adding Arcane Denial to the deck. See console for more details.",
-        color: "red",
-      });
+      expect(Framebus.prototype.emit).toBeCalledWith(
+        "SCRYFALL_PUSH_NOTIFICATION",
+        {
+          header: "Card could not be added",
+          message:
+            "There was an error adding Arcane Denial to the deck. See console for more details.",
+          color: "red",
+        }
+      );
 
       expect(console.error).toBeCalledWith(errFromScryfall);
       expect(cardEl.cardInDeck()).toBe(false);
@@ -533,7 +536,7 @@ describe("AddCardElement", () => {
 
       cardEl.removeCardFromDeck();
 
-      expect(bus.emit).toBeCalledWith("REMOVE_CARD_FROM_DECK", {
+      expect(Framebus.prototype.emit).toBeCalledWith("REMOVE_CARD_FROM_DECK", {
         cardName: "Arcane Denial",
       });
     });

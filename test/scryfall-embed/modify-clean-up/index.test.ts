@@ -1,4 +1,4 @@
-import bus from "framebus";
+import Framebus from "framebus";
 import scryfall from "Js/scryfall-embed/scryfall-globals";
 import modifyCleanUp from "Js/scryfall-embed/modify-clean-up";
 import {
@@ -13,6 +13,7 @@ import {
 import { Deck } from "Js/types/deck";
 import { generateScryfallGlobal } from "../../mocks/scryfall-global";
 
+import { mocked } from "ts-jest/utils";
 import { makeFakeDeck, makeFakeCard } from "Helpers/fake";
 
 jest.mock("framebus");
@@ -518,7 +519,7 @@ describe("modifyCleanUp", () => {
     it("does not setup DECK_ENTRIES_UPDATED event when config is not set to sort entries", () => {
       modifyCleanUp({});
 
-      expect(bus.on).toBeCalledTimes(0);
+      expect(Framebus.prototype.on).toBeCalledTimes(0);
     });
 
     it("does not setup DECK_ENTRIES_UPDATED event when config is set to none", () => {
@@ -526,7 +527,7 @@ describe("modifyCleanUp", () => {
         sortEntriesPrimary: "none",
       });
 
-      expect(bus.on).toBeCalledTimes(0);
+      expect(Framebus.prototype.on).toBeCalledTimes(0);
     });
 
     it("sets up DECK_ENTRIES_UPDATED event when config is set to a non-none value", () => {
@@ -534,8 +535,8 @@ describe("modifyCleanUp", () => {
         sortEntriesPrimary: "name",
       });
 
-      expect(bus.on).toBeCalledTimes(1);
-      expect(bus.on).toBeCalledWith(
+      expect(Framebus.prototype.on).toBeCalledTimes(1);
+      expect(Framebus.prototype.on).toBeCalledWith(
         "DECK_ENTRIES_UPDATED",
         expect.any(Function)
       );
@@ -569,8 +570,11 @@ describe("modifyCleanUp", () => {
       jest.spyOn(window.Scryfall.deckbuilder.entries.maybeboard, "sort");
 
       // TODO better way to mock this?
-      bus.on.mockImplementation((eventName: string, cb: () => void) => {
-        cb();
+      mocked(Framebus.prototype.on).mockImplementation((eventName, cb) => {
+        if (cb) {
+          cb({}, jest.fn());
+        }
+        return true;
       });
 
       modifyCleanUp({
@@ -627,8 +631,11 @@ describe("modifyCleanUp", () => {
 
     it("inserts headings when deck entries update", () => {
       // TODO better way to mock this?
-      bus.on.mockImplementation((eventName: string, cb: () => void) => {
-        cb();
+      mocked(Framebus.prototype.on).mockImplementation((eventName, cb) => {
+        if (cb) {
+          cb({}, jest.fn());
+        }
+        return true;
       });
 
       modifyCleanUp({
@@ -642,8 +649,11 @@ describe("modifyCleanUp", () => {
 
     it("does not insert headings when not configured", () => {
       // TODO better way to mock this?
-      bus.on.mockImplementation((eventName: string, cb: () => void) => {
-        cb();
+      mocked(Framebus.prototype.on).mockImplementation((eventName, cb) => {
+        if (cb) {
+          cb({}, jest.fn());
+        }
+        return true;
       });
 
       modifyCleanUp({

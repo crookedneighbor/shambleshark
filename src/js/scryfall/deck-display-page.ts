@@ -1,8 +1,10 @@
-import bus from "framebus";
+import Framebus from "framebus";
 import deckViewFeatures from "Features/deck-view-features";
 import { ready as elementReady } from "Lib/mutation";
 import createElement from "Lib/create-element";
 import { BUS_EVENTS as events } from "Constants";
+
+const bus = new Framebus();
 
 function addContainerForSidebarFeatures(): void {
   const section = createElement(`<div id="shambleshark-deck-display-sidebar-toolbox" class="sidebar-toolbox">

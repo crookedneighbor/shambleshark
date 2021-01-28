@@ -1,4 +1,4 @@
-import bus from "framebus";
+import Framebus from "framebus";
 import CardInputModifier from "Features/deck-builder-features/card-input-modifier";
 import deckParser from "Lib/deck-parser";
 import { getDeck } from "Lib/scryfall";
@@ -25,7 +25,7 @@ describe("Card Input Modifier", () => {
     flattenEntriesSpy = jest
       .spyOn(deckParser, "flattenEntries")
       .mockReturnValue([]);
-    busOnSpy = jest.spyOn(bus, "on").mockImplementation();
+    busOnSpy = jest.spyOn(Framebus.prototype, "on").mockImplementation();
   });
 
   it("sets tooltip image with img from image cache", () => {
@@ -92,18 +92,27 @@ describe("Card Input Modifier", () => {
     it("listens for card update events", async () => {
       await cim.run();
 
-      expect(bus.on).toBeCalledTimes(5);
-      expect(bus.on).toBeCalledWith(
+      expect(Framebus.prototype.on).toBeCalledTimes(5);
+      expect(Framebus.prototype.on).toBeCalledWith(
         "CALLED_DESTROYENTRY",
         expect.any(Function)
       );
-      expect(bus.on).toBeCalledWith("CALLED_CREATEENTRY", expect.any(Function));
-      expect(bus.on).toBeCalledWith("CALLED_UPDATEENTRY", expect.any(Function));
-      expect(bus.on).toBeCalledWith(
+      expect(Framebus.prototype.on).toBeCalledWith(
+        "CALLED_CREATEENTRY",
+        expect.any(Function)
+      );
+      expect(Framebus.prototype.on).toBeCalledWith(
+        "CALLED_UPDATEENTRY",
+        expect.any(Function)
+      );
+      expect(Framebus.prototype.on).toBeCalledWith(
         "CALLED_REPLACEENTRY",
         expect.any(Function)
       );
-      expect(bus.on).toBeCalledWith("CALLED_CLEANUP", expect.any(Function));
+      expect(Framebus.prototype.on).toBeCalledWith(
+        "CALLED_CLEANUP",
+        expect.any(Function)
+      );
     });
 
     it("removes card id from image cache when destroy entry event fires", async () => {

@@ -1,4 +1,4 @@
-import bus from "framebus";
+import Framebus from "framebus";
 import {
   setupBridgeToTagger,
   resetSetupBridgeToTaggerPromise,
@@ -11,6 +11,8 @@ import noop from "Lib/noop";
 import type { TaggerPayload } from "Js/types/tagger";
 import { mocked } from "ts-jest/utils";
 
+jest.mock("framebus");
+
 describe("tagger bridge", () => {
   describe("setupBridgeToTagger", () => {
     beforeEach(() => {
@@ -18,7 +20,7 @@ describe("tagger bridge", () => {
         data: Record<string, string>,
         cb: () => void
       ) => void;
-      mocked(bus.on).mockImplementation(
+      mocked(Framebus.prototype.on).mockImplementation(
         (event: string, cb: FramebusMockCallback) => {
           // TODO no data is actually passed here... why does framebus typing care?
           cb({}, noop);
@@ -42,8 +44,11 @@ describe("tagger bridge", () => {
         src: "https://tagger.scryfall.com",
       });
 
-      expect(bus.on).toBeCalledTimes(1);
-      expect(bus.on).toBeCalledWith("TAGGER_READY", expect.any(Function));
+      expect(Framebus.prototype.on).toBeCalledTimes(1);
+      expect(Framebus.prototype.on).toBeCalledWith(
+        "TAGGER_READY",
+        expect.any(Function)
+      );
     });
 
     it("only setups up iframes and events once", async () => {
@@ -54,7 +59,7 @@ describe("tagger bridge", () => {
       await setupBridgeToTagger();
 
       expect(iframe.create).toBeCalledTimes(1);
-      expect(bus.on).toBeCalledTimes(1);
+      expect(Framebus.prototype.on).toBeCalledTimes(1);
     });
   });
 
@@ -118,25 +123,16 @@ describe("tagger bridge", () => {
         ],
       };
 
-      bus.emit.mockImplementation(
-        (
-          eventName: string,
-          data: TaggerLookupData,
-          cb: (payload: TaggerPayload) => void
-        ) => {
-          cb(lookupResult);
-        }
-      );
+      mocked(Framebus.prototype.emitAsPromise).mockResolvedValue(lookupResult);
     });
 
     it("emits event to request tags", async () => {
       await requestTags(requestData);
 
-      expect(bus.emit).toBeCalledTimes(1);
-      expect(bus.emit).toBeCalledWith(
+      expect(Framebus.prototype.emitAsPromise).toBeCalledTimes(1);
+      expect(Framebus.prototype.emitAsPromise).toBeCalledWith(
         "TAGGER_TAGS_REQUEST",
-        requestData,
-        expect.any(Function)
+        requestData
       );
     });
 

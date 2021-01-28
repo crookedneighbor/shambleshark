@@ -1,4 +1,4 @@
-import bus from "framebus";
+import Framebus from "framebus";
 import { CHECK_SYMBOL, MINUS_SYMBOL, PLUS_SYMBOL } from "Svg";
 import { BUS_EVENTS as events } from "Constants";
 import createElement from "Lib/create-element";
@@ -25,6 +25,8 @@ type AddCardElementOptions = {
   onAddCard?: OnAddCardFunction;
   getScryfallId?: GetScryfallIDFunction;
 };
+
+const bus = new Framebus();
 
 export default class AddCardElement {
   element: HTMLDivElement;

@@ -1,4 +1,4 @@
-import bus from "framebus";
+import Framebus from "framebus";
 import { BUS_EVENTS as events } from "Constants";
 import { Deck } from "Js/types/deck";
 import api = require("scryfall-client");
@@ -11,6 +11,8 @@ export type Identifier =
   | { id: string }
   | { name: string }
   | { set: string; collector_number: string };
+
+const bus = new Framebus();
 
 export async function getCollection(
   ids: Identifier[]
@@ -28,11 +30,7 @@ export function getDeck(): Promise<Deck> {
     return getDeckPromise;
   }
 
-  getDeckPromise = new Promise((resolve) => {
-    bus.emit(events.REQUEST_DECK, (deck: Deck) => {
-      resolve(deck);
-    });
-  });
+  getDeckPromise = bus.emitAsPromise<Deck>(events.REQUEST_DECK);
 
   setTimeout(() => {
     getDeckPromise = null;

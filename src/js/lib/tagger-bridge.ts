@@ -1,5 +1,5 @@
 import iframe from "Lib/iframe";
-import bus from "framebus";
+import Framebus from "framebus";
 import { BUS_EVENTS as events } from "Constants";
 
 import type { TaggerPayload } from "Js/types/tagger";
@@ -24,13 +24,17 @@ export type TaggerLookupData = {
 let setupPromise: Promise<void>;
 let bridgeSetupInProgress = false;
 
+const bus = new Framebus();
+
 export async function setupBridgeToTagger(): Promise<void> {
   if (bridgeSetupInProgress) {
     return setupPromise;
   }
 
   setupPromise = new Promise((resolve) => {
-    bus.on(events.TAGGER_READY, resolve);
+    bus.on(events.TAGGER_READY, () => {
+      resolve();
+    });
   });
   bridgeSetupInProgress = true;
 
@@ -119,9 +123,10 @@ function collectRelationships(payload: TaggerPayload): RelationshipCollection {
 export async function requestTags(
   taggerData: TaggerLookupData
 ): Promise<TagEntries> {
-  const payload = (await new Promise((resolve) => {
-    bus.emit(events.TAGGER_TAGS_REQUEST, taggerData, resolve);
-  })) as TaggerPayload;
+  const payload = await bus.emitAsPromise<TaggerPayload>(
+    events.TAGGER_TAGS_REQUEST,
+    taggerData
+  );
 
   const tags = collectTags(payload);
   const relationships = collectRelationships(payload);

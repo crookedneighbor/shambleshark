@@ -1,4 +1,4 @@
-import bus from "framebus";
+import Framebus from "framebus";
 import {
   addDeckTotalUpdateListener,
   insertHeadings,
@@ -22,11 +22,12 @@ describe("section heading", () => {
 
   describe("addDeckTotalUpdateListener", () => {
     beforeEach(() => {
-      bus.on.mockImplementation(
-        (eventName: string, cb: (payload: Record<string, number>) => void) => {
-          cb({ totalCount: 100 });
+      mocked(Framebus.prototype.on).mockImplementation((eventName, cb) => {
+        if (cb) {
+          cb({ totalCount: 100 }, jest.fn());
         }
-      );
+        return true;
+      });
       window.Scryfall.deckbuilder.flatSections = [
         "mainboard",
         "commanders",
@@ -40,8 +41,8 @@ describe("section heading", () => {
     it("adds a listenr for deck total count changes", () => {
       addDeckTotalUpdateListener("name");
 
-      expect(bus.on).toBeCalledTimes(1);
-      expect(bus.on).toBeCalledWith(
+      expect(Framebus.prototype.on).toBeCalledTimes(1);
+      expect(Framebus.prototype.on).toBeCalledWith(
         "DECK_TOTAL_COUNT_UPDATED",
         expect.any(Function)
       );

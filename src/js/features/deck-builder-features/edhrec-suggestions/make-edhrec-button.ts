@@ -1,4 +1,4 @@
-import bus from "framebus";
+import Framebus from "framebus";
 import { BUS_EVENTS as events } from "Constants";
 import createElement from "Lib/create-element";
 import DeckSectionChooser from "Ui/deck-section-chooser";
@@ -8,7 +8,7 @@ import { getCardBySetCodeAndCollectorNumber, getDeck } from "Lib/scryfall";
 import { EDHREC_SYMBOL } from "Svg";
 import type { Card, Deck } from "Js/types/deck";
 import type {
-  EDHRecResponseHandler,
+  EDHRecResponse,
   EDHRecSuggestion,
   EDHRecError,
   Suggestions,
@@ -27,6 +27,8 @@ const TYPE_ORDER = [
 const TYPES_WITH_IRREGULAR_PLURALS: Record<string, string> = {
   Sorcery: "Sorceries",
 };
+
+const bus = new Framebus();
 
 function isValidCard(card: Card): boolean {
   return Boolean(card.card_digest);
@@ -113,89 +115,6 @@ function constructEDHRecSection(
   };
 }
 
-// TODO pull out into helper function
-function createEDHRecResponseHandler(
-  drawer: Drawer,
-  deck: Deck
-): EDHRecResponseHandler {
-  return (result) => {
-    if (result.errors) {
-      createErrorDrawerState(drawer, result.errors);
-      return;
-    }
-
-    const recomendations = formatEDHRecSuggestions(result.inRecs);
-    // TODO ENHANCEMENT: handle cuts
-    // const cuts = formatEDHRecSuggestions(result.outRecs)
-
-    const container = document.createElement("div");
-    const sections: Record<string, EDHRecSection> = {};
-    container.id = "edhrec-card-suggestions";
-    const deckSectionChooser = new DeckSectionChooser({
-      id: "edhrec-suggestions-section-chooser",
-      deck,
-    });
-    container.appendChild(deckSectionChooser.element);
-    container.appendChild(document.createElement("hr"));
-
-    Object.values(recomendations).forEach((card) => {
-      const sectionId = card.type.toLowerCase();
-      let section = sections[sectionId];
-
-      if (!section) {
-        section = sections[sectionId] = constructEDHRecSection(
-          sectionId,
-          card.type
-        );
-      }
-
-      card.cardElement = new AddCardElement({
-        name: card.name,
-        img: card.img,
-        type: card.type,
-        singleton: true,
-        getScryfallId() {
-          return getCardBySetCodeAndCollectorNumber(
-            card.set,
-            card.collectorNumber
-          ).then((cardFromScryfall) => {
-            return cardFromScryfall.id;
-          });
-        },
-        onAddCard: (payload) => {
-          const section = deckSectionChooser.getValue();
-
-          if (section) {
-            payload.section = section;
-          }
-        },
-      });
-
-      section.cards.push(card);
-    });
-
-    TYPE_ORDER.forEach((cardType) => {
-      const section = sections[cardType];
-
-      if (!section) {
-        return;
-      }
-
-      const suggestions = section.element.querySelector(
-        ".edhrec-suggestions"
-      ) as HTMLDivElement;
-
-      section.cards.forEach((card) => {
-        suggestions.appendChild(card.cardElement?.element as HTMLDivElement);
-      });
-      container.appendChild(section.element);
-    });
-
-    drawer.setContent(container);
-    drawer.setLoading(false);
-  };
-}
-
 function createDrawer(button: HTMLButtonElement): Drawer {
   const drawer = new Drawer({
     id: "edhrec-drawer",
@@ -228,16 +147,92 @@ function createDrawer(button: HTMLButtonElement): Drawer {
         .map(getCardName);
       const cardsInDeck = getCardsInDeck(deck.entries);
 
-      bus.emit(
-        events.REQUEST_EDHREC_RECOMENDATIONS,
-        {
+      bus
+        .emitAsPromise<EDHRecResponse>(events.REQUEST_EDHREC_RECOMENDATIONS, {
           commanders,
           cards: cardsInDeck,
-        },
-        // TODO no any, not sure how to handle this correctly :(
-        // does framebus need to be updated?
-        createEDHRecResponseHandler(drawer, deck) as unknown
-      );
+        })
+        .then((result) => {
+          if (result.errors) {
+            createErrorDrawerState(drawer, result.errors);
+            return;
+          }
+
+          const recomendations = formatEDHRecSuggestions(result.inRecs);
+          // TODO ENHANCEMENT: handle cuts
+          // const cuts = formatEDHRecSuggestions(result.outRecs)
+
+          const container = document.createElement("div");
+          const sections: Record<string, EDHRecSection> = {};
+          container.id = "edhrec-card-suggestions";
+          const deckSectionChooser = new DeckSectionChooser({
+            id: "edhrec-suggestions-section-chooser",
+            deck,
+          });
+          container.appendChild(deckSectionChooser.element);
+          container.appendChild(document.createElement("hr"));
+
+          Object.values(recomendations).forEach((card) => {
+            const sectionId = card.type.toLowerCase();
+            let section = sections[sectionId];
+
+            if (!section) {
+              section = sections[sectionId] = constructEDHRecSection(
+                sectionId,
+                card.type
+              );
+            }
+
+            card.cardElement = new AddCardElement({
+              name: card.name,
+              img: card.img,
+              type: card.type,
+              singleton: true,
+              getScryfallId() {
+                return getCardBySetCodeAndCollectorNumber(
+                  card.set,
+                  card.collectorNumber
+                ).then((cardFromScryfall) => {
+                  return cardFromScryfall.id;
+                });
+              },
+              onAddCard: (payload) => {
+                const section = deckSectionChooser.getValue();
+
+                if (section) {
+                  payload.section = section;
+                }
+              },
+            });
+
+            section.cards.push(card);
+          });
+
+          TYPE_ORDER.forEach((cardType) => {
+            const section = sections[cardType];
+
+            if (!section) {
+              return;
+            }
+
+            const suggestions = section.element.querySelector(
+              ".edhrec-suggestions"
+            ) as HTMLDivElement;
+
+            section.cards.forEach((card) => {
+              suggestions.appendChild(
+                card.cardElement?.element as HTMLDivElement
+              );
+            });
+            container.appendChild(section.element);
+          });
+
+          drawer.setContent(container);
+          drawer.setLoading(false);
+        });
+
+      // TODO no any, not sure how to handle this correctly :(
+      // does framebus need to be updated?
     });
   });
 

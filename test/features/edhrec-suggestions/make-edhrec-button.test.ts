@@ -1,4 +1,4 @@
-import bus from "framebus";
+import Framebus from "framebus";
 import makeEDHRecButton from "Features/deck-builder-features/edhrec-suggestions/make-edhrec-button";
 import { EDHRecResponse } from "Js/types/edhrec";
 import deckParser from "Lib/deck-parser";
@@ -17,8 +17,6 @@ import { Deck } from "../../../src/js/types/deck";
 jest.mock("Lib/scryfall");
 jest.mock("Lib/mutation");
 jest.mock("framebus");
-
-type EDHRecReplyHandler = (res: EDHRecResponse) => void;
 
 describe("makeEDHRecButton", () => {
   let getCardSpy: jest.SpyInstance;
@@ -73,7 +71,7 @@ describe("makeEDHRecButton", () => {
 
     closeButton.click();
 
-    expect(bus.emit).toBeCalledWith("CLEAN_UP_DECK");
+    expect(Framebus.prototype.emit).toBeCalledWith("CLEAN_UP_DECK");
   });
 
   it("focuses back on the button when closed", async () => {
@@ -179,18 +177,8 @@ describe("makeEDHRecButton", () => {
           }),
         ],
       };
-      mocked(bus.emit).mockImplementation(
-        (
-          eventName: string,
-          payload: Record<string, string>,
-          reply: EDHRecReplyHandler
-        ) => {
-          if (eventName === "REQUEST_EDHREC_RECOMENDATIONS") {
-            reply(fakeEDHRecResponse);
-          }
-
-          return true;
-        }
+      mocked(Framebus.prototype.emitAsPromise).mockResolvedValue(
+        fakeEDHRecResponse
       );
 
       getDeckSpy.mockResolvedValue(fakeDeck);
@@ -218,8 +206,8 @@ describe("makeEDHRecButton", () => {
 
       await wait();
 
-      expect(bus.emit).toBeCalledTimes(1);
-      expect(bus.emit).toBeCalledWith(
+      expect(Framebus.prototype.emitAsPromise).toBeCalledTimes(1);
+      expect(Framebus.prototype.emitAsPromise).toBeCalledWith(
         "REQUEST_EDHREC_RECOMENDATIONS",
         {
           commanders: ["Arjun, the Shifting Flame"],
@@ -228,8 +216,7 @@ describe("makeEDHRecButton", () => {
             "1 Reliquary Tower",
             "1 Obstinate Familiar",
           ],
-        },
-        expect.any(Function)
+        }
       );
     });
 
@@ -248,8 +235,8 @@ describe("makeEDHRecButton", () => {
 
       await wait();
 
-      expect(bus.emit).toBeCalledTimes(1);
-      expect(bus.emit).toBeCalledWith(
+      expect(Framebus.prototype.emitAsPromise).toBeCalledTimes(1);
+      expect(Framebus.prototype.emitAsPromise).toBeCalledWith(
         "REQUEST_EDHREC_RECOMENDATIONS",
         {
           commanders: ["Arjun, the Shifting Flame"],
@@ -258,8 +245,7 @@ describe("makeEDHRecButton", () => {
             "1 Reliquary Tower",
             "1 Obstinate Familiar",
           ],
-        },
-        expect.any(Function)
+        }
       );
     });
 
@@ -289,8 +275,8 @@ describe("makeEDHRecButton", () => {
 
       await wait();
 
-      expect(bus.emit).toBeCalledTimes(1);
-      expect(bus.emit).toBeCalledWith(
+      expect(Framebus.prototype.emitAsPromise).toBeCalledTimes(1);
+      expect(Framebus.prototype.emitAsPromise).toBeCalledWith(
         "REQUEST_EDHREC_RECOMENDATIONS",
         {
           commanders: [
@@ -305,8 +291,7 @@ describe("makeEDHRecButton", () => {
             "1 Reliquary Tower",
             "1 Obstinate Familiar",
           ],
-        },
-        expect.any(Function)
+        }
       );
     });
 
@@ -337,8 +322,8 @@ describe("makeEDHRecButton", () => {
 
       await wait();
 
-      expect(bus.emit).toBeCalledTimes(1);
-      expect(bus.emit).toBeCalledWith(
+      expect(Framebus.prototype.emitAsPromise).toBeCalledTimes(1);
+      expect(Framebus.prototype.emitAsPromise).toBeCalledWith(
         "REQUEST_EDHREC_RECOMENDATIONS",
         {
           commanders: ["Arjun, the Shifting Flame"],
@@ -349,30 +334,17 @@ describe("makeEDHRecButton", () => {
             "1 Obstinate Familiar",
             "1 Rhystic Study",
           ],
-        },
-        expect.any(Function)
+        }
       );
     });
 
     it("displays specific error when edhrec request errors with specific errors", async () => {
-      mocked(bus.emit).mockImplementation(
-        (
-          eventName: string,
-          payload: Record<string, string>,
-          reply: EDHRecReplyHandler
-        ) => {
-          const res = {
-            commanders: [],
-            outRecs: [],
-            inRecs: [],
-            errors: ["1 error", "2 error"],
-          } as EDHRecResponse;
-
-          reply(res);
-
-          return true;
-        }
-      );
+      mocked(Framebus.prototype.emitAsPromise).mockResolvedValue({
+        commanders: [],
+        outRecs: [],
+        inRecs: [],
+        errors: ["1 error", "2 error"],
+      });
       jest.spyOn(Drawer.prototype, "setContent");
 
       const btn = await makeEDHRecButton();
@@ -453,7 +425,7 @@ describe("makeEDHRecButton", () => {
 
       await wait();
 
-      expect(bus.emit).toBeCalledWith("ADD_CARD_TO_DECK", {
+      expect(Framebus.prototype.emit).toBeCalledWith("ADD_CARD_TO_DECK", {
         cardName: "Arcane Denial",
         cardId: "arcane-denial-id",
       });
@@ -486,7 +458,7 @@ describe("makeEDHRecButton", () => {
 
       await wait();
 
-      expect(bus.emit).toBeCalledWith("ADD_CARD_TO_DECK", {
+      expect(Framebus.prototype.emit).toBeCalledWith("ADD_CARD_TO_DECK", {
         cardName: "Arcane Denial",
         cardId: "arcane-denial-id",
         section: "maybeboard",

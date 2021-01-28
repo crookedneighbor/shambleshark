@@ -4,7 +4,7 @@ import {
   FEATURE_IDS as ids,
   FEATURE_SECTIONS as sections,
 } from "Constants";
-import bus from "framebus";
+import Framebus from "framebus";
 import { ready as elementReady } from "Lib/mutation";
 import { getDeck } from "Lib/scryfall";
 import deckParser from "Lib/deck-parser";
@@ -18,6 +18,7 @@ const CARD_EVENTS = [
   events.CALLED_REPLACEENTRY,
   events.CALLED_CREATEENTRY,
 ];
+const bus = new Framebus();
 
 class CardInputModifier extends Feature {
   imageCache: Record<string, string>;
@@ -68,13 +69,10 @@ class CardInputModifier extends Feature {
   }
 
   async run(): Promise<void> {
-    bus.on(
-      events.CALLED_DESTROYENTRY,
-      async ({ payload }: { payload: string }) => {
-        // clean up our imageCache
-        delete this.imageCache[payload];
-      }
-    );
+    bus.on(events.CALLED_DESTROYENTRY, async (data) => {
+      // clean up our imageCache
+      delete this.imageCache[data.payload as string];
+    });
 
     CARD_EVENTS.forEach((eventName) => {
       bus.on(eventName, () => {

@@ -1,7 +1,7 @@
 import start from "Js/edhrec/ready";
 import iframe from "Lib/iframe";
 import wait from "Lib/wait";
-import bus from "framebus";
+import Framebus from "framebus";
 
 import { mocked } from "ts-jest/utils";
 
@@ -15,19 +15,21 @@ describe("EDHRec Ready", () => {
     jest.spyOn(iframe, "isInsideIframe").mockReturnValue(true);
 
     type ReplyType = (res: Record<string, string[]>, reply: jest.Mock) => void;
-    mocked(bus.on).mockImplementation((event: string, reply: ReplyType) => {
-      const response = {
-        commanders: ["Arjun, the Shifting Flame"],
-        cards: ["1 foo", "1 bar"],
-      };
-      replySpy = jest.fn();
+    mocked(Framebus.prototype.on).mockImplementation(
+      (event: string, reply: ReplyType) => {
+        const response = {
+          commanders: ["Arjun, the Shifting Flame"],
+          cards: ["1 foo", "1 bar"],
+        };
+        replySpy = jest.fn();
 
-      if (event === "REQUEST_EDHREC_RECOMENDATIONS") {
-        reply(response, replySpy);
+        if (event === "REQUEST_EDHREC_RECOMENDATIONS") {
+          reply(response, replySpy);
+        }
+
+        return true;
       }
-
-      return true;
-    });
+    );
     fetchSpy = jest.fn().mockResolvedValue("result");
     // jest doesn't have fetch on the window
     window.fetch = jest.fn().mockImplementation(
@@ -49,14 +51,14 @@ describe("EDHRec Ready", () => {
 
     start();
 
-    expect(bus.on).not.toBeCalled();
+    expect(Framebus.prototype.on).not.toBeCalled();
   });
 
   it("listens for recomendations", () => {
     start();
 
-    expect(bus.on).toBeCalledTimes(1);
-    expect(bus.on).toBeCalledWith(
+    expect(Framebus.prototype.on).toBeCalledTimes(1);
+    expect(Framebus.prototype.on).toBeCalledWith(
       "REQUEST_EDHREC_RECOMENDATIONS",
       expect.any(Function)
     );

@@ -1,4 +1,4 @@
-import bus from "framebus";
+import Framebus from "framebus";
 import iframe from "Lib/iframe";
 import { BUS_EVENTS as events } from "Constants";
 import type { TaggerPayload } from "Js/types/tagger";
@@ -51,6 +51,8 @@ fragment TaggingAttrs on Tagging {
   __typename
 }`;
 
+const bus = new Framebus();
+
 export default function setupTaggerListeners(): void {
   if (!iframe.isInsideIframe()) {
     // no need to set listeners when not access from iframe
@@ -59,13 +61,7 @@ export default function setupTaggerListeners(): void {
 
   bus.on(
     events.TAGGER_TAGS_REQUEST,
-    (
-      config: {
-        set: string;
-        number: string;
-      },
-      reply: (card: TaggerPayload) => void
-    ) => {
+    (config, reply: (card: TaggerPayload) => void) => {
       // Firefox errors with a 422 for some reason when
       // using the fetch API inside an iframe, so we must
       // use xhr for this request

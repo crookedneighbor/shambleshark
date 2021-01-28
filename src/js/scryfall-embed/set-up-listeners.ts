@@ -1,4 +1,4 @@
-import bus from "framebus";
+import Framebus from "framebus";
 import { BUS_EVENTS as events } from "Constants";
 import Scryfall from "./scryfall-globals";
 import modifyCleanUp from "./modify-clean-up";
@@ -10,10 +10,12 @@ import {
 
 import type { Card, Deck, DeckSections } from "Js/types/deck";
 
+const bus = new Framebus();
+
 export default function setUpListeners(): void {
   Scryfall.addHooksToCardManagementEvents();
 
-  bus.on(events.REQUEST_DECK, (reply: (deck: Deck) => void) => {
+  bus.on(events.REQUEST_DECK, (reply) => {
     // TODO need to update bus to be a generic so
     // you can specify what the shape of the payload is
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -21,64 +23,43 @@ export default function setUpListeners(): void {
     Scryfall.getDeck().then(reply);
   });
 
-  bus.on(
-    events.SCRYFALL_PUSH_NOTIFICATION,
-    ({
-      header,
-      message,
-      color = "purple",
-      type = "deck",
-    }: {
-      header: string;
-      message: string;
-      color: string;
-      type: string;
-    }) => {
-      // TODO need to update bus to be a generic so
-      // you can specify what the shape of the payload is
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      Scryfall.pushNotification(header, message, color, type);
-    }
-  );
+  bus.on(events.SCRYFALL_PUSH_NOTIFICATION, (data) => {
+    const { header, message, color = "purple", type = "deck" } = data;
+    // TODO need to update bus to be a generic so
+    // you can specify what the shape of the payload is
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    Scryfall.pushNotification(header, message, color, type);
+  });
 
-  bus.on(
-    events.ADD_CARD_TO_DECK,
-    ({
-      cardName,
-      cardId,
-      section,
-    }: {
-      cardName: string;
-      cardId: string;
-      section: string;
-    }) => {
-      // adds card if it does not exist and increments
-      // the card if it already exists
-      Scryfall.addCard(cardId as string).then((addedCardInfo) => {
-        if (section) {
-          addedCardInfo.section = section as DeckSections;
-          Scryfall.updateEntry(addedCardInfo);
-        } else if (isLandCard(addedCardInfo)) {
-          // TODO consier getting rid of getDeckMetatdata helper
-          Scryfall.getDeckMetadata().then((meta) => {
-            if (hasDedicatedLandSection(meta as Deck)) {
-              addedCardInfo.section = "lands";
-              Scryfall.updateEntry(addedCardInfo);
-            }
-          });
-        }
-        Scryfall.pushNotification(
-          "Card Added",
-          `Added ${cardName}.`,
-          "purple",
-          "deck"
-        );
-      });
-    }
-  );
+  bus.on(events.ADD_CARD_TO_DECK, (data) => {
+    const { cardName, cardId, section } = data;
+    // adds card if it does not exist and increments
+    // the card if it already exists
+    Scryfall.addCard(cardId as string).then((addedCardInfo) => {
+      if (section) {
+        addedCardInfo.section = section as DeckSections;
+        Scryfall.updateEntry(addedCardInfo);
+      } else if (isLandCard(addedCardInfo)) {
+        // TODO consier getting rid of getDeckMetatdata helper
+        Scryfall.getDeckMetadata().then((meta) => {
+          if (hasDedicatedLandSection(meta as Deck)) {
+            addedCardInfo.section = "lands";
+            Scryfall.updateEntry(addedCardInfo);
+          }
+        });
+      }
+      Scryfall.pushNotification(
+        "Card Added",
+        `Added ${cardName}.`,
+        "purple",
+        "deck"
+      );
+    });
+  });
 
-  bus.on(events.REMOVE_CARD_FROM_DECK, ({ cardName }: { cardName: string }) => {
+  bus.on(events.REMOVE_CARD_FROM_DECK, (data) => {
+    const cardName = data.cardName;
     Scryfall.getDeck()
       .then((deck) => {
         const entries = flattenEntries(deck);

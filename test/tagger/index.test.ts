@@ -1,6 +1,10 @@
 import start from "Js/scryfall/tagger";
 import iframe from "Lib/iframe";
-import bus from "framebus";
+import Framebus from "framebus";
+
+import { mocked } from "ts-jest/utils";
+
+jest.mock("framebus");
 
 describe("Tagger", () => {
   const xhrMock: Partial<XMLHttpRequest> = {
@@ -19,9 +23,6 @@ describe("Tagger", () => {
   beforeEach(() => {
     jest.spyOn(iframe, "isInsideIframe").mockReturnValue(true);
 
-    jest.spyOn(bus, "on").mockImplementation();
-    jest.spyOn(bus, "emit").mockImplementation();
-
     jest
       .spyOn(window, "XMLHttpRequest")
       .mockImplementation(() => xhrMock as XMLHttpRequest);
@@ -38,40 +39,38 @@ describe("Tagger", () => {
 
     start();
 
-    expect(bus.on).not.toBeCalled();
+    expect(Framebus.prototype.on).not.toBeCalled();
   });
 
   it("emits a ready event", () => {
     start();
 
-    expect(bus.emit).toBeCalledTimes(1);
-    expect(bus.emit).toBeCalledWith("TAGGER_READY");
+    expect(Framebus.prototype.emit).toBeCalledTimes(1);
+    expect(Framebus.prototype.emit).toBeCalledWith("TAGGER_READY");
   });
 
   it("listens for tag requests", () => {
     start();
 
-    expect(bus.on).toBeCalledTimes(1);
-    expect(bus.on).toBeCalledWith("TAGGER_TAGS_REQUEST", expect.any(Function));
+    expect(Framebus.prototype.on).toBeCalledTimes(1);
+    expect(Framebus.prototype.on).toBeCalledWith(
+      "TAGGER_TAGS_REQUEST",
+      expect.any(Function)
+    );
   });
 
   it("requests tags", async () => {
     const replySpy = jest.fn();
-    type FramebusCallback = (
-      arg: Record<string, string>,
-      reply: jest.Mock
-    ) => void;
-    (bus.on as jest.Mock).mockImplementation(
-      (eventName: string, cb: FramebusCallback) => {
-        cb(
-          {
-            set: "set",
-            number: "number",
-          },
-          replySpy
-        );
-      }
-    );
+    mocked(Framebus.prototype.on).mockImplementation((eventName, cb) => {
+      cb(
+        {
+          set: "set",
+          number: "number",
+        },
+        replySpy
+      );
+      return true;
+    });
 
     start();
 

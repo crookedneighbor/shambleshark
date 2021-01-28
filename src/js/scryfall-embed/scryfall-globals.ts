@@ -1,4 +1,4 @@
-import bus from "framebus";
+import Framebus from "framebus";
 import wait from "Lib/wait";
 import url from "Lib/url";
 import { BUS_EVENTS as events } from "Constants";
@@ -43,6 +43,7 @@ type DeckMetadata = {
 
 let getActiveDeckPromise: Promise<Deck> | null;
 let getDeckMetadataPromise: Promise<DeckMetadata> | null;
+const bus = new Framebus();
 
 export function addHooksToCardManagementEvents(): void {
   if (window.ScryfallAPI) {

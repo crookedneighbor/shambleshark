@@ -4,9 +4,11 @@ import {
   BUS_EVENTS as events,
   FEATURE_SECTIONS as sections,
 } from "Constants";
-import bus from "framebus";
+import Framebus from "framebus";
 
 import "./index.css";
+
+const bus = new Framebus();
 
 class CleanUpImprover extends Feature {
   static metadata = {

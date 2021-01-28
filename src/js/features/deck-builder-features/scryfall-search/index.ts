@@ -1,5 +1,5 @@
 import Feature, { SettingsDefaults } from "Feature";
-import bus from "framebus";
+import Framebus from "framebus";
 import {
   BUS_EVENTS as events,
   FEATURE_IDS as ids,
@@ -32,6 +32,8 @@ type SavedSearch = {
   query: string;
   name: string;
 };
+
+const bus = new Framebus();
 
 class ScryfallSearch extends Feature {
   drawer: Drawer;
