@@ -42,9 +42,15 @@ class CardNicknameDisplay extends Feature {
   async run(): Promise<void> {
     const settings = await CardNicknameDisplay.getSettings();
     const choice = settings.location as string;
-    const urlParts = window.location.pathname.split("/");
-    const setCode = urlParts[2];
-    const collectorNumber = urlParts[3];
+    // TODO this hack is dupicated in tag menu
+    // let's pull it out to a helper
+    const taggerUrl = "https://tagger.scryfall.com/card/";
+    const taggerButton = document.querySelector(
+      `a[href^="${taggerUrl}"]`
+    ) as HTMLAnchorElement;
+    const parts = taggerButton.href.split(taggerUrl)[1].split("/");
+    const setCode = parts[0];
+    const collectorNumber = parts[1];
 
     elementReady<HTMLDivElement>(this.getParentSelector(choice), (element) => {
       const result = nicknames.find((data) => {

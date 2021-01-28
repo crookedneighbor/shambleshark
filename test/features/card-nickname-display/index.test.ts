@@ -8,8 +8,8 @@ jest.mock("Lib/mutation");
 
 describe("CardNicknameDisplay", () => {
   describe("run", () => {
-    const { location } = window;
     let container: HTMLDivElement;
+    let taggerButton: HTMLAnchorElement;
     let settingsSpy: SpyInstance;
 
     beforeEach(() => {
@@ -22,21 +22,14 @@ describe("CardNicknameDisplay", () => {
       mocked(ready).mockImplementation((selector, cb) => {
         cb(container);
       });
-
-      // @ts-ignore
-      delete window.location;
-      // @ts-ignore
-      window.location = {
-        pathname: "/card/foo/123/card-name",
-      };
-    });
-
-    afterEach(() => {
-      window.location = location;
+      taggerButton = document.createElement("a");
+      taggerButton.href = "https://tagger.scryfall.com/card/set/number/foo";
+      document.body.appendChild(taggerButton);
     });
 
     it("adds container to the prints element when set code and collector number match a nickname", async () => {
-      window.location.pathname = "/card/grn/161/conclave-centaur";
+      taggerButton.href =
+        "https://tagger.scryfall.com/card/grn/161/conclave-centaur";
       const tm = new CardNicknameDisplay();
 
       await tm.run();
@@ -49,7 +42,7 @@ describe("CardNicknameDisplay", () => {
     });
 
     it("handles cards with multiple names in sidebar", async () => {
-      window.location.pathname = "/card/znr/106/card-name";
+      taggerButton.href = "https://tagger.scryfall.com/card/znr/106/card-name";
       const tm = new CardNicknameDisplay();
 
       await tm.run();
@@ -64,7 +57,8 @@ describe("CardNicknameDisplay", () => {
     });
 
     it("does not add container to the prints element when no nicknames match", async () => {
-      window.location.pathname = "/card/foo/bar/not-a-match";
+      taggerButton.href =
+        "https://tagger.scryfall.com/card/foo/bar/not-a-match";
       const tm = new CardNicknameDisplay();
 
       await tm.run();
@@ -73,7 +67,8 @@ describe("CardNicknameDisplay", () => {
     });
 
     it("adds to card title instead when 'flavor-name' setting is used", async () => {
-      window.location.pathname = "/card/grn/161/conclave-centaur";
+      taggerButton.href =
+        "https://tagger.scryfall.com/card/grn/161/conclave-centaur";
       settingsSpy.mockResolvedValue({
         location: "flavor-name",
       });
@@ -91,7 +86,7 @@ describe("CardNicknameDisplay", () => {
     });
 
     it("handles cards with multiple names in flavor name", async () => {
-      window.location.pathname = "/card/znr/106/card-name";
+      taggerButton.href = "https://tagger.scryfall.com/card/znr/106/card-name";
       settingsSpy.mockResolvedValue({
         location: "flavor-name",
       });
