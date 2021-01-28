@@ -27,6 +27,7 @@ export const FEATURE_IDS = {
   TaggerLink: "tagger-link",
 
   // Card Page
+  CardNicknameDisplay: "card-nickname-display",
   TagMenu: "tag-menu",
 };
 
