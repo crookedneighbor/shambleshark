@@ -68,7 +68,9 @@ describe("CardNicknameDisplay", () => {
 
       const el = container.querySelector("em") as HTMLDivElement;
       expect(el).toBeTruthy();
-      expect(el.innerText).toBe('"Elfcoil Engine" (Scryfall Preview Name)');
+      expect(el.innerHTML).toBe(
+        '"Elfcoil Engine" <span class="card-nickname-source">- Scryfall Preview Name</span>'
+      );
     });
   });
 });

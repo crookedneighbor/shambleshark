@@ -1,7 +1,10 @@
 import Feature from "Feature";
 import { FEATURE_IDS as ids, FEATURE_SECTIONS as sections } from "Constants";
 import { ready as elementReady } from "Lib/mutation";
+import createElement from "Lib/create-element";
 import nicknames from "Lib/card-nicknames";
+
+import "./index.css";
 
 class CardNicknameDisplay extends Feature {
   static metadata = {
@@ -75,8 +78,9 @@ class CardNicknameDisplay extends Feature {
 
     switch (choice) {
       case "flavor-name":
-        container = document.createElement("em");
-        container.innerText = `"${result.nickname}" (${result.source})`;
+        container = createElement(
+          `<em>"${result.nickname}" <span class="card-nickname-source">- ${result.source}</span></em>`
+        );
         break;
       case "sidebar":
       default:
