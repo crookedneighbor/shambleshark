@@ -4,6 +4,11 @@
 
 - Deck Display
   - Add option to stack view of the visual card list
+- Card Nicknames on Card Display Page
+  - Add Scryfall preview names to card page (defaults to being turned off)
+- EDHRec Suggestions
+  - Fix issue where commander was not included in deck
+  - Fix issue where maybeboard was sent to edhrec by mistake
 
 # 0.8.0 - Pre-release
 
