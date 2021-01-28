@@ -54,8 +54,7 @@ class CardNicknameDisplay extends Feature {
       });
 
       if (result) {
-        const container = this.createContainer(choice, result);
-        element.appendChild(container);
+        this.addToPage(element, choice, result);
       }
     });
   }
@@ -63,39 +62,38 @@ class CardNicknameDisplay extends Feature {
   private getParentSelector(choice: string): string {
     switch (choice) {
       case "flavor-name":
-        return ".card-text-title";
+        return ".card-text";
       case "sidebar":
       default:
         return ".prints-info-section";
     }
   }
 
-  private createContainer(
+  private addToPage(
+    element: HTMLElement,
     choice: string,
     result: typeof nicknames[0]
-  ): HTMLElement {
-    let container: HTMLElement;
-
+  ): void {
     switch (choice) {
       case "flavor-name":
-        container = createElement(
-          `<div><em>"${result.nickname.join(
-            " // "
-          )}" <span class="card-nickname-source">- ${
-            result.source
-          }</span></em></div>`
+        Array.from(element.querySelectorAll(".card-text-title")).forEach(
+          (subElement, index) => {
+            subElement.appendChild(
+              createElement(
+                `<div><em>"${result.nickname[index]}" <span class="card-nickname-source">- ${result.source}</span></em></div>`
+              )
+            );
+          }
         );
         break;
       case "sidebar":
       default:
-        container = document.createElement("div");
-        container.classList.add("prints-info-section-note");
-        container.innerText = `${result.source}: "${result.nickname.join(
-          " // "
-        )}"`;
+        element.appendChild(
+          createElement(`<div class="prints-info-section-note">
+  ${result.source}: "${result.nickname.join('" // "')}"
+</div>`)
+        );
     }
-
-    return container;
   }
 }
 
