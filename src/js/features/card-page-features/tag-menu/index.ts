@@ -111,8 +111,11 @@ class TagMenu extends Feature {
 
     const payload = await requestTags(this.getTaggerData());
 
-    elementReady<HTMLDivElement>(".prints", (element) => {
-      element.appendChild(this.container);
+    elementReady<HTMLDivElement>(".prints-table:last-of-type", (element) => {
+      (element.parentNode as HTMLDivElement).insertBefore(
+        this.container,
+        element.nextSibling
+      );
 
       if (settings.artTags && payload.art.length > 0) {
         this.addTags(payload.art, "Art Tags", payload.taggerLink);

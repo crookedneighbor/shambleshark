@@ -16,7 +16,10 @@ describe("TagMenu", () => {
     let cardTags: TagInfo[];
 
     beforeEach(() => {
+      const container = document.createElement("div");
       printElement = document.createElement("div");
+      printElement.classList.add("prints-table");
+      container.appendChild(printElement);
       artTags = [];
       cardTags = [];
 
@@ -71,14 +74,14 @@ describe("TagMenu", () => {
       });
     });
 
-    it("adds container to the prints element", async () => {
+    it("adds container as a sibling to the prints element", async () => {
       const tm = new TagMenu();
 
       await tm.run();
 
-      expect(printElement.querySelector(".tag-menu-container")).toBe(
-        tm.container
-      );
+      expect(
+        printElement.parentNode?.querySelector(".tag-menu-container")
+      ).toBe(tm.container);
     });
 
     it("adds art tags to page when there is at least one art tag", async () => {
