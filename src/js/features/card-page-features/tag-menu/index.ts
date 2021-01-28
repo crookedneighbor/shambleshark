@@ -49,9 +49,7 @@ function createTable(
   name: string,
   link: string
 ): HTMLTableElement {
-  const table = createElement<
-    HTMLTableElement
-  >(`<table class="tags-table prints-table">
+  const table = createElement<HTMLTableElement>(`<table class="tags-table prints-table">
       <thead>
         <tr>
           <th>
