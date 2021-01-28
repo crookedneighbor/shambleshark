@@ -160,4 +160,20 @@ export default [
     nickname: ["Kool-Aid® Man"],
     source: "Scryfall Preview Name",
   },
+  {
+    // https://scryfall.com/card/eld/185/yorvo-lord-of-garenbrig
+    setCode: "eld",
+    collectorNumber: "185",
+    realName: ["Yorvo, Lord of Garenbrig"],
+    nickname: ["Yorvo, He Big"],
+    source: "Scryfall Preview Name",
+  },
+  {
+    // https://scryfall.com/card/eld/179/trail-of-crumbs
+    setCode: "eld",
+    collectorNumber: "179",
+    realName: ["Trail of Crumbs"],
+    nickname: ["Trail of Breadcrumbs"],
+    source: "Scryfall Preview Name",
+  },
 ];

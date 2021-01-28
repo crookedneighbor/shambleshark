@@ -216,4 +216,20 @@ export default [
     nickname: ["Part of Your World"],
     source: "Scryfall Preview Name",
   },
+  {
+    // https://scryfall.com/card/iko/234/crystalline-giant
+    setCode: "iko",
+    collectorNumber: "234",
+    realName: ["Crystalline Giant"],
+    nickname: ["Crystal Giant"],
+    source: "Scryfall Preview Name",
+  },
+  {
+    // https://scryfall.com/card/iko/219/cunning-nightbonder
+    setCode: "iko",
+    collectorNumber: "219",
+    realName: ["Cunning Nightbonder"],
+    nickname: ["Flashy Rogue"],
+    source: "Scryfall Preview Name",
+  },
 ];

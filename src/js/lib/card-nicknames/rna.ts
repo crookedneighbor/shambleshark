@@ -152,4 +152,28 @@ export default [
     collectorNumber: "172",
     source: "Scryfall Preview Name",
   },
+  {
+    // https://scryfall.com/card/rna/224/consecrate-consume
+    realName: ["Consecrate", "Consume"],
+    nickname: ["Scarecrow", "Tinman"],
+    setCode: "rna",
+    collectorNumber: "224",
+    source: "Scryfall Preview Name",
+  },
+  {
+    // https://scryfall.com/card/rna/222/carnival-carnage
+    realName: ["Carnival", "Carnage"],
+    nickname: ["A song of fire", "and blood"],
+    setCode: "rna",
+    collectorNumber: "222",
+    source: "Scryfall Preview Name",
+  },
+  {
+    // https://scryfall.com/card/rna/161/cindervines
+    realName: ["Cindervines"],
+    nickname: ["Whiplash"],
+    setCode: "rna",
+    collectorNumber: "161",
+    source: "Scryfall Preview Name",
+  },
 ];

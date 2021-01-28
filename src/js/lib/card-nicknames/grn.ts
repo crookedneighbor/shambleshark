@@ -88,4 +88,68 @@ export default [
     collectorNumber: "125",
     source: "Scryfall Preview Name",
   },
+  {
+    // https://scryfall.com/card/grn/159/chance-for-glory
+    realName: ["Chance for Glory"],
+    nickname: ["Final Bortune"],
+    setCode: "grn",
+    collectorNumber: "159",
+    source: "Scryfall Preview Name",
+  },
+  {
+    // https://scryfall.com/card/grn/186/ledev-champion
+    realName: ["Ledev Champion"],
+    nickname: ["Good Doggo Rider"],
+    setCode: "grn",
+    collectorNumber: "186",
+    source: "Scryfall Preview Name",
+  },
+  {
+    // https://scryfall.com/card/grn/145/sprouting-renewal
+    realName: ["Sprouting Renewal"],
+    nickname: ["Grumpty Statue is Grumpy"],
+    setCode: "grn",
+    collectorNumber: "145",
+    source: "Scryfall Preview Name",
+  },
+  {
+    // https://scryfall.com/card/grn/35/devious-cover-up
+    realName: ["Devious Cover Up"],
+    nickname: ["Strictly-Better Put Away"],
+    setCode: "grn",
+    collectorNumber: "35",
+    source: "Scryfall Preview Name",
+  },
+  {
+    // https://scryfall.com/card/grn/154/beacon-bolt
+    realName: ["Beacon Bolt"],
+    nickname: ["The Lightning-Struck Tower"],
+    setCode: "grn",
+    collectorNumber: "154",
+    source: "Scryfall Preview Name",
+  },
+  {
+    // https://scryfall.com/card/grn/135/kraul-foragers
+    realName: ["Kraul Forages"],
+    nickname: ["Shroom Maintenance Squad"],
+    setCode: "grn",
+    collectorNumber: "135",
+    source: "Scryfall Preview Name",
+  },
+  {
+    // https://scryfall.com/card/grn/104/goblin-locksmith
+    realName: ["Goblin Locksmith"],
+    nickname: ["Gentle Knocker"],
+    setCode: "grn",
+    collectorNumber: "104",
+    source: "Scryfall Preview Name",
+  },
+  {
+    // https://scryfall.com/card/grn/124/bounty-of-might
+    realName: ["Bounty of Might"],
+    nickname: ["Giant-er Growth"],
+    setCode: "grn",
+    collectorNumber: "124",
+    source: "Scryfall Preview Name",
+  },
 ];

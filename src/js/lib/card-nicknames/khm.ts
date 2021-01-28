@@ -160,4 +160,36 @@ export default [
     nickname: ["Adios Wormhole"],
     source: "Scryfall Preview Name",
   },
+  {
+    // https://scryfall.com/card/khm/30/spectral-steel
+    setCode: "khm",
+    collectorNumber: "30",
+    realName: ["Spectral Steel"],
+    nickname: ["Spirit Blade"],
+    source: "Scryfall Preview Name",
+  },
+  {
+    // https://scryfall.com/card/khm/96/grim-draugr
+    setCode: "khm",
+    collectorNumber: "96",
+    realName: ["Grim Draugr"],
+    nickname: ["Draugr Scourge Lord"],
+    source: "Scryfall Preview Name",
+  },
+  {
+    // https://scryfall.com/card/khm/107/rise-of-the-dread-marn
+    setCode: "khm",
+    collectorNumber: "107",
+    realName: ["Rise of the Dread Marn"],
+    nickname: ["Rise of the Marnhorde"],
+    source: "Scryfall Preview Name",
+  },
+  {
+    // https://scryfall.com/card/khm/110/skemfar-shadowsage
+    setCode: "khm",
+    collectorNumber: "110",
+    realName: ["Skemfar Shadowsage"],
+    nickname: ["Forsworn Cleric"],
+    source: "Scryfall Preview Name",
+  },
 ];
