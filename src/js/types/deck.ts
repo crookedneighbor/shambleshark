@@ -4,6 +4,7 @@ export type DeckSections =
   | "mainboard"
   | "maybeboard"
   | "nonlands"
+  | "outside"
   | "sideboard";
 
 export type DeckSectionKinds = "primary" | "secondary";

@@ -110,7 +110,7 @@ describe("makeEDHRecButton", () => {
 
       fakeDeck = makeFakeDeck({
         primarySections: ["commanders", "nonlands"],
-        secondarySections: ["lands"],
+        secondarySections: ["lands", "maybeboard", "outside"],
         entries: {
           commanders: [
             makeFakeCard({
@@ -138,6 +138,8 @@ describe("makeEDHRecButton", () => {
               },
             }),
           ],
+          maybeboard: [],
+          outside: [],
         },
       });
       fakeEDHRecResponse = {
@@ -211,6 +213,36 @@ describe("makeEDHRecButton", () => {
 
     it("emits a request for EDHRec recomendations with deck data", async () => {
       const btn = await makeEDHRecButton();
+
+      click(btn);
+
+      await wait();
+
+      expect(bus.emit).toBeCalledTimes(1);
+      expect(bus.emit).toBeCalledWith(
+        "REQUEST_EDHREC_RECOMENDATIONS",
+        {
+          commanders: ["Arjun, the Shifting Flame"],
+          cards: [
+            "1 Arjun, the Shifting Flame",
+            "1 Reliquary Tower",
+            "1 Obstinate Familiar",
+          ],
+        },
+        expect.any(Function)
+      );
+    });
+
+    it("emits a request for EDHRec recomendations without maybebaord from deck data", async () => {
+      const btn = await makeEDHRecButton();
+      fakeDeck.entries!.maybeboard!.push(
+        makeFakeCard({
+          id: "some-id",
+          cardDigest: {
+            name: "Card in Maybeboard",
+          },
+        })
+      );
 
       click(btn);
 
