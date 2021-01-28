@@ -79,14 +79,20 @@ class CardNicknameDisplay extends Feature {
     switch (choice) {
       case "flavor-name":
         container = createElement(
-          `<em>"${result.nickname}" <span class="card-nickname-source">- ${result.source}</span></em>`
+          `<div><em>"${result.nickname.join(
+            " // "
+          )}" <span class="card-nickname-source">- ${
+            result.source
+          }</span></em></div>`
         );
         break;
       case "sidebar":
       default:
         container = document.createElement("div");
         container.classList.add("prints-info-section-note");
-        container.innerText = `${result.source}: "${result.nickname}"`;
+        container.innerText = `${result.source}: "${result.nickname.join(
+          " // "
+        )}"`;
     }
 
     return container;
