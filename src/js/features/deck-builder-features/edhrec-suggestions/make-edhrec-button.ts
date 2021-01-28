@@ -38,7 +38,6 @@ function getCardName(card: Card): string {
 
 function getCardsInDeck(entries: Deck["entries"]) {
   return Object.entries(entries)
-    .filter((value) => value[0] != "commanders")
     .map((value) => value[1])
     .flat()
     .filter((c) => isValidCard(c as Card))

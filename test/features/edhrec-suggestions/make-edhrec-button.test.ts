@@ -221,7 +221,11 @@ describe("makeEDHRecButton", () => {
         "REQUEST_EDHREC_RECOMENDATIONS",
         {
           commanders: ["Arjun, the Shifting Flame"],
-          cards: ["1 Reliquary Tower", "1 Obstinate Familiar"],
+          cards: [
+            "1 Arjun, the Shifting Flame",
+            "1 Reliquary Tower",
+            "1 Obstinate Familiar",
+          ],
         },
         expect.any(Function)
       );
@@ -262,7 +266,13 @@ describe("makeEDHRecButton", () => {
             "Tana, the Bloodsower",
             "Reyhan, Last of the Abzan",
           ],
-          cards: ["1 Reliquary Tower", "1 Obstinate Familiar"],
+          cards: [
+            "1 Sidar Kondo of Jamuraa",
+            "1 Tana, the Bloodsower",
+            "1 Reyhan, Last of the Abzan",
+            "1 Reliquary Tower",
+            "1 Obstinate Familiar",
+          ],
         },
         expect.any(Function)
       );
@@ -301,6 +311,7 @@ describe("makeEDHRecButton", () => {
         {
           commanders: ["Arjun, the Shifting Flame"],
           cards: [
+            "1 Arjun, the Shifting Flame",
             "1 Reliquary Tower",
             "5 Island",
             "1 Obstinate Familiar",
