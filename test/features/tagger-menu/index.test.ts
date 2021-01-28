@@ -8,7 +8,7 @@ import { mocked } from "ts-jest/utils";
 jest.mock("Lib/tagger-bridge");
 jest.mock("Lib/mutation");
 
-describe("Tagger Link", () => {
+describe("TagMenu", () => {
   describe("run", () => {
     let settingsSpy: SpyInstance;
     let printElement: HTMLDivElement;
