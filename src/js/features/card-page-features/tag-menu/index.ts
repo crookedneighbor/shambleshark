@@ -110,6 +110,12 @@ class TagMenu extends Feature {
     const payload = await requestTags(this.getTaggerData());
 
     elementReady<HTMLDivElement>(".prints-table:last-of-type", (element) => {
+      if (this.container.parentNode) {
+        // the container has already been inserted,
+        // so this new element is the very element
+        // we are adding!
+        return;
+      }
       (element.parentNode as HTMLDivElement).insertBefore(
         this.container,
         element.nextSibling
