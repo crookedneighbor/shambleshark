@@ -40,6 +40,18 @@ describe("CardTooltip", () => {
       expect(ready).toBeCalledWith("#card-tooltip", expect.any(Function));
     });
 
+    it("creates tooltip image element if it does not already exist", async () => {
+      expect(
+        fakeElement.querySelector("img#card-tooltip-img-front")
+      ).toBeFalsy();
+
+      tooltip.findTooltip();
+
+      expect(
+        fakeElement.querySelector("img#card-tooltip-img-front")
+      ).toBeTruthy();
+    });
+
     it("skips waiting for tooltip element if it is already available", () => {
       tooltip.findTooltip();
 
@@ -176,7 +188,7 @@ describe("CardTooltip", () => {
       });
 
       tooltip.tooltipElement = document.createElement("div");
-      tooltip.tooltipElement.innerHTML = '<img id="card-tooltip-img" />';
+      tooltip.tooltipElement.innerHTML = '<img id="card-tooltip-img-front" />';
       document.body.appendChild(tooltip.tooltipElement);
 
       tooltip.img = "https://example.com/image.png";
@@ -245,7 +257,8 @@ describe("CardTooltip", () => {
       expect(tooltip.tooltipElement?.style.top).toBe("70px");
 
       expect(
-        (document.getElementById("card-tooltip-img") as HTMLImageElement).src
+        (document.getElementById("card-tooltip-img-front") as HTMLImageElement)
+          .src
       ).toBe("https://example.com/image.png");
     });
 

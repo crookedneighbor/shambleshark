@@ -50,6 +50,16 @@ export default class CardTooltip {
     // element never respnds a second time
     elementReady("#card-tooltip", (tooltip) => {
       this.tooltipElement = tooltipElement = tooltip;
+
+      let cardToolTipImg = this.tooltipElement.querySelector(
+        "#card-tooltip-img-front"
+      ) as HTMLImageElement;
+
+      if (!cardToolTipImg) {
+        cardToolTipImg = document.createElement("img");
+        cardToolTipImg.id = "card-tooltip-img-front";
+        this.tooltipElement.appendChild(cardToolTipImg);
+      }
     });
   }
 
@@ -116,12 +126,12 @@ export default class CardTooltip {
       this.tooltipElement.style.top = event.pageY - 30 + "px";
 
       const cardToolTipImg = document.getElementById(
-        "card-tooltip-img"
+        "card-tooltip-img-front"
       ) as HTMLImageElement;
 
       if (cardToolTipImg.src !== this.img) {
         const t = document.createElement("img");
-        t.id = "card-tooltip-img";
+        t.id = "card-tooltip-img-front";
         t.className = "card";
         t.src = this.img;
 
