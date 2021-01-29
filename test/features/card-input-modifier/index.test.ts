@@ -261,7 +261,10 @@ describe("Card Input Modifier", () => {
         makeFakeCard({
           id: "foo",
           cardDigest: {
-            image: "https://example.com/foo-in-card-digest",
+            image_uris: {
+              front: "https://example.com/foo-in-card-digest",
+              back: "https://example.com/back/foo-in-card-digest",
+            },
           },
         }),
       ]);
@@ -278,7 +281,10 @@ describe("Card Input Modifier", () => {
         makeFakeCard({
           id: "not-foo",
           cardDigest: {
-            image: "https://example.com/not-foo-in-card-digest",
+            image_uris: {
+              front: "https://example.com/foo-in-card-digest",
+              back: "https://example.com/back/foo-in-card-digest",
+            },
           },
         }),
       ]);
@@ -308,7 +314,10 @@ describe("Card Input Modifier", () => {
         makeFakeCard({
           id: "foo",
           cardDigest: {
-            image: "https://example.com/foo-in-card-digest",
+            image_uris: {
+              front: "https://example.com/foo-in-card-digest",
+              back: "https://example.com/foo-in-card-digest",
+            },
           },
         }),
       ]);
@@ -327,13 +336,19 @@ describe("Card Input Modifier", () => {
         makeFakeCard({
           id: "foo",
           cardDigest: {
-            image: "https://example.com/new-foo",
+            image_uris: {
+              front: "https://example.com/new-foo",
+              back: "https://example.com/new-foo/back",
+            },
           },
         }),
         makeFakeCard({
           id: "bar",
           cardDigest: {
-            image: "https://example.com/bar",
+            image_uris: {
+              front: "https://example.com/bar",
+              back: "https://example.com/bar/back",
+            },
           },
         }),
         makeFakeCard({

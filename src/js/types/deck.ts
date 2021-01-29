@@ -12,7 +12,10 @@ export type DeckSectionKinds = "primary" | "secondary";
 export interface CardDigest {
   collector_number: string;
   id: string;
-  image: string;
+  image_uris: {
+    front: string;
+    back: string;
+  };
   mana_cost: string;
   name: string;
   object: "card_digest";

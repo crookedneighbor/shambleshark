@@ -126,7 +126,8 @@ class CardInputModifier extends Feature {
       return "";
     }
 
-    const img = entry.card_digest?.image;
+    const card = entry.card_digest;
+    const img = card?.image_uris?.front;
 
     if (!img) {
       return "";
@@ -143,7 +144,7 @@ class CardInputModifier extends Feature {
 
     const entries = await this.getEntries(true);
     entries?.forEach((entry) => {
-      this.imageCache[entry.id] = entry.card_digest?.image || "";
+      this.imageCache[entry.id] = entry.card_digest?.image_uris?.front || "";
     });
   }
 }

@@ -18,7 +18,10 @@ export function makeFakeCard(overrides: FakeCardOptions = {}): Card {
   const cardDigest: CardDigest = {
     collector_number: `collector-${id}`,
     id: `id-${id}`,
-    image: `https://img.scryfall.com/${id}`,
+    image_uris: {
+      front: `https://img.scryfall.com/${id}`,
+      back: `https://img.scryfall.com/back/${id}`,
+    },
     mana_cost: "{0}",
     name: "name",
     object: "card_digest",
