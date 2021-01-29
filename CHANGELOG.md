@@ -1,5 +1,12 @@
 # Changelog
 
+# 0.9.1 - Pre-release
+
+- Card Input Modifier
+  - Update card image tooltip to respect change in card_digest
+- EDHRec Suggestions
+  - Use Scryfall for image sources (#78)
+
 # 0.9.0 - Pre-release
 
 - Deck Display
