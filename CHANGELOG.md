@@ -5,6 +5,8 @@
 - Card Input Modifier
   - Fix issue where card images would be incorrect after hovering over double faced cards (#88)
   - Support double sided card images
+- Contact Page
+  - Make Shambleshark warning impossible to miss (#84)
 
 # 0.9.1 - Pre-release
 

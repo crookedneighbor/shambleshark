@@ -1,3 +1,16 @@
+.shambleshark-cover-page {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #4f4255;
+  z-index: 9999;
+  padding: 3em;
+  display: flex;
+  align-items: center;
+}
+
 p.shambleshark__contact-p {
   margin: 18px 0 0 0;
 }
