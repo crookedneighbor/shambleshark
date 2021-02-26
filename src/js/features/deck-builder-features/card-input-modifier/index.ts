@@ -20,8 +20,13 @@ const CARD_EVENTS = [
 ];
 const bus = new Framebus();
 
+type ImageRecord = {
+  front: string;
+  back?: string;
+};
+
 class CardInputModifier extends Feature {
-  imageCache: Record<string, string>;
+  imageCache: Record<string, ImageRecord>;
   listeners: Record<string, Element>;
   tooltip: CardTooltip;
   _getEntriesPromise: Promise<Card[]> | undefined;
@@ -56,14 +61,14 @@ class CardInputModifier extends Feature {
     this.tooltip = new CardTooltip({
       onMouseover: (element) => {
         const id = element.getAttribute("data-entry");
-        const img = id && this.imageCache[id];
+        const imgs = id && this.imageCache[id];
 
-        if (!img) {
-          this.tooltip.setImage("");
+        if (!imgs) {
+          this.tooltip.setImages("", "");
           return;
         }
 
-        this.tooltip.setImage(img);
+        this.tooltip.setImages(imgs.front, imgs.back);
       },
     });
   }
@@ -114,7 +119,7 @@ class CardInputModifier extends Feature {
     return this._getEntriesPromise;
   }
 
-  async lookupImage(id: string, bustCache = false): Promise<string> {
+  async lookupImage(id: string, bustCache = false): Promise<ImageRecord> {
     if (!bustCache && id in this.imageCache) {
       return Promise.resolve(this.imageCache[id]);
     }
@@ -123,19 +128,27 @@ class CardInputModifier extends Feature {
     const entry = entries.find((e) => e.id === id);
 
     if (!entry) {
-      return "";
+      return {
+        front: "",
+      };
     }
 
     const card = entry.card_digest;
-    const img = card?.image_uris?.front;
+    const front = card?.image_uris?.front;
+    const back = card?.image_uris?.back;
 
-    if (!img) {
-      return "";
+    if (!front) {
+      return {
+        front: "",
+      };
     }
 
-    this.imageCache[id] = img;
+    this.imageCache[id] = {
+      front,
+      back,
+    };
 
-    return img;
+    return this.imageCache[id];
   }
 
   async refreshCache(): Promise<void> {
@@ -144,7 +157,10 @@ class CardInputModifier extends Feature {
 
     const entries = await this.getEntries(true);
     entries?.forEach((entry) => {
-      this.imageCache[entry.id] = entry.card_digest?.image_uris?.front || "";
+      this.imageCache[entry.id] = {
+        front: entry.card_digest?.image_uris?.front || "",
+        back: entry.card_digest?.image_uris?.back || "",
+      };
     });
   }
 }

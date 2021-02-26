@@ -40,18 +40,6 @@ describe("CardTooltip", () => {
       expect(ready).toBeCalledWith("#card-tooltip", expect.any(Function));
     });
 
-    it("creates tooltip image element if it does not already exist", async () => {
-      expect(
-        fakeElement.querySelector("img#card-tooltip-img-front")
-      ).toBeFalsy();
-
-      tooltip.findTooltip();
-
-      expect(
-        fakeElement.querySelector("img#card-tooltip-img-front")
-      ).toBeTruthy();
-    });
-
     it("skips waiting for tooltip element if it is already available", () => {
       tooltip.findTooltip();
 
@@ -165,12 +153,23 @@ describe("CardTooltip", () => {
     });
   });
 
-  describe("setImage", () => {
-    it("sets image", () => {
+  describe("setImages", () => {
+    it("sets front image", () => {
       const tooltip = new CardTooltip();
 
-      tooltip.setImage("https://example.com/foo.png");
-      expect(tooltip.img).toBe("https://example.com/foo.png");
+      tooltip.setImages("https://example.com/foo.png");
+      expect(tooltip.frontImg).toBe("https://example.com/foo.png");
+    });
+
+    it("can set back image", () => {
+      const tooltip = new CardTooltip();
+
+      tooltip.setImages(
+        "https://example.com/front.png",
+        "https://example.com/back.png"
+      );
+      expect(tooltip.frontImg).toBe("https://example.com/front.png");
+      expect(tooltip.backImg).toBe("https://example.com/back.png");
     });
   });
 
@@ -191,7 +190,7 @@ describe("CardTooltip", () => {
       tooltip.tooltipElement.innerHTML = '<img id="card-tooltip-img-front" />';
       document.body.appendChild(tooltip.tooltipElement);
 
-      tooltip.img = "https://example.com/image.png";
+      tooltip.setImages("https://example.com/image.png");
       el = document.createElement("div");
       fakeEvent = new MouseEvent("mouseout");
     });
@@ -221,7 +220,7 @@ describe("CardTooltip", () => {
 
       handler(fakeEvent);
 
-      expect(tooltip.tooltipElement?.style.display).not.toBe("block");
+      expect(tooltip.tooltipElement?.style.display).not.toBe("flex");
 
       Object.defineProperty(window, "innerWidth", {
         writable: true,
@@ -230,16 +229,74 @@ describe("CardTooltip", () => {
     });
 
     it("noops when there is no img", () => {
-      delete tooltip.img;
+      delete tooltip.frontImg;
 
       const handler = tooltip.createMousemoveHandler(el);
 
       handler(fakeEvent);
 
-      expect(tooltip.tooltipElement?.style.display).not.toBe("block");
+      expect(tooltip.tooltipElement?.style.display).not.toBe("flex");
     });
 
-    it("opens tooltip", () => {
+    it("opens tooltip with just front image", () => {
+      const handler = tooltip.createMousemoveHandler(el);
+
+      Object.defineProperty(fakeEvent, "pageX", {
+        writable: true,
+        value: 100,
+      });
+      Object.defineProperty(fakeEvent, "pageY", {
+        writable: true,
+        value: 100,
+      });
+
+      tooltip.setImages("https://example.com/front.png");
+      handler(fakeEvent);
+
+      expect(tooltip.tooltipElement?.style.display).toBe("flex");
+      expect(tooltip.tooltipElement?.style.left).toBe("150px");
+      expect(tooltip.tooltipElement?.style.top).toBe("70px");
+
+      expect(
+        (document.getElementById("card-tooltip-img-front") as HTMLImageElement)
+          .src
+      ).toBe("https://example.com/front.png");
+      expect(document.getElementById("card-tooltip-img-back")).toBeFalsy();
+    });
+
+    it("opens tooltip with back image", () => {
+      const handler = tooltip.createMousemoveHandler(el);
+
+      Object.defineProperty(fakeEvent, "pageX", {
+        writable: true,
+        value: 100,
+      });
+      Object.defineProperty(fakeEvent, "pageY", {
+        writable: true,
+        value: 100,
+      });
+
+      tooltip.setImages(
+        "https://example.com/front.png",
+        "https://example.com/back.png"
+      );
+      handler(fakeEvent);
+
+      expect(tooltip.tooltipElement?.style.display).toBe("flex");
+      expect(tooltip.tooltipElement?.style.left).toBe("150px");
+      expect(tooltip.tooltipElement?.style.top).toBe("70px");
+
+      expect(
+        (document.getElementById("card-tooltip-img-front") as HTMLImageElement)
+          .src
+      ).toBe("https://example.com/front.png");
+      expect(
+        (document.getElementById("card-tooltip-img-back") as HTMLImageElement)
+          .src
+      ).toBe("https://example.com/back.png");
+    });
+
+    it("applies two-up class when a back image exists", () => {
       const handler = tooltip.createMousemoveHandler(el);
 
       Object.defineProperty(fakeEvent, "pageX", {
@@ -252,14 +309,22 @@ describe("CardTooltip", () => {
       });
       handler(fakeEvent);
 
-      expect(tooltip.tooltipElement?.style.display).toBe("block");
-      expect(tooltip.tooltipElement?.style.left).toBe("150px");
-      expect(tooltip.tooltipElement?.style.top).toBe("70px");
+      expect(tooltip.tooltipElement?.className).not.toContain("two-up");
 
-      expect(
-        (document.getElementById("card-tooltip-img-front") as HTMLImageElement)
-          .src
-      ).toBe("https://example.com/image.png");
+      tooltip.setImages("front.png");
+      handler(fakeEvent);
+
+      expect(tooltip.tooltipElement?.className).not.toContain("two-up");
+
+      tooltip.setImages("front.png", "back.png");
+      handler(fakeEvent);
+
+      expect(tooltip.tooltipElement?.className).toContain("two-up");
+
+      tooltip.setImages("front.png");
+      handler(fakeEvent);
+
+      expect(tooltip.tooltipElement?.className).not.toContain("two-up");
     });
 
     it("calls onMousemove callback with element if provided", () => {

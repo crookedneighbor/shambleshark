@@ -32,14 +32,18 @@ describe("Card Input Modifier", () => {
     const el = document.createElement("div");
     el.setAttribute("data-entry", "id");
 
-    cim.imageCache.id = "https://example.com/image.png";
-    jest.spyOn(cim.tooltip, "setImage").mockImplementation();
+    cim.imageCache.id = {
+      front: "https://example.com/front.png",
+      back: "https://example.com/back.png",
+    };
+    jest.spyOn(cim.tooltip, "setImages").mockImplementation();
 
     cim.tooltip.triggerOnMouseover(el);
 
-    expect(cim.tooltip.setImage).toBeCalledTimes(1);
-    expect(cim.tooltip.setImage).toBeCalledWith(
-      "https://example.com/image.png"
+    expect(cim.tooltip.setImages).toBeCalledTimes(1);
+    expect(cim.tooltip.setImages).toBeCalledWith(
+      "https://example.com/front.png",
+      "https://example.com/back.png"
     );
   });
 
@@ -47,11 +51,11 @@ describe("Card Input Modifier", () => {
     const el = document.createElement("div");
     el.setAttribute("data-entry", "id");
 
-    jest.spyOn(cim.tooltip, "setImage").mockImplementation();
+    jest.spyOn(cim.tooltip, "setImages").mockImplementation();
 
     cim.tooltip.triggerOnMouseover(el);
 
-    expect(cim.tooltip.setImage).toBeCalledWith("");
+    expect(cim.tooltip.setImages).toBeCalledWith("", "");
   });
 
   describe("run", () => {
@@ -119,7 +123,7 @@ describe("Card Input Modifier", () => {
       const payload = {
         payload: "foo",
       };
-      cim.imageCache.foo = "foo";
+      cim.imageCache.foo = { front: "foo" };
 
       type ReplyType = (res: Record<string, string>) => void;
       busOnSpy.mockImplementation((event: string, cb: ReplyType) => {
@@ -158,7 +162,7 @@ describe("Card Input Modifier", () => {
     beforeEach(() => {
       entry = document.createElement("div");
       entry.setAttribute("data-entry", "id");
-      jest.spyOn(cim, "lookupImage").mockResolvedValue("");
+      jest.spyOn(cim, "lookupImage").mockResolvedValue({ front: "" });
       jest.spyOn(cim.tooltip, "addElement").mockImplementation();
     });
 
@@ -248,12 +252,14 @@ describe("Card Input Modifier", () => {
 
   describe("lookupImage", () => {
     it("resolves with image url if it is in the cache", async () => {
-      cim.imageCache.foo = "https://example.com/foo";
+      cim.imageCache.foo = { front: "https://example.com/foo" };
 
-      const url = await cim.lookupImage("foo");
+      const urls = await cim.lookupImage("foo");
 
       expect(getDeck).toBeCalledTimes(0);
-      expect(url).toBe("https://example.com/foo");
+      expect(urls).toEqual({
+        front: "https://example.com/foo",
+      });
     });
 
     it("looks up deck to find image", async () => {
@@ -269,11 +275,17 @@ describe("Card Input Modifier", () => {
         }),
       ]);
 
-      const url = await cim.lookupImage("foo");
+      const urls = await cim.lookupImage("foo");
 
       expect(getDeck).toBeCalledTimes(1);
-      expect(url).toBe("https://example.com/foo-in-card-digest");
-      expect(cim.imageCache.foo).toBe("https://example.com/foo-in-card-digest");
+      expect(urls.front).toBe("https://example.com/foo-in-card-digest");
+      expect(urls.back).toBe("https://example.com/back/foo-in-card-digest");
+      expect(cim.imageCache.foo.front).toBe(
+        "https://example.com/foo-in-card-digest"
+      );
+      expect(cim.imageCache.foo.back).toBe(
+        "https://example.com/back/foo-in-card-digest"
+      );
     });
 
     it("returns nothing if entry with specific id cannot be found", async () => {
@@ -289,10 +301,12 @@ describe("Card Input Modifier", () => {
         }),
       ]);
 
-      const url = await cim.lookupImage("foo");
+      const urls = await cim.lookupImage("foo");
 
       expect(getDeck).toBeCalledTimes(1);
-      expect(url).toBeFalsy();
+      expect(urls).toEqual({
+        front: "",
+      });
     });
 
     it("returns nothing if entry with specific id does not have an image", async () => {
@@ -302,14 +316,16 @@ describe("Card Input Modifier", () => {
         },
       ]);
 
-      const url = await cim.lookupImage("foo");
+      const urls = await cim.lookupImage("foo");
 
       expect(getDeck).toBeCalledTimes(1);
-      expect(url).toBeFalsy();
+      expect(urls).toEqual({
+        front: "",
+      });
     });
 
     it("can bust the cache to re-lookup card image", async () => {
-      cim.imageCache.foo = "https://example.com/cached-foo";
+      cim.imageCache.foo = { front: "https://example.com/cached-foo" };
       flattenEntriesSpy.mockReturnValue([
         makeFakeCard({
           id: "foo",
@@ -322,11 +338,13 @@ describe("Card Input Modifier", () => {
         }),
       ]);
 
-      const url = await cim.lookupImage("foo", true);
+      const urls = await cim.lookupImage("foo", true);
 
       expect(getDeck).toBeCalledTimes(1);
-      expect(url).toBe("https://example.com/foo-in-card-digest");
-      expect(cim.imageCache.foo).toBe("https://example.com/foo-in-card-digest");
+      expect(urls.front).toBe("https://example.com/foo-in-card-digest");
+      expect(cim.imageCache.foo.front).toBe(
+        "https://example.com/foo-in-card-digest"
+      );
     });
   });
 
@@ -356,7 +374,7 @@ describe("Card Input Modifier", () => {
           cardDigest: false,
         }),
       ]);
-      cim.imageCache.foo = "https://example.com/cached-foo";
+      cim.imageCache.foo = { front: "https://example.com/cached-foo" };
 
       jest.useFakeTimers();
 
@@ -377,9 +395,12 @@ describe("Card Input Modifier", () => {
       // let the entries finish assigning the new cache
       await refresh;
 
-      expect(cim.imageCache.foo).toBe("https://example.com/new-foo");
-      expect(cim.imageCache.bar).toBe("https://example.com/bar");
-      expect(cim.imageCache.baz).toBeFalsy();
+      expect(cim.imageCache.foo.front).toBe("https://example.com/new-foo");
+      expect(cim.imageCache.bar.front).toBe("https://example.com/bar");
+      expect(cim.imageCache.baz).toEqual({
+        front: "",
+        back: "",
+      });
     });
   });
 });

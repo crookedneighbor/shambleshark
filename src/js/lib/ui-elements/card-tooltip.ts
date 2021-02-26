@@ -20,7 +20,8 @@ let tooltipElement: HTMLElement | null;
 export default class CardTooltip {
   elements: ElementConfig[];
   tooltipElement?: HTMLElement;
-  img?: string;
+  frontImg?: string;
+  backImg?: string;
 
   private _onMouseover: OnMouseHandler;
   private _onMouseout: OnMouseHandler;
@@ -50,16 +51,6 @@ export default class CardTooltip {
     // element never respnds a second time
     elementReady("#card-tooltip", (tooltip) => {
       this.tooltipElement = tooltipElement = tooltip;
-
-      let cardToolTipImg = this.tooltipElement.querySelector(
-        "#card-tooltip-img-front"
-      ) as HTMLImageElement;
-
-      if (!cardToolTipImg) {
-        cardToolTipImg = document.createElement("img");
-        cardToolTipImg.id = "card-tooltip-img-front";
-        this.tooltipElement.appendChild(cardToolTipImg);
-      }
     });
   }
 
@@ -92,8 +83,9 @@ export default class CardTooltip {
     this.elements.splice(index, 1);
   }
 
-  setImage(url: string): void {
-    this.img = url;
+  setImages(frontUrl: string, backUrl?: string): void {
+    this.frontImg = frontUrl;
+    this.backImg = backUrl;
   }
 
   createMousemoveHandler(el: HTMLElement): MouseHandler {
@@ -112,12 +104,18 @@ export default class CardTooltip {
 
       this.triggerOnMouseover(el);
 
-      if (!this.img) {
+      if (!this.frontImg) {
         return;
       }
 
-      if (this.tooltipElement.style.display !== "block") {
-        this.tooltipElement.style.display = "block";
+      if (this.backImg) {
+        this.tooltipElement.className = "two-up";
+      } else {
+        this.tooltipElement.className = "";
+      }
+
+      if (this.tooltipElement.style.display !== "flex") {
+        this.tooltipElement.style.display = "flex";
       }
 
       // TODO look into using something other than pageX, as it is not
@@ -125,18 +123,36 @@ export default class CardTooltip {
       this.tooltipElement.style.left = event.pageX + 50 + "px";
       this.tooltipElement.style.top = event.pageY - 30 + "px";
 
-      const cardToolTipImg = document.getElementById(
+      const existingFrontCardTooltipImg = document.getElementById(
         "card-tooltip-img-front"
       ) as HTMLImageElement;
+      const existingBackCardTooltipImg = document.getElementById(
+        "card-tooltip-img-back"
+      ) as HTMLImageElement;
 
-      if (cardToolTipImg.src !== this.img) {
-        const t = document.createElement("img");
-        t.id = "card-tooltip-img-front";
-        t.className = "card";
-        t.src = this.img;
+      if (existingFrontCardTooltipImg?.src !== this.frontImg) {
+        const newFrontImgElement = document.createElement("img");
+        newFrontImgElement.id = "card-tooltip-img-front";
+        newFrontImgElement.className = "card";
+        newFrontImgElement.src = this.frontImg;
 
-        this.tooltipElement.removeChild(cardToolTipImg);
-        this.tooltipElement.appendChild(t);
+        if (existingFrontCardTooltipImg) {
+          this.tooltipElement.removeChild(existingFrontCardTooltipImg);
+        }
+        this.tooltipElement.appendChild(newFrontImgElement);
+      }
+
+      if (this.backImg && existingBackCardTooltipImg?.src !== this.backImg) {
+        const newBackImgElement = document.createElement("img");
+        newBackImgElement.id = "card-tooltip-img-back";
+        newBackImgElement.className = "card";
+        newBackImgElement.src = this.backImg;
+        if (existingBackCardTooltipImg) {
+          this.tooltipElement.removeChild(existingBackCardTooltipImg);
+        }
+        this.tooltipElement.appendChild(newBackImgElement);
+      } else if (existingBackCardTooltipImg && !this.backImg) {
+        this.tooltipElement.removeChild(existingBackCardTooltipImg);
       }
     };
   }
