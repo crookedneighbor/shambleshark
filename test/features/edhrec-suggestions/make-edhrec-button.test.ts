@@ -149,31 +149,25 @@ describe("makeEDHRecButton", () => {
         ],
         inRecs: [
           makeFakeEDHRecSuggestion({
-            scryfall_uri:
-              "https://scryfall.com/card/eld/331/arcane-signet?utm_source=api",
+            scryfall_uri: "eld/331/arcane-signet?utm_source=api",
             names: ["Arcane Signet"],
-            primary_types: ["Artifact"],
-            images: [
+            primary_type: "Artifact",
+            image:
               "https://img.scryfall.com/cards/normal/front/8/4/84128e98-87d6-4c2f-909b-9435a7833e63.jpg?1567631723",
-            ],
           }),
           makeFakeEDHRecSuggestion({
-            scryfall_uri:
-              "https://scryfall.com/card/ori/251/shivan-reef?utm_source=api",
+            scryfall_uri: "ori/251/shivan-reef?utm_source=api",
             names: ["Shivan Reef"],
-            primary_types: ["Land"],
-            images: [
+            primary_type: "Land",
+            image:
               "https://img.scryfall.com/cards/normal/front/f/1/f1d33afd-6f2a-43c8-ae5d-17a0674fcdd3.jpg?1562049659",
-            ],
           }),
           makeFakeEDHRecSuggestion({
-            scryfall_uri:
-              "https://scryfall.com/card/a25/41/arcane-denial?utm_source=api",
+            scryfall_uri: "a25/41/arcane-denial?utm_source=api",
             names: ["Arcane Denial"],
-            primary_types: ["Instant"],
-            images: [
+            primary_type: "Instant",
+            image:
               "https://img.scryfall.com/cards/normal/front/9/d/9d1ffeb1-6c31-45f7-8140-913c397022a3.jpg?1562439019",
-            ],
           }),
         ],
       };
@@ -469,19 +463,19 @@ describe("makeEDHRecButton", () => {
       fakeEDHRecResponse.inRecs.push(
         makeFakeEDHRecSuggestion({
           names: ["Fake Creature"],
-          primary_types: ["Creature"],
+          primary_type: "Creature",
         }),
         makeFakeEDHRecSuggestion({
           names: ["Fake Sorcery"],
-          primary_types: ["Sorcery"],
+          primary_type: "Sorcery",
         }),
         makeFakeEDHRecSuggestion({
           names: ["Fake Enchantment"],
-          primary_types: ["Enchantment"],
+          primary_type: "Enchantment",
         }),
         makeFakeEDHRecSuggestion({
           names: ["Fake Planeswalker"],
-          primary_types: ["Planeswalker"],
+          primary_type: "Planeswalker",
         })
       );
 
@@ -509,7 +503,7 @@ describe("makeEDHRecButton", () => {
       fakeEDHRecResponse.inRecs.push(
         makeFakeEDHRecSuggestion({
           names: ["Fake Unknown Type"],
-          primary_types: ["Unknown Type"],
+          primary_type: "Unknown Type",
         })
       );
 

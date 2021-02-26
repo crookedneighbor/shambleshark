@@ -10,10 +10,10 @@ export interface EDHRecResponse {
 export type EDHRecResponseHandler = (response: EDHRecResponse) => void;
 
 export interface EDHRecSuggestion {
-  primary_types: string[];
+  primary_type: string;
   names: string[];
   scryfall_uri: string;
-  images: string[];
+  image: string;
   price: number;
   salt: number;
   score: number;

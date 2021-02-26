@@ -40,7 +40,9 @@ function getCardName(card: Card): string {
 
 function getCardsInDeck(entries: Deck["entries"]) {
   return Object.entries(entries)
-    .filter((value) => value[0] !== "maybeboard")
+    .filter((value) => {
+      return value[0] !== "maybeboard";
+    })
     .map((value) => value[1])
     .flat()
     .filter((c) => isValidCard(c as Card))
@@ -53,17 +55,15 @@ function getCardsInDeck(entries: Deck["entries"]) {
 
 function formatEDHRecSuggestions(list: EDHRecSuggestion[]): Suggestions {
   return list.reduce<Suggestions>((suggestions, rec) => {
-    const type = rec.primary_types[0];
+    const primaryType = rec.primary_type;
     const name = rec.names.join(" // ");
-    const [set, collectorNumber] = rec.scryfall_uri
-      .split("/card/")[1]
-      .split("/");
-    const img = rec.images[0];
+    const [set, collectorNumber] = rec.scryfall_uri.split("/");
+    const img = rec.image;
     const { price, salt, score } = rec;
 
     suggestions[name] = {
       name,
-      type,
+      type: primaryType,
       set,
       collectorNumber,
       img,

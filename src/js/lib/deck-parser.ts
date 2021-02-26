@@ -10,7 +10,7 @@ type FlattenEntryOptions = {
   };
 };
 
-function getCommandersQuery(deck: Deck) {
+function getCommandersWithSearch(deck: Deck) {
   const commanders = getCommanders(deck);
   const ids = commanders
     .map((card) => `oracle_id:"${card.card_digest?.oracle_id}"`)
@@ -55,7 +55,7 @@ export function getCommanders(deck: Deck): Card[] {
 
 // TODO should be more accuate about the string array the promise resolves
 export function getCommanderColorIdentity(deck: Deck): Promise<string[]> {
-  return getCommandersQuery(deck)
+  return getCommandersWithSearch(deck)
     .then((cards) => cards.map((card) => card.color_identity))
     .catch(() => [])
     .then((colorIdentities) => {

@@ -1,5 +1,10 @@
 # Changelog
 
+# unreleased
+
+- EDHRec Suggestions
+  - Fix issue where recomendation panel never loads (#89)
+
 # 0.10.0 - Pre-release
 
 - Card Input Modifier

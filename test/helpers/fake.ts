@@ -82,10 +82,10 @@ export function makeFakeEDHRecSuggestion(
   options: FakeEDHRecSuggestionOptions = {}
 ): EDHRecSuggestion {
   return {
-    primary_types: ["Creature"],
+    primary_type: "Creature",
     names: ["Fake Name"],
-    scryfall_uri: "https://scryfall.com/card/set/id/fake-id",
-    images: ["fake-unknown.png"],
+    scryfall_uri: "set/id/fake-id",
+    image: "fake-unknown.png",
     price: 19.99,
     salt: 10,
     score: 99,
