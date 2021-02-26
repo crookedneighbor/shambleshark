@@ -1,6 +1,6 @@
 # Changelog
 
-# unreleased
+# 0.10.0 - Pre-release
 
 - Card Input Modifier
   - Fix issue where card images would be incorrect after hovering over double faced cards (#88)
