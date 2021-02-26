@@ -95,7 +95,7 @@ const options = {
             loader: MiniCssExtractPlugin.loader,
             options: {
               publicPath: "../",
-              hmr: process.env.NODE_ENV !== "production",
+              hmr: env.NODE_ENV !== "production",
             },
           },
           "css-loader",
@@ -145,7 +145,7 @@ const options = {
       cleanAfterEveryBuildPatterns: ["!*.html", "!*manifest.json"],
     }),
     // expose and write the allowed env vars on the compiled bundle
-    new webpack.EnvironmentPlugin(["NODE_ENV"]),
+    new webpack.EnvironmentPlugin({ NODE_ENV: env.NODE_ENV }),
     new ForkTsCheckerWebpackPlugin({
       eslint: {
         files: "./src/**/*.ts",
