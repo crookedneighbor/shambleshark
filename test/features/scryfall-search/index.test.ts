@@ -604,9 +604,9 @@ describe("Scryfall Search", () => {
       expect(searchSpy).toBeCalledWith("foo");
     });
 
-    it.each(["id", "ids", "identity", "ci"])(
-      "does not add `ids` to query when `%s` is already present",
-      async function (param) {
+    it.each(["id", "ids", "identity", "ci", "commander"])(
+      "does not add `ids` to query when `%s` param is already present",
+      async (param) => {
         ss.settings!.restrictToCommanderColorIdentity = true;
         jest.spyOn(deckParser, "isSingletonTypeDeck").mockReturnValue(true);
         jest.spyOn(deckParser, "isCommanderLike").mockReturnValue(true);
@@ -615,9 +615,25 @@ describe("Scryfall Search", () => {
           .mockResolvedValue(["B", "G"]);
 
         await ss.runSearch(`${param}:W foo`);
-
-        expect(searchSpy).toBeCalledTimes(1);
         expect(searchSpy).toBeCalledWith(`${param}:W foo`);
+
+        await ss.runSearch(`${param}=W foo`);
+        expect(searchSpy).toBeCalledWith(`${param}=W foo`);
+
+        await ss.runSearch(`${param}!=W foo`);
+        expect(searchSpy).toBeCalledWith(`${param}!=W foo`);
+
+        await ss.runSearch(`${param}>=W foo`);
+        expect(searchSpy).toBeCalledWith(`${param}>=W foo`);
+
+        await ss.runSearch(`${param}>W foo`);
+        expect(searchSpy).toBeCalledWith(`${param}>W foo`);
+
+        await ss.runSearch(`${param}<W foo`);
+        expect(searchSpy).toBeCalledWith(`${param}<W foo`);
+
+        await ss.runSearch(`${param}<=W foo`);
+        expect(searchSpy).toBeCalledWith(`${param}<=W foo`);
       }
     );
 

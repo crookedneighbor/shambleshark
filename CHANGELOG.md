@@ -7,6 +7,8 @@
   - Support double sided card images
 - Contact Page
   - Make Shambleshark warning impossible to miss (#84)
+- Scryfall Search
+  - Fix issue where implied color identity was included in deckbuilder search when explicit color identity search was used (#75)
 
 # 0.9.1 - Pre-release
 

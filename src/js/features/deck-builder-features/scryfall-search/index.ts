@@ -138,12 +138,8 @@ class ScryfallSearch extends Feature {
   }
 
   private _queryContainsColorIdentity(query: string): boolean {
-    query = query.toLowerCase();
-
     return Boolean(
-      ["id", "ids", "identity", "ci"].find((idParam) => {
-        return query.includes(`${idParam}:`);
-      })
+      query.toLowerCase().match(/(commander|id|ids|identity|ci)(:|=|>|<|!)/)
     );
   }
 
