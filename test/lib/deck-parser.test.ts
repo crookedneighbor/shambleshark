@@ -1,5 +1,6 @@
 import {
   getCommanderColorIdentity,
+  getCommanders,
   getSections,
   flattenEntries,
   hasDedicatedLandSection,
@@ -164,6 +165,66 @@ describe("Deck Parser", () => {
       expect(colors).toEqual(["U", "R", "W"]);
       expect(search).toBeCalledTimes(1);
       expect(search).toBeCalledWith('oracle_id:"id-1" or oracle_id:"id-3"');
+    });
+  });
+
+  describe("getCommanders", () => {
+    it("returns array of cards for each commander", async () => {
+      const fakeDeck = makeFakeDeck({
+        entries: {
+          commanders: [
+            makeFakeCard({
+              section: "commanders",
+              cardDigest: {
+                oracle_id: "id-1",
+              },
+            }),
+            makeFakeCard({
+              section: "commanders",
+              cardDigest: {
+                oracle_id: "id-2",
+              },
+            }),
+          ],
+        },
+      });
+
+      const commanders = getCommanders(fakeDeck);
+
+      expect(commanders.length).toBe(2);
+      expect(commanders[0].card_digest?.oracle_id).toBe("id-1");
+      expect(commanders[1].card_digest?.oracle_id).toBe("id-2");
+    });
+
+    it("ignores cards without a card digest", async () => {
+      const fakeDeck = makeFakeDeck({
+        entries: {
+          commanders: [
+            makeFakeCard({
+              section: "commanders",
+              cardDigest: {
+                oracle_id: "id-1",
+              },
+            }),
+            makeFakeCard({
+              section: "commanders",
+              cardDigest: false,
+            }),
+            makeFakeCard({
+              section: "commanders",
+              cardDigest: {
+                oracle_id: "id-2",
+              },
+            }),
+          ],
+        },
+      });
+
+      const commanders = getCommanders(fakeDeck);
+
+      expect(commanders.length).toBe(2);
+      expect(commanders[0].card_digest?.oracle_id).toBe("id-1");
+      expect(commanders[1].card_digest?.oracle_id).toBe("id-2");
     });
   });
 

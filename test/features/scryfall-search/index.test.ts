@@ -580,6 +580,7 @@ describe("Scryfall Search", () => {
       ss.settings!.restrictToCommanderColorIdentity = true;
       jest.spyOn(deckParser, "isSingletonTypeDeck").mockReturnValue(true);
       jest.spyOn(deckParser, "isCommanderLike").mockReturnValue(true);
+      jest.spyOn(deckParser, "getCommanders").mockReturnValue([makeFakeCard()]);
       jest
         .spyOn(deckParser, "getCommanderColorIdentity")
         .mockResolvedValue(["B", "G"]);
@@ -594,11 +595,24 @@ describe("Scryfall Search", () => {
       ss.settings!.restrictToCommanderColorIdentity = true;
       jest.spyOn(deckParser, "isSingletonTypeDeck").mockReturnValue(true);
       jest.spyOn(deckParser, "isCommanderLike").mockReturnValue(true);
+      jest.spyOn(deckParser, "getCommanders").mockReturnValue([makeFakeCard()]);
       jest
         .spyOn(deckParser, "getCommanderColorIdentity")
         .mockResolvedValue(["B", "G"]);
 
       await ss.runSearch("foo", false);
+
+      expect(searchSpy).toBeCalledTimes(1);
+      expect(searchSpy).toBeCalledWith("foo");
+    });
+
+    it("does not add `ids` to query when restrictToCommanderColorIdentity setting is active and deck is commanderlike but no commander is present (yet)", async () => {
+      ss.settings!.restrictToCommanderColorIdentity = true;
+      jest.spyOn(deckParser, "isSingletonTypeDeck").mockReturnValue(true);
+      jest.spyOn(deckParser, "isCommanderLike").mockReturnValue(true);
+      jest.spyOn(deckParser, "getCommanders").mockReturnValue([]);
+
+      await ss.runSearch("foo");
 
       expect(searchSpy).toBeCalledTimes(1);
       expect(searchSpy).toBeCalledWith("foo");

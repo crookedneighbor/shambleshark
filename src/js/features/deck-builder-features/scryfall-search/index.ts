@@ -137,7 +137,7 @@ class ScryfallSearch extends Feature {
     this.deck = await getDeck();
   }
 
-  private _queryContainsColorIdentity(query: string): boolean {
+  private queryContainsColorIdentity(query: string): boolean {
     return Boolean(
       query.toLowerCase().match(/(commander|id|ids|identity|ci)(:|=|>|<|!)/)
     );
@@ -241,7 +241,8 @@ class ScryfallSearch extends Feature {
       adjustQuery &&
       this.settings?.restrictToCommanderColorIdentity &&
       deckParser.isCommanderLike(this.deck) &&
-      !this._queryContainsColorIdentity(this.currentQuery)
+      !this.queryContainsColorIdentity(this.currentQuery) &&
+      deckParser.getCommanders(this.deck).length > 0
     ) {
       const colors = await deckParser.getCommanderColorIdentity(this.deck);
 

@@ -10,10 +10,9 @@ type FlattenEntryOptions = {
   };
 };
 
-function getCommanders(deck: Deck) {
-  const commanders = deck.entries.commanders || [];
+function getCommandersQuery(deck: Deck) {
+  const commanders = getCommanders(deck);
   const ids = commanders
-    .filter((card: Card) => card.card_digest)
     .map((card) => `oracle_id:"${card.card_digest?.oracle_id}"`)
     .join(" or ");
 
@@ -48,9 +47,15 @@ export function hasDedicatedLandSection(deck: Deck): boolean {
   return getSections(deck).includes("lands");
 }
 
+export function getCommanders(deck: Deck): Card[] {
+  const commanders = deck.entries.commanders || [];
+
+  return commanders.filter((card: Card) => card.card_digest);
+}
+
 // TODO should be more accuate about the string array the promise resolves
 export function getCommanderColorIdentity(deck: Deck): Promise<string[]> {
-  return getCommanders(deck)
+  return getCommandersQuery(deck)
     .then((cards) => cards.map((card) => card.color_identity))
     .catch(() => [])
     .then((colorIdentities) => {
@@ -115,6 +120,7 @@ export function isSingletonTypeDeck(deck: Deck): boolean {
 
 export default {
   getCommanderColorIdentity,
+  getCommanders,
   isLandCard,
   getSections,
   flattenEntries,

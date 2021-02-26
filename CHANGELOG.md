@@ -9,6 +9,7 @@
   - Make Shambleshark warning impossible to miss (#84)
 - Scryfall Search
   - Fix issue where implied color identity was included in deckbuilder search when explicit color identity search was used (#75)
+  - Fix issue where color identity would be applied to inline search when no commanders were present (#74)
 
 # 0.9.1 - Pre-release
 
