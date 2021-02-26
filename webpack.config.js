@@ -6,7 +6,6 @@ const env = require("./utils/env");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const WriteFilePlugin = require("write-file-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const ForkTsCheckerNotifierWebpackPlugin = require("fork-ts-checker-notifier-webpack-plugin");
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
@@ -63,6 +62,13 @@ if (fileSystem.existsSync(secretsPath)) {
 const options = {
   context: process.cwd(),
   mode: env.NODE_ENV,
+  devServer: {
+    hot: true,
+    contentBase: path.join(__dirname, "../build"),
+    headers: { "Access-Control-Allow-Origin": "*" },
+    port: env.PORT,
+    writeToDisk: true,
+  },
   optimization: {
     // extensions don't receive a performance boost by doing this
     // and Firefox requires extension code to be unminified
@@ -95,7 +101,6 @@ const options = {
             loader: MiniCssExtractPlugin.loader,
             options: {
               publicPath: "../",
-              hmr: env.NODE_ENV !== "production",
             },
           },
           "css-loader",
@@ -108,7 +113,10 @@ const options = {
       },
       {
         test: new RegExp(".(" + fileExtensions.join("|") + ")$"), // eslint-disable-line
-        loader: "file-loader?name=[name].[ext]",
+        loader: "file-loader",
+        options: {
+          name: "[name].[ext]",
+        },
         exclude: /node_modules/,
       },
       {
@@ -203,12 +211,11 @@ const options = {
       chunks: ["background"],
     }),
     new MiniCssExtractPlugin(),
-    new WriteFilePlugin(),
   ],
 };
 
 if (env.NODE_ENV === "development") {
-  options.devtool = "cheap-module-eval-source-map";
+  options.devtool = "cheap-module-source-map";
 }
 
 module.exports = options;
