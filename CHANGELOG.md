@@ -1,6 +1,6 @@
 # Changelog
 
-# unreleased
+# 0.10.1 - Pre-release
 
 - EDHRec Suggestions
   - Fix issue where recomendation panel never loads (#89)
