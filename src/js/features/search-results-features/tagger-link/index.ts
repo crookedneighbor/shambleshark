@@ -1,12 +1,7 @@
 import { getURL } from "Browser/runtime";
 import Feature from "Feature";
 import { FEATURE_IDS as ids, FEATURE_SECTIONS as sections } from "Constants";
-import {
-  setupBridgeToTagger,
-  requestTags,
-  TagEntries,
-  TagInfo,
-} from "Lib/tagger-bridge";
+import { requestTags, TagEntries, TagInfo } from "Lib/tagger-bridge";
 import createElement from "Lib/create-element";
 import { ready as elementReady } from "Lib/mutation";
 import { sortByAttribute } from "Lib/sort";
@@ -70,14 +65,6 @@ class TaggerLink extends Feature {
   async run(): Promise<void> {
     const settings = await TaggerLink.getSettings();
     this.showPreview = Boolean(settings.previewTags);
-
-    if (!this.showPreview) {
-      this.setupButtons();
-
-      return;
-    }
-
-    await setupBridgeToTagger();
 
     this.setupButtons();
   }

@@ -1,7 +1,3 @@
-import iframe from "Lib/iframe";
-import Framebus from "framebus";
-import { BUS_EVENTS as events } from "Constants";
-
 import type { TaggerPayload } from "Js/types/tagger";
 
 export type TagEntries = {
@@ -21,35 +17,6 @@ export type TaggerLookupData = {
   number: string;
 };
 
-let setupPromise: Promise<void>;
-let bridgeSetupInProgress = false;
-
-const bus = new Framebus();
-
-export async function setupBridgeToTagger(): Promise<void> {
-  if (bridgeSetupInProgress) {
-    return setupPromise;
-  }
-
-  setupPromise = new Promise((resolve) => {
-    bus.on(events.TAGGER_READY, () => {
-      resolve();
-    });
-  });
-  bridgeSetupInProgress = true;
-
-  await iframe.create({
-    id: "tagger-iframe",
-    src: "https://tagger.scryfall.com",
-  });
-
-  await setupPromise;
-}
-
-export function resetSetupBridgeToTaggerPromise(): void {
-  bridgeSetupInProgress = false;
-}
-
 function collectTags(payload: TaggerPayload): RelationshipCollection {
   const tags: RelationshipCollection = {
     art: [],
@@ -62,7 +29,11 @@ function collectTags(payload: TaggerPayload): RelationshipCollection {
     PRINTING_TAG: "print",
   };
 
-  payload.taggings?.forEach(({ tag }) => {
+  payload.edges.forEach((edge) => {
+    if (edge.__typename !== "Tagging") {
+      return;
+    }
+    const tag = edge.tag;
     const tagType = tag.type;
     const key = tagToCollectionMap[tagType];
     const tagsByType = tags[key];
@@ -90,23 +61,27 @@ function collectRelationships(payload: TaggerPayload): RelationshipCollection {
     oracleId: "oracle",
   };
 
-  payload.relationships?.forEach((r) => {
+  payload.edges.forEach((edge) => {
+    if (edge.__typename !== "Relationship") {
+      return;
+    }
+
     let name, tagType;
-    const isTheRelatedTag = payload[r.foreignKey] === r.relatedId;
-    let link = `https://scryfall.com/search?q=${r.foreignKey}=`;
+    const isTheRelatedTag = payload[edge.foreignKey] === edge.relatedId;
+    let link = `https://scryfall.com/search?q=${edge.foreignKey}=`;
 
     if (isTheRelatedTag) {
-      name = r.contentName;
-      tagType = r.classifier;
-      link += r.contentId;
+      name = edge.contentName;
+      tagType = edge.classifier;
+      link += edge.contentId;
     } else {
-      name = r.relatedName;
-      tagType = r.classifierInverse;
-      link += r.relatedId;
+      name = edge.relatedName;
+      tagType = edge.classifierInverse;
+      link += edge.relatedId;
     }
 
     const relationshipsFromType =
-      relationships[typeToRelationshipMap[r.foreignKey]];
+      relationships[typeToRelationshipMap[edge.foreignKey]];
 
     if (relationshipsFromType) {
       relationshipsFromType.push({
@@ -123,10 +98,14 @@ function collectRelationships(payload: TaggerPayload): RelationshipCollection {
 export async function requestTags(
   taggerData: TaggerLookupData
 ): Promise<TagEntries> {
-  const payload = await bus.emitAsPromise<TaggerPayload>(
-    events.TAGGER_TAGS_REQUEST,
-    taggerData
-  );
+  const { data } = await window
+    .fetch(
+      `https://tagger.scryfall.com/graphql/registry?name=shambleshark_card_edges&set=${taggerData.set}&number=${taggerData.number}`
+    )
+    .then((res) => {
+      return res.json();
+    });
+  const payload = data.card;
 
   const tags = collectTags(payload);
   const relationships = collectRelationships(payload);
@@ -137,5 +116,11 @@ export async function requestTags(
     art: artEntries,
     oracle: oracleEntries,
     taggerLink: `https://tagger.scryfall.com/card/${taggerData.set}/${taggerData.number}`,
+  };
+
+  return {
+    art: [],
+    oracle: [],
+    taggerLink: "https://tagger.scryfall.com",
   };
 }

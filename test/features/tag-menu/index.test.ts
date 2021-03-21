@@ -1,5 +1,5 @@
 import TagMenu from "Features/card-page-features/tag-menu";
-import { setupBridgeToTagger, requestTags, TagInfo } from "Lib/tagger-bridge";
+import { requestTags, TagInfo } from "Lib/tagger-bridge";
 import { ready } from "Lib/mutation";
 
 import SpyInstance = jest.SpyInstance;
@@ -23,7 +23,6 @@ describe("TagMenu", () => {
       artTags = [];
       cardTags = [];
 
-      mocked(setupBridgeToTagger).mockResolvedValue();
       mocked(requestTags).mockResolvedValue({
         taggerLink: "https://tagger.scryfall.com/card-slug",
         art: artTags,
@@ -52,14 +51,6 @@ describe("TagMenu", () => {
       await tm.run();
 
       expect(TagMenu.getSettings).toBeCalledTimes(1);
-    });
-
-    it("sets up bridge to tagger", async () => {
-      const tm = new TagMenu();
-
-      await tm.run();
-
-      expect(setupBridgeToTagger).toBeCalledTimes(1);
     });
 
     it("requests tags", async () => {

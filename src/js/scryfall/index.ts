@@ -1,4 +1,3 @@
-import modifyTagger from "./tagger";
 import modifyCardPage from "./card-page";
 import modifyContactPage from "./contact-page";
 import modifyDeckDisplayPage from "./deck-display-page";
@@ -31,10 +30,7 @@ function isDeckEditorPage(urlPieces: string[]) {
 export default function start(): void {
   const hostname = window.location.hostname;
 
-  if (hostname === "tagger.scryfall.com") {
-    modifyTagger();
-    return;
-  } else if (hostname !== "scryfall.com") {
+  if (hostname !== "scryfall.com") {
     // if we're on a subdomain, we don't want
     // to run the main scryfall code
     return;

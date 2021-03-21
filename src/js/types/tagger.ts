@@ -19,9 +19,32 @@ export interface Relationship {
   oracleId?: string;
 }
 
-export interface TaggerPayload {
-  illustrationId?: string;
-  oracleId?: string;
-  taggings?: Tagging[];
-  relationships?: Relationship[];
-}
+type TagEdge = {
+  id: string;
+  tag: {
+    name: string;
+    slug: string;
+    type: "ILLUSTRATION_TAG" | "ORACLE_CARD_TAG" | "PRINTING_TAG";
+    typeSlug: "artwork" | "card" | "prints";
+    __typename: "Tag";
+  };
+  __typename: "Tagging";
+};
+
+type RelationshipEdge = {
+  classifier: string;
+  classifierInverse: string;
+  contentId: string;
+  contentName: string;
+  foreignKey: "illustrationId" | "oracleId";
+  id: string;
+  relatedId: string;
+  relatedName: string;
+  __typename: "Relationship";
+};
+
+export type TaggerPayload = {
+  illustrationId: string;
+  oracleId: string;
+  edges: Array<TagEdge | RelationshipEdge>;
+};

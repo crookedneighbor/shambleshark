@@ -1,9 +1,5 @@
 import TaggerLink from "Features/search-results-features/tagger-link";
-import {
-  setupBridgeToTagger,
-  requestTags,
-  TagEntries,
-} from "Lib/tagger-bridge";
+import { requestTags, TagEntries } from "Lib/tagger-bridge";
 import { ready } from "Lib/mutation";
 
 import SpyInstance = jest.SpyInstance;
@@ -14,12 +10,9 @@ jest.mock("Lib/mutation");
 
 describe("Tagger Link", () => {
   describe("run", () => {
-    let settingsSpy: SpyInstance;
-
     beforeEach(() => {
-      mocked(setupBridgeToTagger).mockResolvedValue();
       jest.spyOn(TaggerLink.prototype, "setupButtons").mockImplementation();
-      settingsSpy = jest.spyOn(TaggerLink, "getSettings").mockResolvedValue({
+      jest.spyOn(TaggerLink, "getSettings").mockResolvedValue({
         previewTags: true,
       });
     });
@@ -32,38 +25,14 @@ describe("Tagger Link", () => {
       expect(TaggerLink.getSettings).toBeCalledTimes(1);
     });
 
-    it("when previewTags setting is true, waits for Tagger bridge to finish setting up before setting up buttons", async () => {
+    it("sets up buttons", async () => {
       const tl = new TaggerLink();
 
-      mocked(setupBridgeToTagger).mockImplementation(() => {
-        expect(tl.setupButtons).toBeCalledTimes(0);
-
-        return Promise.resolve();
-      });
+      jest.spyOn(tl, "setupButtons").mockImplementation();
 
       await tl.run();
 
       expect(tl.setupButtons).toBeCalledTimes(1);
-    });
-
-    it("when previewTags setting is true, sets up the Tagger bridge", async () => {
-      const tl = new TaggerLink();
-
-      await tl.run();
-
-      expect(setupBridgeToTagger).toBeCalledTimes(1);
-    });
-
-    it("when previewTags setting is false, skips setting up Tagger bridge", async () => {
-      const tl = new TaggerLink();
-
-      settingsSpy.mockResolvedValue({
-        previewTags: false,
-      });
-      await tl.run();
-
-      expect(tl.setupButtons).toBeCalledTimes(1);
-      expect(setupBridgeToTagger).not.toBeCalled();
     });
   });
 
