@@ -1,6 +1,6 @@
 # Changelog
 
-# unreleased
+# 0.11.0
 
 - Add Card Search Links feature to card detail page (#87)
 - Tag Menu
