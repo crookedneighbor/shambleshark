@@ -2,6 +2,7 @@ import Feature from "Feature";
 import { FEATURE_IDS as ids, FEATURE_SECTIONS as sections } from "Constants";
 import { ready as elementReady } from "Lib/mutation";
 import createElement from "Lib/create-element";
+import emptyElement from "Lib/empty-element";
 
 import "./index.css";
 
@@ -17,8 +18,9 @@ class CardSearchLinks extends Feature {
 
   static settingsDefaults = {
     enabled: false,
-    displayAsLinks: true,
+    displayAsLinks: false,
     typeline: true,
+    manaCost: true,
   };
 
   static settingDefinitions = [
@@ -32,6 +34,11 @@ class CardSearchLinks extends Feature {
       label: "Make card type line searchable",
       input: "checkbox",
     },
+    {
+      id: "manaCost",
+      label: "Make the mana cost line searchable",
+      input: "checkbox",
+    },
   ];
 
   async run(): Promise<void> {
@@ -39,6 +46,9 @@ class CardSearchLinks extends Feature {
 
     if (settings.typeline) {
       this.decorateTypeLine(Boolean(settings.displayAsLinks));
+    }
+    if (settings.manaCost) {
+      this.decorateManaCost();
     }
   }
 
@@ -67,6 +77,24 @@ class CardSearchLinks extends Feature {
       if (!displayAsLinks) {
         element.classList.add("hide-link-color");
       }
+    });
+  }
+
+  decorateManaCost(): void {
+    elementReady<HTMLDivElement>(".card-text-mana-cost", (element) => {
+      let manaCost = "";
+      const symbols = element.querySelectorAll(".card-symbol");
+
+      symbols.forEach((abbr) => {
+        manaCost += (abbr.textContent || "").replace(/[{}]/g, "");
+      });
+
+      const link = createElement(
+        `<a href='/search?q=mana%3D"${manaCost}"'>${element.innerHTML}</a>`
+      );
+      emptyElement(element);
+
+      element.appendChild(link);
     });
   }
 }

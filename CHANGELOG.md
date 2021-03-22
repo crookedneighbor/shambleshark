@@ -1,5 +1,11 @@
 # Changelog
 
+# 0.12.0
+
+- Card Search Links
+  - Change default view to not display as links
+  - Add mana cost link
+
 # 0.11.0
 
 - Add Card Search Links feature to card detail page (#87)

@@ -16,10 +16,14 @@ describe("CardSearchLinks", () => {
         .mockResolvedValue({
           displayAsLinks: false,
           typeline: false,
+          manaCost: false,
         });
 
       jest
         .spyOn(CardSearchLinks.prototype, "decorateTypeLine")
+        .mockImplementation();
+      jest
+        .spyOn(CardSearchLinks.prototype, "decorateManaCost")
         .mockImplementation();
     });
 
@@ -31,7 +35,7 @@ describe("CardSearchLinks", () => {
       expect(csl.decorateTypeLine).not.toBeCalled();
     });
 
-    it("calls decorateTypeLine when not configured to decorate type line", async () => {
+    it("calls decorateTypeLine when configured to decorate type line", async () => {
       const csl = new CardSearchLinks();
       settingsSpy.mockResolvedValue({
         typeline: true,
@@ -65,6 +69,25 @@ describe("CardSearchLinks", () => {
 
       expect(csl.decorateTypeLine).toBeCalledTimes(1);
       expect(csl.decorateTypeLine).toBeCalledWith(true);
+    });
+
+    it("does not call decorateManaCost when not configured to decorate mana costs", async () => {
+      const csl = new CardSearchLinks();
+
+      await csl.run();
+
+      expect(csl.decorateManaCost).not.toBeCalled();
+    });
+
+    it("calls decorateTypeLine when configured to decorate type line", async () => {
+      const csl = new CardSearchLinks();
+      settingsSpy.mockResolvedValue({
+        manaCost: true,
+      });
+
+      await csl.run();
+
+      expect(csl.decorateManaCost).toBeCalledTimes(1);
     });
   });
 
@@ -122,6 +145,38 @@ describe("CardSearchLinks", () => {
 
       tm.decorateTypeLine(false);
       expect(container.classList.contains("hide-link-color")).toBe(true);
+    });
+  });
+
+  describe("decorateManaCost", () => {
+    let container: HTMLDivElement;
+
+    beforeEach(() => {
+      container = document.createElement("div");
+      const abbr3 = document.createElement("abbr");
+      abbr3.classList.add("card-symbol");
+      abbr3.textContent = "{3}";
+      const abbrG = document.createElement("abbr");
+      abbrG.classList.add("card-symbol");
+      abbrG.textContent = "{G}";
+      container.appendChild(abbr3);
+      container.appendChild(abbrG);
+
+      mocked(ready).mockImplementation((selector, cb) => {
+        cb(container);
+      });
+    });
+
+    it("decorates manacost with link", () => {
+      const tm = new CardSearchLinks();
+
+      tm.decorateManaCost();
+
+      const link = container.querySelector("a") as HTMLAnchorElement;
+
+      expect(link.innerHTML).toContain("{3}");
+      expect(link.innerHTML).toContain("{G}");
+      expect(link.href).toContain("/search?q=mana%3D%223G%22");
     });
   });
 });
