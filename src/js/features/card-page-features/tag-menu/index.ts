@@ -1,12 +1,7 @@
 import Feature from "Feature";
 import { FEATURE_IDS as ids, FEATURE_SECTIONS as sections } from "Constants";
 import createElement from "Lib/create-element";
-import {
-  setupBridgeToTagger,
-  requestTags,
-  TagInfo,
-  TaggerLookupData,
-} from "Lib/tagger-bridge";
+import { requestTags, TagInfo, TaggerLookupData } from "Lib/tagger-bridge";
 import { ready as elementReady } from "Lib/mutation";
 import TaggerIcon from "Ui/tagger-icon";
 import "./index.css";
@@ -104,9 +99,6 @@ class TagMenu extends Feature {
 
   async run(): Promise<void> {
     const settings = await TagMenu.getSettings();
-
-    await setupBridgeToTagger();
-
     const payload = await requestTags(this.getTaggerData());
 
     elementReady<HTMLDivElement>(".prints-table:last-of-type", (element) => {

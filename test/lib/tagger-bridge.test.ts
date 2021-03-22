@@ -1,68 +1,8 @@
-import Framebus from "framebus";
-import {
-  setupBridgeToTagger,
-  resetSetupBridgeToTaggerPromise,
-  requestTags,
-  TaggerLookupData,
-} from "Lib/tagger-bridge";
-import iframe from "Lib/iframe";
-import noop from "Lib/noop";
+import { requestTags, TaggerLookupData } from "Lib/tagger-bridge";
 
 import type { TaggerPayload } from "Js/types/tagger";
-import { mocked } from "ts-jest/utils";
-
-jest.mock("framebus");
 
 describe("tagger bridge", () => {
-  describe("setupBridgeToTagger", () => {
-    beforeEach(() => {
-      type FramebusMockCallback = (
-        data: Record<string, string>,
-        cb: () => void
-      ) => void;
-      mocked(Framebus.prototype.on).mockImplementation(
-        (event: string, cb: FramebusMockCallback) => {
-          // TODO no data is actually passed here... why does framebus typing care?
-          cb({}, noop);
-
-          return true;
-        }
-      );
-      jest.spyOn(iframe, "create").mockImplementation();
-    });
-
-    afterEach(() => {
-      resetSetupBridgeToTaggerPromise();
-    });
-
-    it("sets up iframe and waits for tagger iframe to emit ready event", async () => {
-      await setupBridgeToTagger();
-
-      expect(iframe.create).toBeCalledTimes(1);
-      expect(iframe.create).toBeCalledWith({
-        id: "tagger-iframe",
-        src: "https://tagger.scryfall.com",
-      });
-
-      expect(Framebus.prototype.on).toBeCalledTimes(1);
-      expect(Framebus.prototype.on).toBeCalledWith(
-        "TAGGER_READY",
-        expect.any(Function)
-      );
-    });
-
-    it("only setups up iframes and events once", async () => {
-      await setupBridgeToTagger();
-      await setupBridgeToTagger();
-      await setupBridgeToTagger();
-      await setupBridgeToTagger();
-      await setupBridgeToTagger();
-
-      expect(iframe.create).toBeCalledTimes(1);
-      expect(Framebus.prototype.on).toBeCalledTimes(1);
-    });
-  });
-
   describe("requestTags", () => {
     let requestData: TaggerLookupData;
     let lookupResult: TaggerPayload;
@@ -75,34 +15,42 @@ describe("tagger bridge", () => {
       lookupResult = {
         illustrationId: "illustration-id",
         oracleId: "oracle-id",
-        taggings: [
+        edges: [
           {
+            id: "some-id",
+            __typename: "Tagging",
             tag: {
               name: "Tag 1",
               type: "ILLUSTRATION_TAG",
               slug: "tag-1",
               typeSlug: "artwork",
+              __typename: "Tag",
             },
           },
           {
+            id: "some-id",
+            __typename: "Tagging",
             tag: {
               name: "Tag 2",
               type: "ORACLE_CARD_TAG",
               slug: "tag-2",
               typeSlug: "card",
+              __typename: "Tag",
             },
           },
           {
+            id: "some-id",
+            __typename: "Tagging",
             tag: {
               name: "Tag 3",
               type: "PRINTING_TAG",
               slug: "tag-3",
               typeSlug: "prints",
+              __typename: "Tag",
             },
           },
-        ],
-        relationships: [
           {
+            id: "some-id",
             foreignKey: "illustrationId",
             relatedId: "related-id",
             contentName: "Depicts Relationship",
@@ -110,8 +58,10 @@ describe("tagger bridge", () => {
             relatedName: "Depicted Relationship",
             classifier: "DEPICTS",
             classifierInverse: "DEPICTED_IN",
+            __typename: "Relationship",
           },
           {
+            id: "some-id",
             foreignKey: "oracleId",
             relatedId: "related-id",
             contentName: "Better Than Relationship",
@@ -119,20 +69,28 @@ describe("tagger bridge", () => {
             relatedName: "Worse Than Relationship",
             classifier: "BETTER_THAN",
             classifierInverse: "WORSE_THAN",
+            __typename: "Relationship",
           },
         ],
       };
 
-      mocked(Framebus.prototype.emitAsPromise).mockResolvedValue(lookupResult);
+      window.fetch = jest.fn().mockImplementation(() => {
+        return Promise.resolve({
+          json: () =>
+            Promise.resolve({
+              data: {
+                card: lookupResult,
+              },
+            }),
+        });
+      });
     });
 
-    it("emits event to request tags", async () => {
+    it("requests tags from tagger", async () => {
       await requestTags(requestData);
 
-      expect(Framebus.prototype.emitAsPromise).toBeCalledTimes(1);
-      expect(Framebus.prototype.emitAsPromise).toBeCalledWith(
-        "TAGGER_TAGS_REQUEST",
-        requestData
+      expect(window.fetch).toBeCalledWith(
+        "https://tagger.scryfall.com/graphql/registry?name=shambleshark_card_edges&set=DOM&number=123"
       );
     });
 
@@ -174,12 +132,19 @@ describe("tagger bridge", () => {
     });
 
     it("ignores any other types", async () => {
-      lookupResult.taggings!.push({
+      lookupResult.edges.push({
+        id: "some-id",
+        __typename: "Tagging",
         tag: {
           name: "bad type",
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
           type: "NONE",
           slug: "bad-type",
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
           typeSlug: "none",
+          __typename: "Tag",
         },
       });
 
@@ -190,8 +155,10 @@ describe("tagger bridge", () => {
     });
 
     it("uses contentName and classifier when it is the related tag", async () => {
-      lookupResult.relationships = [
+      lookupResult.edges = [
         {
+          id: "some-id",
+          __typename: "Relationship",
           foreignKey: "oracleId",
           relatedId: "oracle-id",
           contentName: "Content Name",
@@ -203,16 +170,18 @@ describe("tagger bridge", () => {
       ];
       const tags = await requestTags(requestData);
 
-      expect(tags.oracle[1]).toEqual({
+      expect(tags.oracle[0]).toEqual({
         name: "Content Name",
         tagType: "BETTER_THAN",
         link: "https://scryfall.com/search?q=oracleId=better-than-id",
       });
     });
 
-    it("uses realtedName and classifierInverse when it is the related tag", async () => {
-      lookupResult.relationships = [
+    it("uses relatedName and classifierInverse when it is the related tag", async () => {
+      lookupResult.edges = [
         {
+          id: "some-id",
+          __typename: "Relationship",
           foreignKey: "oracleId",
           relatedId: "not-oracle-id",
           contentName: "Content Name",
@@ -224,7 +193,7 @@ describe("tagger bridge", () => {
       ];
       const tags = await requestTags(requestData);
 
-      expect(tags.oracle[1]).toEqual({
+      expect(tags.oracle[0]).toEqual({
         name: "Related Name",
         tagType: "WORSE_THAN",
         link: "https://scryfall.com/search?q=oracleId=not-oracle-id",
@@ -232,8 +201,7 @@ describe("tagger bridge", () => {
     });
 
     it("skips any unknown foreign keys", async () => {
-      lookupResult.relationships!.push({
-        // Intentionally doing this to force the path for an unknown key
+      lookupResult.edges.push({
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         foreignKey: "unknown",
@@ -243,6 +211,7 @@ describe("tagger bridge", () => {
         relatedName: "Related Name",
         classifier: "BETTER_THAN",
         classifierInverse: "WORSE_THAN",
+        __typename: "Relationship",
       });
       const tags = await requestTags(requestData);
 

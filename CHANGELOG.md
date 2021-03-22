@@ -1,5 +1,12 @@
 # Changelog
 
+# unreleased
+
+- Tag Menu
+  - Fix issue where tags never populate (#90)
+- Tagger Link
+  - Fix issue where tags never populate (#90)
+
 # 0.10.1 - Pre-release
 
 - EDHRec Suggestions
