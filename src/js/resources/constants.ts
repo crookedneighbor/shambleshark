@@ -28,6 +28,7 @@ export const FEATURE_IDS = {
 
   // Card Page
   CardNicknameDisplay: "card-nickname-display",
+  CardSearchLinks: "card-search-links",
   TagMenu: "tag-menu",
 };
 

@@ -2,6 +2,7 @@
 
 # unreleased
 
+- Add Card Search Links feature to card detail page (#87)
 - Tag Menu
   - Fix issue where tags never populate (#90)
 - Tagger Link

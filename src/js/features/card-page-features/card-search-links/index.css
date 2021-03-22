@@ -1,0 +1,4 @@
+.hide-link-color a,
+.hide-link-color a:hover {
+  color: rgb(22, 22, 29);
+}
