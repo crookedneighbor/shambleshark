@@ -12,7 +12,7 @@
     {
       "js": ["scryfall.bundle.js"],
       "css": ["scryfall.css"],
-      "matches": ["<all_urls>"],
+      "matches": ["*://*.scryfall.com/*"],
       "all_frames": true
     },
     {
