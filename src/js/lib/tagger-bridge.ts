@@ -100,7 +100,10 @@ export async function requestTags(
 ): Promise<TagEntries> {
   const { data } = await window
     .fetch(
-      `https://tagger.scryfall.com/graphql/registry?name=shambleshark_card_edges&set=${taggerData.set}&number=${taggerData.number}`
+      `https://tagger.scryfall.com/graphql/registry?name=shambleshark_card_edges&set=${taggerData.set}&number=${taggerData.number}`,
+      {
+        method: "POST",
+      }
     )
     .then((res) => {
       return res.json();

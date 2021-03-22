@@ -90,7 +90,10 @@ describe("tagger bridge", () => {
       await requestTags(requestData);
 
       expect(window.fetch).toBeCalledWith(
-        "https://tagger.scryfall.com/graphql/registry?name=shambleshark_card_edges&set=DOM&number=123"
+        "https://tagger.scryfall.com/graphql/registry?name=shambleshark_card_edges&set=DOM&number=123",
+        {
+          method: "POST",
+        }
       );
     });
 
