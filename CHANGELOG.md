@@ -1,5 +1,10 @@
 # Changelog
 
+# unreleased
+
+- Card Nicknames on Card Display Page
+  - Fix issue where nickname would display before real name was known
+
 # 0.12.0
 
 - Card Search Links

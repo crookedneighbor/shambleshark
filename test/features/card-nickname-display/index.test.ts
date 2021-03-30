@@ -1,4 +1,5 @@
 import CardNicknameDisplay from "Features/card-page-features/card-nickname-display";
+import nicknames from "Lib/card-nicknames";
 import { ready } from "Lib/mutation";
 
 import SpyInstance = jest.SpyInstance;
@@ -57,6 +58,24 @@ describe("CardNicknameDisplay", () => {
     });
 
     it("does not add container to the prints element when no nicknames match", async () => {
+      const elfcoil = nicknames.find(
+        (nick) => nick.setCode === "grn" && nick.collectorNumber === "161"
+      );
+      const realName = elfcoil!.realName;
+      elfcoil!.realName = [];
+
+      taggerButton.href =
+        "https://tagger.scryfall.com/card/grn/161/conclave-centaur";
+      const tm = new CardNicknameDisplay();
+
+      await tm.run();
+
+      expect(container.querySelector(".prints-info-section-note")).toBeFalsy();
+
+      elfcoil!.realName = realName;
+    });
+
+    it("does not add container to the prints element when value does not contain any real names", async () => {
       taggerButton.href =
         "https://tagger.scryfall.com/card/foo/bar/not-a-match";
       const tm = new CardNicknameDisplay();

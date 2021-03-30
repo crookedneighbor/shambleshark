@@ -59,7 +59,7 @@ class CardNicknameDisplay extends Feature {
         );
       });
 
-      if (result) {
+      if (result && result.realName.length > 0) {
         this.addToPage(element, choice, result);
       }
     });
