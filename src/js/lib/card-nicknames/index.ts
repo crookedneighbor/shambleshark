@@ -12,6 +12,7 @@ import coreset2021 from "./m21";
 import zendikarRising from "./znr";
 import commanderLegends from "./cmr";
 import kaldheim from "./khm";
+import strixhaven from "./stx";
 
 type NickNameMetaData = {
   realName: string[];
@@ -36,6 +37,7 @@ const nicknames: NickNameMetaData[] = [
   ...zendikarRising,
   ...commanderLegends,
   ...kaldheim,
+  ...strixhaven,
 ];
 
 export default nicknames;
