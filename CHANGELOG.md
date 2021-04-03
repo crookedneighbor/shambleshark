@@ -1,6 +1,6 @@
 # Changelog
 
-# unreleased
+# 0.13.0
 
 - Card Nicknames on Card Display Page
   - Fix issue where nickname would display before real name was known
