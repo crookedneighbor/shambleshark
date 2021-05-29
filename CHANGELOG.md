@@ -1,5 +1,10 @@
 # Changelog
 
+# unreleased
+
+- Card Search Links
+  - Fix issue where color indicator in type line would be printed as text
+
 # 0.13.0
 
 - Card Nicknames on Card Display Page

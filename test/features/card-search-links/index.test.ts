@@ -137,6 +137,31 @@ describe("CardSearchLinks", () => {
       expect(container.innerHTML).not.toContain("—");
     });
 
+    it("preserves color indicators in type line", () => {
+      const tm = new CardSearchLinks();
+      container.innerHTML = `<abbr class="color-indicator color-indicator-BR" title="Color Indicator: Black and Red">
+  Color Indicator: Black and Red
+</abbr> Legendary Creature — Human Wizard`;
+
+      tm.decorateTypeLine(false);
+
+      const links = container.querySelectorAll("a");
+
+      expect(links.length).toBe(4);
+
+      expect(links[0].innerHTML).toBe("Legendary");
+      expect(links[0].href).toContain("/search?q=type%3Alegendary");
+      expect(links[1].innerHTML).toBe("Creature");
+      expect(links[1].href).toContain("/search?q=type%3Acreature");
+      expect(container.innerHTML).toContain("—");
+      expect(links[2].innerHTML).toBe("Human");
+      expect(links[2].href).toContain("/search?q=type%3Ahuman");
+      expect(links[3].innerHTML).toBe("Wizard");
+      expect(links[3].href).toContain("/search?q=type%3Awizard");
+
+      expect(container.querySelector(".color-indicator")).toBeTruthy();
+    });
+
     it("includes 'hide-link-color' class when configured", () => {
       const tm = new CardSearchLinks();
 

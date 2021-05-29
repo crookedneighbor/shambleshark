@@ -54,6 +54,12 @@ class CardSearchLinks extends Feature {
 
   decorateTypeLine(displayAsLinks: boolean): void {
     elementReady<HTMLDivElement>(".card-text-type-line", (element) => {
+      const colorIndicator = element.querySelector(".color-indicator");
+
+      if (colorIndicator) {
+        element.removeChild(colorIndicator);
+      }
+
       const text = (element.textContent || "").trim();
       const parts = text.split(" — ");
       const supertype = parts[0];
@@ -72,6 +78,9 @@ class CardSearchLinks extends Feature {
       }
 
       element.textContent = "";
+      if (colorIndicator) {
+        element.appendChild(colorIndicator);
+      }
       element.appendChild(createElement(`<span>${newTypeLine}</span>`));
 
       if (!displayAsLinks) {
