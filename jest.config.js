@@ -2,8 +2,7 @@
 const path = require("path");
 
 module.exports = {
-  // TODO change to ts-jest when all converted over
-  preset: "ts-jest/presets/js-with-babel",
+  preset: "ts-jest",
   testEnvironment: "jsdom",
   setupFilesAfterEnv: ["./test/helpers/setup.ts"],
   moduleNameMapper: {

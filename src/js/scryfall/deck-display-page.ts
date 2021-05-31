@@ -7,7 +7,8 @@ import { BUS_EVENTS as events } from "Constants";
 const bus = new Framebus();
 
 function addContainerForSidebarFeatures(): void {
-  const section = createElement(`<div id="shambleshark-deck-display-sidebar-toolbox" class="sidebar-toolbox">
+  const section =
+    createElement(`<div id="shambleshark-deck-display-sidebar-toolbox" class="sidebar-toolbox">
   </div>`);
 
   elementReady(".sidebar", (container) => {

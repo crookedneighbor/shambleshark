@@ -252,9 +252,10 @@ export function insertHeadings(sortChoice: string, headings: Headings): void {
           const entryElement = document.querySelector(
             `[data-entry="${entry.id}"]`
           ) as HTMLElement;
-          const originalTitle = entryElement.parentNode?.parentNode?.querySelector(
-            "h6.deckbuilder-section-title-bar"
-          );
+          const originalTitle =
+            entryElement.parentNode?.parentNode?.querySelector(
+              "h6.deckbuilder-section-title-bar"
+            );
           originalTitle?.classList.add("is-hidden");
 
           entryElement.parentNode?.insertBefore(li, entryElement);

@@ -252,7 +252,7 @@ class ScryfallSearch extends Feature {
     this.cardList = await search(this.currentQuery).catch(() => {
       // most likely a 404, return no results
       // fake it as a Card List
-      return ([] as unknown) as List<Card>;
+      return [] as unknown as List<Card>;
     });
 
     this.addMetadataToContainer();
@@ -287,24 +287,28 @@ class ScryfallSearch extends Feature {
 
       <div id="scryfall-search__card-results"></div>
     </div>`);
-    (el.querySelector(
-      "#scryfall-search__section-selection-container"
-    ) as HTMLDivElement).appendChild(this.deckSectionChooser.element);
+    (
+      el.querySelector(
+        "#scryfall-search__section-selection-container"
+      ) as HTMLDivElement
+    ).appendChild(this.deckSectionChooser.element);
 
     return el;
   }
 
   addMetadataToContainer(): void {
     const totalCards = this.cardList?.total_cards || 0;
-    (this.container.querySelector(
-      ".scryfall-search__search-results-counter-total"
-    ) as HTMLSpanElement).innerText = `${totalCards} result${
-      totalCards !== 1 ? "s" : ""
-    } `;
+    (
+      this.container.querySelector(
+        ".scryfall-search__search-results-counter-total"
+      ) as HTMLSpanElement
+    ).innerText = `${totalCards} result${totalCards !== 1 ? "s" : ""} `;
 
-    (this.container.querySelector(
-      "a.scryfall-search__external-link-icon"
-    ) as HTMLAnchorElement).href = `/search?q=${encodeURI(this.currentQuery)}`;
+    (
+      this.container.querySelector(
+        "a.scryfall-search__external-link-icon"
+      ) as HTMLAnchorElement
+    ).href = `/search?q=${encodeURI(this.currentQuery)}`;
 
     this.inlineSearchField.value = this.currentQuery;
 
@@ -446,7 +450,8 @@ class ScryfallSearch extends Feature {
   }
 
   private _createSearchElement(search: SavedSearch): Element {
-    const searchGroup = createElement(`<div class="scryfall-search__saved-search-group">
+    const searchGroup =
+      createElement(`<div class="scryfall-search__saved-search-group">
       <div class="scryfall-search__saved-search-details">
         <div class="scryfall-search__saved-search-details-name-container">
           ${search.name}

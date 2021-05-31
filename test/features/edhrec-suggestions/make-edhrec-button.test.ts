@@ -347,9 +347,8 @@ describe("makeEDHRecButton", () => {
 
       await wait();
 
-      const errors = document.querySelectorAll<HTMLLIElement>(
-        "#edhrec-drawer li"
-      );
+      const errors =
+        document.querySelectorAll<HTMLLIElement>("#edhrec-drawer li");
       expect(errors[0].innerText).toContain("1 error");
       expect(errors[1].innerText).toContain("2 error");
     });

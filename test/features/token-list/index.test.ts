@@ -166,22 +166,22 @@ describe("Token List", () => {
     beforeEach(() => {
       const container = document.createElement("div");
       tokens = [
-        ({
+        {
           name: "Token 1",
           scryfall_uri: "https://scryfall.com/token-1",
           oracle_id: "token-1",
           getImage: jest
             .fn()
             .mockReturnValue("https://img.scryfall.com/token-1"),
-        } as unknown) as Card,
-        ({
+        } as unknown as Card,
+        {
           name: "Token 2",
           scryfall_uri: "https://scryfall.com/token-2",
           oracle_id: "token-2",
           getImage: jest
             .fn()
             .mockReturnValue("https://img.scryfall.com/token-2"),
-        } as unknown) as Card,
+        } as unknown as Card,
       ];
       tl.createUI(container);
       setContentSpy = jest
@@ -246,27 +246,27 @@ describe("Token List", () => {
       tokenCollection = [
         [],
         [
-          ({
+          {
             name: "Token 1",
             oracle_id: "id-1",
             scryfall_uri: "https://scryfall.com/code/1",
             getImage: jest.fn(),
-          } as unknown) as Card,
-          ({
+          } as unknown as Card,
+          {
             name: "Token 2",
             oracle_id: "id-2",
             scryfall_uri: "https://scryfall.com/code/2",
             getImage: jest.fn(),
-          } as unknown) as Card,
+          } as unknown as Card,
         ],
         [],
         [
-          ({
+          {
             name: "Token 3",
             oracle_id: "id-3",
             scryfall_uri: "https://scryfall.com/code/3",
             getImage: jest.fn(),
-          } as unknown) as Card,
+          } as unknown as Card,
         ],
       ];
     });
@@ -291,12 +291,12 @@ describe("Token List", () => {
     });
 
     it("alphebetizes by name", () => {
-      tokenCollection[1].push(({
+      tokenCollection[1].push({
         oracle_id: "alpha-token-id",
         name: "Alpha Token",
         scryfall_uri: "https://scryfall.com/code/2",
         getImage: jest.fn(),
-      } as unknown) as Card);
+      } as unknown as Card);
       const tokens = tl.flattenTokenCollection(tokenCollection);
 
       expect(tokens).toEqual([
@@ -320,12 +320,12 @@ describe("Token List", () => {
     });
 
     it("removes duplicate ids", () => {
-      tokenCollection[2].push(({
+      tokenCollection[2].push({
         oracle_id: "id-1",
         name: "Token 1",
         scryfall_uri: "https://scryfall.com/code/1",
         getImage: jest.fn(),
-      } as unknown) as Card);
+      } as unknown as Card);
       const tokens = tl.flattenTokenCollection(tokenCollection);
 
       expect(tokens).toEqual([

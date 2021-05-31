@@ -32,13 +32,11 @@ describe("EDHRec Ready", () => {
     );
     fetchSpy = jest.fn().mockResolvedValue("result");
     // jest doesn't have fetch on the window
-    window.fetch = jest.fn().mockImplementation(
-      (): Promise<unknown> => {
-        return Promise.resolve({
-          json: fetchSpy,
-        });
-      }
-    );
+    window.fetch = jest.fn().mockImplementation((): Promise<unknown> => {
+      return Promise.resolve({
+        json: fetchSpy,
+      });
+    });
   });
 
   afterEach(async () => {

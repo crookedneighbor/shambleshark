@@ -285,9 +285,8 @@ describe("TagMenu", () => {
 
       expect(table.querySelectorAll("tbody tr").length).toBe(7);
 
-      const viewMoreLink = table.querySelectorAll<HTMLAnchorElement>(
-        "tbody tr a"
-      )[6];
+      const viewMoreLink =
+        table.querySelectorAll<HTMLAnchorElement>("tbody tr a")[6];
       expect(viewMoreLink.innerText).toContain("View more tags");
       expect(viewMoreLink.href).toBe("https://scryfall.com/link");
     });
