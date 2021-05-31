@@ -1,6 +1,6 @@
 # Changelog
 
-# unreleased
+# 0.13.1
 
 - Card Search Links
   - Fix issue where color indicator in type line would be printed as text
