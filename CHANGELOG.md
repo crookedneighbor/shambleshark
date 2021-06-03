@@ -2,7 +2,8 @@
 
 # 0.14.0
 
-- Add Modern Horizons 2 nicknames
+- Card Nicknames on Card Display Page
+  - Add Modern Horizons 2 nicknames
 
 # 0.13.1
 
