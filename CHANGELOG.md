@@ -1,5 +1,9 @@
 # Changelog
 
+# 0.14.0
+
+- Add Modern Horizons 2 nicknames
+
 # 0.13.1
 
 - Card Search Links
