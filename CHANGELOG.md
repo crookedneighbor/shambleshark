@@ -1,5 +1,10 @@
 # Changelog
 
+# unreleased
+
+- Card Nicknames on Card Display Page
+  - Add Adventures in the Forgotten Realms nicknames
+
 # 0.14.0
 
 - Card Nicknames on Card Display Page
