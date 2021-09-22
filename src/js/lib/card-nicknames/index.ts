@@ -15,6 +15,7 @@ import kaldheim from "./khm";
 import strixhaven from "./stx";
 import modernHorizons2 from "./mh2";
 import forgottenRealms from "./afr";
+import midnightHunt from "./mid";
 
 type NickNameMetaData = {
   realName: string[];
@@ -42,6 +43,7 @@ const nicknames: NickNameMetaData[] = [
   ...strixhaven,
   ...modernHorizons2,
   ...forgottenRealms,
+  ...midnightHunt,
 ];
 
 export default nicknames;

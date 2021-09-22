@@ -4,6 +4,7 @@
 
 - Card Nicknames on Card Display Page
   - Add Adventures in the Forgotten Realms nicknames
+  - Add Midnight Hunt nicknames
 
 # 0.14.0
 
