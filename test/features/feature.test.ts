@@ -294,7 +294,7 @@ describe("Base Feature", () => {
     });
 
     it("rejects if attempting to set a property that does not exist in defaults", async () => {
-      let error;
+      expect.assertions(3);
 
       jest.spyOn(FeatureThatSavesSettings, "getSettings").mockResolvedValue({
         foo: "bar",
@@ -304,15 +304,12 @@ describe("Base Feature", () => {
       try {
         await FeatureThatSavesSettings.saveSetting("does-not-exist", "value");
       } catch (e) {
-        error = e;
+        expect(e).toBeTruthy();
+        expect((e as Error).message).toBe(
+          'Internal Error: Could not find property "does-not-exist" on feature'
+        );
+        expect(setSpy).toBeCalledTimes(0);
       }
-
-      expect(error).toBeTruthy();
-      expect(error.message).toBe(
-        'Internal Error: Could not find property "does-not-exist" on feature'
-      );
-
-      expect(setSpy).toBeCalledTimes(0);
     });
   });
 
