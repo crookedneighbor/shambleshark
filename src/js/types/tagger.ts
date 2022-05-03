@@ -3,7 +3,7 @@ export interface Tagging {
     name: string;
     type: string;
     slug: string;
-    typeSlug: string;
+    namespace: string;
   };
 }
 
@@ -25,7 +25,7 @@ type TagEdge = {
     name: string;
     slug: string;
     type: "ILLUSTRATION_TAG" | "ORACLE_CARD_TAG" | "PRINTING_TAG";
-    typeSlug: "artwork" | "card" | "prints";
+    namespace: "artwork" | "card" | "prints";
     __typename: "Tag";
   };
   __typename: "Tagging";

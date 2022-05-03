@@ -23,7 +23,7 @@ describe("tagger bridge", () => {
               name: "Tag 1",
               type: "ILLUSTRATION_TAG",
               slug: "tag-1",
-              typeSlug: "artwork",
+              namespace: "artwork",
               __typename: "Tag",
             },
           },
@@ -34,7 +34,7 @@ describe("tagger bridge", () => {
               name: "Tag 2",
               type: "ORACLE_CARD_TAG",
               slug: "tag-2",
-              typeSlug: "card",
+              namespace: "card",
               __typename: "Tag",
             },
           },
@@ -45,7 +45,7 @@ describe("tagger bridge", () => {
               name: "Tag 3",
               type: "PRINTING_TAG",
               slug: "tag-3",
-              typeSlug: "prints",
+              namespace: "prints",
               __typename: "Tag",
             },
           },
@@ -146,7 +146,7 @@ describe("tagger bridge", () => {
           slug: "bad-type",
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
-          typeSlug: "none",
+          namespace: "none",
           __typename: "Tag",
         },
       });

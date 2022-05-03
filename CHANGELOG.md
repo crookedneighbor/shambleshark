@@ -2,6 +2,8 @@
 
 # unreleased
 
+- Tag Menu
+  - Fix issue where links were not populated correctly
 - Card Nicknames on Card Display Page
   - Add Adventures in the Forgotten Realms nicknames
   - Add Midnight Hunt nicknames

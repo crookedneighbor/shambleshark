@@ -40,7 +40,7 @@ function collectTags(payload: TaggerPayload): RelationshipCollection {
 
     if (tagsByType) {
       tagsByType.push({
-        link: `https://tagger.scryfall.com/tags/${tag.typeSlug}/${tag.slug}`,
+        link: `https://tagger.scryfall.com/tags/${tag.namespace}/${tag.slug}`,
         isTag: true,
         tagType,
         name: tag.name,
@@ -119,11 +119,5 @@ export async function requestTags(
     art: artEntries,
     oracle: oracleEntries,
     taggerLink: `https://tagger.scryfall.com/card/${taggerData.set}/${taggerData.number}`,
-  };
-
-  return {
-    art: [],
-    oracle: [],
-    taggerLink: "https://tagger.scryfall.com",
   };
 }
