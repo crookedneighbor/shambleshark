@@ -66,6 +66,12 @@ const options = {
     hot: true,
     headers: { "Access-Control-Allow-Origin": "*" },
     port: env.PORT,
+    static: {
+      directory: path.join(__dirname, "../build"),
+    },
+    devMiddleware: {
+      writeToDisk: true,
+    },
   },
   optimization: {
     // extensions don't receive a performance boost by doing this
