@@ -7,6 +7,7 @@
 - Card Nicknames on Card Display Page
   - Add Adventures in the Forgotten Realms nicknames
   - Add Midnight Hunt nicknames
+  - Add Crimson Vow nicknames
 
 # 0.14.0
 

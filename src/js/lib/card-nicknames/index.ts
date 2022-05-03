@@ -16,6 +16,7 @@ import strixhaven from "./stx";
 import modernHorizons2 from "./mh2";
 import forgottenRealms from "./afr";
 import midnightHunt from "./mid";
+import crimsonVow from "./vow";
 
 type NickNameMetaData = {
   realName: string[];
@@ -44,6 +45,7 @@ const nicknames: NickNameMetaData[] = [
   ...modernHorizons2,
   ...forgottenRealms,
   ...midnightHunt,
+  ...crimsonVow,
 ];
 
 export default nicknames;
