@@ -64,10 +64,8 @@ const options = {
   mode: env.NODE_ENV,
   devServer: {
     hot: true,
-    contentBase: path.join(__dirname, "../build"),
     headers: { "Access-Control-Allow-Origin": "*" },
     port: env.PORT,
-    writeToDisk: true,
   },
   optimization: {
     // extensions don't receive a performance boost by doing this
@@ -154,11 +152,7 @@ const options = {
     }),
     // expose and write the allowed env vars on the compiled bundle
     new webpack.EnvironmentPlugin({ NODE_ENV: env.NODE_ENV }),
-    new ForkTsCheckerWebpackPlugin({
-      eslint: {
-        files: "./src/**/*.ts",
-      },
-    }),
+    new ForkTsCheckerWebpackPlugin(),
     new ForkTsCheckerNotifierWebpackPlugin({
       title: "TypeScript",
       excludeWarnings: false,
