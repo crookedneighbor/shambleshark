@@ -1,6 +1,6 @@
 # Changelog
 
-# unreleased
+# 0.15.0
 
 - Tag Menu
   - Fix issue where links were not populated correctly
