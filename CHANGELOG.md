@@ -8,6 +8,7 @@
   - Add Adventures in the Forgotten Realms nicknames
   - Add Midnight Hunt nicknames
   - Add Crimson Vow nicknames
+  - Add Neon Dynasty nicknames
 
 # 0.14.0
 

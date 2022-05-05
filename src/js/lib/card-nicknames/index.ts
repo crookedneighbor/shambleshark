@@ -17,6 +17,7 @@ import modernHorizons2 from "./mh2";
 import forgottenRealms from "./afr";
 import midnightHunt from "./mid";
 import crimsonVow from "./vow";
+import neonDynasty from "./neo";
 
 type NickNameMetaData = {
   realName: string[];
@@ -46,6 +47,7 @@ const nicknames: NickNameMetaData[] = [
   ...forgottenRealms,
   ...midnightHunt,
   ...crimsonVow,
+  ...neonDynasty,
 ];
 
 export default nicknames;
