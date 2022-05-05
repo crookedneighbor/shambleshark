@@ -18,6 +18,7 @@ import forgottenRealms from "./afr";
 import midnightHunt from "./mid";
 import crimsonVow from "./vow";
 import neonDynasty from "./neo";
+import streetsOfNewCapenna from "./stc";
 
 type NickNameMetaData = {
   realName: string[];
@@ -48,6 +49,7 @@ const nicknames: NickNameMetaData[] = [
   ...midnightHunt,
   ...crimsonVow,
   ...neonDynasty,
+  ...streetsOfNewCapenna,
 ];
 
 export default nicknames;
