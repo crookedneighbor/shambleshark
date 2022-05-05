@@ -9,7 +9,7 @@
   - Add Midnight Hunt nicknames
   - Add Crimson Vow nicknames
   - Add Neon Dynasty nicknames
-  - Add Strees of New Capenna nicknames
+  - Add Streets of New Capenna nicknames
 
 # 0.14.0
 
