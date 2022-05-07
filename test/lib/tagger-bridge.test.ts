@@ -45,7 +45,7 @@ describe("tagger bridge", () => {
               name: "Tag 3",
               type: "PRINTING_TAG",
               slug: "tag-3",
-              namespace: "prints",
+              namespace: "print",
               __typename: "Tag",
             },
           },
@@ -53,8 +53,8 @@ describe("tagger bridge", () => {
             id: "some-id",
             foreignKey: "illustrationId",
             relatedId: "related-id",
-            contentName: "Depicts Relationship",
-            contentId: "depicts-id",
+            subjectName: "Depicts Relationship",
+            subjectId: "depicts-id",
             relatedName: "Depicted Relationship",
             classifier: "DEPICTS",
             classifierInverse: "DEPICTED_IN",
@@ -64,8 +64,8 @@ describe("tagger bridge", () => {
             id: "some-id",
             foreignKey: "oracleId",
             relatedId: "related-id",
-            contentName: "Better Than Relationship",
-            contentId: "worse-than-id",
+            subjectName: "Better Than Relationship",
+            subjectId: "worse-than-id",
             relatedName: "Worse Than Relationship",
             classifier: "BETTER_THAN",
             classifierInverse: "WORSE_THAN",
@@ -157,15 +157,15 @@ describe("tagger bridge", () => {
       expect(tags.oracle.length).toBe(2);
     });
 
-    it("uses contentName and classifier when it is the related tag", async () => {
+    it("uses subjectName and classifier when it is the related tag", async () => {
       lookupResult.edges = [
         {
           id: "some-id",
           __typename: "Relationship",
           foreignKey: "oracleId",
           relatedId: "oracle-id",
-          contentName: "Content Name",
-          contentId: "better-than-id",
+          subjectName: "Content Name",
+          subjectId: "better-than-id",
           relatedName: "Related Name",
           classifier: "BETTER_THAN",
           classifierInverse: "WORSE_THAN",
@@ -187,8 +187,8 @@ describe("tagger bridge", () => {
           __typename: "Relationship",
           foreignKey: "oracleId",
           relatedId: "not-oracle-id",
-          contentName: "Content Name",
-          contentId: "better-than-id",
+          subjectName: "Content Name",
+          subjectId: "better-than-id",
           relatedName: "Related Name",
           classifier: "BETTER_THAN",
           classifierInverse: "WORSE_THAN",
@@ -209,8 +209,8 @@ describe("tagger bridge", () => {
         // @ts-ignore
         foreignKey: "unknown",
         relatedId: "not-oracle-id",
-        contentName: "Content Name",
-        contentId: "better-than-id",
+        subjectName: "Content Name",
+        subjectId: "better-than-id",
         relatedName: "Related Name",
         classifier: "BETTER_THAN",
         classifierInverse: "WORSE_THAN",
