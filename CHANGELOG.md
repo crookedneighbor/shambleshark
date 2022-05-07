@@ -1,5 +1,10 @@
 # Changelog
 
+# 0.15.1
+
+- Tag Menu
+  - Fix issue where related tags did not populate due to change in Tagger API
+
 # 0.15.0
 
 - Tag Menu

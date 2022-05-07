@@ -71,9 +71,9 @@ function collectRelationships(payload: TaggerPayload): RelationshipCollection {
     let link = `https://scryfall.com/search?q=${edge.foreignKey}=`;
 
     if (isTheRelatedTag) {
-      name = edge.contentName;
+      name = edge.subjectName;
       tagType = edge.classifier;
-      link += edge.contentId;
+      link += edge.subjectId;
     } else {
       name = edge.relatedName;
       tagType = edge.classifierInverse;

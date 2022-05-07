@@ -11,8 +11,8 @@ export interface Relationship {
   classifierInverse: string;
   relatedName: string;
   classifier: string;
-  contentName: string;
-  contentId: string;
+  subjectName: string;
+  subjectId: string;
   relatedId: string;
   foreignKey: "illustrationId" | "oracleId";
   illustrationId?: string;
@@ -25,7 +25,7 @@ type TagEdge = {
     name: string;
     slug: string;
     type: "ILLUSTRATION_TAG" | "ORACLE_CARD_TAG" | "PRINTING_TAG";
-    namespace: "artwork" | "card" | "prints";
+    namespace: "artwork" | "card" | "print";
     __typename: "Tag";
   };
   __typename: "Tagging";
@@ -34,8 +34,8 @@ type TagEdge = {
 type RelationshipEdge = {
   classifier: string;
   classifierInverse: string;
-  contentId: string;
-  contentName: string;
+  subjectId: string;
+  subjectName: string;
   foreignKey: "illustrationId" | "oracleId";
   id: string;
   relatedId: string;
