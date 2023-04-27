@@ -1,6 +1,6 @@
 // adapted from the mdn page on array.sort
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
-export function sortByAttribute<T>(attributes: (keyof T)[]) {
+export function sortByAttribute<T extends object>(attributes: (keyof T)[]) {
   return (a: T, b: T): number => {
     let comparison = 0;
 
@@ -18,7 +18,9 @@ export function sortByAttribute<T>(attributes: (keyof T)[]) {
 
       if (typeof aValue !== typeof bValue) {
         throw new Error(
-          `${attr} \`${aValue}\` and ${attr} \`${bValue}\` are not of the same type`
+          `${String(attr)} \`${aValue}\` and ${String(
+            attr
+          )} \`${bValue}\` are not of the same type`
         );
       }
 
