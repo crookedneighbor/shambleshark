@@ -7,7 +7,6 @@ const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const ForkTsCheckerNotifierWebpackPlugin = require("fork-ts-checker-notifier-webpack-plugin");
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 const TsconfigPathsPlugin = require("tsconfig-paths-webpack-plugin");
 
@@ -159,10 +158,6 @@ const options = {
     // expose and write the allowed env vars on the compiled bundle
     new webpack.EnvironmentPlugin({ NODE_ENV: env.NODE_ENV }),
     new ForkTsCheckerWebpackPlugin(),
-    new ForkTsCheckerNotifierWebpackPlugin({
-      title: "TypeScript",
-      excludeWarnings: false,
-    }),
     new CopyWebpackPlugin({
       patterns: [
         {
