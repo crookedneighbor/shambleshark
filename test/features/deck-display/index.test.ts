@@ -2,8 +2,6 @@ import DeckDisplay from "Features/deck-view-features/deck-display";
 import { ready } from "Lib/mutation";
 import createElement from "Lib/create-element";
 
-import { mocked } from "ts-jest/utils";
-
 jest.mock("Lib/mutation");
 
 describe("Price Options", () => {
@@ -19,7 +17,7 @@ describe("Price Options", () => {
       <div class="card-grid-item" data-card-id="4"></div>
     </div>`);
 
-    mocked(ready).mockImplementation((selector, cb) => {
+    jest.mocked(ready).mockImplementation((selector, cb) => {
       cb(el);
     });
 
@@ -30,7 +28,7 @@ describe("Price Options", () => {
 
   describe("run", () => {
     it("noops if not configured to collapse the deck display", async () => {
-      mocked(DeckDisplay.getSettings).mockResolvedValue({
+      jest.mocked(DeckDisplay.getSettings).mockResolvedValue({
         collapseCardView: false,
       });
 

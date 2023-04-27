@@ -3,8 +3,6 @@ import { requestTags, TagInfo } from "Lib/tagger-bridge";
 import { ready } from "Lib/mutation";
 
 import SpyInstance = jest.SpyInstance;
-import { mocked } from "ts-jest/utils";
-
 jest.mock("Lib/tagger-bridge");
 jest.mock("Lib/mutation");
 
@@ -23,7 +21,7 @@ describe("TagMenu", () => {
       artTags = [];
       cardTags = [];
 
-      mocked(requestTags).mockResolvedValue({
+      jest.mocked(requestTags).mockResolvedValue({
         taggerLink: "https://tagger.scryfall.com/card-slug",
         art: artTags,
         oracle: cardTags,
@@ -34,7 +32,7 @@ describe("TagMenu", () => {
         artTags: true,
         cardTags: true,
       });
-      mocked(ready).mockImplementation((selector, cb) => {
+      jest.mocked(ready).mockImplementation((selector, cb) => {
         cb(printElement);
       });
 

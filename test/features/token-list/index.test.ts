@@ -4,8 +4,6 @@ import { getCollection } from "Lib/scryfall";
 import wait from "Lib/wait";
 import Modal from "Lib/ui-elements/modal";
 import type { Card } from "scryfall-client/dist/types/model";
-import { mocked } from "ts-jest/utils";
-
 jest.mock("Lib/scryfall");
 jest.mock("Lib/mutation");
 
@@ -26,7 +24,7 @@ describe("Token List", () => {
 
     beforeEach(() => {
       container = document.createElement("div") as HTMLDivElement;
-      readySpy = mocked(ready).mockImplementation((selector, cb) => {
+      readySpy = jest.mocked(ready).mockImplementation((selector, cb) => {
         cb(container);
       });
       elements = [];
@@ -349,8 +347,10 @@ describe("Token List", () => {
     let getCollectionSpy: jest.SpyInstance;
 
     beforeEach(() => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      getCollectionSpy = mocked(getCollection).mockResolvedValue([] as any);
+      getCollectionSpy = jest
+        .mocked(getCollection)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .mockResolvedValue([] as any);
     });
 
     it("calls getCollection", async () => {

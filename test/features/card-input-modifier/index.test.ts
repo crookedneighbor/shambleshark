@@ -6,8 +6,6 @@ import { ready } from "Lib/mutation";
 import wait from "Lib/wait";
 
 import { makeFakeCard, makeFakeDeck } from "Helpers/fake";
-import { mocked } from "ts-jest/utils";
-
 jest.mock("Lib/scryfall");
 jest.mock("Lib/mutation");
 jest.mock("framebus");
@@ -21,7 +19,7 @@ describe("Card Input Modifier", () => {
 
   beforeEach(() => {
     cim = new CardInputModifier();
-    getDeckSpy = mocked(getDeck).mockResolvedValue(makeFakeDeck());
+    getDeckSpy = jest.mocked(getDeck).mockResolvedValue(makeFakeDeck());
     flattenEntriesSpy = jest
       .spyOn(deckParser, "flattenEntries")
       .mockReturnValue([]);
@@ -63,7 +61,7 @@ describe("Card Input Modifier", () => {
     let readySpy: jest.SpyInstance;
 
     beforeEach(() => {
-      readySpy = mocked(ready);
+      readySpy = jest.mocked(ready);
 
       fakeEntry = document.createElement("div");
       fakeEntry.setAttribute("data-entry", "entry-id");

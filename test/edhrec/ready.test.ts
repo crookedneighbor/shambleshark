@@ -3,8 +3,6 @@ import iframe from "Lib/iframe";
 import wait from "Lib/wait";
 import Framebus from "framebus";
 
-import { mocked } from "ts-jest/utils";
-
 jest.mock("framebus");
 
 describe("EDHRec Ready", () => {
@@ -15,8 +13,9 @@ describe("EDHRec Ready", () => {
     jest.spyOn(iframe, "isInsideIframe").mockReturnValue(true);
 
     type ReplyType = (res: Record<string, string[]>, reply: jest.Mock) => void;
-    mocked(Framebus.prototype.on).mockImplementation(
-      (event: string, reply: ReplyType) => {
+    jest
+      .mocked(Framebus.prototype.on)
+      .mockImplementation((event: string, reply: ReplyType) => {
         const response = {
           commanders: ["Arjun, the Shifting Flame"],
           cards: ["1 foo", "1 bar"],
@@ -28,8 +27,7 @@ describe("EDHRec Ready", () => {
         }
 
         return true;
-      }
-    );
+      });
     fetchSpy = jest.fn().mockResolvedValue("result");
     // jest doesn't have fetch on the window
     window.fetch = jest.fn().mockImplementation((): Promise<unknown> => {

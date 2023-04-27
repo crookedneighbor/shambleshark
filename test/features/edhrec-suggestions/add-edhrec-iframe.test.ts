@@ -7,8 +7,6 @@ import { Deck } from "../../../src/js/types/deck";
 import SpyInstance = jest.SpyInstance;
 
 import { makeFakeDeck, makeFakeCard } from "Helpers/fake";
-import { mocked } from "ts-jest/utils";
-
 jest.mock("Lib/scryfall");
 jest.mock("Lib/mutation");
 
@@ -22,7 +20,7 @@ describe("addEDHRecIframe", () => {
   beforeEach(() => {
     btn = document.createElement("button");
 
-    getDeckSpy = mocked(getDeck).mockResolvedValue(
+    getDeckSpy = jest.mocked(getDeck).mockResolvedValue(
       makeFakeDeck({
         primarySections: ["commanders", "nonlands"],
         secondarySections: ["lands", "maybeboard"],
@@ -37,7 +35,7 @@ describe("addEDHRecIframe", () => {
     jest
       .spyOn(deckParser, "getSections")
       .mockReturnValue(["commanders", "lands", "nonlands", "maybeboard"]);
-    mutationChangeSpy = mocked(change);
+    mutationChangeSpy = jest.mocked(change);
 
     const deckbuilderElement = document.createElement("div");
     deckbuilderElement.id = "deckbuilder";

@@ -5,8 +5,6 @@ import iframe from "Lib/iframe";
 import SpyInstance = jest.SpyInstance;
 
 import { makeFakeDeck } from "Helpers/fake";
-import { mocked } from "ts-jest/utils";
-
 jest.mock("Lib/scryfall");
 jest.mock("Lib/mutation");
 
@@ -17,7 +15,7 @@ describe("EDHRec Suggestions", () => {
     let readySpy: SpyInstance;
 
     beforeEach(() => {
-      getDeckSpy = mocked(getDeck);
+      getDeckSpy = jest.mocked(getDeck);
       toolbar = document.createElement("div");
       toolbar.classList.add("deckbuilder-toolbar-items-right");
       document.body.appendChild(toolbar);
@@ -36,7 +34,7 @@ describe("EDHRec Suggestions", () => {
           },
         })
       );
-      readySpy = mocked(ready).mockImplementation((selector, cb) => {
+      readySpy = jest.mocked(ready).mockImplementation((selector, cb) => {
         const el = document.createElement("div");
         el.innerText = "Commander(s)";
 

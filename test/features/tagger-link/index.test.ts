@@ -3,8 +3,6 @@ import { requestTags, TagEntries } from "Lib/tagger-bridge";
 import { ready } from "Lib/mutation";
 
 import SpyInstance = jest.SpyInstance;
-import { mocked } from "ts-jest/utils";
-
 jest.mock("Lib/tagger-bridge");
 jest.mock("Lib/mutation");
 
@@ -40,7 +38,7 @@ describe("Tagger Link", () => {
     let readySpy: SpyInstance;
 
     beforeEach(() => {
-      readySpy = mocked(ready);
+      readySpy = jest.mocked(ready);
       jest
         .spyOn(TaggerLink.prototype, "makeButton")
         .mockReturnValue(document.createElement("a"));
@@ -69,7 +67,7 @@ describe("Tagger Link", () => {
       const fakeBtn = document.createElement("a");
       fakeBtn.classList.add("tagger-link-button");
 
-      mocked(tl.makeButton).mockReturnValue(fakeBtn);
+      jest.mocked(tl.makeButton).mockReturnValue(fakeBtn);
 
       readySpy.mockImplementation((cssSelector, cb) => {
         cb(el.querySelector(".card-grid-item-card"));
@@ -144,7 +142,7 @@ describe("Tagger Link", () => {
         pageX: 100,
       } as MouseEvent;
 
-      mocked(requestTags).mockResolvedValue({
+      jest.mocked(requestTags).mockResolvedValue({
         taggerLink: "https://tagger.scryfall.com",
         art: [],
         oracle: [],

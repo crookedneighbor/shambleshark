@@ -141,6 +141,9 @@ function updateTotalsInHeadings(totalCount: number): void {
 function updateSubTotalsInHeadings(section: string, sortChoice: string): void {
   const totalsForSection = calculateTotalsForSection(section, sortChoice);
 
+  console.log(section);
+  console.log(totalsForSection);
+
   Object.keys(totalsForSection).forEach((area) => {
     const el = document.querySelector<HTMLElement>(
       `[data-heading-section-id="${area}"] .modify-cleanup-subtotal-count`
@@ -233,6 +236,8 @@ export function insertHeadings(sortChoice: string, headings: Headings): void {
       }
       const totalsForSection = calculateTotalsForSection(section, sortChoice);
 
+      console.log(totalsForSection);
+
       resetPreviousHeadings(headings, section);
 
       window.Scryfall.deckbuilder.entries[section].forEach((entry) => {
@@ -242,12 +247,13 @@ export function insertHeadings(sortChoice: string, headings: Headings): void {
         const headingToUse = getHeadingToUse(sortChoice, entry);
 
         if (headingToUse && !headings[section][headingToUse.id]) {
+          const headingId = headingToUse.id;
           const li = createHeadingElement(
             entry,
             headingToUse,
-            totalsForSection[headingToUse.id]
+            totalsForSection[headingId]
           );
-          headings[section][headingToUse.id] = li;
+          headings[section][headingId] = li;
 
           const entryElement = document.querySelector(
             `[data-entry="${entry.id}"]`

@@ -10,19 +10,19 @@ import {
 } from "Js/scryfall-embed/modify-clean-up/calculate-totals";
 import { makeFakeCard } from "Helpers/fake";
 import { generateScryfallGlobal } from "../../mocks/scryfall-global";
-import { mocked } from "ts-jest/utils";
-
 jest.mock("framebus");
 jest.mock("Js/scryfall-embed/modify-clean-up/calculate-totals");
 
 describe("section heading", () => {
   beforeEach(() => {
     window.Scryfall = generateScryfallGlobal();
+    jest.mocked(calculateTotalsByCardType).mockReturnValue({});
+    jest.mocked(calculateTotalsByName).mockReturnValue({});
   });
 
   describe("addDeckTotalUpdateListener", () => {
     beforeEach(() => {
-      mocked(Framebus.prototype.on).mockImplementation((eventName, cb) => {
+      jest.mocked(Framebus.prototype.on).mockImplementation((eventName, cb) => {
         if (cb) {
           cb({ totalCount: 100 }, jest.fn());
         }
@@ -125,7 +125,7 @@ describe("section heading", () => {
     });
 
     it("adds subtotal to elements", () => {
-      mocked(calculateTotalsByName).mockReturnValue({
+      jest.mocked(calculateTotalsByName).mockReturnValue({
         abcd: 3,
         efg: 5,
       });
@@ -583,9 +583,9 @@ describe("section heading", () => {
       window.Scryfall.deckbuilder.entries.columna.push(firstCard);
       window.Scryfall.deckbuilder.entries.columna.push(secondCard);
       window.Scryfall.deckbuilder.entries.columna.push(thirdCard);
-      mocked(window.Scryfall.deckbuilder.totalCount).mockReturnValue(3);
+      jest.mocked(window.Scryfall.deckbuilder.totalCount).mockReturnValue(3);
 
-      mocked(calculateTotalsByName).mockReturnValue({
+      jest.mocked(calculateTotalsByName).mockReturnValue({
         abcd: 2,
         yz: 1,
       });

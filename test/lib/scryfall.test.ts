@@ -3,8 +3,6 @@ import type List from "scryfall-client/dist/models/list";
 import type Card from "scryfall-client/dist/models/card";
 import { getCollection, getDeck } from "Lib/scryfall";
 import Framebus from "framebus";
-import { mocked } from "ts-jest/utils";
-
 import SpyInstance = jest.SpyInstance;
 import { makeFakeDeck } from "Helpers/fake";
 
@@ -17,7 +15,7 @@ describe("scryfall", () => {
 
     beforeEach(() => {
       jest.useFakeTimers();
-      emitSpy = mocked(Framebus.prototype.emitAsPromise);
+      emitSpy = jest.mocked(Framebus.prototype.emitAsPromise);
     });
 
     afterEach(() => {
@@ -69,9 +67,9 @@ describe("scryfall", () => {
     beforeEach(() => {
       fakeCards = [{ id: "foo" }];
 
-      getCollectionSpy = mocked(scryfall.getCollection).mockResolvedValue(
-        fakeCards as List<Card>
-      );
+      getCollectionSpy = jest
+        .mocked(scryfall.getCollection)
+        .mockResolvedValue(fakeCards as List<Card>);
     });
 
     it("looks up collection endpoint", async () => {

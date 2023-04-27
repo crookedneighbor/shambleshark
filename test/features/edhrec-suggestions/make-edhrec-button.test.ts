@@ -11,7 +11,6 @@ import {
   makeFakeDeck,
   makeFakeEDHRecSuggestion,
 } from "Helpers/fake";
-import { mocked } from "ts-jest/utils";
 import { Deck } from "../../../src/js/types/deck";
 
 jest.mock("Lib/scryfall");
@@ -23,8 +22,8 @@ describe("makeEDHRecButton", () => {
   let getDeckSpy: jest.SpyInstance;
 
   beforeEach(() => {
-    getCardSpy = mocked(getCardBySetCodeAndCollectorNumber);
-    getDeckSpy = mocked(getDeck).mockResolvedValue(
+    getCardSpy = jest.mocked(getCardBySetCodeAndCollectorNumber);
+    getDeckSpy = jest.mocked(getDeck).mockResolvedValue(
       makeFakeDeck({
         primarySections: ["commanders", "nonlands"],
         secondarySections: ["lands", "maybeboard"],
@@ -171,9 +170,9 @@ describe("makeEDHRecButton", () => {
           }),
         ],
       };
-      mocked(Framebus.prototype.emitAsPromise).mockResolvedValue(
-        fakeEDHRecResponse
-      );
+      jest
+        .mocked(Framebus.prototype.emitAsPromise)
+        .mockResolvedValue(fakeEDHRecResponse);
 
       getDeckSpy.mockResolvedValue(fakeDeck);
     });
@@ -333,7 +332,7 @@ describe("makeEDHRecButton", () => {
     });
 
     it("displays specific error when edhrec request errors with specific errors", async () => {
-      mocked(Framebus.prototype.emitAsPromise).mockResolvedValue({
+      jest.mocked(Framebus.prototype.emitAsPromise).mockResolvedValue({
         commanders: [],
         outRecs: [],
         inRecs: [],

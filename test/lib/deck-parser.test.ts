@@ -15,15 +15,13 @@ import SpyInstance = jest.SpyInstance;
 import { Deck } from "Js/types/deck";
 import { makeFakeDeck, makeFakeCard } from "Helpers/fake";
 
-import { mocked } from "ts-jest/utils";
-
 jest.mock("Lib/scryfall");
 
 describe("Deck Parser", () => {
   let searchSpy: SpyInstance;
 
   beforeEach(() => {
-    searchSpy = mocked(search);
+    searchSpy = jest.mocked(search);
   });
 
   afterEach(() => {

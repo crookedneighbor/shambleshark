@@ -1,5 +1,4 @@
 import wait from "Lib/wait";
-import { mocked } from "ts-jest/utils";
 import {
   getDeck,
   getDeckMetadata,
@@ -29,15 +28,15 @@ describe("set up listeners on Scryfall page", () => {
     window.ScryfallAPI = generateScryfallAPIGlobal();
     window.Scryfall = generateScryfallGlobal();
 
-    mocked(getDeckMetadata).mockResolvedValue({
+    jest.mocked(getDeckMetadata).mockResolvedValue({
       id: "deck-id",
       sections: {
         primary: ["mainboard"],
         secondary: ["sideboard"],
       },
     });
-    mocked(updateEntry).mockResolvedValue(makeFakeCard());
-    mocked(removeEntry).mockResolvedValue();
+    jest.mocked(updateEntry).mockResolvedValue(makeFakeCard());
+    jest.mocked(removeEntry).mockResolvedValue();
   });
 
   it("listens for events", () => {
@@ -85,8 +84,8 @@ describe("set up listeners on Scryfall page", () => {
     it("replies with the active deck passed into the setup script", () => {
       const fakeDeck = makeFakeDeck();
 
-      mocked(getDeck).mockResolvedValue(fakeDeck);
-      mocked(Framebus.prototype.on).mockImplementation((event, cb) => {
+      jest.mocked(getDeck).mockResolvedValue(fakeDeck);
+      jest.mocked(Framebus.prototype.on).mockImplementation((event, cb) => {
         if (event === "REQUEST_DECK") {
           cb({}, jest.fn());
         }
@@ -106,7 +105,7 @@ describe("set up listeners on Scryfall page", () => {
     let pushData: Record<string, string>;
 
     beforeEach(() => {
-      mocked(Framebus.prototype.on).mockImplementation((event, cb) => {
+      jest.mocked(Framebus.prototype.on).mockImplementation((event, cb) => {
         if (event === "SCRYFALL_PUSH_NOTIFICATION") {
           cb(pushData, jest.fn());
         }
@@ -125,8 +124,8 @@ describe("set up listeners on Scryfall page", () => {
       setUpListeners();
 
       return wait().then(() => {
-        expect(mocked(pushNotification).mock.calls.length).toBe(1);
-        expect(mocked(pushNotification).mock.calls[0]).toEqual([
+        expect(jest.mocked(pushNotification).mock.calls.length).toBe(1);
+        expect(jest.mocked(pushNotification).mock.calls[0]).toEqual([
           "header",
           "message",
           "blue",
@@ -145,8 +144,8 @@ describe("set up listeners on Scryfall page", () => {
       setUpListeners();
 
       return wait().then(() => {
-        expect(mocked(pushNotification).mock.calls.length).toBe(1);
-        expect(mocked(pushNotification).mock.calls[0]).toEqual([
+        expect(jest.mocked(pushNotification).mock.calls.length).toBe(1);
+        expect(jest.mocked(pushNotification).mock.calls[0]).toEqual([
           "header",
           "message",
           "purple",
@@ -165,8 +164,8 @@ describe("set up listeners on Scryfall page", () => {
       setUpListeners();
 
       return wait().then(() => {
-        expect(mocked(pushNotification).mock.calls.length).toBe(1);
-        expect(mocked(pushNotification).mock.calls[0]).toEqual([
+        expect(jest.mocked(pushNotification).mock.calls.length).toBe(1);
+        expect(jest.mocked(pushNotification).mock.calls[0]).toEqual([
           "header",
           "message",
           "blue",
@@ -192,20 +191,20 @@ describe("set up listeners on Scryfall page", () => {
           type_line: "Creature",
         },
       });
-      mocked(Framebus.prototype.on).mockImplementation((event, cb) => {
+      jest.mocked(Framebus.prototype.on).mockImplementation((event, cb) => {
         if (event === "ADD_CARD_TO_DECK") {
           cb(cardData, jest.fn());
         }
         return true;
       });
-      mocked(addCard).mockResolvedValue(scryfallCard);
+      jest.mocked(addCard).mockResolvedValue(scryfallCard);
     });
 
     it("adds card to active deck", () => {
       setUpListeners();
 
-      expect(mocked(addCard).mock.calls.length).toBe(1);
-      expect(mocked(addCard).mock.calls[0][0]).toBe("id-1");
+      expect(jest.mocked(addCard).mock.calls.length).toBe(1);
+      expect(jest.mocked(addCard).mock.calls[0][0]).toBe("id-1");
     });
 
     it("updates card for specific section if section is specified", () => {
@@ -214,16 +213,16 @@ describe("set up listeners on Scryfall page", () => {
       setUpListeners();
 
       return wait().then(() => {
-        expect(mocked(updateEntry).mock.calls.length).toBe(1);
+        expect(jest.mocked(updateEntry).mock.calls.length).toBe(1);
         expect(scryfallCard.section).toBe("sideboard");
-        expect(mocked(updateEntry).mock.calls[0][0]).toBe(scryfallCard);
+        expect(jest.mocked(updateEntry).mock.calls[0][0]).toBe(scryfallCard);
       });
     });
 
     it("updates card for specific section if section is specified even when card is a land card and there is a dedicated land section", () => {
       cardData.section = "sideboard";
       scryfallCard.card_digest!.type_line = "Land";
-      mocked(getDeckMetadata).mockResolvedValue({
+      jest.mocked(getDeckMetadata).mockResolvedValue({
         id: "deck-id",
         sections: {
           primary: ["nonlands"],
@@ -234,15 +233,15 @@ describe("set up listeners on Scryfall page", () => {
       setUpListeners();
 
       return wait().then(() => {
-        expect(mocked(updateEntry).mock.calls.length).toBe(1);
+        expect(jest.mocked(updateEntry).mock.calls.length).toBe(1);
         expect(scryfallCard.section).toBe("sideboard");
-        expect(mocked(updateEntry).mock.calls[0][0]).toBe(scryfallCard);
+        expect(jest.mocked(updateEntry).mock.calls[0][0]).toBe(scryfallCard);
       });
     });
 
     it("updates lands to be put in lands section if deck has dedicated lands section and no section is specified", () => {
       scryfallCard.card_digest!.type_line = "Land";
-      mocked(getDeckMetadata).mockResolvedValue({
+      jest.mocked(getDeckMetadata).mockResolvedValue({
         id: "deck-id",
         sections: {
           primary: ["nonlands"],
@@ -253,9 +252,9 @@ describe("set up listeners on Scryfall page", () => {
       setUpListeners();
 
       return wait().then(() => {
-        expect(mocked(updateEntry).mock.calls.length).toBe(1);
+        expect(jest.mocked(updateEntry).mock.calls.length).toBe(1);
         expect(scryfallCard.section).toBe("lands");
-        expect(mocked(updateEntry).mock.calls[0][0]).toBe(scryfallCard);
+        expect(jest.mocked(updateEntry).mock.calls[0][0]).toBe(scryfallCard);
       });
     });
 
@@ -265,7 +264,7 @@ describe("set up listeners on Scryfall page", () => {
       setUpListeners();
 
       return wait().then(() => {
-        expect(mocked(updateEntry).mock.calls.length).toBe(0);
+        expect(jest.mocked(updateEntry).mock.calls.length).toBe(0);
       });
     });
 
@@ -273,7 +272,7 @@ describe("set up listeners on Scryfall page", () => {
       setUpListeners();
 
       return wait().then(() => {
-        expect(mocked(updateEntry).mock.calls.length).toBe(0);
+        expect(jest.mocked(updateEntry).mock.calls.length).toBe(0);
       });
     });
 
@@ -281,8 +280,8 @@ describe("set up listeners on Scryfall page", () => {
       setUpListeners();
 
       return wait().then(() => {
-        expect(mocked(pushNotification).mock.calls.length).toBe(1);
-        expect(mocked(pushNotification).mock.calls[0]).toEqual([
+        expect(jest.mocked(pushNotification).mock.calls.length).toBe(1);
+        expect(jest.mocked(pushNotification).mock.calls[0]).toEqual([
           "Card Added",
           "Added Rashmi, Eternities Crafter.",
           "purple",
@@ -299,13 +298,13 @@ describe("set up listeners on Scryfall page", () => {
       cardData = {
         cardName: "Rashmi, Etrnities Crafter",
       };
-      mocked(Framebus.prototype.on).mockImplementation((event, cb) => {
+      jest.mocked(Framebus.prototype.on).mockImplementation((event, cb) => {
         if (event === "REMOVE_CARD_FROM_DECK") {
           cb(cardData, jest.fn());
         }
         return true;
       });
-      mocked(getDeck).mockResolvedValue(
+      jest.mocked(getDeck).mockResolvedValue(
         makeFakeDeck({
           primarySections: ["commanders"],
           secondarySections: ["nonlands"],
@@ -382,7 +381,7 @@ describe("set up listeners on Scryfall page", () => {
 
   describe("CLEAN_UP_DECK", () => {
     beforeEach(() => {
-      mocked(Framebus.prototype.on).mockImplementation((event, cb) => {
+      jest.mocked(Framebus.prototype.on).mockImplementation((event, cb) => {
         if (event === "CLEAN_UP_DECK") {
           cb({}, jest.fn());
         }

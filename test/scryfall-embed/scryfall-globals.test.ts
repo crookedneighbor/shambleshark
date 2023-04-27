@@ -21,8 +21,6 @@ import {
   generateScryfallAPIGlobal,
 } from "../mocks/scryfall-global";
 import { makeFakeDeck, makeFakeCard } from "Helpers/fake";
-import { mocked } from "ts-jest/utils";
-
 describe("Scryfall Globals", () => {
   let ScryfallAPISpy: ScryfallAPIGlobal;
   let ScryfallSpy: ScryfallGlobal;
@@ -101,7 +99,7 @@ describe("Scryfall Globals", () => {
     });
 
     it("emits event when totalCount is called and count has changed", () => {
-      const spy = mocked(window.Scryfall.deckbuilder.totalCount);
+      const spy = jest.mocked(window.Scryfall.deckbuilder.totalCount);
       spy.mockReturnValue(10);
 
       addHooksToCardManagementEvents();
@@ -124,7 +122,7 @@ describe("Scryfall Globals", () => {
     });
 
     it("emits event when totalCount is called and count has changed", () => {
-      const spy = mocked(window.Scryfall.deckbuilder.totalCount);
+      const spy = jest.mocked(window.Scryfall.deckbuilder.totalCount);
       spy.mockReturnValue(10);
 
       addHooksToCardManagementEvents();

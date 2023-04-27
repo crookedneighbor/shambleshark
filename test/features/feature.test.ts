@@ -1,12 +1,10 @@
 import Feature from "Features/feature";
 import storage from "Lib/storage";
 
-import { mocked } from "ts-jest/utils";
-
 jest.mock("Lib/storage");
 
-const getSpy = mocked(storage.get);
-const setSpy = mocked(storage.set);
+const getSpy = jest.mocked(storage.get);
+const setSpy = jest.mocked(storage.set);
 
 describe("Base Feature", () => {
   describe("enable", () => {

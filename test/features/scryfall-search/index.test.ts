@@ -7,8 +7,6 @@ import Modal from "Lib/ui-elements/modal";
 import { Card, List } from "scryfall-client/dist/types/model";
 
 import { makeFakeDeck, makeFakeCard } from "Helpers/fake";
-import { mocked } from "ts-jest/utils";
-
 jest.mock("Lib/scryfall");
 jest.mock("framebus");
 
@@ -411,7 +409,7 @@ describe("Scryfall Search", () => {
 
   describe("run", () => {
     it("fetches the deck data", async () => {
-      mocked(getDeck).mockResolvedValue(makeFakeDeck());
+      jest.mocked(getDeck).mockResolvedValue(makeFakeDeck());
 
       const ss = new ScryfallSearch();
 
@@ -517,8 +515,8 @@ describe("Scryfall Search", () => {
         restrictFunnyCards: false,
       };
 
-      searchSpy = mocked(search as jest.Mock).mockResolvedValue([]);
-      getDeckSpy = mocked(getDeck).mockResolvedValue(makeFakeDeck());
+      searchSpy = jest.mocked(search as jest.Mock).mockResolvedValue([]);
+      getDeckSpy = jest.mocked(getDeck).mockResolvedValue(makeFakeDeck());
       jest.spyOn(ss, "addCards").mockImplementation();
       jest.spyOn(ss, "addWarnings").mockImplementation();
     });
@@ -906,9 +904,9 @@ describe("Scryfall Search", () => {
           query: "query",
         },
       ];
-      mocked(getDeck).mockResolvedValue(
-        makeFakeDeck({ id: "deck-with-saved-searches" })
-      );
+      jest
+        .mocked(getDeck)
+        .mockResolvedValue(makeFakeDeck({ id: "deck-with-saved-searches" }));
       jest.spyOn(ScryfallSearch, "getData").mockResolvedValue(data);
 
       const ss = new ScryfallSearch();
@@ -923,7 +921,7 @@ describe("Scryfall Search", () => {
     });
 
     it("provides empty array when no data is present", async () => {
-      mocked(getDeck).mockResolvedValue(makeFakeDeck());
+      jest.mocked(getDeck).mockResolvedValue(makeFakeDeck());
       // @ts-ignore
       jest.spyOn(ScryfallSearch, "getData").mockResolvedValue(null);
 
@@ -939,9 +937,9 @@ describe("Scryfall Search", () => {
     it("saves searches", async () => {
       const ss = new ScryfallSearch();
 
-      mocked(getDeck).mockResolvedValue(
-        makeFakeDeck({ id: "deck-with-saved-searches" })
-      );
+      jest
+        .mocked(getDeck)
+        .mockResolvedValue(makeFakeDeck({ id: "deck-with-saved-searches" }));
       ss.savedSearches = [
         {
           name: "name",

@@ -2,8 +2,6 @@ import CardSearchLinks from "Features/card-page-features/card-search-links";
 import { ready } from "Lib/mutation";
 
 import SpyInstance = jest.SpyInstance;
-import { mocked } from "ts-jest/utils";
-
 jest.mock("Lib/mutation");
 
 describe("CardSearchLinks", () => {
@@ -58,7 +56,7 @@ describe("CardSearchLinks", () => {
       expect(csl.decorateTypeLine).toBeCalledTimes(1);
       expect(csl.decorateTypeLine).toBeCalledWith(false);
 
-      mocked(csl.decorateTypeLine).mockReset();
+      jest.mocked(csl.decorateTypeLine).mockReset();
 
       settingsSpy.mockResolvedValue({
         typeline: true,
@@ -97,7 +95,7 @@ describe("CardSearchLinks", () => {
     beforeEach(() => {
       container = document.createElement("div");
       container.textContent = "Legendary Creature — Druid Advisor";
-      mocked(ready).mockImplementation((selector, cb) => {
+      jest.mocked(ready).mockImplementation((selector, cb) => {
         cb(container);
       });
     });
@@ -187,7 +185,7 @@ describe("CardSearchLinks", () => {
       container.appendChild(abbr3);
       container.appendChild(abbrG);
 
-      mocked(ready).mockImplementation((selector, cb) => {
+      jest.mocked(ready).mockImplementation((selector, cb) => {
         cb(container);
       });
     });

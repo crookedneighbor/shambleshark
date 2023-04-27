@@ -2,8 +2,6 @@ import { ready } from "Lib/mutation";
 import CardTooltip from "Ui/card-tooltip";
 import noop from "Lib/noop";
 
-import { mocked } from "ts-jest/utils";
-
 jest.mock("Lib/mutation");
 
 describe("CardTooltip", () => {
@@ -22,7 +20,7 @@ describe("CardTooltip", () => {
 
     beforeEach(() => {
       fakeElement = document.createElement("div");
-      mocked(ready).mockImplementation((selector, cb) => {
+      jest.mocked(ready).mockImplementation((selector, cb) => {
         cb(fakeElement);
       });
       tooltip = new CardTooltip();
@@ -44,7 +42,7 @@ describe("CardTooltip", () => {
       tooltip.findTooltip();
 
       expect(ready).toBeCalledTimes(1);
-      mocked(ready).mockClear();
+      jest.mocked(ready).mockClear();
 
       tooltip.findTooltip();
 

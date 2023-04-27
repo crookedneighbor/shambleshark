@@ -3,8 +3,6 @@ import nicknames from "Lib/card-nicknames";
 import { ready } from "Lib/mutation";
 
 import SpyInstance = jest.SpyInstance;
-import { mocked } from "ts-jest/utils";
-
 jest.mock("Lib/mutation");
 
 describe("CardNicknameDisplay", () => {
@@ -20,7 +18,7 @@ describe("CardNicknameDisplay", () => {
         .mockResolvedValue({
           location: "sidebar",
         });
-      mocked(ready).mockImplementation((selector, cb) => {
+      jest.mocked(ready).mockImplementation((selector, cb) => {
         cb(container);
       });
       taggerButton = document.createElement("a");

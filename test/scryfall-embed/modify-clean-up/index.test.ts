@@ -13,7 +13,6 @@ import {
 import { Deck } from "Js/types/deck";
 import { generateScryfallGlobal } from "../../mocks/scryfall-global";
 
-import { mocked } from "ts-jest/utils";
 import { makeFakeDeck, makeFakeCard } from "Helpers/fake";
 
 jest.mock("framebus");
@@ -570,7 +569,7 @@ describe("modifyCleanUp", () => {
       jest.spyOn(window.Scryfall.deckbuilder.entries.maybeboard, "sort");
 
       // TODO better way to mock this?
-      mocked(Framebus.prototype.on).mockImplementation((eventName, cb) => {
+      jest.mocked(Framebus.prototype.on).mockImplementation((eventName, cb) => {
         if (cb) {
           cb({}, jest.fn());
         }
@@ -631,7 +630,7 @@ describe("modifyCleanUp", () => {
 
     it("inserts headings when deck entries update", () => {
       // TODO better way to mock this?
-      mocked(Framebus.prototype.on).mockImplementation((eventName, cb) => {
+      jest.mocked(Framebus.prototype.on).mockImplementation((eventName, cb) => {
         if (cb) {
           cb({}, jest.fn());
         }
@@ -649,7 +648,7 @@ describe("modifyCleanUp", () => {
 
     it("does not insert headings when not configured", () => {
       // TODO better way to mock this?
-      mocked(Framebus.prototype.on).mockImplementation((eventName, cb) => {
+      jest.mocked(Framebus.prototype.on).mockImplementation((eventName, cb) => {
         if (cb) {
           cb({}, jest.fn());
         }
