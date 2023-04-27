@@ -78,7 +78,7 @@ class CardNicknameDisplay extends Feature {
   private addToPage(
     element: HTMLElement,
     choice: string,
-    result: typeof nicknames[0]
+    result: (typeof nicknames)[0]
   ): void {
     switch (choice) {
       case "flavor-name":
