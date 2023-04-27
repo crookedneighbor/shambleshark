@@ -141,9 +141,6 @@ function updateTotalsInHeadings(totalCount: number): void {
 function updateSubTotalsInHeadings(section: string, sortChoice: string): void {
   const totalsForSection = calculateTotalsForSection(section, sortChoice);
 
-  console.log(section);
-  console.log(totalsForSection);
-
   Object.keys(totalsForSection).forEach((area) => {
     const el = document.querySelector<HTMLElement>(
       `[data-heading-section-id="${area}"] .modify-cleanup-subtotal-count`
@@ -235,8 +232,6 @@ export function insertHeadings(sortChoice: string, headings: Headings): void {
         return;
       }
       const totalsForSection = calculateTotalsForSection(section, sortChoice);
-
-      console.log(totalsForSection);
 
       resetPreviousHeadings(headings, section);
 
