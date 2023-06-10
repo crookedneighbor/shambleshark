@@ -25,8 +25,8 @@ export function sortByAttribute<T extends object>(attributes: (keyof T)[]) {
       }
 
       if (typeof aValue === "string" && typeof bValue === "string") {
-        aValue = aValue.toUpperCase();
-        bValue = bValue.toUpperCase();
+        aValue = String(aValue).toUpperCase();
+        bValue = String(bValue).toUpperCase();
       }
 
       if (aValue < bValue) {
